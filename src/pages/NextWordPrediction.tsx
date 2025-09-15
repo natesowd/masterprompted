@@ -149,9 +149,10 @@ export default function NextWordPrediction() {
             </p>
             
             <div className="flex items-center justify-between">
+              <div className="flex-1"></div>
               <span className="text-white/70 text-sm font-medium">1 / 7</span>
               
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-1 justify-end">
                 <Button
                   onClick={closePopup}
                   variant="outline"
