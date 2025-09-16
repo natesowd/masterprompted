@@ -8,7 +8,7 @@ const evaluationCriteria = [
     id: "factual-accuracy",
     label: "Factual Accuracy",
     icon: CheckCircle,
-    description: "Evaluates whether the information presented is correct, verifiable, and based on reliable sources. This includes checking facts, statistics, quotes, and claims against credible references."
+    description: "Factual accuracy in an LLM output ensures that information provided is correct and aligns with real-world knowledge, which is crucial for reliable, trustworthy results. A part of this are hallucinations, when the AI generates information that appears plausible but is factually incorrect or entirely fabricated; often because it extrapolates from incorrect training data, lacks real-world context, or misunderstands the user's query."
   },
   {
     id: "relevance", 
