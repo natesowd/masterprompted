@@ -1,20 +1,50 @@
+import { Paperclip } from "lucide-react";
 import Header from "@/components/Header";
+import { Card, CardContent } from "@/components/ui/card";
+import EvaluationPanel from "@/components/EvaluationPanel";
+import Chatbox from "@/components/ChatBox";
 
 const PromptPlayground = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="container mx-auto px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-foreground mb-6">
-            Prompt Playground
-          </h1>
-          
-          <div className="bg-card rounded-lg border p-8">
-            <p className="text-muted-foreground text-lg">
-              This is the Prompt Playground page. Content will be added here soon.
-            </p>
+
+      <main className="container mx-auto px-4 pt-24 pb-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Two-column layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left column - Main content */}
+            <div className="lg:col-span-8">
+              {/* Original Prompt */}
+              {/* <Card className="bg-gray-200 border-none rounded-2xl mb-8">
+                <CardContent className="p-6">
+                  <p className="text-gray-800 text-lg leading-relaxed mb-4">
+                    Write a headline for a long form journalistic article about ai ethics agreement reached across the eu
+                  </p>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Paperclip className="h-4 w-4" />
+                    <span className="text-sm">EU_AI_Act.pdf</span>
+                  </div>
+                </CardContent>
+              </Card> */}
+              <Chatbox canType={true} />
+
+              {/* AI Response */}
+              <div className="space-y-6">
+                <p className="text-gray-700 text-lg">
+                  Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
+                </p>
+
+                <h1 className="text-2xl text-gray-900 leading-tight font-normal md:text-4xl">
+                  European Union Unites on Historic AI Ethics Framework, Charting Path for Responsible Technology Development
+                </h1>
+              </div>
+            </div>
+
+            {/* Right column - Evaluation panel */}
+            <div className="lg:col-span-4">
+              <EvaluationPanel />
+            </div>
           </div>
         </div>
       </main>
