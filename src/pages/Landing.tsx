@@ -38,7 +38,7 @@ const Landing = () => {
               </h1>
               
               <p className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-                A hands-on exploration for journalists to explore how large language models function, their strengths and limitations, and how to use them responsibly.
+                A hands-on exploration and practice for journalists to observe how large language models function, their limitations, and how to use them for more trustworthy content production.
               </p>
             </div>
             
