@@ -1,12 +1,19 @@
-import React from 'react';
-import { Dialog, DialogClose, DialogFooter, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
-interface DialogPopupProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  description: string;
+interface UncontrolledPopupProps {
+  isOpen?: boolean;
+  title?: string;
+  description?: string;
   primaryAction?: {
     label: string;
     onClick: () => void;
@@ -17,23 +24,21 @@ interface DialogPopupProps {
   };
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = ({
-  isOpen,
-  onClose,
+const UncontrolledPopup: React.FC<UncontrolledPopupProps> = ({
+  isOpen = true,
   title,
   description,
   primaryAction,
   secondaryAction,
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog defaultOpen={isOpen}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold text-foreground">
-              {title}
-            </DialogTitle>
-          </div>
+          <DialogTitle className="text-xl font-semibold text-foreground">
+            {title}
+          </DialogTitle>
+          <DialogClose />
         </DialogHeader>
         <div className="space-y-6">
           <p className="text-muted-foreground leading-relaxed">
@@ -61,7 +66,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default DialogPopup;
+export default UncontrolledPopup;

@@ -3,12 +3,12 @@ import Header from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import Chatbox from "@/components/ChatBox";
+import ControlledPopup from "@/components/ControlledPopup";
 
 const PromptPlayground = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-7xl mx-auto">
           {/* Two-column layout */}
