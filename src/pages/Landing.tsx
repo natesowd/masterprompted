@@ -53,7 +53,7 @@ const Landing = () => {
               <div className="flex justify-center">
                 <Button 
                   onClick={handleWatchTrailer}
-                  className="bg-white text-black hover:bg-white/90 px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-3"
+                  className="bg-white text-black hover:bg-white/90 px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-3 h-20"
                 >
                   <img src="/play_circle.png" alt="Play" className="w-6 h-6" />
                   Watch Trailer
