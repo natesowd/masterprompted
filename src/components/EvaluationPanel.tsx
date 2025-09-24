@@ -20,7 +20,7 @@ const evaluationCriteria = [
     id: "voice",
     label: "Voice", 
     icon: Mic,
-    description: "Examines the tone, style, and personality conveyed through the writing. This includes consistency in language choice, formality level, and overall communication approach."
+    description: "Voice refers to the tone, style, or 'personality' conveyed in the response, which can be shaped by specifying so in the prompt. When the voice of a prompt is human-like, LLM outputs are made to seem more plausible and knowledgeable, effectively disguising other aspects discussed."
   },
   {
     id: "bias",
