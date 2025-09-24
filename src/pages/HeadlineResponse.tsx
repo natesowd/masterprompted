@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import Chatbox from "@/components/ChatBox";
+import SentPrompt from "@/components/SentPrompt";
 import { PopoverSeries } from "@/components/PopoverSeries";
 export default function HeadlineResponse() {
   // Define popover steps for the journalistic evaluation tour
@@ -46,8 +46,7 @@ export default function HeadlineResponse() {
             <div className="lg:col-span-8">
               {/* Original Prompt */}
               <div className="mb-8">
-                <Chatbox 
-                  canType={false} 
+                <SentPrompt 
                   text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" 
                   fileName="EU_AI_Act.pdf"
                 />
