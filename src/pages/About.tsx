@@ -48,7 +48,7 @@ const About = () => {
         /> */}
         {/* <UncontrolledPopup isOpen={false}/> */}
         
-          <PopoverSeries steps={steps} />
+          {/* <PopoverSeries steps={steps} /> */}
       </main>
     </div>
   );

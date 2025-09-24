@@ -96,7 +96,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
       {/* 1. Render the mask/hole */}
       {isOpen && rect && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40 pointer-events-none" />
+          <div className="fixed inset-0 bg-black/0 z-40 pointer-events-none" />
           <div
             className="fixed z-40 pointer-events-none"
             style={{
