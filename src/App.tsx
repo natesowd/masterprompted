@@ -12,6 +12,7 @@ import NextWordPrediction from "./pages/NextWordPrediction";
 import HeadlineResponse from "./pages/HeadlineResponse";
 import PromptConstruction from "./pages/PromptConstruction";
 import Specificity from "./pages/Specificity";
+import SpecificityResponse from "./pages/SpecificityResponse";
 
 import ConversationStyle from "./pages/ConversationStyle";
 import Context from "./pages/Context";
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/module/headline-response" element={<HeadlineResponse />} />
           <Route path="/module/prompt-construction" element={<PromptConstruction />} />
           <Route path="/module/prompt-construction/specificity" element={<Specificity />} />
+          <Route path="/module/prompt-construction/specificity/response" element={<SpecificityResponse />} />
           
           <Route path="/module/prompt-construction/conversation-style" element={<ConversationStyle />} />
           <Route path="/module/prompt-construction/context" element={<Context />} />
