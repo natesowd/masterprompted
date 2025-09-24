@@ -37,7 +37,7 @@ const FakeTrigger = forwardRef<HTMLDivElement, { rect: DOMRect | null }>(({ rect
 
 export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeriesProps) {
   const [currentStep, setCurrentStep] = useState<number | null>(initialStep)
-  const [rect, setRect] = useState<(DOMRect & { borderRadius?: string }) | null>(null)
+  const [rect, setRect] = useState<DOMRect | null>(null)
 
   // The triggerRefs array is now entirely unnecessary and removed for simplicity.
 
@@ -62,15 +62,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
         // Find the element in the DOM
         const el = document.querySelector<HTMLElement>(selector);
         if (el) {
-          const rect = el.getBoundingClientRect();
-          // Get computed styles to check for border radius
-          const computedStyles = window.getComputedStyle(el);
-          const borderRadius = computedStyles.borderRadius || '0px';
-          
-          setRect({
-            ...rect,
-            borderRadius
-          } as DOMRect & { borderRadius: string });
+          setRect(el.getBoundingClientRect());
         } else {
           console.warn(`PopoverSeries could not find element with selector: ${selector}`);
           setRect(null);
@@ -97,23 +89,16 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
     <>
       {/* 1. Render the mask/hole */}
       {isOpen && rect && (
-        <>
-          {/* Overlay with cutout */}
-          <div className="fixed inset-0 bg-black/50 z-40 pointer-events-none" />
-          {/* Highlighted element area */}
-          <div
-            className="fixed z-40 pointer-events-none"
-            style={{
-              left: rect.left - 8,
-              top: rect.top - 8,
-              width: rect.width + 16,
-              height: rect.height + 16,
-              borderRadius: rect.borderRadius || '8px',
-              boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
-              background: 'transparent',
-            }}
-          />
-        </>
+        <div
+          className="fixed inset-0 bg-black/50 z-40 pointer-events-none"
+          style={{
+            // punch a transparent hole using mask
+            WebkitMask: `radial-gradient(circle at ${rect.left + rect.width / 2}px ${rect.top + rect.height / 2
+              }px, transparent ${Math.max(rect.width, rect.height) / 2 + 4}px, black ${Math.max(rect.width, rect.height) / 2 + 12}px)`,
+            WebkitMaskComposite: "destination-out",
+            maskComposite: "exclude",
+          }}
+        />
       )}
 
       {/* 2. Render the actual Popover for the current step */}
