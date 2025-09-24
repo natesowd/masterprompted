@@ -56,6 +56,7 @@ export default function EvaluationPanel() {
             key={criterion.id} 
             open={openItem === criterion.id}
             onOpenChange={() => toggleItem(criterion.id)}
+            data-criterion-id={criterion.id}
           >
             <CollapsibleTrigger className="w-full">
               <div className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
