@@ -31,11 +31,6 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
 
   const moduleItems = [
     { 
-      title: "About Simulator", 
-      path: "/module/about-simulator",
-      completed: false
-    },
-    { 
       title: "Introduction", 
       path: "/module/introduction",
       completed: false
