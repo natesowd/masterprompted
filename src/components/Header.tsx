@@ -136,9 +136,9 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
                       <div className="absolute left-0 top-1 bottom-1 w-1 bg-primary rounded-r" />
                     )}
                     
-                    {/* Checkmark for completed modules */}
+                    {/* Checkmark for active or completed modules */}
                     <div className="w-5 h-5 flex items-center justify-center">
-                      {item.completed && (
+                      {(item.completed || isActive(item.path)) && (
                         <Check className="h-4 w-4 text-primary" />
                       )}
                     </div>
