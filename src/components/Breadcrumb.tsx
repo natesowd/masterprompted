@@ -1,4 +1,4 @@
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const breadcrumbMap: Record<string, string> = {
@@ -72,7 +72,6 @@ export default function Breadcrumb() {
               to={item.label === "Guided Simulation" ? "/module/introduction" : item.path}
               className="hover:text-gray-900 transition-colors"
             >
-              {index === 0 && <Home className="h-4 w-4 inline mr-1" />}
               {item.label}
             </Link>
           )}
