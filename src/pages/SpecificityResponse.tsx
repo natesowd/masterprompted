@@ -4,8 +4,8 @@ import Header from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronDown, Paperclip } from "lucide-react";
+import { Paperclip } from "lucide-react";
+import EvaluationPanel from "@/components/EvaluationPanel";
 
 export default function SpecificityResponse() {
   const navigate = useNavigate();
@@ -137,101 +137,8 @@ export default function SpecificityResponse() {
           </div>
 
           {/* Right Sidebar - Journalistic Evaluation */}
-          <div className="w-64 flex-shrink-0">
-            <Card className="bg-white border border-gray-200 rounded-lg">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Journalistic Evaluation</h3>
-                
-                <div className="space-y-3">
-                  <div>
-                    <Select>
-                      <SelectTrigger className="w-full">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">📊</span>
-                          <SelectValue placeholder="Factual Accuracy" />
-                        </div>
-                        <ChevronDown className="h-4 w-4" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Select>
-                      <SelectTrigger className="w-full">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">🎯</span>
-                          <SelectValue placeholder="Relevance" />
-                        </div>
-                        <ChevronDown className="h-4 w-4" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Select>
-                      <SelectTrigger className="w-full">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">🗣️</span>
-                          <SelectValue placeholder="Voice" />
-                        </div>
-                        <ChevronDown className="h-4 w-4" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="professional">Professional</SelectItem>
-                        <SelectItem value="casual">Casual</SelectItem>
-                        <SelectItem value="formal">Formal</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Select>
-                      <SelectTrigger className="w-full">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">⚖️</span>
-                          <SelectValue placeholder="Bias" />
-                        </div>
-                        <ChevronDown className="h-4 w-4" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="minimal">Minimal</SelectItem>
-                        <SelectItem value="moderate">Moderate</SelectItem>
-                        <SelectItem value="significant">Significant</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Select>
-                      <SelectTrigger className="w-full">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">📝</span>
-                          <SelectValue placeholder="Plagiarism" />
-                        </div>
-                        <ChevronDown className="h-4 w-4" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None Detected</SelectItem>
-                        <SelectItem value="low">Low Risk</SelectItem>
-                        <SelectItem value="medium">Medium Risk</SelectItem>
-                        <SelectItem value="high">High Risk</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="w-80 flex-shrink-0">
+            <EvaluationPanel />
           </div>
         </div>
       </main>
