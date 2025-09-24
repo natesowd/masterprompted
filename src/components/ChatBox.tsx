@@ -4,7 +4,7 @@ import { Paperclip, ArrowUp } from "lucide-react";
 import { forwardRef } from 'react';
 
 // Accept an 'id' prop
-const SubmitButton = forwardRef<HTMLButtonElement, { onClick?: () => void; id?: string }>(({ onClick, id }, ref) => {
+function SubmitButton({ onClick, id }: { onClick?: () => void; id?: string }) {
   return (
     <Button
       id={id}
@@ -12,7 +12,6 @@ const SubmitButton = forwardRef<HTMLButtonElement, { onClick?: () => void; id?: 
       variant="secondary"
       size="icon"
       className="absolute top-4 right-4 rounded-full p-3 h-10 w-10"
-      ref={ref}
       style={{
         background: '#1F1F1F',
         border: 'none'
@@ -21,7 +20,7 @@ const SubmitButton = forwardRef<HTMLButtonElement, { onClick?: () => void; id?: 
       <ArrowUp className="h-5 w-5 text-white" />
     </Button>
   );
-});
+};
 
 function UploadFile({ onClick, fileName }: { onClick?: () => void; fileName?: string }) {
   return (
