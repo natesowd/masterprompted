@@ -7,35 +7,35 @@ import { forwardRef } from 'react';
 const SubmitButton = forwardRef<HTMLButtonElement, { onClick?: () => void; id?: string }>(({ onClick, id }, ref) => {
   return (
     <Button
-      id={id} // Apply the id here
+      id={id}
       onClick={onClick}
       variant="secondary"
       size="icon"
-      className="absolute top-2 right-2 rounded-full p-3 ml-4"
+      className="absolute top-4 right-4 rounded-full p-3 h-10 w-10"
       ref={ref}
       style={{
-        background: '#64DB96',
+        background: '#1F1F1F',
         border: 'none'
       }}
     >
-      <ArrowUp className="h-5 w-5 text-black" />
+      <ArrowUp className="h-5 w-5 text-white" />
     </Button>
   );
 });
 
 function UploadFile({ onClick, fileName }: { onClick?: () => void; fileName?: string }) {
   return (
-    <div className="absolute bottom-0 left-0 flex items-center gap-0">
+    <div className="flex items-center gap-2 mt-4">
       <Button
         variant="ghost"
         size="icon"
-        className="rounded-full"
+        className="rounded-full p-1 h-6 w-6"
         onClick={onClick}
       >
-        <Paperclip className="h-2 w-2" />
+        <Paperclip className="h-4 w-4 text-gray-600" />
       </Button>
       {fileName && (
-        <span className="text-xs opacity-70 overflow-hidden text-ellipsis max-w-[200px]">
+        <span className="text-sm text-gray-600 overflow-hidden text-ellipsis max-w-[200px]">
           {fileName}
         </span>
       )}
@@ -56,36 +56,30 @@ type ChatboxProps = {
 const Chatbox = ({ canType = true, text = "", onSubmit, onUpload, fileName, submitButtonId }: ChatboxProps) => {
   return (
     <div 
-      className="relative"
+      className="relative mb-8"
       style={{
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        padding: '30px 40px 40px',
-        gap: '20px',
-        isolation: 'isolate',
         background: '#FFFFFF',
-        border: '1px solid #C5C5C5',
-        boxShadow: '0px 6px 15px rgba(62, 62, 62, 0.15)',
+        border: '1px solid #E5E5E5',
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
         borderRadius: '20px',
-        marginBottom: '32px'
+        padding: '24px',
+        maxWidth: '100%'
       }}
     >
       <Textarea
         placeholder="Type your message here..."
-        className="pr-12 pb-10 border-none bg-transparent resize-none focus-visible:ring-0 focus-visible:ring-offset-0 text-lg pl-10"
+        className="border-none bg-transparent resize-none focus-visible:ring-0 focus-visible:ring-offset-0 p-0 min-h-[60px]"
         disabled={!canType}
         defaultValue={text}
         style={{
           fontFamily: 'Manrope',
-          fontSize: '18px',
-          lineHeight: '28px',
+          fontSize: '16px',
+          lineHeight: '24px',
           color: '#1F1F1F'
         }}
       />
-      {/* Pass the ID to the SubmitButton */}
-      <SubmitButton onClick={onSubmit} id={submitButtonId} /> 
+      
+      <SubmitButton onClick={onSubmit} id={submitButtonId} />
       <UploadFile onClick={onUpload} fileName={fileName} />
     </div>
   );
