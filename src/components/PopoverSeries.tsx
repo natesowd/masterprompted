@@ -38,6 +38,7 @@ const FakeTrigger = forwardRef<HTMLDivElement, { rect: DOMRect | null }>(({ rect
 export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeriesProps) {
   const [currentStep, setCurrentStep] = useState<number | null>(initialStep)
   const [rect, setRect] = useState<DOMRect | null>(null)
+  const [borderRadius, setBorderRadius] = useState<string>('0px')
 
   // The triggerRefs array is now entirely unnecessary and removed for simplicity.
 
@@ -63,13 +64,18 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
         const el = document.querySelector<HTMLElement>(selector);
         if (el) {
           setRect(el.getBoundingClientRect());
+          // Get the computed border-radius of the element
+          const computedStyle = window.getComputedStyle(el);
+          setBorderRadius(computedStyle.borderRadius || '0px');
         } else {
           console.warn(`PopoverSeries could not find element with selector: ${selector}`);
           setRect(null);
+          setBorderRadius('0px');
         }
       }
     } else {
       setRect(null);
+      setBorderRadius('0px');
     }
   }, [currentStep, steps]); // Dependencies are correct
 
@@ -89,16 +95,21 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
     <>
       {/* 1. Render the mask/hole */}
       {isOpen && rect && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 pointer-events-none"
-          style={{
-            // punch a transparent hole using mask
-            WebkitMask: `radial-gradient(circle at ${rect.left + rect.width / 2}px ${rect.top + rect.height / 2
-              }px, transparent ${Math.max(rect.width, rect.height) / 2 + 4}px, black ${Math.max(rect.width, rect.height) / 2 + 12}px)`,
-            WebkitMaskComposite: "destination-out",
-            maskComposite: "exclude",
-          }}
-        />
+        <>
+          <div className="fixed inset-0 bg-black/50 z-40 pointer-events-none" />
+          <div
+            className="fixed z-40 pointer-events-none"
+            style={{
+              left: rect.left - 8,
+              top: rect.top - 8,
+              width: rect.width + 16,
+              height: rect.height + 16,
+              background: 'transparent',
+              borderRadius: borderRadius,
+              boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
+            }}
+          />
+        </>
       )}
 
       {/* 2. Render the actual Popover for the current step */}
