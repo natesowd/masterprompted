@@ -69,7 +69,7 @@ export default function Breadcrumb() {
             <span className="text-gray-900 font-medium">{item.label}</span>
           ) : (
             <Link 
-              to={item.path} 
+              to={item.label === "Guided Simulation" ? "/module/introduction" : item.path}
               className="hover:text-gray-900 transition-colors"
             >
               {index === 0 && <Home className="h-4 w-4 inline mr-1" />}
