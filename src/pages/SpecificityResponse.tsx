@@ -37,7 +37,7 @@ export default function SpecificityResponse() {
                     <div className="relative">
                       {/* Tooltip */}
                       {showTooltip && (
-                        <div className="absolute -top-2 -right-4 z-10">
+                        <div className="absolute top-8 -right-56 z-10">
                           <div 
                             className="bg-emerald-600 text-white p-3 rounded-lg shadow-lg text-sm w-48"
                             style={{
@@ -58,9 +58,9 @@ export default function SpecificityResponse() {
                                 Close
                               </Button>
                             </div>
-                            {/* Arrow pointing down to "Specific" button */}
-                            <div className="absolute -bottom-1 left-32">
-                              <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-emerald-600"></div>
+                            {/* Arrow pointing left to "Specific" button */}
+                            <div className="absolute top-1/2 -left-1 transform -translate-y-1/2">
+                              <div className="w-0 h-0 border-t-4 border-b-4 border-r-4 border-t-transparent border-b-transparent border-r-emerald-600"></div>
                             </div>
                           </div>
                         </div>
