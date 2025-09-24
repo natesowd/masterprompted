@@ -37,14 +37,10 @@ const evaluationCriteria = [
 ];
 
 export default function EvaluationPanel() {
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  const [openItem, setOpenItem] = useState<string | null>(null);
 
   const toggleItem = (id: string) => {
-    setOpenItems(prev => 
-      prev.includes(id) 
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
-    );
+    setOpenItem(prev => prev === id ? null : id);
   };
 
   return (
@@ -58,7 +54,7 @@ export default function EvaluationPanel() {
         {evaluationCriteria.map((criterion) => (
           <Collapsible 
             key={criterion.id} 
-            open={openItems.includes(criterion.id)}
+            open={openItem === criterion.id}
             onOpenChange={() => toggleItem(criterion.id)}
           >
             <CollapsibleTrigger className="w-full">
@@ -69,7 +65,7 @@ export default function EvaluationPanel() {
                 </div>
                 <ChevronDown 
                   className={`h-4 w-4 text-gray-500 transition-transform ${
-                    openItems.includes(criterion.id) ? 'rotate-180' : ''
+                    openItem === criterion.id ? 'rotate-180' : ''
                   }`}
                 />
               </div>
