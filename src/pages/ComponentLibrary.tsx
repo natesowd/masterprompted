@@ -116,11 +116,11 @@ const ComponentLibrary = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Dialog Components</CardTitle>
-                  <CardDescription>Modal dialog examples</CardDescription>
+                  <CardDescription>Modal dialog examples (click buttons to open)</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <ControlledDialog />
-                  <UncontrolledDialog />
+                  <Button variant="outline">Open Controlled Dialog</Button>
+                  <Button variant="outline">Open Uncontrolled Dialog</Button>
                 </CardContent>
               </Card>
             </div>
