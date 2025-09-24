@@ -74,6 +74,6 @@ export default function HeadlineResponse() {
       </main>
       
       {/* PopoverSeries for evaluation tour */}
-      <PopoverSeries steps={popoverSteps} />
+      {/* <PopoverSeries steps={popoverSteps} /> */}
     </div>;
 }
