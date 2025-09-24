@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Modules from "./pages/Modules";
 import Introduction from "./pages/Introduction";
+import AboutSimulator from "./pages/AboutSimulator";
 import JournalisticEvaluation from "./pages/JournalisticEvaluation";
 import NextWordPrediction from "./pages/NextWordPrediction";
 import HeadlineResponse from "./pages/HeadlineResponse";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/help" element={<Help />} />
           <Route path="/imprint" element={<Imprint />} />
           <Route path="/module/introduction" element={<Introduction />} />
+          <Route path="/module/about-simulator" element={<AboutSimulator />} />
           <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
           <Route path="/module/next-word-prediction" element={<NextWordPrediction />} />
           <Route path="/module/headline-response" element={<HeadlineResponse />} />
