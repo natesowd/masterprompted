@@ -63,6 +63,9 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
   ];
 
   const isActive = (path: string) => {
+    if (path === "/module/introduction") {
+      return location.pathname === path || location.pathname === "/module/about-simulator";
+    }
     return location.pathname === path;
   };
 
