@@ -2,146 +2,69 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Paperclip, ArrowUp, X } from "lucide-react";
 import Header from "@/components/Header";
-import Breadcrumb from "@/components/Breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import Chatbox from "@/components/ChatBox";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export default function NextWordPrediction() {
+  const submitButtonRef = useRef(null);
+  const [popoverSteps, setPopoverSteps] = useState([]); // State to hold steps
   const navigate = useNavigate();
-  const [clickCount, setClickCount] = useState(0);
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-  const arrowButtonRef = useRef<HTMLButtonElement>(null);
-
-  const calculatePopupPosition = () => {
-    if (arrowButtonRef.current) {
-      const rect = arrowButtonRef.current.getBoundingClientRect();
-      setPopupPosition({
-        top: rect.bottom + 20, // 20px below the button
-        left: rect.left + rect.width / 2 - 112 // Center popup on button (224px popup width / 2 = 112px)
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (showPopup) {
-      calculatePopupPosition();
-      window.addEventListener('resize', calculatePopupPosition);
-      return () => window.removeEventListener('resize', calculatePopupPosition);
-    }
-  }, [showPopup]);
-
-  const handlePageClick = (e: React.MouseEvent) => {
-    // Don't count clicks on the arrow button
-    if ((e.target as HTMLElement).closest('.arrow-button')) {
-      return;
-    }
-    
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-    
-    if (newCount > 1) {
-      setShowPopup(true);
-    }
-  };
 
   const handleSubmit = () => {
-    // Navigate to the headline response page
     navigate("/module/headline-response");
   };
 
-  const closePopup = () => {
-    setShowPopup(false);
-    // Just close the popup and stay on the current page
-  };
+  // 1. Use useEffect to detect when the ref is attached and trigger a re-render.
+  useEffect(() => {
+    // Check if the ref has a value (i.e., the button has rendered)
+    if (submitButtonRef.current) {
+        console.log("Ref is now attached! Updating steps state.");
+        
+        // Define steps using the attached ref value
+        const initialSteps = [
+            {
+                id: "step1",
+                trigger: submitButtonRef.current, // Use the current value of the ref
+                content: (
+                    <p className="text-sm leading-relaxed">
+                    Could you share the specifics or background for the message you want to convey? 
+                    This will help me assist you better.
+                    </p>
+                )
+            }
+        ];
+        
+        // 2. Update the state, which triggers a re-render and causes PopoverSeries to render
+        setPopoverSteps(initialSteps);
+    }
+  }, []); // Empty dependency array: runs once after the initial render
 
-  const handlePopupClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the page click handler
-  };
+  // console.log("Current steps length:", popoverSteps.length); // You can debug here
 
   return (
-    <div className="min-h-screen bg-background" onClick={handlePageClick}>
+    <div className="min-h-screen bg-background">
       <Header />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <Breadcrumb />
+        <Breadcrumb/>
         <div className="max-w-2xl mx-auto relative min-h-[600px]">
           <Chatbox 
             canType={false} 
             text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" 
             fileName="EU_AI_Act.pdf"
+            ref={submitButtonRef} // Ref is passed and attached to the DOM element
             onSubmit={handleSubmit}
           />
         </div>
+        
+        {/* 3. Conditional Rendering: Only render PopoverSeries if steps are available */}
+        {popoverSteps.length > 0 && (
+            <PopoverSeries steps={popoverSteps} /> 
+        )}
       </main>
-
-      {/* Popup Modal */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={closePopup}>
-          <div 
-            className="bg-teal-700 text-white rounded-2xl p-6 max-w-sm relative"
-            onClick={handlePopupClick}
-            style={{
-              position: 'fixed',
-              top: `${popupPosition.top}px`,
-              left: `${popupPosition.left}px`
-            }}
-          >
-            {/* Pointer pointing to arrow button */}
-            <div 
-              className="absolute"
-              style={{
-                top: '-10px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '0',
-                height: '0',
-                borderLeft: '10px solid transparent',
-                borderRight: '10px solid transparent',
-                borderBottom: '10px solid #0F766E'
-              }}
-            ></div>
-            
-            <div className="flex justify-between items-start mb-4">
-              <Button
-                onClick={closePopup}
-                variant="ghost"
-                size="sm"
-                className="text-white hover:bg-teal-600 p-1 -mt-1 -mr-1"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            
-            <p className="text-white/90 text-sm leading-relaxed mb-6">
-              Could you share the specifics or background for the message you want to convey? This will help me assist you better.
-            </p>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex-1"></div>
-              <span className="pagination-indicator text-white/70 text-sm font-medium mr-[10px]">1 / 7</span>
-              
-              <div className="flex gap-3 flex-1 justify-end">
-                <Button
-                  onClick={closePopup}
-                  variant="outline"
-                  className="bg-transparent border-white/30 text-white hover:bg-white/10 px-4 py-2"
-                >
-                  Previous
-                </Button>
-                <Button
-                  onClick={closePopup}
-                  className="bg-white text-teal-700 hover:bg-gray-100 px-6 py-2"
-                >
-                  Continue
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

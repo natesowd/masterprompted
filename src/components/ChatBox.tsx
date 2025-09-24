@@ -59,7 +59,6 @@ const Chatbox = forwardRef<HTMLButtonElement, ChatboxProps>(({ canType = true, t
     </div>
   );
 
-  console.log("Ref: ", ref);
   return renderTextarea();
 });
 

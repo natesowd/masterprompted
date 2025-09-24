@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, forwardRef } from "react" // Import forwardRef
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 
 type Step = {
   id: string
-  trigger: React.ReactNode
+  // Changed type to HTMLElement | null to accurately reflect the content of the ref
+  trigger: HTMLElement | null
   content: React.ReactNode
 }
 
@@ -15,13 +16,35 @@ interface PopoverSeriesProps {
   onClose?: () => void
 }
 
+// 1. FIX: Wrap FakeTrigger with forwardRef
+// It must accept a ref to satisfy PopoverTrigger asChild, even if we don't use the ref internally.
+// We are explicitly setting the type to accept a ref to an HTMLDivElement.
+const FakeTrigger = forwardRef<HTMLDivElement, { rect: DOMRect | null }>(({ rect }, ref) => {
+    if (!rect) return null; // Defensive check
+
+    return (
+        <div
+            className="absolute z-50 pointer-events-none"
+            style={{
+                width: rect.width,
+                height: rect.height,
+                left: rect.left,
+                top: rect.top,
+            }}
+            ref={ref} // Pass the ref from PopoverTrigger to the div
+        />
+    );
+});
+
 export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeriesProps) {
   const [currentStep, setCurrentStep] = useState<number | null>(initialStep)
   const [rect, setRect] = useState<DOMRect | null>(null)
-  const triggerRefs = useRef<(HTMLElement | null)[]>([])
+  
+  // The triggerRefs array is now entirely unnecessary and removed for simplicity.
 
+  const currentStepData = currentStep !== null ? steps[currentStep] : null;
   const isOpen = currentStep !== null
-  // console.log("Current Trigger: ", steps[0].trigger)
+  
   const close = () => {
     setCurrentStep(null)
     onClose?.()
@@ -35,20 +58,31 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
     }
   }
 
-  // Update rect when step changes
+  // 2. FIX: Ensure useEffect correctly tracks dependencies and calculates rect
   useEffect(() => {
+    // This effect now ONLY runs once, when the steps are initially available, or when currentStep changes
     if (currentStep !== null) {
-      const el = triggerRefs.current[currentStep]
+      const el = steps[currentStep]?.trigger 
       if (el) {
         setRect(el.getBoundingClientRect())
+      } else {
+         // If the trigger element is null (e.g., ref not attached yet), wait for next render
+         setRect(null); 
       }
     } else {
       setRect(null)
     }
-  }, [currentStep])
+  }, [currentStep, steps]) // Include currentStep and steps for correctness
+
+  
+  if (!currentStepData || !rect) {
+    // We must return null here to allow the Chatbox ref to attach on the first render
+    return null; 
+  }
 
   return (
     <>
+      {/* 1. Render the mask/hole */}
       {isOpen && rect && (
         <div
           className="fixed inset-0 bg-black/50 z-40 pointer-events-none"
@@ -62,78 +96,74 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
         />
       )}
 
-      {steps.map((step, index) => (
-        <Popover
-          key={step.id}
-          open={currentStep === index}
-          onOpenChange={() => { }}
+      {/* 2. Render the actual Popover for the current step */}
+      <Popover
+        key={currentStepData.id}
+        open={isOpen}
+        onOpenChange={() => {}}
+      >
+        <PopoverTrigger asChild>
+           {/* 3. Use the forwardRef-wrapped FakeTrigger */}
+           <FakeTrigger rect={rect} /> 
+        </PopoverTrigger>
+
+        {/* ... (rest of PopoverContent remains the same, using currentStepData) ... */}
+        <PopoverContent
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="z-50 relative space-y-4"
         >
-          <PopoverTrigger
-            asChild
-            className="z-50 relative"
-            ref={(el: HTMLElement | null) => {
-              triggerRefs.current[index] = el
-            }}
-          >
-            {step.trigger}
-          </PopoverTrigger>
-          <PopoverContent
-            onOpenAutoFocus={(e) => e.preventDefault()}
-            className="z-50 relative space-y-4"
-          >
-            <div className="flex justify-between align-top">
-              <div className="mt-2">{step.content}</div>
+          <div className="flex justify-between align-top">
+            <div className="mt-2">{currentStepData.content}</div>
+            <Button
+              className="absolute top-1 right-1 rounded-full p-2"
+              onClick={close}
+              variant="ghost"
+              size="icon"
+            >
+              <X className="h-4 w-4" /> 
+            </Button>
+          </div>
+          {steps.length > 1 ? (
+            <div className="flex justify-between items-center text-sm text-muted-foreground pt-2 border-t">
+              <div className="ml-4">
+                {currentStep + 1} / {steps.length}
+              </div>
+              <div className="flex justify-between gap-4">
+                <Button
+                  onClick={() => goToStep(currentStep - 1)}
+                  disabled={currentStep === 0}
+                  variant="secondary"
+                >
+                  Previous
+                </Button>
+                {currentStep === steps.length - 1 ?
+                  (
+                    <Button
+                      onClick={() => close()}
+                    >
+                      Done
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => goToStep(currentStep + 1)}
+                      disabled={currentStep === steps.length - 1}
+                    >
+                      Next
+                    </Button>
+                  )}
+              </div>
+            </div>
+          ) :
+            <div className="flex justify-end">
               <Button
-                className="absolute top-1 right-1 rounded-full p-2"
-                onClick={close}
-                variant="ghost"
-                size="icon"
+                onClick={() => close()}
               >
-                <X className="h-1 w-1" />
+                Got it
               </Button>
             </div>
-            {steps.length > 1 ? (
-              <div className="flex justify-between items-center text-sm text-muted-foreground pt-2 border-t">
-                <div className="ml-4">
-                  {index + 1} / {steps.length}
-                </div>
-                <div className="flex justify-between gap-4">
-                  <Button
-                    onClick={() => goToStep(index - 1)}
-                    disabled={index === 0}
-                    variant="secondary"
-                  >
-                    Previous
-                  </Button>
-                  {index === steps.length - 1 ?
-                    (
-                      <Button
-                        onClick={() => close()}
-                      >
-                        Done
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => goToStep(index + 1)}
-                        disabled={index === steps.length - 1}
-                      >
-                        Next
-                      </Button>
-                    )}
-                </div>
-              </div>
-            ) :
-              <div className="flex justify-end">
-                <Button
-                  onClick={() => close()}
-                >
-                  Got it
-                </Button>
-              </div>
-            }
-          </PopoverContent>
-        </Popover>
-      ))}
+          }
+        </PopoverContent>
+      </Popover>
     </>
   )
 }
