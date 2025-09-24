@@ -18,9 +18,9 @@ export default function PromptConstruction() {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-4xl mx-auto flex justify-center items-center min-h-[calc(100vh-200px)]">
           <Card className="w-full max-w-2xl bg-white border border-border shadow-lg">
-            <CardContent className="p-0">
+            <CardContent className="p-8">
               {/* Header with close button */}
-              <div className="flex justify-between items-center p-6 border-b border-border">
+              <div className="flex justify-between items-center mb-8">
                 <div className="text-sm text-muted-foreground">
                   Learning 2: Prompt construction
                 </div>
@@ -35,7 +35,7 @@ export default function PromptConstruction() {
               </div>
 
               {/* Main content */}
-              <div className="flex gap-8 p-8">
+              <div className="flex gap-8">
                 {/* Icon */}
                 <div className="flex-shrink-0">
                   <div className="w-20 h-20 relative">
