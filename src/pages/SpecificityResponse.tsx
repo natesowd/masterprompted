@@ -5,8 +5,8 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Paperclip } from "lucide-react";
 import EvaluationPanel from "@/components/EvaluationPanel";
+import Chatbox from "@/components/ChatBox";
 
 export default function SpecificityResponse() {
   const navigate = useNavigate();
@@ -97,17 +97,13 @@ export default function SpecificityResponse() {
           {/* Main Content */}
           <div className="flex-1">
             {/* Original Prompt Display */}
-            <Card className="bg-gray-50 border border-gray-200 rounded-lg mb-6">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-gray-600 mb-2">
-                  <Paperclip className="h-4 w-4" />
-                  <span className="text-sm">EU_AI_Act.pdf</span>
-                </div>
-                <p className="text-gray-800">
-                  Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems
-                </p>
-              </CardContent>
-            </Card>
+            <div className="mb-6">
+              <Chatbox 
+                canType={false} 
+                text="Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems" 
+                fileName="EU_AI_Act.pdf"
+              />
+            </div>
 
             {/* AI Response */}
             <div className="bg-white rounded-lg p-6">
