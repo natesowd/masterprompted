@@ -93,9 +93,9 @@ export default function SpecificityResponse() {
                     
                     <Button
                       onClick={handleReset}
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
-                      className="w-full"
+                      className="w-full text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                     >
                       Reset
                     </Button>
