@@ -35,23 +35,9 @@ export default function PromptConstruction() {
               </div>
 
               {/* Main content */}
-              <div className="flex gap-8">
-                {/* Icon */}
-                <div className="flex-shrink-0">
-                  <div className="w-20 h-20 relative">
-                    <svg viewBox="0 0 100 100" className="w-full h-full">
-                      {/* Geometric star pattern similar to the design */}
-                      <g fill="#10B981" opacity="0.8">
-                        <polygon points="50,5 61,35 91,35 68,57 79,87 50,70 21,87 32,57 9,35 39,35" />
-                        <polygon points="50,20 56,40 76,40 62,52 68,72 50,62 32,72 38,52 24,40 44,40" fill="#10B981" opacity="0.6" />
-                        <polygon points="50,30 53,45 68,45 57,54 62,69 50,62 38,69 43,54 32,45 47,45" fill="#10B981" opacity="0.4" />
-                      </g>
-                    </svg>
-                  </div>
-                </div>
-
+              <div>
                 {/* Content */}
-                <div className="flex-1">
+                <div>
                   <h2 className="text-2xl font-bold text-foreground mb-4">
                     How does my input affect the quality of the LLM's output?
                   </h2>
