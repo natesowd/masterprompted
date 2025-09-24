@@ -45,7 +45,7 @@ const AboutSimulator = () => {
 
 
               {/* Content section */}
-              <div className="flex-1 flex flex-col justify-center">
+              <div className="flex-1 flex flex-col justify-start pt-4">
                 {/* Main heading */}
                 <h1 className="text-3xl font-bold text-gray-900 leading-tight mb-4">
                   What is a "Guided Simulator"?
