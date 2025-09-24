@@ -35,11 +35,21 @@ export default function Breadcrumb() {
     isLast: false
   });
   
-  // Add path segments
+  // Add path segments, but stop at prompt-construction level
   for (let i = 0; i < pathSegments.length; i++) {
     currentPath += '/' + pathSegments[i];
-    const isLast = i === pathSegments.length - 1;
     
+    // If we're in prompt-construction sub-routes, stop at prompt-construction
+    if (currentPath === '/module/prompt-construction') {
+      breadcrumbItems.push({
+        label: breadcrumbMap[currentPath] || pathSegments[i].charAt(0).toUpperCase() + pathSegments[i].slice(1),
+        path: currentPath,
+        isLast: true
+      });
+      break;
+    }
+    
+    const isLast = i === pathSegments.length - 1;
     const label = breadcrumbMap[currentPath] || pathSegments[i].charAt(0).toUpperCase() + pathSegments[i].slice(1);
     
     breadcrumbItems.push({
