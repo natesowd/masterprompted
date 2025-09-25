@@ -129,14 +129,11 @@ export default function HeadlineResponse() {
                         return (
                           <span key={index}>
                             <span 
-                               className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
+                               className="bg-green-200 text-black px-2 py-1 rounded-lg cursor-pointer hover:bg-green-300 transition-colors duration-200"
                                onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
                                data-word-union
                              >
                                {word}
-                               <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                                 0.73
-                               </span>
                             </span>
                             {index < currentSentence.length - 1 && " "}
                           </span>
@@ -147,14 +144,16 @@ export default function HeadlineResponse() {
                         return (
                           <span key={index}>
                              <span 
-                               className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
+                               className={`${word === "Unites" ? "bg-green-200 text-black px-2 py-1 rounded-lg" : "relative group"} cursor-pointer transition-colors duration-200 hover:bg-green-300`}
                                onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
                                data-word-unites={word === "Unites" ? true : undefined}
                              >
                                {word}
-                               <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                                 {word === "Unites" ? "0.67" : word === "Reaches" ? "0.24" : "0.09"}
-                               </span>
+                               {word !== "Unites" && (
+                                 <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                                   {word === "Reaches" ? "0.24" : "0.09"}
+                                 </span>
+                               )}
                              </span>
                             {index < currentSentence.length - 1 && " "}
                           </span>
