@@ -108,7 +108,7 @@ export default function HeadlineResponse() {
                   
                   {/* Word alternatives popup */}
                   {selectedWord && (
-                    <div className="absolute inset-0 z-10 pointer-events-none" style={{ transform: 'translate(-100px, -50px)' }}>
+                    <div className="absolute inset-0 z-10 pointer-events-none" style={{ transform: 'translate(-100px, -30px)' }}>
                       <div className="relative w-full h-full">
                         {wordAlternatives[selectedWord as keyof typeof wordAlternatives].map((alt, index) => {
                           // Calculate circular positions around the center word
