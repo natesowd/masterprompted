@@ -70,8 +70,20 @@ export default function HeadlineResponse() {
   // Define popover steps for word interaction tour
   const popoverSteps = [
     {
-      id: "word-interaction",
+      id: "word-union",
       trigger: "[data-word-union]",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-semibold text-sm">Interactive Word Selection</h3>
+          <p className="text-sm leading-relaxed">
+            Click on either of these words to select a different word. Try and find the word combination that leads to a factual inaccuracy.
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: "word-unites",
+      trigger: "[data-word-unites]",
       content: (
         <div className="space-y-2">
           <h3 className="font-semibold text-sm">Interactive Word Selection</h3>

@@ -154,10 +154,10 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
           <div
             className="fixed z-41"
             style={{
-              left: rect.left - 8,
-              top: rect.top - 8,
-              width: rect.width + 16,
-              height: rect.height + 16,
+              left: rect.left - 2,
+              top: rect.top - 2,
+              width: rect.width + 4,
+              height: rect.height + 4,
               background: 'transparent',
               borderRadius: borderRadius,
               boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
