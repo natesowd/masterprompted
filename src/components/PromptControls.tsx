@@ -18,6 +18,8 @@ function ParameterSelector({ parameterTitle, leftParameter, rightParameter, show
         return null; // Don't render anything if showParameter is false
     }
     return (
+        <>
+        <h4 className="text-sm font-medium text-gray-700 mb-3">{parameterTitle}</h4>
         <div className="flex bg-gray-100 rounded-full p-1">
             <button
                 onClick={() => setLeftSelected(true)}
@@ -38,6 +40,7 @@ function ParameterSelector({ parameterTitle, leftParameter, rightParameter, show
                 {rightParameter}
             </button>
         </div>
+        </>
     );
 }
 
@@ -69,8 +72,6 @@ export default function PromptControls({ showSpecificity = true, showStyle = tru
 
                 <div className="space-y-4">
                     <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Prompt Specificity</h4>
-
                         <div className="relative">
                             {/* Selectors */}
                             <ParameterSelector
@@ -78,7 +79,6 @@ export default function PromptControls({ showSpecificity = true, showStyle = tru
                                 leftParameter="General"
                                 rightParameter="Specific"
                                 showParameter={showSpecificity}
-                                onParameterChange={(param) => setIsSpecific(param === "Specific")}
                             />
                         </div>
 
