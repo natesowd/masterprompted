@@ -59,7 +59,32 @@ export default function HeadlineResponse() {
                 </p>
                 
                 <h1 className="text-2xl text-gray-900 leading-tight font-normal md:text-4xl">
-                  European Union Unites on Historic AI Ethics Framework, Charting Path for Responsible Technology Development
+                  European Union{" "}
+                  <span 
+                    className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
+                    onMouseEnter={(e) => {
+                      const randomNum = (Math.random()).toFixed(2);
+                      e.currentTarget.setAttribute('data-score', randomNum);
+                    }}
+                  >
+                    Unites
+                    <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                      {typeof window !== 'undefined' && Math.random().toFixed(2)}
+                    </span>
+                  </span>{" "}
+                  <span 
+                    className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
+                    onMouseEnter={(e) => {
+                      const randomNum = (Math.random()).toFixed(2);
+                      e.currentTarget.setAttribute('data-score', randomNum);
+                    }}
+                  >
+                    on
+                    <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                      {typeof window !== 'undefined' && Math.random().toFixed(2)}
+                    </span>
+                  </span>{" "}
+                  Historic AI Ethics Framework, Charting Path for Responsible Technology Development
                 </h1>
               </div>
             </div>
