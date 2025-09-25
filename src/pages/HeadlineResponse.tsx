@@ -3,22 +3,15 @@ import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import SentPrompt from "@/components/SentPrompt";
 import { PopoverSeries } from "@/components/PopoverSeries";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ArrowRight } from "lucide-react";
 
 export default function HeadlineResponse() {
   const navigate = useNavigate();
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [currentSentence, setCurrentSentence] = useState(["European", "Union", "Unites", "on", "Historic AI Ethics Framework, Charting Path for Responsible Technology Development"]);
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  
-  // Open popover on component mount
-  useEffect(() => {
-    setIsPopoverOpen(true);
-  }, []);
   
   // Word progression data from the table
   const wordProgressions = {
@@ -129,65 +122,53 @@ export default function HeadlineResponse() {
                 </p>
                 
                 <div className="relative">
-                  <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                    <h1 className="text-2xl text-gray-900 leading-tight font-normal md:text-4xl">
-                      {currentSentence.map((word, index) => {
-                        const isClickable = (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes"));
-                        
-                        // Special handling for Union/Unites position with popover
-                        if ((index === 1 && word === "Union") || (index === 2 && word === "Unites")) {
-                          return (
-                            <span key={index}>
-                              <PopoverTrigger asChild>
-                                <span 
-                                   className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
-                                   onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
-                                 >
-                                   {word}
-                                   <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                                     {word === "Union" ? "0.73" : "0.67"}
-                                   </span>
-                                </span>
-                              </PopoverTrigger>
-                              {index < currentSentence.length - 1 && " "}
-                            </span>
-                          );
-                        }
-                        
-                        if (isClickable && word !== "Unites") {
-                          return (
-                            <span key={index}>
-                               <span 
-                                 className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
-                                 onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
-                               >
-                                 {word}
-                                 <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                                   {word === "Reaches" ? "0.24" : "0.09"}
-                                 </span>
-                               </span>
-                              {index < currentSentence.length - 1 && " "}
-                            </span>
-                          );
-                        }
-                        
+                  <h1 className="text-2xl text-gray-900 leading-tight font-normal md:text-4xl">
+                    {currentSentence.map((word, index) => {
+                      const isClickable = (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes"));
+                      
+                      // Special handling for Union/Unites position
+                      if (index === 1 && word === "Union") {
                         return (
                           <span key={index}>
-                            {word}
+                            <span 
+                               className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
+                               onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
+                             >
+                               {word}
+                               <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                                 0.73
+                               </span>
+                            </span>
                             {index < currentSentence.length - 1 && " "}
                           </span>
                         );
-                      })}
-                    </h1>
-                    
-                    <PopoverContent className="w-80 p-4" side="bottom" align="start">
-                      <div className="space-y-2">
-                        <p className="text-sm leading-relaxed">
-                          Click on either of these words to select a different word. Try and find the word combination that leads to a factual inaccuracy.
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                      }
+                      
+                      if (isClickable) {
+                        return (
+                          <span key={index}>
+                             <span 
+                               className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
+                               onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
+                             >
+                               {word}
+                               <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                                 {word === "Unites" ? "0.67" : word === "Reaches" ? "0.24" : "0.09"}
+                               </span>
+                             </span>
+                            {index < currentSentence.length - 1 && " "}
+                          </span>
+                        );
+                      }
+                      
+                      return (
+                        <span key={index}>
+                          {word}
+                          {index < currentSentence.length - 1 && " "}
+                        </span>
+                      );
+                    })}
+                  </h1>
                   
                   {/* Word alternatives popup */}
                   {selectedWord && (
