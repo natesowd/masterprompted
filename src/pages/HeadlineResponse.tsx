@@ -174,7 +174,7 @@ export default function HeadlineResponse() {
                          return (
                            <span key={index} className="relative">
                              <span
-                               onMouseEnter={() => {
+                               onMouseLeave={() => {
                                  if (!charterTooltipShown) {
                                    setShowCharterTooltip(true);
                                    setCharterTooltipShown(true);
@@ -191,7 +191,7 @@ export default function HeadlineResponse() {
                              
                              {/* Charter Tooltip */}
                              {showCharterTooltip && (
-                               <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 z-50">
+                               <div className="fixed right-80 top-1/2 transform -translate-y-1/2 z-50">
                                  <div className="bg-emerald-500 text-white px-6 py-4 rounded-lg shadow-lg w-80">
                                    <h3 className="text-sm font-semibold mb-2">Journalistic Evaluation Checklist</h3>
                                    <p className="text-sm leading-relaxed mb-3">
