@@ -67,30 +67,16 @@ export default function HeadlineResponse() {
     
     return [];
   };
-  // Define popover steps for the journalistic evaluation tour
+  // Define popover steps for word interaction tour
   const popoverSteps = [
     {
-      id: "evaluation-panel",
-      trigger: "[data-evaluation-panel]",
+      id: "word-interaction",
+      trigger: "[data-word-union]",
       content: (
         <div className="space-y-2">
-          <h3 className="font-semibold text-sm">Journalistic Evaluation</h3>
+          <h3 className="font-semibold text-sm">Interactive Word Selection</h3>
           <p className="text-sm leading-relaxed">
-            This panel helps you evaluate AI-generated content across key journalistic criteria. 
-            Each section examines different aspects of quality and reliability that journalists should consider.
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "factual-accuracy",
-      trigger: "[data-criterion-id='factual-accuracy']",
-      content: (
-        <div className="space-y-2">
-          <h3 className="font-semibold text-sm">Factual Accuracy</h3>
-          <p className="text-sm leading-relaxed">
-            Click here to learn about factual accuracy - one of the most critical aspects when evaluating AI outputs. 
-            This covers how to identify hallucinations and ensure information reliability.
+            Click on either of these words to select a different word. Try and find the word combination that leads to a factual inaccuracy.
           </p>
         </div>
       ),
@@ -133,6 +119,7 @@ export default function HeadlineResponse() {
                             <span 
                                className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
                                onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
+                               data-word-union
                              >
                                {word}
                                <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
@@ -150,6 +137,7 @@ export default function HeadlineResponse() {
                              <span 
                                className="relative group cursor-pointer transition-colors duration-200 hover:bg-green-200 hover:px-1 hover:rounded"
                                onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
+                               data-word-unites={word === "Unites" ? true : undefined}
                              >
                                {word}
                                <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
@@ -286,7 +274,7 @@ export default function HeadlineResponse() {
         </div>
       </main>
       
-      {/* PopoverSeries for evaluation tour */}
-      {/* <PopoverSeries steps={popoverSteps} /> */}
+      {/* PopoverSeries for word interaction tour */}
+      <PopoverSeries steps={popoverSteps} />
     </div>;
 }
