@@ -77,19 +77,7 @@ export default function HeadlineResponse() {
         <div className="space-y-2">
           <h3 className="font-semibold text-sm">Interactive Word Selection</h3>
           <p className="text-sm leading-relaxed">
-            Click on either of these words to select a different word. Try and find the word combination that leads to a factual inaccuracy.
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "word-unites",
-      trigger: "[data-word-unites]",
-      content: (
-        <div className="space-y-2">
-          <h3 className="font-semibold text-sm">Interactive Word Selection</h3>
-          <p className="text-sm leading-relaxed">
-            Click on either of these words to select a different word. Try and find the word combination that leads to a factual inaccuracy.
+            Click on the highlighted words to select a different option. Try and find the word combination that leads to a factual inaccuracy.
           </p>
         </div>
       ),
