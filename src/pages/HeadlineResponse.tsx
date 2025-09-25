@@ -120,8 +120,7 @@ export default function HeadlineResponse() {
                 <div className="relative">
                   <h1 className="text-2xl text-gray-900 leading-tight font-normal md:text-4xl">
                     {currentSentence.map((word, index) => {
-                      const isClickable = (index === 2 && (word === "unites" || word === "Reaches" || word === "finalizes")) || 
-                                         (index === 3 && currentSentence.length > 4);
+                      const isClickable = (index === 2 && (word === "unites" || word === "Reaches" || word === "finalizes"));
                       
                       // Special handling for Union/Unites position
                       if (index === 1 && word === "Union") {
