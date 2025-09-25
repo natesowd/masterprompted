@@ -13,9 +13,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 export default function HeadlineResponse() {
   const navigate = useNavigate();
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
-  const [currentSentence, setCurrentSentence] = useState(["European", "Union", "Unites", "Around", "Sweeping", "AI", "Ethics", "Charter,", "Pioneering", "International", "Tech", "Policy", "Standards"]);
+  const [currentSentence, setCurrentSentence] = useState(["European", "Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"]);
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipShown, setTooltipShown] = useState(false);
+  const [showFactualInaccuracyTooltip, setShowFactualInaccuracyTooltip] = useState(false);
+  const [factualTooltipShown, setFactualTooltipShown] = useState(false);
+  const [showCharterTooltip, setShowCharterTooltip] = useState(false);
+  const [charterTooltipShown, setCharterTooltipShown] = useState(false);
   
   // Word progression data from the table
   const wordProgressions = {
@@ -165,19 +169,72 @@ export default function HeadlineResponse() {
                          );
                        }
                       
-                      // Handle TextFlag for "Charter,"
-                      if (word === "Charter,") {
-                        return (
-                          <span key={index}>
-                            <TextFlag 
-                              text="Charter"
-                              evaluationFactor="factual-accuracy"
-                              explanation="The term 'charter' has been used here to describe the EU AI Act. A charter is a different type of document than an act and therefore are not interchangeable terms."
-                            />
-                            ,{index < currentSentence.length - 1 && " "}
-                          </span>
-                        );
-                      }
+                       // Handle TextFlag for "Charter,"
+                       if (word === "Charter,") {
+                         return (
+                           <span key={index} className="relative">
+                             <span
+                               onMouseLeave={() => {
+                                 if (!charterTooltipShown) {
+                                   setShowCharterTooltip(true);
+                                   setCharterTooltipShown(true);
+                                 }
+                               }}
+                             >
+                               <TextFlag 
+                                 text="Charter"
+                                 evaluationFactor="factual-accuracy"
+                                 explanation="The term 'charter' has been used here to describe the EU AI Act. A charter is a different type of document than an act and therefore are not interchangeable terms."
+                               />
+                             </span>
+                             ,{index < currentSentence.length - 1 && " "}
+                             
+                             {/* Charter Tooltip */}
+                             {showCharterTooltip && (
+                               <div className="fixed right-80 top-1/2 transform -translate-y-1/2 z-50">
+                                 <div className="bg-emerald-500 text-white px-6 py-4 rounded-lg shadow-lg w-80">
+                                   <h3 className="text-sm font-semibold mb-2">Journalistic Evaluation Checklist</h3>
+                                   <p className="text-sm leading-relaxed mb-3">
+                                     For more information on the flagged content, expand the relevant term according to the icon.
+                                   </p>
+                                   <p className="text-sm leading-relaxed mb-4">
+                                     This checklist is designed to help you apply your journalistic expertise effectively to LLM outputs. With LLM-specific criteria, it guides you to keep your reporting reliable.
+                                   </p>
+                                   <button 
+                                     onClick={() => setShowCharterTooltip(false)}
+                                     className="bg-white text-emerald-500 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+                                   >
+                                     Continue
+                                   </button>
+                                 </div>
+                               </div>
+                             )}
+                             
+                             {/* Factual Inaccuracy Tooltip */}
+                             {showFactualInaccuracyTooltip && (
+                               <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 z-50">
+                                 <div className="bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg max-w-md w-80">
+                                   <p className="text-sm leading-relaxed mb-2 font-medium">
+                                     You found the factual inaccuracy!
+                                   </p>
+                                   <p className="text-sm leading-relaxed mb-4">
+                                     Through a series of word selections, the LLM has generated an error in factual information.
+                                   </p>
+                                   <p className="text-sm leading-relaxed mb-4">
+                                     Hover over the word to read more about the falsehood.
+                                   </p>
+                                   <button 
+                                     onClick={() => setShowFactualInaccuracyTooltip(false)}
+                                     className="bg-white text-emerald-500 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+                                   >
+                                     Close
+                                   </button>
+                                 </div>
+                               </div>
+                             )}
+                           </span>
+                         );
+                       }
                       
                       return (
                         <span key={index}>
@@ -256,8 +313,16 @@ export default function HeadlineResponse() {
                                          newSentence.push(...completionWords);
                                        }
                                      }
-                                     setCurrentSentence(newSentence);
-                                     setSelectedWord(null);
+                                      setCurrentSentence(newSentence);
+                                      setSelectedWord(null);
+                                      
+                                      // Check if "Unites Around" combination is selected
+                                      if (newSentence.includes("Unites") && newSentence.includes("Around") && !factualTooltipShown) {
+                                        setTimeout(() => {
+                                          setShowFactualInaccuracyTooltip(true);
+                                          setFactualTooltipShown(true);
+                                        }, 500);
+                                      }
                                    }}
                                 >
                                    <div className="text-xs font-medium mb-1 text-center text-green-800">
