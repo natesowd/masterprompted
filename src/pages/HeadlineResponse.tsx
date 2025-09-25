@@ -9,7 +9,7 @@ export default function HeadlineResponse() {
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [currentSentence, setCurrentSentence] = useState(["European", "Union", "unites", "on", "Historic AI Ethics Framework, Charting Path for Responsible Technology Development"]);
   
-  // Complete sentence mappings from the table
+  // Complete sentence mappings from the table (first row for each verb)
   const verbSentences = {
     "unites": ["European", "Union", "unites", "on", "Historic AI Ethics Framework, Charting Path for Responsible Technology Development"],
     "Reaches": ["European", "Union", "Reaches", "Consensus", "on Historic AI Ethics Framework, Paving the Way for Responsible Tech Innovation"],
