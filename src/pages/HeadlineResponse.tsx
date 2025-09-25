@@ -139,7 +139,7 @@ export default function HeadlineResponse() {
                               
                               {/* Alternative word bubble */}
                               <div 
-                                className="absolute bg-green-200 text-green-800 px-3 py-2 rounded-lg shadow-lg cursor-pointer hover:bg-green-300 transition-colors duration-200 whitespace-nowrap pointer-events-auto"
+                                className="absolute bg-green-200 text-black px-3 py-2 rounded-lg shadow-lg cursor-pointer hover:bg-green-300 transition-colors duration-200 whitespace-nowrap pointer-events-auto"
                                 style={{ 
                                   left: '50%',
                                   top: '50%',
@@ -148,7 +148,7 @@ export default function HeadlineResponse() {
                                 }}
                                 onClick={() => setSelectedWord(null)}
                               >
-                                <div className="text-xs font-medium mb-1 text-center">
+                                <div className="text-xs font-medium mb-1 text-center text-green-800">
                                   {alt.probability.toFixed(2)}
                                 </div>
                                 <div className="text-sm font-semibold text-center">
