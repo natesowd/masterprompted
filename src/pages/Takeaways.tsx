@@ -10,35 +10,42 @@ export default function Takeaways() {
         <Breadcrumb />
         
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-foreground mb-8">Key Takeaways</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Takeaways:</h1>
+          <h2 className="text-4xl font-bold text-foreground mb-12">How do LLMs form responses to user prompts?</h2>
           
-          <div className="space-y-6">
-            <div className="p-6 border border-border rounded-lg bg-card">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Understanding AI Text Generation</h2>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• AI models predict the next most likely word based on training data and context</li>
-                <li>• Probability scores indicate how confident the model is in each word choice</li>
-                <li>• Higher probability doesn't always mean better content quality</li>
-              </ul>
+          <div className="space-y-8">
+            <div className="flex gap-6 items-start">
+              <div className="w-12 h-12 bg-foreground text-background rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">
+                1
+              </div>
+              <p className="text-lg text-foreground pt-2">
+                <span className="font-bold">LLMs generate text through next-word prediction</span>—a powerful but probabilistic process that relies on patterns in data rather than strong logical reasoning.
+              </p>
             </div>
             
-            <div className="p-6 border border-border rounded-lg bg-card">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Journalistic Evaluation Criteria</h2>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Factual accuracy is paramount when evaluating AI-generated content</li>
-                <li>• Consider bias, tone, and appropriate language for your audience</li>
-                <li>• Always verify claims and cross-reference with reliable sources</li>
-              </ul>
+            <div className="flex gap-6 items-start">
+              <div className="w-12 h-12 bg-foreground text-background rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">
+                2
+              </div>
+              <p className="text-lg text-foreground pt-2">
+                <span className="font-bold">Because of this stochastic nature, errors are inevitable:</span> even the most advanced models can produce mistakes, distortions, or unfounded claims.
+              </p>
             </div>
             
-            <div className="p-6 border border-border rounded-lg bg-card">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Best Practices</h2>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Use AI as a starting point, not the final product</li>
-                <li>• Human oversight and editing remain essential</li>
-                <li>• Understanding model behavior helps make better editorial decisions</li>
-              </ul>
+            <div className="flex gap-6 items-start">
+              <div className="w-12 h-12 bg-foreground text-background rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">
+                3
+              </div>
+              <p className="text-lg text-foreground pt-2">
+                <span className="font-bold">As a journalist, your critical expertise is essential:</span> apply your analytical skills to evaluate AI outputs, filter out misinformation, and prevent LLM falsehoods from entering your reporting.
+              </p>
             </div>
+          </div>
+          
+          <div className="mt-16">
+            <button className="bg-green-400 hover:bg-green-500 text-black font-medium px-8 py-3 rounded-full transition-colors">
+              Next Task →
+            </button>
           </div>
         </div>
       </main>

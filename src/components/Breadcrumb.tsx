@@ -30,26 +30,21 @@ export default function Breadcrumb() {
   const breadcrumbItems = [];
   let currentPath = '';
   
-  // Add home
-  breadcrumbItems.push({
-    label: "Home",
-    path: "/",
-    isLast: false
-  });
-  
-  // Special case for takeaways page
+  // Special case for takeaways page - only show "Next word prediction"
   if (location.pathname === '/takeaways') {
     breadcrumbItems.push({
-      label: "Next Word Prediction",
-      path: "/module/next-word-prediction-intro",
-      isLast: false
-    });
-    breadcrumbItems.push({
-      label: "Takeaways",
+      label: "Next word prediction",
       path: "/takeaways",
       isLast: true
     });
   } else {
+    // Add home for other pages
+    breadcrumbItems.push({
+      label: "Home",
+      path: "/",
+      isLast: false
+    });
+    
     // Add path segments, but stop at prompt-construction level
     for (let i = 0; i < pathSegments.length; i++) {
       currentPath += '/' + pathSegments[i];
