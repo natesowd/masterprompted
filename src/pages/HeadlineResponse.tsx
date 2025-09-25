@@ -18,6 +18,8 @@ export default function HeadlineResponse() {
   const [tooltipShown, setTooltipShown] = useState(false);
   const [showFactualInaccuracyTooltip, setShowFactualInaccuracyTooltip] = useState(false);
   const [factualTooltipShown, setFactualTooltipShown] = useState(false);
+  const [showCharterTooltip, setShowCharterTooltip] = useState(false);
+  const [charterTooltipShown, setCharterTooltipShown] = useState(false);
   
   // Word progression data from the table
   const wordProgressions = {
@@ -171,12 +173,42 @@ export default function HeadlineResponse() {
                        if (word === "Charter,") {
                          return (
                            <span key={index} className="relative">
-                             <TextFlag 
-                               text="Charter"
-                               evaluationFactor="factual-accuracy"
-                               explanation="The term 'charter' has been used here to describe the EU AI Act. A charter is a different type of document than an act and therefore are not interchangeable terms."
-                             />
+                             <span
+                               onMouseEnter={() => {
+                                 if (!charterTooltipShown) {
+                                   setShowCharterTooltip(true);
+                                   setCharterTooltipShown(true);
+                                 }
+                               }}
+                             >
+                               <TextFlag 
+                                 text="Charter"
+                                 evaluationFactor="factual-accuracy"
+                                 explanation="The term 'charter' has been used here to describe the EU AI Act. A charter is a different type of document than an act and therefore are not interchangeable terms."
+                               />
+                             </span>
                              ,{index < currentSentence.length - 1 && " "}
+                             
+                             {/* Charter Tooltip */}
+                             {showCharterTooltip && (
+                               <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 z-50">
+                                 <div className="bg-emerald-500 text-white px-6 py-4 rounded-lg shadow-lg w-80">
+                                   <h3 className="text-sm font-semibold mb-2">Journalistic Evaluation Checklist</h3>
+                                   <p className="text-sm leading-relaxed mb-3">
+                                     For more information on the flagged content, expand the relevant term according to the icon.
+                                   </p>
+                                   <p className="text-sm leading-relaxed mb-4">
+                                     This checklist is designed to help you apply your journalistic expertise effectively to LLM outputs. With LLM-specific criteria, it guides you to keep your reporting reliable.
+                                   </p>
+                                   <button 
+                                     onClick={() => setShowCharterTooltip(false)}
+                                     className="bg-white text-emerald-500 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+                                   >
+                                     Continue
+                                   </button>
+                                 </div>
+                               </div>
+                             )}
                              
                              {/* Factual Inaccuracy Tooltip */}
                              {showFactualInaccuracyTooltip && (
