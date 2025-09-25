@@ -17,7 +17,9 @@ const breadcrumbMap: Record<string, string> = {
   "/module/prompt-construction/bias": "Bias",
   "/module/system-parameters": "System Parameters",
   "/module/multiple-sources": "Multiple Sources",
-  "/module/llm-training": "LLM Training"
+  "/module/llm-training": "LLM Training",
+  "/next-word-prediction": "Next Word Prediction",
+  "/takeaways": "Takeaways"
 };
 
 export default function Breadcrumb() {
@@ -35,28 +37,42 @@ export default function Breadcrumb() {
     isLast: false
   });
   
-  // Add path segments, but stop at prompt-construction level
-  for (let i = 0; i < pathSegments.length; i++) {
-    currentPath += '/' + pathSegments[i];
-    
-    // If we're in prompt-construction sub-routes, stop at prompt-construction
-    if (currentPath === '/module/prompt-construction') {
-      breadcrumbItems.push({
-        label: breadcrumbMap[currentPath] || pathSegments[i].charAt(0).toUpperCase() + pathSegments[i].slice(1),
-        path: currentPath,
-        isLast: true
-      });
-      break;
-    }
-    
-    const isLast = i === pathSegments.length - 1;
-    const label = breadcrumbMap[currentPath] || pathSegments[i].charAt(0).toUpperCase() + pathSegments[i].slice(1);
-    
+  // Special case for takeaways page
+  if (location.pathname === '/takeaways') {
     breadcrumbItems.push({
-      label,
-      path: currentPath,
-      isLast
+      label: "Next Word Prediction",
+      path: "/module/next-word-prediction-intro",
+      isLast: false
     });
+    breadcrumbItems.push({
+      label: "Takeaways",
+      path: "/takeaways",
+      isLast: true
+    });
+  } else {
+    // Add path segments, but stop at prompt-construction level
+    for (let i = 0; i < pathSegments.length; i++) {
+      currentPath += '/' + pathSegments[i];
+      
+      // If we're in prompt-construction sub-routes, stop at prompt-construction
+      if (currentPath === '/module/prompt-construction') {
+        breadcrumbItems.push({
+          label: breadcrumbMap[currentPath] || pathSegments[i].charAt(0).toUpperCase() + pathSegments[i].slice(1),
+          path: currentPath,
+          isLast: true
+        });
+        break;
+      }
+      
+      const isLast = i === pathSegments.length - 1;
+      const label = breadcrumbMap[currentPath] || pathSegments[i].charAt(0).toUpperCase() + pathSegments[i].slice(1);
+      
+      breadcrumbItems.push({
+        label,
+        path: currentPath,
+        isLast
+      });
+    }
   }
 
   return (
