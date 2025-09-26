@@ -372,7 +372,7 @@ export default function HeadlineResponse() {
       {/* Single tooltip for probability explanation */}
       {showTooltip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="bg-emerald-500 text-white p-4 rounded-lg shadow-lg max-w-xs pointer-events-auto relative">
+          <div className="bg-emerald-600 text-white rounded-xl shadow-lg max-w-xs pointer-events-auto relative" style={{ padding: '16px 20px' }}>
             <p className="text-sm leading-relaxed mb-4">
               The numbers on top of each word represent the probability that the word would be selected.
             </p>
