@@ -13,7 +13,7 @@ const PromptPlayground = () => {
       <main className="container mx-auto px-4 py-12">
         <div className="flex gap-8">
           {/* Left Sidebar - Prompt Controls */}
-          <div className="w-64 flex-shrink-0">
+          <div className="flex-none">
             <div className="sticky top-4">
               <PromptControls />
             </div>
@@ -35,7 +35,7 @@ const PromptPlayground = () => {
           </div>
 
           {/* Right Sidebar - Evaluation Panel */}
-          <div className="w-96 flex-shrink-0">
+          <div className="flex-none flex-shrink-0">
             <div className="sticky top-4">
               <EvaluationPanel />
             </div>

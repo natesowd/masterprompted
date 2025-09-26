@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-interface ParameterSelectorProps {
+interface ParameterProps {
     parameterTitle: string;
     leftParameter: string;
     rightParameter: string;
@@ -10,7 +10,7 @@ interface ParameterSelectorProps {
     onParameterChange?: (param: string) => void;
 
 }
-function ParameterSelector({ parameterTitle, leftParameter, rightParameter, showParameter = true, onParameterChange }: ParameterSelectorProps) {
+function Parameter({ parameterTitle, leftParameter, rightParameter, showParameter = true, onParameterChange }: ParameterProps) {
     // Placeholder for parameter selector logic
     const [leftSelected, setLeftSelected] = useState(true);
 
@@ -18,29 +18,29 @@ function ParameterSelector({ parameterTitle, leftParameter, rightParameter, show
         return null; // Don't render anything if showParameter is false
     }
     return (
-        <>
-        <h4 className="text-sm font-medium text-gray-700 mb-3">{parameterTitle}</h4>
-        <div className="flex bg-gray-100 rounded-full p-1">
-            <button
-                onClick={() => setLeftSelected(true)}
-                className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition-colors ${leftSelected
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
-                    }`}
-            >
-                {leftParameter}
-            </button>
-            <button
-                onClick={() => setLeftSelected(false)}
-                className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition-colors ${!leftSelected
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
-                    }`}
-            >
-                {rightParameter}
-            </button>
+        <div className='my-10'>
+            <h4 className="text-sm font-medium text-gray-700 mx-3">{parameterTitle}</h4>
+            <div className="flex justify-between bg-gray-100 rounded-full p-1">
+                <button
+                    onClick={() => setLeftSelected(true)}
+                    className={`grow px-4 py-2 text-sm font-medium rounded-full transition-colors ${leftSelected
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                >
+                    {leftParameter}
+                </button>
+                <button
+                    onClick={() => setLeftSelected(false)}
+                    className={`grow px-4 py-2 text-sm font-medium rounded-full transition-colors ${!leftSelected
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                >
+                    {rightParameter}
+                </button>
+            </div>
         </div>
-        </>
     );
 }
 
@@ -74,11 +74,29 @@ export default function PromptControls({ showSpecificity = true, showStyle = tru
                     <div>
                         <div className="relative">
                             {/* Selectors */}
-                            <ParameterSelector
+                            <Parameter
                                 parameterTitle="Prompt Specificity"
                                 leftParameter="General"
                                 rightParameter="Specific"
                                 showParameter={showSpecificity}
+                            />
+                            <Parameter
+                                parameterTitle="Interaction Style"
+                                leftParameter="Conversational"
+                                rightParameter="Instructional"
+                                showParameter={showStyle}
+                            />
+                            <Parameter
+                                parameterTitle="Context"
+                                leftParameter="No Background"
+                                rightParameter="With Background"
+                                showParameter={showContext}
+                            />
+                            <Parameter
+                                parameterTitle="Bias"
+                                leftParameter="No Bias"
+                                rightParameter="With Bias"
+                                showParameter={showBias}
                             />
                         </div>
 
