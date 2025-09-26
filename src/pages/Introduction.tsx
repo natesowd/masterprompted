@@ -30,7 +30,7 @@ const Introduction = () => {
               isolation: 'isolate',
               position: 'absolute',
               width: '845px',
-              height: '379px',
+              minHeight: 'auto',
               left: 'calc(50% - 845px/2 + 0.5px)',
               top: '100px',
               background: '#FFFFFF',
