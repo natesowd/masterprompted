@@ -130,7 +130,52 @@ export default function HeadlineResponse() {
                     wordSpacing: '0.2em',
                     lineHeight: '1.8'
                   }}>
-                        {currentSentence.join(" ")}
+                        {currentSentence.map((word, index) => {
+                          // Make Unites (index 2) and On (index 3) clickable in new form
+                          const isClickable = (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes")) || 
+                                             (index === 3 && (word === "On" || word === "Around" || word === "Behind" || word === "Consensus" || word === "Agreement" || word === "Milestone" || word === "Landmark" || word === "sweeping" || word === "pioneering"));
+                          
+                          if (isClickable) {
+                            return (
+                              <span key={index}>
+                                <span 
+                                  className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg" 
+                                  onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
+                                  onMouseEnter={() => {
+                                    if (!tooltipShown) {
+                                      setShowTooltip(true);
+                                      setTooltipShown(true);
+                                    }
+                                  }}
+                                >
+                                  {word}
+                                  <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                                    {word === "Unites" ? "0.67" : 
+                                     word === "Reaches" ? "0.24" : 
+                                     word === "Finalizes" ? "0.09" :
+                                     word === "On" ? "0.73" :
+                                     word === "Around" ? "0.42" :
+                                     word === "Behind" ? "0.12" :
+                                     word === "Consensus" ? "0.65" :
+                                     word === "Agreement" ? "0.28" :
+                                     word === "Milestone" ? "0.07" :
+                                     word === "Landmark" ? "0.58" :
+                                     word === "sweeping" ? "0.31" :
+                                     "0.11"}
+                                  </span>
+                                </span>
+                                {index < currentSentence.length - 1 && " "}
+                              </span>
+                            );
+                          }
+                          
+                          return (
+                            <span key={index}>
+                              {word}
+                              {index < currentSentence.length - 1 && " "}
+                            </span>
+                          );
+                        })}
                       </h1>
                     </div>
                     
