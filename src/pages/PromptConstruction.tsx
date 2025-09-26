@@ -26,7 +26,7 @@ export default function PromptConstruction() {
             style={{
               boxSizing: 'border-box',
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'flex-start',
               padding: '40px 50px 60px',
               gap: '40px',
@@ -42,13 +42,17 @@ export default function PromptConstruction() {
               borderRadius: '20px'
             }}
           >
-            {/* Star image overlay on the left within the card */}
-            <img 
-              src={starImage} 
-              alt="Star illustration" 
-              className="absolute left-8 top-8 w-[325px] h-auto z-10"
-            />
-            <CardContent className="p-0 w-full">
+            {/* Left column - Star image */}
+            <div className="flex-shrink-0">
+              <img 
+                src={starImage} 
+                alt="Star illustration" 
+                className="w-[325px] h-auto"
+              />
+            </div>
+
+            {/* Right column - Content */}
+            <CardContent className="p-0 w-full flex flex-col">
               {/* Header with close button */}
               <div className="flex justify-between items-center mb-6">
                 <span className="text-gray-500 text-sm">Learning 2: Prompt construction</span>
@@ -68,14 +72,14 @@ export default function PromptConstruction() {
               </h1>
 
               {/* Description */}
-              <p className="text-gray-600 text-lg leading-relaxed mb-8">
+              <p className="text-gray-600 text-lg leading-relaxed mb-8 flex-grow">
                 Your prompt directly shapes an LLM's response. Large language models use the wording, specificity, and context in your wording to help decide how to reply, meaning the quality of the output can depend heavily on how you phrase it. Explore how real LLM generated responses change with different prompt constructions
               </p>
 
               {/* Continue button */}
               <Button 
                 onClick={handleContinue}
-                className="transition-all duration-200"
+                className="transition-all duration-200 self-start"
                 style={{ 
                   display: 'flex',
                   flexDirection: 'row',
