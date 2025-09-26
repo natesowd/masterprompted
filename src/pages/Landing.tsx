@@ -41,7 +41,7 @@ const Landing = () => {
           <div className="relative px-6 py-16 text-center text-white min-h-[80vh] flex flex-col justify-center">
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+              <h1 className="text-4xl md:text-6xl font-barlow-semi font-bold leading-tight">
                 PromptED: Responsible AI use in Journalism
               </h1>
               
