@@ -247,7 +247,7 @@ export default function HeadlineResponse() {
                   
                   {/* Word alternatives popup */}
                   {selectedWord && (
-                    <div className="absolute inset-0 z-10 pointer-events-none" style={{ transform: `translate(${selectedWord === "word-1" ? "-200px" : selectedWord === "word-3" ? "50px" : "-100px"}, -30px)` }}>
+                    <div className="absolute inset-0 z-10 pointer-events-none" style={{ transform: `translate(${selectedWord === "word-1" ? "-200px" : selectedWord === "word-3" ? "50px" : "-100px"}, -60px)` }}>
                       <div className="relative w-full h-full">
                         {(() => {
                           const wordIndex = parseInt(selectedWord.split('-')[1]);
@@ -257,11 +257,17 @@ export default function HeadlineResponse() {
                             // Calculate circular positions around the center word
                             const radius = 120;
                             const innerRadius = 40; // Gap between center word and lines
-                            const angle = (index * 120) - 90; // 120 degrees apart, starting from top
-                            const x = Math.cos((angle * Math.PI) / 180) * radius;
-                            const y = Math.sin((angle * Math.PI) / 180) * radius;
-                            const innerX = Math.cos((angle * Math.PI) / 180) * innerRadius;
-                            const innerY = Math.sin((angle * Math.PI) / 180) * innerRadius;
+                             const angle = (index * 120) - 90; // 120 degrees apart, starting from top
+                             let x = Math.cos((angle * Math.PI) / 180) * radius;
+                             let y = Math.sin((angle * Math.PI) / 180) * radius;
+                             
+                             // Move "Reaches" specifically to the right by 15px
+                             if (option.word === "Reaches") {
+                               x += 15;
+                             }
+                             
+                             const innerX = Math.cos((angle * Math.PI) / 180) * innerRadius;
+                             const innerY = Math.sin((angle * Math.PI) / 180) * innerRadius;
                             
                             return (
                               <div key={index}>
