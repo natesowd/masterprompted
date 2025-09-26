@@ -35,10 +35,8 @@ const PromptPlayground = () => {
           </div>
 
           {/* Right Sidebar - Evaluation Panel */}
-          <div className="flex-none flex-shrink-0">
-            <div className="sticky top-4">
-              <EvaluationPanel />
-            </div>
+          <div className="flex-none">
+            <EvaluationPanel />
           </div>
         </div>
       </main>

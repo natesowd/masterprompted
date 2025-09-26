@@ -11,21 +11,21 @@ const evaluationCriteria = [
     description: "Factual accuracy in an LLM output ensures that information provided is correct and aligns with real-world knowledge, which is crucial for reliable, trustworthy results. A part of this are hallucinations, when the AI generates information that appears plausible but is factually incorrect or entirely fabricated; often because it extrapolates from incorrect training data, lacks real-world context, or misunderstands the user's query."
   },
   {
-    id: "relevance", 
+    id: "relevance",
     label: "Relevance",
     icon: Target,
     description: "Relevance measures how well the response matches the topic or intent of the prompt. If the prompt is not specific enough, the LLM output may leave out key information that affects a journalist's pool of information to draw from."
   },
   {
     id: "voice",
-    label: "Voice", 
+    label: "Voice",
     icon: Mic,
     description: "Voice refers to the tone, style, or 'personality' conveyed in the response, which can be shaped by specifying so in the prompt. When the voice of a prompt is human-like, LLM outputs are made to seem more plausible and knowledgeable, effectively disguising other aspects discussed."
   },
   {
     id: "bias",
     label: "Bias",
-    icon: Scale, 
+    icon: Scale,
     description: "Bias refers to prejudices and unbalanced narratives outputted by LLMs due to biased training data, model architecture or prompt instructions. LLMs will always have a degree of bias in its representation of different topics and therefore can bias the journalist's piece of work."
   },
   {
@@ -44,35 +44,33 @@ export default function EvaluationPanel() {
   };
 
   return (
-    <Card className="bg-white border border-gray-200 rounded-2xl shadow-sm">
-      <CardHeader className="pb-4">
+    <Card className="w-[20rem] bg-white border border-gray-200 rounded-2xl shadow-sm">  <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-gray-900">
           Journalistic Evaluation
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {evaluationCriteria.map((criterion) => (
-          <Collapsible 
-            key={criterion.id} 
+          <Collapsible
+            key={criterion.id}
             open={openItem === criterion.id}
             onOpenChange={() => toggleItem(criterion.id)}
             data-criterion-id={criterion.id}
           >
             <CollapsibleTrigger className="w-full">
               <div className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mr-20">
                   <criterion.icon className="h-4 w-4 text-gray-600" />
                   <span className="text-sm font-medium text-gray-700">{criterion.label}</span>
                 </div>
-                <ChevronDown 
-                  className={`h-4 w-4 text-gray-500 transition-transform ${
-                    openItem === criterion.id ? 'rotate-180' : ''
-                  }`}
+                <ChevronDown
+                  className={`h-4 w-4 text-gray-500 transition-transform ${openItem === criterion.id ? 'rotate-180' : ''
+                    }`}
                 />
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="px-3 pb-3">
-              <p className="text-sm text-gray-600 leading-relaxed mt-2">
+              <p className="text-sm text-gray-600 leading-relaxed mt-2 whitespace-normal">
                 {criterion.description}
               </p>
             </CollapsibleContent>
