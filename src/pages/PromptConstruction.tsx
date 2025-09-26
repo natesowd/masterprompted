@@ -21,12 +21,6 @@ export default function PromptConstruction() {
         <Breadcrumb />
         <div className="mb-5"></div>
         <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[600px] relative">
-          {/* Star image overlay on the left of the card */}
-          <img 
-            src={starImage} 
-            alt="Star illustration" 
-            className="absolute -left-20 top-20 w-16 h-16 z-10"
-          />
           <Card
             className="transition-all duration-200"
             style={{
@@ -48,6 +42,12 @@ export default function PromptConstruction() {
               borderRadius: '20px'
             }}
           >
+            {/* Star image overlay on the left within the card */}
+            <img 
+              src={starImage} 
+              alt="Star illustration" 
+              className="absolute left-8 top-8 w-12 h-12 z-10"
+            />
             <CardContent className="p-0 w-full">
               {/* Header with close button */}
               <div className="flex justify-between items-center mb-6">
