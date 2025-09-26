@@ -24,7 +24,7 @@ const Introduction = () => {
               boxSizing: 'border-box',
               display: 'flex',
               flexDirection: 'row',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               padding: '40px 50px 50px',
               gap: '30px',
               isolation: 'isolate',
@@ -39,11 +39,12 @@ const Introduction = () => {
               borderRadius: '20px'
             }}
           >
-            {/* Task image inside the popup */}
+            {/* Task image inside the popup - aligned to top and smaller */}
             <img 
               src="/task.png" 
               alt="Task notebook" 
-              className="w-[200px] h-auto flex-shrink-0"
+              className="w-[160px] h-auto flex-shrink-0"
+              style={{ marginTop: '10px' }}
             />
             
             <CardContent className="p-0 w-full flex flex-col">
