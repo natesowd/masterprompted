@@ -6,21 +6,19 @@ import { forwardRef } from 'react';
 // Accept an 'id' prop
 function SubmitButton({ onClick, id }: { onClick?: () => void; id?: string }) {
   return (
-    <div className="flex justify-center mb-4">
-      <Button
-        id={id}
-        onClick={onClick}
-        variant="secondary"
-        size="icon"
-        className="rounded-full p-3 h-10 w-10"
-        style={{
-          background: '#1F1F1F',
-          border: 'none'
-        }}
-      >
-        <ArrowUp className="h-5 w-5 text-white" />
-      </Button>
-    </div>
+    <Button
+      id={id}
+      onClick={onClick}
+      variant="secondary"
+      size="icon"
+      className="absolute top-4 right-4 rounded-full p-3 h-10 w-10"
+      style={{
+        background: '#1F1F1F',
+        border: 'none'
+      }}
+    >
+      <ArrowUp className="h-5 w-5 text-white" />
+    </Button>
   );
 };
 
@@ -67,8 +65,6 @@ const Chatbox = ({ canType = true, text = "", onSubmit, onUpload, fileName, subm
         maxWidth: '100%'
       }}
     >
-      <SubmitButton onClick={onSubmit} id={submitButtonId} />
-      
       <Textarea
         placeholder="Type your message here..."
         className="border-none bg-transparent resize-none focus-visible:ring-0 focus-visible:ring-offset-0 p-0 min-h-[60px]"
@@ -82,6 +78,7 @@ const Chatbox = ({ canType = true, text = "", onSubmit, onUpload, fileName, subm
         }}
       />
       
+      <SubmitButton onClick={onSubmit} id={submitButtonId} />
       <UploadFile onClick={onUpload} fileName={fileName} />
     </div>
   );
