@@ -16,7 +16,6 @@ export default function NextWordPrediction() {
       <Header />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <Breadcrumb />
         <div className="max-w-2xl mx-auto relative min-h-[600px]">
           <Chatbox 
             canType={false} 
@@ -27,6 +26,13 @@ export default function NextWordPrediction() {
           />
         </div>
       </main>
+      
+      {/* Fixed breadcrumb at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 z-10">
+        <div className="container mx-auto">
+          <Breadcrumb />
+        </div>
+      </div>
     </div>
   );
 }
