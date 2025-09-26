@@ -23,6 +23,7 @@ export default function SpecificityResponse() {
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <Breadcrumb />
+        <div className="mb-5"></div>
         <div className="flex gap-6 max-w-7xl mx-auto">
           {/* Left Sidebar - Prompt Controls */}
           <div className="w-64 flex-shrink-0">
