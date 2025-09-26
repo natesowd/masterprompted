@@ -43,7 +43,7 @@ const Introduction = () => {
             <img 
               src="/task.png" 
               alt="Task notebook" 
-              className="w-[160px] h-auto flex-shrink-0"
+              className="w-[325px] h-auto flex-shrink-0"
               style={{ marginTop: '10px' }}
             />
             
