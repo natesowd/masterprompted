@@ -64,7 +64,10 @@ export default function NextWordPrediction() {
                 }
               ]}
               initialStep={0}
-              onClose={() => setShowPopover(false)}
+              onClose={() => {
+                setShowPopover(false);
+                setClickCount(0); // Reset click count when popover is closed
+              }}
             />
           )}
         </div>

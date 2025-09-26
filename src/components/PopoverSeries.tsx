@@ -170,7 +170,11 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
       <Popover
         key={currentStepData.id}
         open={isOpen}
-        onOpenChange={() => { }}
+        onOpenChange={(open) => {
+          if (!open) {
+            close();
+          }
+        }}
       >
         <PopoverTrigger asChild>
           {/* 3. Use the forwardRef-wrapped FakeTrigger */}
