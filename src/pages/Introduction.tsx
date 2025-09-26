@@ -54,7 +54,7 @@ const Introduction = () => {
               </div>
 
               {/* Main heading */}
-              <h1 className="text-3xl font-barlow-semi font-medium text-gray-900 leading-tight" style={{ marginBottom: '10px' }}>
+              <h1 className="text-[40px] font-barlow-semi font-medium text-gray-900 leading-tight" style={{ marginBottom: '10px' }}>
                 Your Task: Reporting on the EU AI Act
               </h1>
 
