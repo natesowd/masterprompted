@@ -18,6 +18,7 @@ const breadcrumbMap: Record<string, string> = {
   "/module/system-parameters": "System Parameters",
   "/module/multiple-sources": "Multiple Sources",
   "/module/llm-training": "LLM Training",
+  "/module/next-word-prediction": "Next Word Prediction",
   "/next-word-prediction": "Next Word Prediction",
   "/takeaways": "Takeaways"
 };
