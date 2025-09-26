@@ -132,8 +132,17 @@ export default function HeadlineResponse() {
                     lineHeight: '1.8'
                   }}>
                         {currentSentence.map((word, index) => {
-                          // Highlight "Unites" (index 2) and "On" (index 3)
-                          if ((index === 2 && word === "Unites") || (index === 3 && word === "On")) {
+                          // Define which words are interactive based on the word progressions data
+                          const isInteractiveWord = (
+                            // Third position words: Unites, Reaches, Finalizes
+                            (index === 2 && ["Unites", "Reaches", "Finalizes"].includes(word)) ||
+                            // Fourth position words: On, Consensus, landmark, sweeping, pioneering
+                            (index === 3 && ["On", "Consensus", "landmark", "sweeping", "pioneering"].includes(word)) ||
+                            // Additional words that appear in other positions
+                            (index === 4 && ["Agreement", "Milestone"].includes(word))
+                          );
+                          
+                          if (isInteractiveWord) {
                             const wordKey = `word-${index}`;
                             const isActive = activeDropdown === wordKey;
                             
@@ -144,16 +153,25 @@ export default function HeadlineResponse() {
                                   onClick={() => setActiveDropdown(isActive ? null : wordKey)}
                                 >
                                   {word}
-                                  <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                                    {word === "Unites" ? "0.67" : "0.73"}
-                                  </span>
+                                   <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                                     {word === "Unites" ? "0.67" : 
+                                      word === "Reaches" ? "0.24" : 
+                                      word === "Finalizes" ? "0.09" : 
+                                      word === "On" ? "0.73" : 
+                                      word === "Consensus" ? "0.82" : 
+                                      word === "landmark" ? "0.45" : 
+                                      word === "sweeping" ? "0.31" : 
+                                      word === "pioneering" ? "0.24" : 
+                                      word === "Agreement" ? "0.18" : 
+                                      word === "Milestone" ? "0.12" : "0.50"}
+                                   </span>
                                 </span>
                                 
                                 {/* Dropdown that expands upward */}
                                 {isActive && (
                                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50">
                                     <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-32">
-                                      {word === "Unites" ? (
+                                      {word === "Unites" && (
                                         <>
                                           <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
                                             const newSentence = ["European", "Union", "Reaches", "Consensus", "On", "Historic", "AI", "Ethics", "Framework,", "Paving", "The", "Way", "For", "Responsible", "Tech", "Innovation"];
@@ -163,14 +181,51 @@ export default function HeadlineResponse() {
                                             Reaches
                                           </div>
                                           <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
-                                            const newSentence = ["European", "Union", "Finalizes", "Landmark", "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"];
+                                            const newSentence = ["European", "Union", "Finalizes", "landmark", "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"];
                                             setCurrentSentence(newSentence);
                                             setActiveDropdown(null);
                                           }}>
                                             Finalizes
                                           </div>
                                         </>
-                                      ) : (
+                                      )}
+                                      {word === "Reaches" && (
+                                        <>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            Unites
+                                          </div>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Finalizes", "landmark", "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            Finalizes
+                                          </div>
+                                        </>
+                                      )}
+                                      {word === "Finalizes" && (
+                                        <>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            Unites
+                                          </div>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Reaches", "Consensus", "On", "Historic", "AI", "Ethics", "Framework,", "Paving", "The", "Way", "For", "Responsible", "Tech", "Innovation"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            Reaches
+                                          </div>
+                                        </>
+                                      )}
+                                      {word === "On" && (
                                         <>
                                           <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
                                             const newSentence = [...currentSentence];
@@ -189,6 +244,60 @@ export default function HeadlineResponse() {
                                             Around
                                           </div>
                                         </>
+                                      )}
+                                      {word === "Consensus" && (
+                                        <>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Reaches", "Agreement", "On", "Historic", "AI", "Ethics", "Framework,", "Laying", "Groundwork", "For", "Safe", "Tech", "Development"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            Agreement
+                                          </div>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Reaches", "Milestone", "In", "AI", "Ethics,", "Advancing", "A", "Unified", "Vision", "For", "Responsible", "Innovation"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            Milestone
+                                          </div>
+                                        </>
+                                      )}
+                                      {word === "landmark" && (
+                                        <>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Finalizes", "sweeping", "AI", "Ethics", "Agreement,", "Establishing", "New", "Norms", "For", "Responsible", "Tech"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            sweeping
+                                          </div>
+                                          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                            const newSentence = ["European", "Union", "Finalizes", "pioneering", "AI", "Ethics", "Framework,", "Guiding", "The", "Future", "Of", "Safe", "Innovation"];
+                                            setCurrentSentence(newSentence);
+                                            setActiveDropdown(null);
+                                          }}>
+                                            pioneering
+                                          </div>
+                                        </>
+                                      )}
+                                      {(word === "sweeping" || word === "pioneering") && (
+                                        <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                          const newSentence = ["European", "Union", "Finalizes", "landmark", "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"];
+                                          setCurrentSentence(newSentence);
+                                          setActiveDropdown(null);
+                                        }}>
+                                          landmark
+                                        </div>
+                                      )}
+                                      {(word === "Agreement" || word === "Milestone") && (
+                                        <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" onClick={() => {
+                                          const newSentence = ["European", "Union", "Reaches", "Consensus", "On", "Historic", "AI", "Ethics", "Framework,", "Paving", "The", "Way", "For", "Responsible", "Tech", "Innovation"];
+                                          setCurrentSentence(newSentence);
+                                          setActiveDropdown(null);
+                                        }}>
+                                          Consensus
+                                        </div>
                                       )}
                                     </div>
                                   </div>
