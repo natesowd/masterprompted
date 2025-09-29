@@ -232,7 +232,7 @@ export default function HeadlineResponse() {
                                       </span>
                                     </button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent className="bg-white border shadow-lg z-50">
+                                   <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-[9999] min-w-[120px]">
                                     {options.map((option) => (
                                       <DropdownMenuItem 
                                         key={option.word}
@@ -268,7 +268,7 @@ export default function HeadlineResponse() {
                                         </span>
                                       </button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="bg-white border shadow-lg z-50">
+                                    <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-[9999] min-w-[120px]">
                                       {options.map((option) => (
                                         <DropdownMenuItem 
                                           key={option.word}
@@ -364,7 +364,7 @@ export default function HeadlineResponse() {
                   lineHeight: '1.8'
                 }}>
                     {currentSentence.map((word, index) => {
-                    const isClickable = index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes");
+                    const isClickable = index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes" || word === "finalizes");
 
                     // Special handling for Union/Unites position
                     if (index === 1 && word === "Union") {
