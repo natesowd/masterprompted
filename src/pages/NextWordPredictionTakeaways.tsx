@@ -27,7 +27,7 @@ export default function Takeaways() {
                 1
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">LLMs generate text through next-word prediction</span>—a powerful but probabilistic process that relies on patterns in data rather than strong logical reasoning.
+                <span className="font-bold">LLMs generate text through next-word prediction</span>—a probabilistic process that relies on patterns in data rather than strong logical reasoning.
               </p>
             </div>
             
