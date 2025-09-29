@@ -56,10 +56,10 @@ export default function HeadlineResponse() {
       }
     }
     
-    // Filter out words that are already selected in the sentence (but keep the current index word functional)
+    // Filter out words that are already selected in the sentence
     return options.filter(option => 
       !currentSentence.some((word, i) => 
-        i !== currentIndex && word.toLowerCase().replace(/[,.]/g, '') === option.word.toLowerCase()
+        word.toLowerCase().replace(/[,.]/g, '') === option.word.toLowerCase()
       )
     );
   };
