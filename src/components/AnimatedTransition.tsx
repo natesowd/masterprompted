@@ -7,7 +7,6 @@ import TypewriterText from "@/components/TypewriterText";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import { PopoverSeries } from "@/components/PopoverSeries";
 
 interface AnimatedTransitionProps {
   promptText: string;
@@ -16,7 +15,7 @@ interface AnimatedTransitionProps {
   onComplete?: () => void;
 }
 
-type AnimationPhase = "chatbox" | "sending" | "sent" | "thinking" | "responding" | "streaming" | "streamingComplete" | "showPopover" | "showEvaluation" | "complete";
+type AnimationPhase = "chatbox" | "sending" | "sent" | "thinking" | "responding" | "streaming" | "showEvaluation" | "complete";
 
 const AnimatedTransition = ({ 
   promptText, 
@@ -27,25 +26,7 @@ const AnimatedTransition = ({
   const navigate = useNavigate();
   const [phase, setPhase] = useState<AnimationPhase>("chatbox");
   const [showResponseElements, setShowResponseElements] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [showEvaluation, setShowEvaluation] = useState(false);
-
-  // PopoverSeries steps for journalistic evaluation guidance
-  const popoverSteps = [
-    {
-      id: "evaluation-intro",
-      trigger: ".evaluation-panel",
-      content: (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Journalistic Evaluation</h3>
-          <p className="text-sm text-muted-foreground">
-            This panel helps you evaluate the AI-generated content using journalistic criteria. 
-            Each criterion provides detailed guidance for assessment.
-          </p>
-        </div>
-      )
-    }
-  ];
 
   // Auto-start the animation as soon as this component mounts
   useEffect(() => {
@@ -63,37 +44,30 @@ const AnimatedTransition = ({
 
     switch (phase) {
       case "sending":
-        timeout = setTimeout(() => setPhase("sent"), 800);
+        timeout = setTimeout(() => setPhase("sent"), 600);
         break;
       case "sent":
-        timeout = setTimeout(() => setPhase("thinking"), 500);
+        timeout = setTimeout(() => setPhase("thinking"), 300);
         break;
       case "thinking":
-        timeout = setTimeout(() => setPhase("responding"), 2000);
+        timeout = setTimeout(() => setPhase("responding"), 1500);
         break;
       case "responding":
         setShowResponseElements(true);
-        timeout = setTimeout(() => setPhase("streaming"), 1200);
+        timeout = setTimeout(() => setPhase("streaming"), 800);
         break;
       case "streaming":
-        // Streaming will trigger streamingComplete phase via TypewriterText onComplete
-        break;
-      case "streamingComplete":
-        timeout = setTimeout(() => setPhase("showPopover"), 1500);
-        break;
-      case "showPopover":
-        setShowPopover(true);
-        timeout = setTimeout(() => setPhase("showEvaluation"), 2000);
+        // Streaming will trigger showEvaluation phase via TypewriterText onComplete
         break;
       case "showEvaluation":
         setShowEvaluation(true);
-        timeout = setTimeout(() => setPhase("complete"), 3000);
+        timeout = setTimeout(() => setPhase("complete"), 1500);
         break;
       case "complete":
         timeout = setTimeout(() => {
           navigate(targetRoute);
           onComplete?.();
-        }, 1000);
+        }, 500);
         break;
     }
 
@@ -150,7 +124,7 @@ const AnimatedTransition = ({
                   </div>
                 )}
                 
-                {(phase === "sent" || phase === "thinking" || phase === "responding" || phase === "streaming" || phase === "streamingComplete" || phase === "showPopover" || phase === "showEvaluation" || phase === "complete") && (
+                {(phase === "sent" || phase === "thinking" || phase === "responding" || phase === "streaming" || phase === "showEvaluation" || phase === "complete") && (
                   <div className="animate-fade-in">
                     <SentPrompt text={promptText} fileName={fileName} />
                   </div>
@@ -172,14 +146,14 @@ const AnimatedTransition = ({
               )}
 
               {/* Streaming response */}
-              {(phase === "streaming" || phase === "streamingComplete" || phase === "showPopover" || phase === "showEvaluation" || phase === "complete") && (
+              {(phase === "streaming" || phase === "showEvaluation" || phase === "complete") && (
                 <div className="animate-fade-in space-y-6">
                   <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
                     {phase === "streaming" ? (
                       <TypewriterText
                         text="Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:"
                         delay={30}
-                        onComplete={() => setPhase("streamingComplete")}
+                        onComplete={() => setPhase("showEvaluation")}
                         className="text-gray-700 text-lg"
                       />
                     ) : (
@@ -190,7 +164,7 @@ const AnimatedTransition = ({
                   </div>
                   
                   {/* Headline that appears after intro text */}
-                  {(phase === "streamingComplete" || phase === "showPopover" || phase === "showEvaluation" || phase === "complete") && (
+                  {(phase === "showEvaluation" || phase === "complete") && (
                     <div className="animate-fade-in bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
                       <TypewriterText
                         text="European Union Unites On Historic AI Ethics Framework, Charting Path For Responsible Technology Development"
@@ -205,21 +179,12 @@ const AnimatedTransition = ({
 
             {/* Right sidebar - Evaluation Panel appears last */}
             {showResponseElements && showEvaluation && (
-              <div className="lg:col-span-4 animate-fade-in animate-slide-in-right evaluation-panel">
+              <div className="lg:col-span-4 animate-fade-in animate-slide-in-right">
                 <EvaluationPanel />
               </div>
             )}
           </div>
         </div>
-
-        {/* PopoverSeries for guidance */}
-        {showPopover && (
-          <PopoverSeries
-            steps={popoverSteps}
-            initialStep={0}
-            onClose={() => setShowPopover(false)}
-          />
-        )}
       </main>
     </div>
   );
