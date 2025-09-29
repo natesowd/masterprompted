@@ -197,17 +197,20 @@ export default function HeadlineResponse() {
       <Header />
       
       <main className="container mx-auto px-6 py-6">
-        <Breadcrumb />
-        
-        {/* Interaction Mode Toggle */}
-        <div className="mb-6 flex items-center space-x-2">
-          <Label htmlFor="interaction-mode" className="text-sm font-medium">
-            Interaction Mode:
-          </Label>
-          <Switch id="interaction-mode" checked={useNewInteraction} onCheckedChange={setUseNewInteraction} />
-          <span className="text-sm text-gray-600">
-            {useNewInteraction ? "New Form" : "Classic Form"}
-          </span>
+        {/* Breadcrumb and Toggle Row */}
+        <div className="flex items-center justify-between mb-6">
+          <Breadcrumb />
+          
+          {/* Interaction Mode Toggle */}
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="interaction-mode" className="text-sm font-medium">
+              Interaction Mode:
+            </Label>
+            <Switch id="interaction-mode" checked={useNewInteraction} onCheckedChange={setUseNewInteraction} />
+            <span className="text-sm text-gray-600">
+              {useNewInteraction ? "New Form" : "Classic Form"}
+            </span>
+          </div>
         </div>
         
         <div className="max-w-7xl mx-auto">
