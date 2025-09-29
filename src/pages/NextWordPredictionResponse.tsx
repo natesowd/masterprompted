@@ -45,11 +45,11 @@ export default function HeadlineResponse() {
           { word: "Agreement", probability: "0.28" },
           { word: "Milestone", probability: "0.07" }
         ];
-      } else if (secondWord === "Finalizes") {
+      } else if (secondWord === "Finalizes" || secondWord === "finalizes") {
         return [
-          { word: "Landmark", probability: "0.58" },
-          { word: "Sweeping", probability: "0.31" },
-          { word: "Pioneering", probability: "0.11" }
+          { word: "landmark", probability: "0.58" },
+          { word: "sweeping", probability: "0.31" },
+          { word: "pioneering", probability: "0.11" }
         ];
       }
     }
@@ -68,7 +68,7 @@ export default function HeadlineResponse() {
         setCurrentSentence(["European", "Union", "Reaches", "Consensus", "on", "Historic", "AI", "Ethics", "Framework,", "Paving", "the", "Way", "for", "Responsible", "Tech", "Innovation"]);
         return;
       } else if (newWord === "Finalizes") {
-        setCurrentSentence(["European", "Union", "Finalizes", "Landmark", "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "for", "Safe", "Technology", "Development"]);
+        setCurrentSentence(["European", "Union", "finalizes", "landmark", "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "for", "Safe", "Technology", "Development"]);
         return;
       } else {
         // Reset third position and beyond for Unites
@@ -112,7 +112,7 @@ export default function HeadlineResponse() {
   // Word progression data from the table
   const wordProgressions = {
     "European Union Unites": {
-      "On": "Historic AI Ethics Framework, Charting Path for Responsible Technology Development",
+      "on": "Historic AI Ethics Framework, Charting Path for Responsible Technology Development",
       "Around": "Sweeping AI Ethics Charter, Pioneering International Tech Policy Standards",
       "Behind": "Historic AI Ethics Framework, Setting Standards for Responsible Innovation"
     },
@@ -122,9 +122,9 @@ export default function HeadlineResponse() {
       "Milestone": "in AI Ethics, Advancing a Unified Vision for Responsible Innovation"
     },
     "European Union Finalizes": {
-      "Landmark": "AI Ethics Agreement, Setting Global Benchmark for Safe Technology Development",
-      "Sweeping": "AI Ethics Agreement, Establishing New Norms for Responsible Tech",
-      "Pioneering": "AI Ethics Framework, Guiding the Future of Safe Innovation"
+      "landmark": "AI Ethics Agreement, Setting Global Benchmark for Safe Technology Development",
+      "sweeping": "AI Ethics Agreement, Establishing New Norms for Responsible Tech",
+      "pioneering": "AI Ethics Framework, Guiding the Future of Safe Innovation"
     }
   };
   const getNextWords = (currentPath: string[]) => {
@@ -132,13 +132,13 @@ export default function HeadlineResponse() {
     if (currentPath.length === 2 && currentPath[0] === "European" && currentPath[1] === "Union") {
       return [{
         word: "Unites",
-        nextWords: ["On", "Around", "Behind"]
+        nextWords: ["on", "Around", "Behind"]
       }, {
         word: "Reaches",
         nextWords: ["Consensus", "Agreement", "Milestone"]
       }, {
         word: "Finalizes",
-        nextWords: ["Landmark", "Sweeping", "Pioneering"]
+        nextWords: ["landmark", "sweeping", "pioneering"]
       }];
     }
     const pathKey = currentPath.slice(0, 3).join(" ");
@@ -218,7 +218,7 @@ export default function HeadlineResponse() {
                   }}>
                         {currentSentence.map((word, index) => {
                           // Handle dropdown for second position (Unites/Reaches/Finalizes/finalizes)
-                          if (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes")) {
+                          if (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes" || word === "finalizes")) {
                             const options = getWordOptions('second');
                             return (
                               <span key={index}>
@@ -364,7 +364,7 @@ export default function HeadlineResponse() {
                   lineHeight: '1.8'
                 }}>
                     {currentSentence.map((word, index) => {
-                    const isClickable = index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes");
+                    const isClickable = index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes" || word === "finalizes");
 
                     // Special handling for Union/Unites position
                     if (index === 1 && word === "Union") {
