@@ -7,10 +7,11 @@ import TextFlag from "@/components/TextFlag";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 export default function HeadlineResponse() {
   const navigate = useNavigate();
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
@@ -22,6 +23,83 @@ export default function HeadlineResponse() {
   const [showCharterTooltip, setShowCharterTooltip] = useState(false);
   const [charterTooltipShown, setCharterTooltipShown] = useState(false);
   const [useNewInteraction, setUseNewInteraction] = useState(false);
+
+  // Helper function to get word options for dropdowns
+  const getWordOptions = (position: 'second' | 'third') => {
+    if (position === 'second') {
+      return [
+        { word: "Unites", probability: "0.67" },
+        { word: "Reaches", probability: "0.24" },
+        { word: "Finalizes", probability: "0.09" }
+      ];
+    } else { // third position
+      const secondWord = currentSentence[2];
+      if (secondWord === "Unites") {
+        return [
+          { word: "On", probability: "0.73" },
+          { word: "Around", probability: "0.42" },
+          { word: "Behind", probability: "0.12" }
+        ];
+      } else if (secondWord === "Reaches") {
+        return [
+          { word: "Consensus", probability: "0.65" },
+          { word: "Agreement", probability: "0.28" },
+          { word: "Milestone", probability: "0.07" }
+        ];
+      } else if (secondWord === "Finalizes") {
+        return [
+          { word: "landmark", probability: "0.58" },
+          { word: "sweeping", probability: "0.31" },
+          { word: "pioneering", probability: "0.11" }
+        ];
+      }
+    }
+    return [];
+  };
+
+  // Function to handle word selection and update sentence
+  const handleWordSelection = (newWord: string, position: number) => {
+    const newSentence = [...currentSentence];
+    newSentence[position] = newWord;
+
+    // Update the rest of the sentence based on the selection
+    if (position === 2) { // Second column selection
+      // Reset third position and beyond
+      const baseWords = ["European", "Union", newWord];
+      const thirdOptions = getWordOptions('third');
+      if (thirdOptions.length > 0) {
+        baseWords.push(thirdOptions[0].word); // Default to first option
+      }
+
+      // Get the completion for this path
+      const pathKey = baseWords.slice(0, 3).join(" ");
+      const progressionData = wordProgressions[pathKey as keyof typeof wordProgressions];
+      if (progressionData && thirdOptions.length > 0) {
+        const thirdWord = thirdOptions[0].word;
+        const completion = progressionData[thirdWord as keyof typeof progressionData] as string;
+        if (completion) {
+          const completionWords = completion.split(" ");
+          setCurrentSentence([...baseWords, ...completionWords]);
+        }
+      }
+    } else if (position === 3) { // Third column selection
+      const pathKey = currentSentence.slice(0, 3).join(" ");
+      const progressionData = wordProgressions[pathKey as keyof typeof wordProgressions];
+      if (progressionData) {
+        const completion = progressionData[newWord as keyof typeof progressionData] as string;
+        if (completion) {
+          const completionWords = completion.split(" ");
+          setCurrentSentence(["European", "Union", currentSentence[2], newWord, ...completionWords]);
+        }
+      }
+    }
+
+    // Show factual inaccuracy tooltip for specific combinations
+    if ((currentSentence[2] === "Unites" && newWord === "Behind") || 
+        (newWord === "Unites" && currentSentence[3] === "Behind")) {
+      setShowFactualInaccuracyTooltip(true);
+    }
+  };
 
   // Word progression data from the table
   const wordProgressions = {
@@ -122,7 +200,7 @@ export default function HeadlineResponse() {
                   Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
                 </p>
                 
-                {/* Conditional rendering based on interaction mode */}
+                 {/* Conditional rendering based on interaction mode */}
                 {useNewInteraction ? (/* New Interaction Form */
               <div className="space-y-6">
                     <div className="relative">
@@ -131,42 +209,89 @@ export default function HeadlineResponse() {
                     lineHeight: '1.8'
                   }}>
                         {currentSentence.map((word, index) => {
-                          // Make Unites (index 2) and On (index 3) clickable in new form
-                          const isClickable = (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes")) || 
-                                             (index === 3 && (word === "On" || word === "Around" || word === "Behind" || word === "Consensus" || word === "Agreement" || word === "Milestone" || word === "Landmark" || word === "sweeping" || word === "pioneering"));
-                          
-                          if (isClickable) {
+                          // Handle dropdown for second position (Unites/Reaches/Finalizes)
+                          if (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes")) {
+                            const options = getWordOptions('second');
                             return (
                               <span key={index}>
-                                <span 
-                                  className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg" 
-                                  onClick={() => setSelectedWord(selectedWord === `word-${index}` ? null : `word-${index}`)}
-                                  onMouseEnter={() => {
-                                    if (!tooltipShown) {
-                                      setShowTooltip(true);
-                                      setTooltipShown(true);
-                                    }
-                                  }}
-                                >
-                                  {word}
-                                  <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                                    {word === "Unites" ? "0.67" : 
-                                     word === "Reaches" ? "0.24" : 
-                                     word === "Finalizes" ? "0.09" :
-                                     word === "On" ? "0.73" :
-                                     word === "Around" ? "0.42" :
-                                     word === "Behind" ? "0.12" :
-                                     word === "Consensus" ? "0.65" :
-                                     word === "Agreement" ? "0.28" :
-                                     word === "Milestone" ? "0.07" :
-                                     word === "Landmark" ? "0.58" :
-                                     word === "sweeping" ? "0.31" :
-                                     "0.11"}
-                                  </span>
-                                </span>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <span className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg inline-flex items-center gap-1">
+                                      {word}
+                                      <ChevronDown className="h-3 w-3" />
+                                      <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                                        {options.find(opt => opt.word === word)?.probability || "0.67"}
+                                      </span>
+                                    </span>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent className="bg-white border shadow-lg">
+                                    {options.map((option) => (
+                                      <DropdownMenuItem 
+                                        key={option.word}
+                                        onClick={() => handleWordSelection(option.word, index)}
+                                        className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"
+                                      >
+                                        <span>{option.word}</span>
+                                        <span className="text-xs text-gray-500 ml-2">{option.probability}</span>
+                                      </DropdownMenuItem>
+                                    ))}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                                 {index < currentSentence.length - 1 && " "}
                               </span>
                             );
+                          }
+                          
+                          // Handle dropdown for third position (On/Around/Behind/etc.)
+                          if (index === 3) {
+                            const options = getWordOptions('third');
+                            const isValidThirdWord = options.some(opt => opt.word === word);
+                            
+                            if (isValidThirdWord) {
+                              return (
+                                <span key={index}>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <span className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg inline-flex items-center gap-1">
+                                        {word}
+                                        <ChevronDown className="h-3 w-3" />
+                                        <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                                          {options.find(opt => opt.word === word)?.probability || "0.73"}
+                                        </span>
+                                      </span>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="bg-white border shadow-lg">
+                                      {options.map((option) => (
+                                        <DropdownMenuItem 
+                                          key={option.word}
+                                          onClick={() => handleWordSelection(option.word, index)}
+                                          className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"
+                                        >
+                                          <span>{option.word}</span>
+                                          <span className="text-xs text-gray-500 ml-2">{option.probability}</span>
+                                        </DropdownMenuItem>
+                                      ))}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                  {index < currentSentence.length - 1 && " "}
+                                </span>
+                              );
+                            }
+                          }
+                          
+                          // Handle TextFlag for "Charter," in new form too
+                          if (word === "Charter,") {
+                            return <span key={index} className="relative">
+                                     <span onMouseLeave={() => {
+                                  if (!charterTooltipShown) {
+                                    setShowCharterTooltip(true);
+                                    setCharterTooltipShown(true);
+                                  }
+                                }}>
+                                       <TextFlag text="Charter" evaluationFactor="factual-accuracy" explanation="The term 'charter' has been used here to describe the EU AI Act. A charter is a different type of document than an act and therefore are not interchangeable terms." />
+                                     </span>
+                                     ,{index < currentSentence.length - 1 && " "}
+                                   </span>;
                           }
                           
                           return (
@@ -179,7 +304,49 @@ export default function HeadlineResponse() {
                       </h1>
                     </div>
                     
-                    {/* New Form Controls */}
+                    {/* Factual Inaccuracy Tooltip for New Form */}
+                    {showFactualInaccuracyTooltip && (
+                      <div className="fixed right-80 top-1/2 transform -translate-y-1/2 z-50">
+                        <div className="bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg max-w-md w-80">
+                          <p className="text-sm leading-relaxed mb-2 font-medium">
+                            You found the factual inaccuracy!
+                          </p>
+                          <p className="text-sm leading-relaxed mb-4">
+                            Through a series of word selections, the LLM has generated an error in factual information.
+                          </p>
+                          <p className="text-sm leading-relaxed mb-4">
+                            Hover over the word to read more about the falsehood.
+                          </p>
+                          <button 
+                            onClick={() => setShowFactualInaccuracyTooltip(false)} 
+                            className="bg-white text-emerald-500 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Charter Tooltip for New Form */}
+                    {showCharterTooltip && (
+                      <div className="fixed right-80 top-1/2 transform -translate-y-1/2 z-50">
+                        <div className="bg-emerald-500 text-white px-6 py-4 rounded-lg shadow-lg w-80">
+                          <h3 className="text-sm font-semibold mb-2">Journalistic Evaluation Checklist</h3>
+                          <p className="text-sm leading-relaxed mb-3">
+                            For more information on the flagged content, expand the relevant term according to the icon.
+                          </p>
+                          <p className="text-sm leading-relaxed mb-4">
+                            This checklist is designed to help you apply your journalistic expertise effectively to LLM outputs. With LLM-specific criteria, it guides you to keep your reporting reliable.
+                          </p>
+                          <button 
+                            onClick={() => setShowCharterTooltip(false)} 
+                            className="bg-white text-emerald-500 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+                          >
+                            Continue
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     
                   </div>) : (/* Classic Interaction Form */
 
@@ -215,7 +382,7 @@ export default function HeadlineResponse() {
                             setShowTooltip(true);
                             setTooltipShown(true);
                           }
-                        }} data-word-unites={word === "Unites" ? true : undefined}>
+                        }} data-word-unites={word === "Unites" ? true : undefined} data-word-reaches={word === "Reaches" ? true : undefined} data-word-finalizes={word === "Finalizes" ? true : undefined}>
                                {word}
                                <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                                  {word === "Unites" ? "0.67" : word === "Reaches" ? "0.24" : "0.09"}
