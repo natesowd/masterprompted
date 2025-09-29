@@ -28,6 +28,12 @@ const AnimatedTransition = ({
   const [showResponseElements, setShowResponseElements] = useState(false);
   const [showEvaluation, setShowEvaluation] = useState(false);
 
+  // Auto-start the animation as soon as this component mounts
+  useEffect(() => {
+    const t = setTimeout(() => setPhase("sending"), 100);
+    return () => clearTimeout(t);
+  }, []);
+
   const handleSubmit = () => {
     // Start the animation sequence
     setPhase("sending");
