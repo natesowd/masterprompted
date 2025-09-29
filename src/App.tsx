@@ -38,6 +38,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* NAV BAR */}
           <Route path="/" element={<Landing />} />
           <Route path="/modules" element={<Modules />} />
           <Route path="/playground" element={<PromptPlayground />} />
@@ -45,23 +46,31 @@ const App = () => (
           <Route path="/help" element={<Help />} />
           <Route path="/components" element={<ComponentLibrary />} />
           <Route path="/imprint" element={<Imprint />} />
-          <Route path="/module/introduction" element={<Introduction />} />
-          <Route path="/module/about-simulator" element={<AboutSimulator />} />
-          <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
-          <Route path="/module/next-word-prediction-intro" element={<NextWordPredictionIntro />} />
-          <Route path="/module/next-word-prediction" element={<NextWordPrediction />} />
-          <Route path="/module/headline-response" element={<HeadlineResponse />} />
+
+          {/* INTRO MODULE */}
+          <Route path="/module/intro" element={<Introduction />} />
+          <Route path="/module/intro/about-simulator" element={<AboutSimulator />} />
+
+          {/* NEXT WORD PREDICTION MODULE */}
+          <Route path="/module/next-word-prediction" element={<NextWordPredictionIntro />} />
+          <Route path="/module/next-word-prediction/prompt" element={<NextWordPrediction />} />
+          <Route path="/module/next-word-prediction/response" element={<HeadlineResponse />} />
+          <Route path="/module/next-word-prediction/takeaways" element={<Takeaways />} />
+
+          {/* PROMPT CONSTRUCTION MODULE */}
           <Route path="/module/prompt-construction" element={<PromptConstruction />} />
           <Route path="/module/prompt-construction/specificity" element={<Specificity />} />
           <Route path="/module/prompt-construction/specificity/response" element={<SpecificityResponse />} />
-          
           <Route path="/module/prompt-construction/conversation-style" element={<ConversationStyle />} />
           <Route path="/module/prompt-construction/context" element={<Context />} />
           <Route path="/module/prompt-construction/bias" element={<Bias />} />
+
+          {/* UNIMPLEMENTED */}
           <Route path="/module/system-parameters" element={<SystemParameters />} />
           <Route path="/module/multiple-sources" element={<MultipleSources />} />
           <Route path="/module/llm-training" element={<LLMTraining />} />
-          <Route path="/takeaways" element={<Takeaways />} />
+          <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

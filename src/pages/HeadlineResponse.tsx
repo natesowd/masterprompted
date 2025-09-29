@@ -367,7 +367,7 @@ export default function HeadlineResponse() {
                 
                 {/* Takeaways Button */}
                 <div className="mt-8">
-                  <Button variant="outline" onClick={() => navigate("/takeaways")} className="rounded-full px-6 py-3 border-2 border-foreground hover:bg-foreground hover:text-background transition-colors">
+                  <Button variant="outline" onClick={() => navigate("/module/next-word-prediction/takeaways")} className="rounded-full px-6 py-3 border-2 border-foreground hover:bg-foreground hover:text-background transition-colors">
                     Takeaways
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>

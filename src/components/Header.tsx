@@ -33,12 +33,12 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
   const moduleItems = [
     { 
       title: "Introduction", 
-      path: "/module/introduction",
+      path: "/module/intro",
       completed: false
     },
     { 
       title: "Next Word Prediction", 
-      path: "/module/next-word-prediction-intro",
+      path: "/module/next-word-prediction",
       completed: false
     },
     { 

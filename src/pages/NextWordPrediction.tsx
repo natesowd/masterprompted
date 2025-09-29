@@ -11,7 +11,7 @@ export default function NextWordPrediction() {
   const [showPopover, setShowPopover] = useState(false);
 
   const handleSubmit = () => {
-    navigate("/module/headline-response");
+    navigate("/module/next-word-prediction/response");
   };
 
   useEffect(() => {

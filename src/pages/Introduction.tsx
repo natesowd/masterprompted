@@ -8,7 +8,7 @@ const Introduction = () => {
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    navigate("/module/about-simulator");
+    navigate("/module/intro/about-simulator");
   };
 
   return (

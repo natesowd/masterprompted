@@ -8,7 +8,7 @@ const NextWordPredictionIntro = () => {
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    navigate("/module/next-word-prediction");
+    navigate("/module/next-word-prediction/prompt");
   };
 
   return (
