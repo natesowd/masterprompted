@@ -9,25 +9,29 @@ interface TypewriterTextProps {
 
 const TypewriterText = ({ text, delay = 50, onComplete, className = "" }: TypewriterTextProps) => {
   const [displayText, setDisplayText] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const words = text.split(' ');
 
   useEffect(() => {
-    if (currentIndex < text.length) {
+    if (currentWordIndex < words.length) {
       const timeout = setTimeout(() => {
-        setDisplayText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
+        setDisplayText(prev => {
+          const nextWord = words[currentWordIndex];
+          return prev + (prev ? ' ' : '') + nextWord;
+        });
+        setCurrentWordIndex(prev => prev + 1);
       }, delay);
 
       return () => clearTimeout(timeout);
-    } else if (onComplete && currentIndex === text.length) {
+    } else if (onComplete && currentWordIndex === words.length) {
       onComplete();
     }
-  }, [currentIndex, text, delay, onComplete]);
+  }, [currentWordIndex, words, delay, onComplete]);
 
   return (
     <span className={className}>
       {displayText}
-      {currentIndex < text.length && (
+      {currentWordIndex < words.length && (
         <span className="animate-pulse ml-1">|</span>
       )}
     </span>

@@ -15,7 +15,7 @@ interface AnimatedTransitionProps {
   onComplete?: () => void;
 }
 
-type AnimationPhase = "chatbox" | "sending" | "sent" | "thinking" | "responding" | "streaming" | "streamingComplete" | "showHeadline" | "showEvaluation" | "complete";
+type AnimationPhase = "chatbox" | "sending" | "sent" | "responding" | "streaming" | "streamingComplete" | "showHeadline" | "showEvaluation" | "complete";
 
 const AnimatedTransition = ({ 
   promptText, 
@@ -48,10 +48,7 @@ const AnimatedTransition = ({
         timeout = setTimeout(() => setPhase("sent"), 800);
         break;
       case "sent":
-        timeout = setTimeout(() => setPhase("thinking"), 500);
-        break;
-      case "thinking":
-        timeout = setTimeout(() => setPhase("responding"), 2000);
+        timeout = setTimeout(() => setPhase("responding"), 500);
         break;
       case "responding":
         setShowResponseElements(true);
@@ -132,19 +129,12 @@ const AnimatedTransition = ({
                   </div>
                 )}
                 
-                {(phase === "sent" || phase === "thinking" || phase === "responding" || phase === "streaming" || phase === "streamingComplete" || phase === "showHeadline" || phase === "showEvaluation" || phase === "complete") && (
+                {(phase === "sent" || phase === "responding" || phase === "streaming" || phase === "streamingComplete" || phase === "showHeadline" || phase === "showEvaluation" || phase === "complete") && (
                   <div className="animate-fade-in">
                     <SentPrompt text={promptText} fileName={fileName} />
                   </div>
                 )}
               </div>
-
-              {/* Thinking phase */}
-              {phase === "thinking" && (
-                <div className="animate-fade-in bg-white rounded-lg p-8 border border-gray-200 shadow-sm">
-                  <LoadingDots text="Analyzing prompt" />
-                </div>
-              )}
 
               {/* Responding phase */}
               {phase === "responding" && (
