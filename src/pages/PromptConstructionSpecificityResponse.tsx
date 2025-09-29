@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import SentPrompt from "@/components/SentPrompt";
+import ModuleNavigation from "@/components/ModuleNavigation";
 export default function SpecificityResponse() {
   const navigate = useNavigate();
   const [showTooltip, setShowTooltip] = useState(true);
@@ -118,5 +119,10 @@ export default function SpecificityResponse() {
           </div>
         </div>
       </main>
+      
+      <ModuleNavigation 
+        previousRoute="/module/prompt-construction/specificity" 
+        nextRoute="/module/prompt-construction/context"
+      />
     </div>;
 }

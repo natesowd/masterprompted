@@ -4,6 +4,7 @@ import EvaluationPanel from "@/components/EvaluationPanel";
 import SentPrompt from "@/components/SentPrompt";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import TextFlag from "@/components/TextFlag";
+import ModuleNavigation from "@/components/ModuleNavigation";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -600,5 +601,10 @@ export default function HeadlineResponse() {
       
       {/* PopoverSeries for word interaction tour */}
       <PopoverSeries steps={popoverSteps} />
+      
+      <ModuleNavigation 
+        previousRoute="/module/next-word-prediction/prompt" 
+        nextRoute="/module/next-word-prediction/takeaways"
+      />
     </div>;
 }

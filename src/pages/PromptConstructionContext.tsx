@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
+import ModuleNavigation from "@/components/ModuleNavigation";
 
 export default function Context() {
   return (
@@ -16,6 +17,11 @@ export default function Context() {
           </div>
         </div>
       </main>
+      
+      <ModuleNavigation 
+        previousRoute="/module/prompt-construction/specificity/response" 
+        nextRoute="/module/prompt-construction/conversation-style"
+      />
     </div>
   );
 }

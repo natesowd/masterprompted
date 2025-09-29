@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
+import ModuleNavigation from "@/components/ModuleNavigation";
 
 export default function Bias() {
   return (
@@ -16,6 +17,11 @@ export default function Bias() {
           </div>
         </div>
       </main>
+      
+      <ModuleNavigation 
+        previousRoute="/module/prompt-construction/conversation-style" 
+        nextRoute="/modules"
+      />
     </div>
   );
 }

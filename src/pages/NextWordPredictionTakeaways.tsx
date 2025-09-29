@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
+import ModuleNavigation from "@/components/ModuleNavigation";
 
 export default function Takeaways() {
   const navigate = useNavigate();
@@ -60,6 +61,11 @@ export default function Takeaways() {
           </div>
         </div>
       </main>
+      
+      <ModuleNavigation 
+        previousRoute="/module/next-word-prediction/response" 
+        nextRoute="/module/prompt-construction"
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import Chatbox from "@/components/ChatBox";
 import Breadcrumb from "@/components/Breadcrumb";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import AnimatedTransition from "@/components/AnimatedTransition";
+import ModuleNavigation from "@/components/ModuleNavigation";
 
 export default function NextWordPrediction() {
   const navigate = useNavigate();
@@ -85,6 +86,11 @@ export default function NextWordPrediction() {
           )}
         </div>
       </main>
+      
+      <ModuleNavigation 
+        previousRoute="/module/next-word-prediction" 
+        nextRoute="/module/next-word-prediction/response"
+      />
     </div>
   );
 }
