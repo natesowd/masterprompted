@@ -24,7 +24,7 @@ export default function HeadlineResponse() {
   const [charterTooltipShown, setCharterTooltipShown] = useState(false);
   const [useNewInteraction, setUseNewInteraction] = useState(false);
 
-  const getWordOptions = (position: 'second' | 'third') => {
+  const getWordOptions = (position: 'second' | 'third', currentIndex?: number) => {
     let options: { word: string; probability: string }[] = [];
     
     if (position === 'second') {
@@ -56,10 +56,10 @@ export default function HeadlineResponse() {
       }
     }
     
-    // Filter out words that are already selected in the sentence
+    // Filter out words that are already selected in the sentence (but keep the current index word functional)
     return options.filter(option => 
-      !currentSentence.some(word => 
-        word.toLowerCase().replace(/[,.]/, '') === option.word.toLowerCase()
+      !currentSentence.some((word, i) => 
+        i !== currentIndex && word.toLowerCase().replace(/[,.]/g, '') === option.word.toLowerCase()
       )
     );
   };
@@ -88,7 +88,7 @@ export default function HeadlineResponse() {
               { word: "Around", probability: "0.42" },
               { word: "Behind", probability: "0.12" },
             ]
-          : getWordOptions('third');
+          : getWordOptions('third', 3);
         if (thirdOptions.length > 0) {
           baseWords.push(thirdOptions[0].word); // Default to first option
         }
@@ -234,7 +234,7 @@ export default function HeadlineResponse() {
                         {currentSentence.map((word, index) => {
                           // Handle dropdown for second position (Unites/Reaches/Finalizes/finalizes)
                           if (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes" || word === "finalizes")) {
-                            const options = getWordOptions('second');
+                            const options = getWordOptions('second', index);
                             return (
                               <span key={index}>
                                 <DropdownMenu>
@@ -267,7 +267,7 @@ export default function HeadlineResponse() {
                           
                           // Handle dropdown for third position (On/Around/Behind/landmark/etc.)
                           if (index === 3) {
-                            const options = getWordOptions('third');
+                            const options = getWordOptions('third', index);
                             const isValidThirdWord = options.some(opt => opt.word === word);
                             
                             if (isValidThirdWord) {
