@@ -4,14 +4,16 @@ import Header from "@/components/Header";
 import Chatbox from "@/components/ChatBox";
 import Breadcrumb from "@/components/Breadcrumb";
 import { PopoverSeries } from "@/components/PopoverSeries";
+import AnimatedTransition from "@/components/AnimatedTransition";
 
 export default function NextWordPrediction() {
   const navigate = useNavigate();
   const [clickCount, setClickCount] = useState(0);
   const [showPopover, setShowPopover] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const handleSubmit = () => {
-    navigate("/module/next-word-prediction/response");
+    setShowAnimation(true);
   };
 
   useEffect(() => {
@@ -38,6 +40,17 @@ export default function NextWordPrediction() {
     };
   }, []);
 
+
+  if (showAnimation) {
+    return (
+      <AnimatedTransition
+        promptText="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu"
+        fileName="EU_AI_Act.pdf"
+        targetRoute="/module/next-word-prediction/response"
+        onComplete={() => setShowAnimation(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
