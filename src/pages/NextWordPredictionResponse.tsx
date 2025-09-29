@@ -73,7 +73,14 @@ export default function HeadlineResponse() {
       } else {
         // Reset third position and beyond for Unites
         const baseWords = ["European", "Union", newWord];
-        const thirdOptions = getWordOptions('third');
+        // IMPORTANT: compute third options based on the newly selected second word (not the old sentence)
+        const thirdOptions = newWord === "Unites"
+          ? [
+              { word: "On", probability: "0.73" },
+              { word: "Around", probability: "0.42" },
+              { word: "Behind", probability: "0.12" },
+            ]
+          : getWordOptions('third');
         if (thirdOptions.length > 0) {
           baseWords.push(thirdOptions[0].word); // Default to first option
         }
