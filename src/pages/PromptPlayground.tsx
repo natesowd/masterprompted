@@ -8,27 +8,42 @@ import SentPrompt from "@/components/SentPrompt"; // ✨ 1. Import the new compo
 import { useState } from "react";
 
 const PromptPlayground = () => {
-  // State for the text currently in the chatbox
-  const [text, setText] = useState(""); 
-  
+
   // ✨ 2. Add new state to store the list of submitted prompts
   const [submittedPrompts, setSubmittedPrompts] = useState<string[]>([]);
 
   // ✨ 3. Update the handler to manage the list and clear the input
-  const handleChatSubmit = (submittedText: string) => {
+  const handleChatSubmit = async (submittedText: string) => {
     if (!submittedText.trim()) return; // Don't submit empty prompts
 
-    console.log("Text submitted from Chatbox:", submittedText);
-    
+
     // Add the new prompt to our list of submitted prompts
     setSubmittedPrompts(prevPrompts => [...prevPrompts, submittedText]);
-    
-    // Set the main text state to the submitted value (optional, if needed elsewhere)
-    setText(submittedText); 
-    
-    // NOTE: We don't clear the Chatbox from here. 
-    // The Chatbox clears itself after calling onSubmit. We'll modify it slightly.
+
+    console.log("Text submitted from Chatbox:", submittedText);
+
+    let currentFileIds: string[] = []; // Placeholder for file IDs
+    const response = await fetch(
+      "https://llm1.hochschule-stralsund.de:8000/answer",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: submittedText,
+          temperature: 0.7,
+          fileIds: currentFileIds,
+        }),
+      }
+    );
+
+    const data: any = await response.json();
+
+    const answer: string = data.answer;
+
+    console.log("Received answer from backend:", answer);
   };
+
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,7 +60,7 @@ const PromptPlayground = () => {
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             <Chatbox onSubmit={handleChatSubmit} canType={true} />
-            
+
             {/* ✨ 4. Render the list of submitted prompts */}
             <div className="mt-6 space-y-4">
               {submittedPrompts.map((prompt, index) => (
