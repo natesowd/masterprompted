@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import Chatbox from "@/components/ChatBox";
+import SentPrompt from "@/components/SentPrompt";
 export default function SpecificityResponse() {
   const navigate = useNavigate();
   const [showTooltip, setShowTooltip] = useState(true);
@@ -80,7 +80,7 @@ export default function SpecificityResponse() {
           <div className="flex-1">
             {/* Original Prompt Display */}
             <div className="mb-6">
-              <Chatbox canType={false} text="Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems" fileName="EU_AI_Act.pdf" />
+              <SentPrompt text="Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems" fileName="EU_AI_Act.pdf" />
             </div>
 
             {/* AI Response */}
