@@ -27,7 +27,7 @@ export default function Takeaways() {
                 1
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">LLMs generate text through next-word prediction</span>—a probabilistic process that relies on patterns in data rather than strong logical reasoning.
+                <span className="font-bold">LLMs generate text through next-word prediction</span>—a probabilistic process that relies on patterns in data rather than logical reasoning.
               </p>
             </div>
             
@@ -36,7 +36,7 @@ export default function Takeaways() {
                 2
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">Because of this stochastic nature, errors are inevitable:</span> even the most advanced models can produce mistakes, distortions, or unfounded claims.
+                <span className="font-bold">Because of this stochastic nature, errors are inevitable:</span> advanced models will produce mistakes, distortions, or unfounded claims.
               </p>
             </div>
             
