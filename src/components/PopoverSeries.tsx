@@ -184,7 +184,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
         {/* ... (rest of PopoverContent remains the same, using currentStepData) ... */}
         <PopoverContent
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="z-50 relative space-y-4"
+          className="space-y-4"
           side="bottom"
           align="center"
         >
