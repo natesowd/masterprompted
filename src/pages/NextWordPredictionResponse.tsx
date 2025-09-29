@@ -64,22 +64,31 @@ export default function HeadlineResponse() {
 
     // Update the rest of the sentence based on the selection
     if (position === 2) { // Second column selection
-      // Reset third position and beyond
-      const baseWords = ["European", "Union", newWord];
-      const thirdOptions = getWordOptions('third');
-      if (thirdOptions.length > 0) {
-        baseWords.push(thirdOptions[0].word); // Default to first option
-      }
+      // Handle specific sentence switches for Reaches and Finalizes
+      if (newWord === "Reaches") {
+        setCurrentSentence(["European", "Union", "Reaches", "Consensus", "on", "Historic", "AI", "Ethics", "Framework,", "Paving", "the", "Way", "for", "Responsible", "Tech", "Innovation"]);
+        return;
+      } else if (newWord === "Finalizes") {
+        setCurrentSentence(["European", "Union", "finalizes", "landmark", "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "for", "Safe", "Technology", "Development"]);
+        return;
+      } else {
+        // Reset third position and beyond for Unites
+        const baseWords = ["European", "Union", newWord];
+        const thirdOptions = getWordOptions('third');
+        if (thirdOptions.length > 0) {
+          baseWords.push(thirdOptions[0].word); // Default to first option
+        }
 
-      // Get the completion for this path
-      const pathKey = baseWords.slice(0, 3).join(" ");
-      const progressionData = wordProgressions[pathKey as keyof typeof wordProgressions];
-      if (progressionData && thirdOptions.length > 0) {
-        const thirdWord = thirdOptions[0].word;
-        const completion = progressionData[thirdWord as keyof typeof progressionData] as string;
-        if (completion) {
-          const completionWords = completion.split(" ");
-          setCurrentSentence([...baseWords, ...completionWords]);
+        // Get the completion for this path
+        const pathKey = baseWords.slice(0, 3).join(" ");
+        const progressionData = wordProgressions[pathKey as keyof typeof wordProgressions];
+        if (progressionData && thirdOptions.length > 0) {
+          const thirdWord = thirdOptions[0].word;
+          const completion = progressionData[thirdWord as keyof typeof progressionData] as string;
+          if (completion) {
+            const completionWords = completion.split(" ");
+            setCurrentSentence([...baseWords, ...completionWords]);
+          }
         }
       }
     } else if (position === 3) { // Third column selection
