@@ -78,7 +78,7 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
     <header className={`w-full px-6 py-4 transition-all duration-200 ${
       transparent ? 'bg-transparent' : `bg-white ${isScrolled ? 'border-b border-border shadow-sm' : ''}`
     }`}>
-      <div className="flex items-center justify-between max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mx-auto">
         <div className="flex items-center gap-12">
           {/* Logo */}
           <div 

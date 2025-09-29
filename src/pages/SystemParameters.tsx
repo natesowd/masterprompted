@@ -6,7 +6,7 @@ export default function SystemParameters() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      <main className="container mx-auto px-6 py-6">
         <Breadcrumb />
         <div className="max-w-4xl mx-auto">
           <div className="text-center">

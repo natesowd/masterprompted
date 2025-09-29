@@ -13,7 +13,7 @@ export default function Takeaways() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      <main className="container mx-auto px-6 py-6">
         <Breadcrumb />
         <div className="mb-5"></div>
         

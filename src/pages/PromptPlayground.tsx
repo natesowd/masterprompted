@@ -10,7 +10,7 @@ const PromptPlayground = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-6 py-6">
         <div className="flex gap-8">
           {/* Left Sidebar - Prompt Controls */}
           <div className="flex-none">
