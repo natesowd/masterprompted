@@ -24,13 +24,13 @@ const ModuleNavigation = ({
           <Button
             variant="ghost"
             onClick={() => navigate(previousRoute)}
-            className="flex items-center gap-2 hover:bg-gray-100 rounded-full px-4 py-2"
+            className="hover:bg-gray-100 rounded-full p-2"
+            size="icon"
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="text-sm font-medium">{previousLabel}</span>
           </Button>
         ) : (
-          <div className="w-20"></div>
+          <div className="w-8 h-8"></div>
         )}
         
         <div className="w-px h-6 bg-gray-300"></div>
@@ -39,13 +39,13 @@ const ModuleNavigation = ({
           <Button
             variant="ghost"
             onClick={() => navigate(nextRoute)}
-            className="flex items-center gap-2 hover:bg-gray-100 rounded-full px-4 py-2"
+            className="hover:bg-gray-100 rounded-full p-2"
+            size="icon"
           >
-            <span className="text-sm font-medium">{nextLabel}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         ) : (
-          <div className="w-20"></div>
+          <div className="w-8 h-8"></div>
         )}
       </div>
     </div>
