@@ -12,8 +12,8 @@ export default function Specificity() {
   const [showTooltip, setShowTooltip] = useState(true);
   const [promptText, setPromptText] = useState("Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems");
   const handleSubmit = () => {
-    // Navigate to the response page
-    navigate("/module/prompt-construction/specificity/response");
+    // Navigate to the document attachment page
+    navigate("/module/prompt-construction/summarize");
   };
   const handleFileUpload = () => {
     // Handle file upload logic here
