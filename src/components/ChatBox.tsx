@@ -46,7 +46,7 @@ const Chatbox = ({ canType = true, text = "", onSubmit, onUpload, fileName, subm
   // ✨ Internal state to track typing without re-rendering the parent
   const [inputValue, setInputValue] = useState(text);
 
-  // Syncs the internal state if the initial text prop changes
+  // update internal state due to initial/external text changes
   useEffect(() => {
     setInputValue(text);
   }, [text]);
@@ -79,6 +79,11 @@ const Chatbox = ({ canType = true, text = "", onSubmit, onUpload, fileName, subm
         disabled={!canType}
         value={inputValue} // Controlled by internal state
         onChange={(e) => setInputValue(e.target.value)} // Update internal state on typing
+        onKeyDown={e => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit();
+          }}}
         style={{ fontFamily: 'Manrope', fontSize: '16px', lineHeight: '24px', color: '#1F1F1F' }}
       />
       
