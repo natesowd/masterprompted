@@ -45,44 +45,44 @@ export default function SpecificityResponse() {
           <div className="flex-1">
             {/* Article Content */}
             <div className="bg-white rounded-lg p-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-6 leading-relaxed">
                 Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU: "European Union Unites on Historic AI Ethics Framework, Charting Path for Responsible Technology Development"
               </h1>
               
               <div className="mb-6">
-                <p className="text-gray-800 leading-relaxed mb-4">
-                  <span className="text-red-500">🎯</span> Certainly! The AI Act is a <span className="text-red-500">📈</span> significant piece of legislation aimed at regulating artificial intelligence within the European Union.
+                <p className="text-gray-800 leading-relaxed mb-4 text-base">
+                  Certainly! The AI Act is a significant piece of legislation aimed at regulating artificial intelligence within the European Union.
                 </p>
               </div>
               
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-gray-900">Here's a summary of its main points:</h2>
+                <p className="text-lg font-medium text-gray-900 mb-4">Here&apos;s a summary of its main points:</p>
                 
-                <ul className="space-y-3 text-gray-700">
+                <ul className="space-y-4 text-gray-700">
                   <li className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <div>
+                    <p className="text-base leading-relaxed">
                       <strong>Risk-Based Classification:</strong> AI systems are classified according to their risk level:
-                    </div>
+                    </p>
                   </li>
                   
                   <li className="flex items-start ml-6">
                     <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <div>
+                    <p className="text-base leading-relaxed">
                       <strong>Unacceptable Risk:</strong> Prohibited, e.g., social scoring and manipulative AI.
-                    </div>
+                    </p>
                   </li>
                   
                   <li className="flex items-start ml-6">
                     <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <div>
+                    <p className="text-base leading-relaxed">
                       <strong>High-Risk:</strong> Subject to strict regulation.
-                    </div>
+                    </p>
                   </li>
                   
                   <li className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <div>...</div>
+                    <p className="text-base leading-relaxed">...</p>
                   </li>
                 </ul>
               </div>
