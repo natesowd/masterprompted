@@ -63,7 +63,8 @@ export default function NextWordPrediction() {
         <div className="max-w-2xl mx-auto relative min-h-[600px]">
           <Chatbox 
             canType={false} 
-            text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" 
+            value="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" 
+            onChange={() => {}}
             fileName="EU_AI_Act.pdf"
             submitButtonId="chatbox-submit-button" // Pass the ID here
             onSubmit={handleSubmit}

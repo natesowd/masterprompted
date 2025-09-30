@@ -153,16 +153,10 @@ const PromptPlayground = () => {
           <div className="flex-none">
             <div className="sticky top-4">
               <PromptControls
-              specificity={specificity}
-              style={style}
-              context={context}
-              bias={bias}
-              onSpecificityChange={setSpecificity}
-              onStyleChange={setStyle}
-              onContextChange={setContext}
-              onBiasChange={setBias}
-              onReset={handleReset}
-              onSubmit={() => handlePromptOptimize(currentPrompt, specificity, style, context, bias)}
+                showSpecificity={true}
+                showStyle={true}
+                showContext={true}
+                showBias={true}
               />
             </div>
           </div>

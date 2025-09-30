@@ -263,7 +263,8 @@ const ComponentLibrary = () => {
                 </CardHeader>
                 <CardContent>
                   <Chatbox
-                    text="Type your message here..."
+                    value="Type your message here..."
+                    onChange={() => {}}
                     onSubmit={(message) => console.log("Message sent:", message)}
                   />
                 </CardContent>
