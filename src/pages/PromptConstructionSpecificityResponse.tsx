@@ -45,9 +45,9 @@ export default function SpecificityResponse() {
           <div className="flex-1">
             {/* Article Content */}
             <div className="bg-white rounded-lg p-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-6 leading-relaxed">
+              <p className="text-2xl font-bold text-gray-900 mb-6 leading-relaxed">
                 Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU: "European Union Unites on Historic AI Ethics Framework, Charting Path for Responsible Technology Development"
-              </h1>
+              </p>
               
               <div className="mb-6">
                 <p className="text-gray-800 leading-relaxed mb-4 text-base">
