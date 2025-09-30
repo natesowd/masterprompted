@@ -47,11 +47,6 @@ export default function Specificity() {
                   lineHeight: '1.5'
                 }} className="border-0 p-0 text-gray-800 text-lg leading-relaxed mb-4 resize-none min-h-[60px] focus:ring-0 focus:outline-none bg-transparent my-0" />
                   
-                  {/* Attached file */}
-                  <div className="flex items-center gap-2 text-gray-600">
-                    
-                    <span className="text-sm">EU_AI_Act.pdf</span>
-                  </div>
                 </div>
                 
                 {/* Arrow button */}
