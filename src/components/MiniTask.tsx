@@ -55,37 +55,38 @@ export function MiniTask({ title, description, onStartTask, className = "" }: Mi
   return (
     <>
       
-      {/* Spotlight for "unite" word */}
-      {spotlightRects.unite && (
-        <div
-          className="fixed z-50 pointer-events-none"
-          style={{
-            left: spotlightRects.unite.left - 2,
-            top: spotlightRects.unite.top - 2,
-            width: spotlightRects.unite.width + 4,
-            height: spotlightRects.unite.height + 4,
-            background: 'transparent',
-            borderRadius: '8px',
-            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
-          }}
-        />
-      )}
+      {/* Combined spotlight covering both words */}
+      { (spotlightRects.unite || spotlightRects.on) && (() => {
+        const u = spotlightRects.unite;
+        const o = spotlightRects.on;
+        const left = Math.min(u?.left ?? Infinity, o?.left ?? Infinity) - 3;
+        const top = Math.min(u?.top ?? Infinity, o?.top ?? Infinity) - 3;
+        const right = Math.max(
+          (u ? u.left + u.width : -Infinity),
+          (o ? o.left + o.width : -Infinity)
+        ) + 3;
+        const bottom = Math.max(
+          (u ? u.top + u.height : -Infinity),
+          (o ? o.top + o.height : -Infinity)
+        ) + 3;
+        const width = Math.max(0, right - left);
+        const height = Math.max(0, bottom - top);
+        return (
+          <div
+            className="fixed z-50 pointer-events-none"
+            style={{
+              left,
+              top,
+              width,
+              height,
+              background: 'transparent',
+              borderRadius: '8px',
+              boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
+            }}
+          />
+        );
+      })()}
 
-      {/* Spotlight for "on" word */}
-      {spotlightRects.on && (
-        <div
-          className="fixed z-50 pointer-events-none"
-          style={{
-            left: spotlightRects.on.left - 2,
-            top: spotlightRects.on.top - 2,
-            width: spotlightRects.on.width + 4,
-            height: spotlightRects.on.height + 4,
-            background: 'transparent',
-            borderRadius: '8px',
-            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
-          }}
-        />
-      )}
 
       {/* MiniTask component */}
       <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4 ${className}`}>
