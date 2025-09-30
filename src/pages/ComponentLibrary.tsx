@@ -373,16 +373,40 @@ const ComponentLibrary = () => {
                 <CardDescription>Various button styles and variants</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-4">
-                  <Button variant="default">Default</Button>
-                  <Button variant="destructive">Destructive</Button>
-                  <Button variant="outline">Outline</Button>
-                  <Button variant="secondary">Secondary</Button>
-                  <Button variant="ghost">Ghost</Button>
-                  <Button variant="link">Link</Button>
-                  <Button size="sm">Small</Button>
-                  <Button size="lg">Large</Button>
-                  <Button disabled>Disabled</Button>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2 text-gray-600">Primary</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <Button variant="default">Contained</Button>
+                      <Button variant="outline">Outlined</Button>
+                      <Button variant="ghost">Text</Button>
+                      <Button variant="default" disabled>Disabled</Button>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium mb-2 text-gray-600">Secondary</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <Button variant="secondary">Contained</Button>
+                      <Button variant="secondary-outline">Outlined</Button>
+                      <Button variant="secondary-ghost">Text</Button>
+                      <Button variant="secondary" disabled>Disabled</Button>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium mb-2 text-gray-600">Sizes</h4>
+                    <div className="flex flex-wrap gap-4 items-center">
+                      <Button size="sm">Small</Button>
+                      <Button size="default">Default</Button>
+                      <Button size="lg">Large</Button>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium mb-2 text-gray-600">Legacy</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <Button variant="destructive">Destructive</Button>
+                      <Button variant="link">Link</Button>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

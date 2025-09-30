@@ -155,7 +155,7 @@ export default function PromptControls({
 
                     <div className="flex gap-2">
                         
-                        <Button onClick={handleSubmitClick} variant="default" size="sm" className="flex-1 text-gray-600 hover:text-gray-800 hover:bg-gray-50">
+                        <Button onClick={handleSubmitClick} variant="default" size="sm" className="flex-1">
                             Apply Changes
                         </Button>
                     </div>

@@ -10,12 +10,11 @@ function SubmitButton({ onClick, id }: { onClick?: (e?: React.MouseEvent) => voi
     <Button
       id={id}
       onClick={onClick}
-      variant="secondary"
+      variant="default"
       size="icon"
       className="absolute top-4 right-4 rounded-full p-3 h-10 w-10"
-      style={{ background: '#1F1F1F', border: 'none' }}
     >
-      <ArrowUp className="h-5 w-5 text-white" />
+      <ArrowUp className="h-5 w-5" />
     </Button>
   );
 };

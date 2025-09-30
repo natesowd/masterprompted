@@ -208,7 +208,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
                 <Button
                   onClick={() => goToStep(currentStep - 1)}
                   disabled={currentStep === 0}
-                  variant="secondary"
+                  variant="outline"
                 >
                   Previous
                 </Button>
@@ -216,6 +216,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
                   (
                     <Button
                       onClick={() => close()}
+                      variant="default"
                     >
                       Done
                     </Button>
@@ -223,6 +224,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
                     <Button
                       onClick={() => goToStep(currentStep + 1)}
                       disabled={currentStep === steps.length - 1}
+                      variant="default"
                     >
                       Next
                     </Button>
@@ -233,6 +235,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
             <div className="flex justify-end">
               <Button
                 onClick={() => close()}
+                variant="default"
               >
                 Got it
               </Button>

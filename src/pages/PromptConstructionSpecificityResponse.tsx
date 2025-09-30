@@ -75,7 +75,7 @@ export default function SpecificityResponse() {
               {/* Navigation */}
               <div className="mt-12 flex justify-between items-center">
                 <div></div>
-                <Button variant="outline" className="px-8 py-2 rounded-full border-gray-300 hover:border-gray-400">
+                <Button variant="secondary" className="px-8 py-2 rounded-full">
                   Next →
                 </Button>
               </div>
