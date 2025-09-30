@@ -17,10 +17,10 @@ export default function PromptConstruction() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-6 py-6">
+      <main className="content-container">
         <Breadcrumb />
         <div className="mb-5"></div>
-        <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[600px] relative">
+        <div className="content-center min-h-[600px] relative">
           <Card
             className="transition-all duration-200"
             style={{
