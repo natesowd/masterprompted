@@ -6,7 +6,7 @@ const Imprint = () => {
       <Header />
       
       <main className="container mx-auto px-6 py-8">
-        <div className="content-wrapper">
+        <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-foreground mb-6">
             Imprint
           </h1>

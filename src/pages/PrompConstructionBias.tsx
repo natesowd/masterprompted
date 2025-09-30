@@ -7,10 +7,10 @@ export default function Bias() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="content-container">
+      <main className="container mx-auto px-6 py-6">
         <Breadcrumb />
         <div className="mb-5"></div>
-        <div className="content-wrapper">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-foreground mb-4">Bias</h1>
             <p className="text-xl text-muted-foreground">Coming soon...</p>
