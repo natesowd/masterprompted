@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import SentPrompt from "@/components/SentPrompt";
-import { PopoverSeries } from "@/components/PopoverSeries";
+import { MiniTask } from "@/components/MiniTask";
 import TextFlag from "@/components/TextFlag";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import { useState } from "react";
@@ -21,6 +21,7 @@ export default function HeadlineResponse() {
   const [factualTooltipShown, setFactualTooltipShown] = useState(false);
   const [showCharterTooltip, setShowCharterTooltip] = useState(false);
   const [charterTooltipShown, setCharterTooltipShown] = useState(false);
+  const [showMiniTask, setShowMiniTask] = useState(true);
   
 
   const getWordOptions = (position: 'second' | 'third', currentIndex?: number) => {
@@ -399,8 +400,14 @@ export default function HeadlineResponse() {
           </div>
         </div>}
       
-      {/* PopoverSeries for word interaction tour */}
-      <PopoverSeries steps={popoverSteps} />
+      {/* MiniTask for word interaction guidance */}
+      {showMiniTask && (
+        <MiniTask
+          title="Mini Task: Find the factual inaccuracy"
+          description="Click on the green highlighted words to try out different combinations – each combination will generate a different outcome."
+          onStartTask={() => setShowMiniTask(false)}
+        />
+      )}
       
       <ModuleNavigation 
         previousRoute="/module/next-word-prediction/prompt" 
