@@ -111,8 +111,7 @@ const AnimatedTransition = ({
                   <div className="transition-all duration-300">
                     <Chatbox 
                       canType={false} 
-                      value={promptText}
-                      onChange={() => {}}
+                      text={promptText}
                       fileName={fileName}
                       onSubmit={handleSubmit}
                     />
@@ -123,8 +122,7 @@ const AnimatedTransition = ({
                   <div className="transform transition-all duration-600 scale-98 opacity-90">
                     <Chatbox 
                       canType={false} 
-                      value={promptText}
-                      onChange={() => {}}
+                      text={promptText}
                       fileName={fileName}
                       onSubmit={() => {}}
                     />

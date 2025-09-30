@@ -1,16 +1,18 @@
+// src/components/PromptControls.tsx
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+// No longer needs useState from 'react'
 
-// Updated ParameterProps to use three-option radio buttons
+// 1. Update ParameterProps to use string-based current value and change handler
 interface ParameterProps {
     parameterTitle: string;
     leftParameter: string;
     rightParameter: string;
     showParameter?: boolean;
     enabled?: boolean;
-    currentValue: "left" | "middle" | "right"; // Three states
-    onParameterChange?: (param: "left" | "middle" | "right") => void;
+    currentValue: string; 
+    onParameterChange?: (param: string) => void;
 }
 
 function Parameter({
@@ -27,84 +29,50 @@ function Parameter({
         return null;
     }
     
+    // Logic remains the same, driven by props
+    const isLeftSelected = currentValue === leftParameter || currentValue === "";
+    const isRightSelected = currentValue === rightParameter;
+
+    const handleLeftClick = () => {
+        if (enabled) {
+            onParameterChange?.(leftParameter);
+        }
+    };
+
+    const handleRightClick = () => {
+        if (enabled) {
+            onParameterChange?.(rightParameter);
+        }
+    };
+
     return (
-        <div className="my-6">
-            <h4 className="text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
-                {parameterTitle}
-                <div className="w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-xs text-white">i</span>
-                </div>
-            </h4>
-            
-            {/* Radio button controls */}
-            <div className="relative">
-                {/* Connecting line */}
-                <div className="absolute top-3 left-3 right-3 h-0.5 bg-gray-300 z-0"></div>
-                
-                {/* Radio buttons container */}
-                <div className="flex justify-between items-center relative z-10">
-                    {/* Left option */}
-                    <div className="flex flex-col items-center">
-                        <button
-                            onClick={() => enabled && onParameterChange?.("left")}
-                            className={`w-6 h-6 rounded-full border-2 transition-colors ${
-                                currentValue === "left" 
-                                    ? "bg-emerald-500 border-emerald-500" 
-                                    : "bg-white border-gray-300 hover:border-gray-400"
-                            } ${!enabled && "cursor-not-allowed opacity-50"}`}
-                            disabled={!enabled}
-                        >
-                            {currentValue === "left" && (
-                                <div className="w-2 h-2 bg-white rounded-full mx-auto"></div>
-                            )}
-                        </button>
-                        <span className="text-xs text-gray-600 mt-2 text-center max-w-20">
-                            {leftParameter}
-                        </span>
-                    </div>
-                    
-                    {/* Middle option */}
-                    <div className="flex flex-col items-center">
-                        <button
-                            onClick={() => enabled && onParameterChange?.("middle")}
-                            className={`w-6 h-6 rounded-full border-2 transition-colors ${
-                                currentValue === "middle" 
-                                    ? "bg-emerald-500 border-emerald-500" 
-                                    : "bg-white border-gray-300 hover:border-gray-400"
-                            } ${!enabled && "cursor-not-allowed opacity-50"}`}
-                            disabled={!enabled}
-                        >
-                            {currentValue === "middle" && (
-                                <div className="w-2 h-2 bg-white rounded-full mx-auto"></div>
-                            )}
-                        </button>
-                    </div>
-                    
-                    {/* Right option */}
-                    <div className="flex flex-col items-center">
-                        <button
-                            onClick={() => enabled && onParameterChange?.("right")}
-                            className={`w-6 h-6 rounded-full border-2 transition-colors ${
-                                currentValue === "right" 
-                                    ? "bg-emerald-500 border-emerald-500" 
-                                    : "bg-white border-gray-300 hover:border-gray-400"
-                            } ${!enabled && "cursor-not-allowed opacity-50"}`}
-                            disabled={!enabled}
-                        >
-                            {currentValue === "right" && (
-                                <div className="w-2 h-2 bg-white rounded-full mx-auto"></div>
-                            )}
-                        </button>
-                        <span className="text-xs text-gray-600 mt-2 text-center max-w-20">
-                            {rightParameter}
-                        </span>
-                    </div>
-                </div>
+        <div className={`my-5`}>
+            <h4 className="text-sm font-medium text-gray-700 mx-3">{parameterTitle}</h4>
+            <div className={`flex justify-between bg-gray-100 rounded-full p-1 ${!enabled && 'cursor-not-allowed'} ${!enabled && 'opacity-60'}`}>
+                <button
+                    onClick={handleLeftClick}
+                    className={`grow px-4 py-2 text-sm font-medium rounded-full transition-colors
+                        ${isLeftSelected ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'}
+                        ${enabled ? 'hover:text-gray-800' : 'cursor-not-allowed'}
+                    `}
+                >
+                    {leftParameter}
+                </button>
+                <button
+                    onClick={handleRightClick}
+                    className={`grow px-4 py-2 text-sm font-medium rounded-full transition-colors
+                        ${isRightSelected ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'}
+                        ${enabled ? 'hover:text-gray-800' : 'cursor-not-allowed'}
+                    `}
+                >
+                    {rightParameter}
+                </button>
             </div>
         </div>
     );
 }
 
+// Props updated to accept state and handlers from the parent component
 interface PromptControlsProps {
     showSpecificity?: boolean;
     showStyle?: boolean;
@@ -114,6 +82,22 @@ interface PromptControlsProps {
     enableStyle?: boolean;
     enableContext?: boolean;
     enableBias?: boolean;
+
+    // State values
+    specificity: string;
+    style: string;
+    context: string;
+    bias: string;
+
+    // State change handlers
+    onSpecificityChange: (value: string) => void;
+    onStyleChange: (value: string) => void;
+    onContextChange: (value: string) => void;
+    onBiasChange: (value: string) => void;
+
+    // Event handlers
+    onReset: () => void;
+    onSubmit: () => void;
 }
 
 export default function PromptControls({
@@ -124,29 +108,19 @@ export default function PromptControls({
     enableSpecificity = true,
     enableStyle = true,
     enableContext = true,
-    enableBias = true
+    enableBias = true,
+    specificity,
+    style,
+    context,
+    bias,
+    onSpecificityChange,
+    onStyleChange,
+    onContextChange,
+    onBiasChange,
+    onReset,
+    onSubmit,
 }: PromptControlsProps) {
-    // Use three-state values: "left", "middle", "right"
-    const [specificity, setSpecificity] = useState<"left" | "middle" | "right">("middle");
-    const [style, setStyle] = useState<"left" | "middle" | "right">("middle");
-    const [context, setContext] = useState<"left" | "middle" | "right">("middle");
-    const [bias, setBias] = useState<"left" | "middle" | "right">("middle");
-
-    // Reset to middle position
-    const handleReset = () => {
-        setSpecificity("middle");
-        setStyle("middle");
-        setContext("middle");
-        setBias("middle");
-    };
-
-    const handleSubmit = () => {
-        // Handle submit logic here
-        console.log("Specificity:", specificity);
-        console.log("Style:", style);
-        console.log("Context:", context);
-        console.log("Bias:", bias);
-    }
+    // State and handlers have been removed from this component.
 
     return (
         <Card className="bg-white border border-gray-200 rounded-lg">
@@ -161,52 +135,61 @@ export default function PromptControls({
                 </div>
                 <div>
                     <div className="relative">
-                        {/* Updated parameters to match the image */}
+                        {/* Selectors are now controlled by props from the parent */}
                         <Parameter
-                            parameterTitle="Specificity"
-                            leftParameter="More General"
-                            rightParameter="More Specific"
+                            parameterTitle="Prompt Specificity"
+                            leftParameter="General"
+                            rightParameter="Specific"
                             showParameter={showSpecificity}
                             enabled={enableSpecificity}
                             currentValue={specificity}
-                            onParameterChange={setSpecificity}
+                            onParameterChange={onSpecificityChange}
                         />
                         <Parameter
                             parameterTitle="Interaction Style"
-                            leftParameter="More Technical"
-                            rightParameter="More Human"
+                            leftParameter="Conversational"
+                            rightParameter="Instructional"
                             showParameter={showStyle}
                             enabled={enableStyle}
                             currentValue={style}
-                            onParameterChange={setStyle}
+                            onParameterChange={onStyleChange}
                         />
                         <Parameter
                             parameterTitle="Context"
-                            leftParameter="With Background"
-                            rightParameter="No Background"
+                            leftParameter="No Background"
+                            rightParameter="With Background"
                             showParameter={showContext}
                             enabled={enableContext}
                             currentValue={context}
-                            onParameterChange={setContext}
+                            onParameterChange={onContextChange}
                         />
                         <Parameter
-                            parameterTitle="Confirmation Bias"
+                            parameterTitle="Bias"
                             leftParameter="No Bias"
-                            rightParameter="Biased"
+                            rightParameter="With Bias"
                             showParameter={showBias}
                             enabled={enableBias}
                             currentValue={bias}
-                            onParameterChange={setBias}
+                            onParameterChange={onBiasChange}
                         />
                     </div>
 
-                    <div className="mt-6">
+                    <div className="flex gap-2">
                         <Button
-                            onClick={handleSubmit}
-                            variant="default"
-                            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+                            onClick={onReset}
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                         >
-                            Modify Prompt
+                            Reset
+                        </Button>
+                        <Button
+                            onClick={onSubmit}
+                            variant="default"
+                            size="sm"
+                            className="flex-1 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                        >
+                            Apply Changes
                         </Button>
                     </div>
                 </div>
