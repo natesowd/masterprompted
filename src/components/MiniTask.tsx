@@ -44,7 +44,7 @@ export function MiniTask({ title, description, onStartTask, className = "" }: Mi
   return (
     <>
       {/* Grey overlay with spotlights */}
-      <div className="fixed inset-0 bg-black/0 z-40" onClick={(e) => e.stopPropagation()} />
+      <div className="fixed inset-0 bg-black/50 z-40" onClick={(e) => e.stopPropagation()} />
       
       {/* Spotlight for "unite" word */}
       {spotlightRects.unite && (
