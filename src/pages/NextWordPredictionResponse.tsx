@@ -5,6 +5,7 @@ import SentPrompt from "@/components/SentPrompt";
 import { MiniTask } from "@/components/MiniTask";
 import TextFlag from "@/components/TextFlag";
 import ModuleNavigation from "@/components/ModuleNavigation";
+import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -342,26 +343,12 @@ export default function HeadlineResponse() {
                       </div>
                     )}
 
-                    {/* Charter Tooltip for New Form */}
-                    {showCharterTooltip && (
-                      <div className="fixed right-80 top-1/2 transform -translate-y-1/2 z-50">
-                        <div className="bg-emerald-500 text-white px-6 py-4 rounded-lg shadow-lg w-80">
-                          <h3 className="text-sm font-semibold mb-2">Journalistic Evaluation Checklist</h3>
-                          <p className="text-sm leading-relaxed mb-3">
-                            For more information on the flagged content, expand the relevant term according to the icon.
-                          </p>
-                          <p className="text-sm leading-relaxed mb-4">
-                            This checklist is designed to help you apply your journalistic expertise effectively to LLM outputs. With LLM-specific criteria, it guides you to keep your reporting reliable.
-                          </p>
-                          <button 
-                            onClick={() => setShowCharterTooltip(false)} 
-                            className="bg-white text-emerald-500 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
-                          >
-                            Continue
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    <GuidanceTooltip
+                      text="Journalistic Evaluation Checklist: For more information on the flagged content, expand the relevant term according to the icon. This checklist is designed to help you apply your journalistic expertise effectively to LLM outputs. With LLM-specific criteria, it guides you to keep your reporting reliable."
+                      isVisible={showCharterTooltip}
+                      onClose={() => setShowCharterTooltip(false)}
+                      className="fixed right-80 top-1/2 transform -translate-y-1/2 z-50"
+                    />
                     
                   </div>
                 
