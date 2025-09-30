@@ -14,6 +14,7 @@ import HeadlineResponse from "./pages/NextWordPredictionResponse";
 import PromptConstruction from "./pages/PromptConstructionBase";
 import Specificity from "./pages/PromptConstructionSpecificity";
 import SpecificityResponse from "./pages/PromptConstructionSpecificityResponse";
+import PromptConstructionSummarize from "./pages/PromptConstructionSummarize";
 
 import ConversationStyle from "./pages/PromptConstructionConversationStyle";
 import Context from "./pages/PromptConstructionContext";
@@ -59,6 +60,7 @@ const App = () => (
 
           {/* PROMPT CONSTRUCTION MODULE */}
           <Route path="/module/prompt-construction" element={<PromptConstruction />} />
+          <Route path="/module/prompt-construction/summarize" element={<PromptConstructionSummarize />} />
           <Route path="/module/prompt-construction/specificity" element={<Specificity />} />
           <Route path="/module/prompt-construction/specificity/response" element={<SpecificityResponse />} />
           <Route path="/module/prompt-construction/conversation-style" element={<ConversationStyle />} />
