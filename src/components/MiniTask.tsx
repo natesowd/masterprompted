@@ -89,7 +89,7 @@ export function MiniTask({ title, description, onStartTask, className = "" }: Mi
 
 
       {/* MiniTask component */}
-      <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl p-6 max-w-md w-max ${className}`}>
+      <div className={`fixed bottom-6 left-6 right-6 mx-auto z-50 bg-white rounded-2xl shadow-xl p-6 max-w-md ${className}`}>
         <div className="flex items-start gap-4">
           {/* Red circular icon */}
           <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
