@@ -44,7 +44,7 @@ export default function SpecificityResponse() {
                   /> The AI Act is a <TextFlag
                     text="significant" 
                     evaluationFactor="bias" 
-                    explanation="Using subjective language like 'significant' introduces bias by making a value judgment. A more objective approach would simply present the facts without such qualifiers."
+                    explanation="Although the AI Act may be regarded as &quot;significant,&quot; an LLM cannot determine such judgments. The linguistic choices of an LLM output can dangerously shape a user's interpretation."
                   /> piece of legislation aimed at regulating artificial intelligence within the European Union.
                 </p>
               </div>
