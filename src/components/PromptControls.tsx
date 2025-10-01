@@ -3,163 +3,195 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from 'react';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
-// 1. Update ParameterProps to use string-based current value and change handler
+// 1. Updated ParameterProps for RadioGroup usage and added a middle option
 interface ParameterProps {
-  parameterTitle: string;
-  leftParameter: string;
-  rightParameter: string;
-  showParameter?: boolean;
-  enabled?: boolean;
-  currentValue: string;
-  onParameterChange?: (param: string) => void;
+    parameterTitle: string;
+    leftParameter: string;
+    rightParameter: string;
+    showParameter?: boolean;
+    enabled?: boolean;
+    currentValue: string;
+    // onParameterChange now expects a string that is one of the three radio values
+    onParameterChange?: (param: string) => void;
 }
 function Parameter({
-  parameterTitle,
-  leftParameter,
-  rightParameter,
-  showParameter = true,
-  enabled = true,
-  currentValue,
-  onParameterChange
+    parameterTitle,
+    leftParameter,
+    rightParameter,
+    showParameter = true,
+    enabled = true,
+    currentValue,
+    onParameterChange
 }: ParameterProps) {
-  if (!showParameter) {
-    return null;
-  }
+    if (!showParameter) {
+        return null;
+    }
 
-  // Logic remains the same, driven by props
-  const isLeftSelected = currentValue === leftParameter || currentValue === "";
-  const isRightSelected = currentValue === rightParameter;
-  const handleLeftClick = () => {
-    if (enabled) {
-      onParameterChange?.(leftParameter);
+    // The 'No Change' value is explicitly an empty string ""
+    const NO_CHANGE_VALUE = "";
+    
+    // Determine the selected value for the RadioGroup
+    let selectedValue = currentValue;
+    if (selectedValue !== leftParameter && selectedValue !== rightParameter) {
+        // If the current value doesn't match a parameter, treat it as "No Change"
+        selectedValue = NO_CHANGE_VALUE;
     }
-  };
-  const handleRightClick = () => {
-    if (enabled) {
-      onParameterChange?.(rightParameter);
-    }
-  };
-  return <div className={`my-5`}>
-            <h4 className="text-sm font-medium text-gray-700 mx-3">{parameterTitle}</h4>
-            <div className={`flex justify-between bg-gray-100 rounded-full p-1 ${!enabled && 'cursor-not-allowed'} ${!enabled && 'opacity-60'}`}>
-                <button onClick={handleLeftClick} className={`grow px-4 py-2 text-sm font-medium rounded-full transition-colors
-                        ${isLeftSelected ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'}
-                        ${enabled ? 'hover:text-gray-800' : 'cursor-not-allowed'}
-                    `}>
-                    {leftParameter}
-                </button>
-                <button onClick={handleRightClick} className={`grow px-4 py-2 text-sm font-medium rounded-full transition-colors
-                        ${isRightSelected ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'}
-                        ${enabled ? 'hover:text-gray-800' : 'cursor-not-allowed'}
-                    `}>
-                    {rightParameter}
-                </button>
+
+    // New handler for RadioGroup
+    const handleValueChange = (value: string) => {
+        if (enabled && onParameterChange) {
+            onParameterChange(value);
+        }
+    };
+
+    // Aggressive styling adjustments for fitting into w-sm:
+    // 1. Fieldset padding reduced to minimum (p-0 px-1)
+    // 2. RadioGroup forced to w-full and uses 'gap-0' for maximum compression.
+    // 3. Each option is given flex-1 to distribute width evenly.
+    return <fieldset 
+        // Minimized padding and margin
+        className={`my-3 p-0 px-1 border border-gray-200 rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
+        disabled={!enabled}
+    >
+        {/* Title uses text-xs and a small margin/padding */}
+        <legend className="text-xs font-medium text-gray-700 px-2 mx-auto">
+            {parameterTitle}
+        </legend>
+        
+        {/* Forced full width, minimal padding, and no gap for maximum space usage */}
+        <RadioGroup 
+            value={selectedValue} 
+            onValueChange={handleValueChange} 
+            orientation="horizontal" 
+            className="flex w-full justify-between gap-0 p-1"
+        >
+            {/* Left Parameter - flex-1 makes it use 1/3 of the space */}
+            <div className="flex flex-1 flex-col items-center gap-1">
+                <RadioGroupItem value={leftParameter} id={`${parameterTitle}-r1`} />
+                {/* Smallest font, nowrap, and reduced horizontal padding on the label itself */}
+                <Label htmlFor={`${parameterTitle}-r1`} className="text-[10px] font-normal whitespace-nowrap px-1">{leftParameter}</Label>
             </div>
-        </div>;
+            
+            {/* Middle "No Change" Parameter - flex-1 makes it use 1/3 of the space */}
+            <div className="flex flex-1 flex-col items-center gap-1">
+                <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
+                <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">No Change</Label>
+            </div>
+            
+            {/* Right Parameter - flex-1 makes it use 1/3 of the space */}
+            <div className="flex flex-1 flex-col items-center gap-1">
+                <RadioGroupItem value={rightParameter} id={`${parameterTitle}-r3`} />
+                <Label htmlFor={`${parameterTitle}-r3`} className="text-[10px] font-normal whitespace-nowrap px-1">{rightParameter}</Label>
+            </div>
+        </RadioGroup>
+    </fieldset>;
 }
 
-// Props updated to accept state and handlers from the parent component
+// Props for PromptControls remain the same
 interface PromptControlsProps {
-  showSpecificity?: boolean;
-  showStyle?: boolean;
-  showContext?: boolean;
-  showBias?: boolean;
-  enableSpecificity?: boolean;
-  enableStyle?: boolean;
-  enableContext?: boolean;
-  enableBias?: boolean;
+    showSpecificity?: boolean;
+    showStyle?: boolean;
+    showContext?: boolean;
+    showBias?: boolean;
+    enableSpecificity?: boolean;
+    enableStyle?: boolean;
+    enableContext?: boolean;
+    enableBias?: boolean;
 
-  // State values
-  specificity?: string;
-  style?: string;
-  context?: string;
-  bias?: string;
+    // State values
+    specificity?: string;
+    style?: string;
+    context?: string;
+    bias?: string;
 
-  // State change handlers (optional)
-  onSpecificityChange?: (value: string) => void;
-  onStyleChange?: (value: string) => void;
-  onContextChange?: (value: string) => void;
-  onBiasChange?: (value: string) => void;
+    // State change handlers (optional)
+    onSpecificityChange?: (value: string) => void;
+    onStyleChange?: (value: string) => void;
+    onContextChange?: (value: string) => void;
+    onBiasChange?: (value: string) => void;
 
-  // Event handlers (optional)
-  onReset?: () => void;
-  onSubmit?: () => void;
+    // Event handlers (optional)
+    onReset?: () => void;
+    onSubmit?: () => void;
 }
 export default function PromptControls({
-  showSpecificity = true,
-  showStyle = true,
-  showContext = true,
-  showBias = true,
-  enableSpecificity = true,
-  enableStyle = true,
-  enableContext = true,
-  enableBias = true,
-  specificity,
-  style,
-  context,
-  bias,
-  onSpecificityChange,
-  onStyleChange,
-  onContextChange,
-  onBiasChange,
-  onReset,
-  onSubmit
+    showSpecificity = true,
+    showStyle = true,
+    showContext = true,
+    showBias = true,
+    enableSpecificity = true,
+    enableStyle = true,
+    enableContext = true,
+    enableBias = true,
+    specificity,
+    style,
+    context,
+    bias,
+    onSpecificityChange,
+    onStyleChange,
+    onContextChange,
+    onBiasChange,
+    onReset,
+    onSubmit
 }: PromptControlsProps) {
-  // If parent doesn't provide state/handlers, keep an internal editing state
-  const [localSpecificity, setLocalSpecificity] = useState<string>(specificity ?? "General");
-  const [localStyle, setLocalStyle] = useState<string>(style ?? "Conversational");
-  const [localContext, setLocalContext] = useState<string>(context ?? "No Background");
-  const [localBias, setLocalBias] = useState<string>(bias ?? "No Bias");
+    // Local state remains the same
+    const [localSpecificity, setLocalSpecificity] = useState<string>(specificity ?? "");
+    const [localStyle, setLocalStyle] = useState<string>(style ?? "");
+    const [localContext, setLocalContext] = useState<string>(context ?? "");
+    const [localBias, setLocalBias] = useState<string>(bias ?? "");
 
-  // Helpers to call parent handlers when available, otherwise update local state
-  const handleSpecificityChange = (val: string) => {
-    if (onSpecificityChange) onSpecificityChange(val);else setLocalSpecificity(val);
-  };
-  const handleStyleChange = (val: string) => {
-    if (onStyleChange) onStyleChange(val);else setLocalStyle(val);
-  };
-  const handleContextChange = (val: string) => {
-    if (onContextChange) onContextChange(val);else setLocalContext(val);
-  };
-  const handleBiasChange = (val: string) => {
-    if (onBiasChange) onBiasChange(val);else setLocalBias(val);
-  };
-  const handleResetClick = () => {
-    // Reset parent state if handler provided, otherwise reset local state
-    if (onReset) onReset();else {
-      setLocalSpecificity("General");
-      setLocalStyle("Conversational");
-      setLocalContext("No Background");
-      setLocalBias("No Bias");
-    }
-  };
-  const handleSubmitClick = () => {
-    if (onSubmit) onSubmit();
-    // otherwise nothing — this is a demo control
-  };
-  return <Card className="bg-white border border-gray-200 rounded-lg">
-            <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    
-                    <h3 className="font-semibold text-gray-900">Prompt Controls</h3>
-                </div>
-                <div>
-                    <div className="relative">
-                        {/* Selectors are now controlled by props from the parent */}
-                        <Parameter parameterTitle="Prompt Specificity" leftParameter="General" rightParameter="Specific" showParameter={showSpecificity} enabled={enableSpecificity} currentValue={specificity ?? localSpecificity} onParameterChange={handleSpecificityChange} />
-                        <Parameter parameterTitle="Interaction Style" leftParameter="Conversational" rightParameter="Instructional" showParameter={showStyle} enabled={enableStyle} currentValue={style ?? localStyle} onParameterChange={handleStyleChange} />
-                        <Parameter parameterTitle="Context" leftParameter="No Background" rightParameter="With Background" showParameter={showContext} enabled={enableContext} currentValue={context ?? localContext} onParameterChange={handleContextChange} />
-                        <Parameter parameterTitle="Bias" leftParameter="No Bias" rightParameter="With Bias" showParameter={showBias} enabled={enableBias} currentValue={bias ?? localBias} onParameterChange={handleBiasChange} />
-                    </div>
+    // Helpers remain the same
+    const handleSpecificityChange = (val: string) => {
+        if (onSpecificityChange) onSpecificityChange(val); else setLocalSpecificity(val);
+    };
+    const handleStyleChange = (val: string) => {
+        if (onStyleChange) onStyleChange(val); else setLocalStyle(val);
+    };
+    const handleContextChange = (val: string) => {
+        if (onContextChange) onContextChange(val); else setLocalContext(val);
+    };
+    const handleBiasChange = (val: string) => {
+        if (onBiasChange) onBiasChange(val); else setLocalBias(val);
+    };
+    const handleResetClick = () => {
+        // Reset parent state if handler provided, otherwise reset local state to ""
+        if (onReset) onReset(); else {
+            setLocalSpecificity("");
+            setLocalStyle("");
+            setLocalContext("");
+            setLocalBias("");
+        }
+    };
+    const handleSubmitClick = () => {
+        if (onSubmit) onSubmit();
+        // otherwise nothing — this is a demo control
+    };
+    // The main PromptControls Card keeps its fixed width
+    return <Card className="bg-white border border-gray-200 rounded-lg max-w-sm">
+        <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
 
-                    <div className="flex gap-2">
-                        
-                        <Button onClick={handleSubmitClick} variant="default" size="sm" className="flex-1">
-                            Apply Changes
-                        </Button>
-                    </div>
+                <h3 className="font-semibold text-gray-900">Prompt Controls</h3>
+            </div>
+            <div>
+                <div className="relative">
+                    {/* Selectors are now controlled by props from the parent */}
+                    <Parameter parameterTitle="Prompt Specificity" leftParameter="General" rightParameter="Specific" showParameter={showSpecificity} enabled={enableSpecificity} currentValue={specificity ?? localSpecificity} onParameterChange={handleSpecificityChange} />
+                    <Parameter parameterTitle="Interaction Style" leftParameter="Conversational" rightParameter="Instructional" showParameter={showStyle} enabled={enableStyle} currentValue={style ?? localStyle} onParameterChange={handleStyleChange} />
+                    <Parameter parameterTitle="Context" leftParameter="No Background" rightParameter="With Background" showParameter={showContext} enabled={enableContext} currentValue={context ?? localContext} onParameterChange={handleContextChange} />
+                    <Parameter parameterTitle="Bias" leftParameter="No Bias" rightParameter="With Bias" showParameter={showBias} enabled={enableBias} currentValue={bias ?? localBias} onParameterChange={handleBiasChange} />
                 </div>
-            </CardContent>
-        </Card>;
+
+                <div className="flex gap-2">
+
+                    <Button onClick={handleSubmitClick} variant="default" size="sm" className="flex-1">
+                        Apply Changes
+                    </Button>
+                </div>
+            </div>
+        </CardContent>
+    </Card>;
 }
