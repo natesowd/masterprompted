@@ -1,5 +1,6 @@
 TODO:
-- 
+- disable clicks on dimmed-out screen
+- fix element ordering in popoverSeries, chatBox (absolute to flex)
 
 IN PROGRESS:
 - Fix breadcrumb to the same position (below the nav bar) across pages

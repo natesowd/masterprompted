@@ -74,7 +74,6 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
       setBorderRadius('0px');
     }
   }, [currentStep, steps]);
-
   const isOpen = currentStep !== null;
   const currentStepData = isOpen ? steps[currentStep] : null;
 
@@ -96,6 +95,8 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
     <>
       {/* Spotlight/Mask Effect */}
       {isOpen && rect && (
+        <>
+        {/* <div className="fixed inset-0 z-40" /> */}
         <div
           // MODIFICATION 2: Added `pointer-events-none`.
           // This allows clicks and interactions to pass through the spotlight
@@ -111,6 +112,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
             boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
           }}
         />
+        </>
         // MODIFICATION 3: Removed the separate full-screen overlay div.
         // It was redundant and blocked all interactions. The box-shadow above
         // is sufficient to create the visual overlay.
