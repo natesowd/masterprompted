@@ -57,7 +57,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
 
   return (
     <div 
-      className="relative mb-4 mx-auto"
+      className="relative mb-4 max-w-3xl"
       style={{
         background: '#FFFFFF',
         border: '1px solid #E5E5E5',
