@@ -1,9 +1,9 @@
 TODO:
-- Please have a look at the popover on NWP - the text box is now on another part of the screen!
+- 
 
 IN PROGRESS:
 - Fix breadcrumb to the same position (below the nav bar) across pages
   - fixed, but some links in the breacrumb are dead. need to change the component.
 
 DONE:
-- 
+- Please have a look at the popover on NWP - the text box is now on another part of the screen!

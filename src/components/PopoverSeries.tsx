@@ -37,29 +37,9 @@ const FakeTrigger = forwardRef<HTMLDivElement, { rect: DOMRect | null }>(({ rect
 });
 
 export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeriesProps) {
-  const [currentStep, setCurrentStep] = useState<number | null>(null)
+  const [currentStep, setCurrentStep] = useState<number | null>(initialStep)
   const [rect, setRect] = useState<DOMRect | null>(null)
   const [borderRadius, setBorderRadius] = useState<string>('0px')
-  const [isScrolling, setIsScrolling] = useState(false)
-
-  const scrollToTop = () => {
-    return new Promise<void>((resolve) => {
-      if (window.scrollY === 0) {
-        resolve();
-        return;
-      }
-      setIsScrolling(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      const checkScroll = () => {
-        if (window.scrollY === 0) {
-          window.removeEventListener('scroll', checkScroll);
-          setIsScrolling(false);
-          resolve();
-        }
-      };
-      window.addEventListener('scroll', checkScroll);
-    });
-  };
 
   const close = () => {
     setCurrentStep(null)
@@ -68,22 +48,11 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
 
   const goToStep = async (stepIndex: number) => {
     if (stepIndex >= 0 && stepIndex < steps.length) {
-      if (stepIndex === 0) {
-        await scrollToTop();
-      }
       setCurrentStep(stepIndex);
     } else {
       close();
     }
   }
-
-  useEffect(() => {
-    if (initialStep === 0) {
-      scrollToTop().then(() => {
-        setCurrentStep(initialStep);
-      });
-    }
-  }, []);
 
   useEffect(() => {
     if (currentStep !== null) {
