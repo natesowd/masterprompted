@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
+import ModuleNavigation from "@/components/ModuleNavigation";
 import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,5 +59,10 @@ export default function Specificity() {
           </Card>
         </div>
       </main>
+      
+      <ModuleNavigation 
+        previousRoute="/module/prompt-construction" 
+        nextRoute="/module/prompt-construction/summarize"
+      />
     </div>;
 }

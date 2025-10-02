@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
+import ModuleNavigation from "@/components/ModuleNavigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -110,6 +111,11 @@ export default function PromptConstruction() {
           </Card>
         </div>
       </main>
+      
+      <ModuleNavigation 
+        previousRoute="/modules" 
+        nextRoute="/module/prompt-construction/specificity"
+      />
     </div>
   );
 }
