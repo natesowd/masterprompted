@@ -1,12 +1,13 @@
 TODO:
 - disable clicks on dimmed-out screen
-- fix element ordering in popoverSeries, chatBox (absolute to flex)
+- fix element ordering in popoverSeries (absolute to flex)
 - fix link to guided simulator in landing page
 - radio group icons are slightly off center. 
 
 IN PROGRESS:
-- Fix breadcrumb to the same position (below the nav bar) across pages
-  - fixed, but some links in the breacrumb are dead. need to change the component.
+- 
 
 DONE:
 - Please have a look at the popover on NWP - the text box is now on another part of the screen!
+- Fix breadcrumb to the same position (below the nav bar) across pages
+

@@ -4,8 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 const breadcrumbMap: Record<string, string> = {
   "/modules": "Modules",
   "/module": "Guided Simulation",
-  "/module/introduction": "Introduction",
-  "/module/about-simulator": "About Simulator", 
+  "/module/intro": "Introduction",
+  "/module/intro/about-simulator": "About Simulator", 
   "/module/journalistic-evaluation": "Journalistic Evaluation",
   "/module/next-word-prediction-intro": "Next Word Prediction",
   "/module/headline-response": "Next Word Prediction",
@@ -42,7 +42,7 @@ export default function Breadcrumb() {
   if (location.pathname === '/takeaways') {
     breadcrumbItems.push({
       label: "Guided Simulation",
-      path: "/module/introduction",
+      path: "/module/intro",
       isLast: false
     });
     breadcrumbItems.push({
@@ -91,7 +91,7 @@ export default function Breadcrumb() {
             <span className="text-gray-900 font-medium">{item.label}</span>
           ) : (
             <Link 
-              to={item.label === "Guided Simulation" ? "/module/introduction" : item.path}
+              to={item.label === "Guided Simulation" ? "/module/intro" : item.path}
               className="hover:text-gray-900 transition-colors"
             >
               {item.label}
