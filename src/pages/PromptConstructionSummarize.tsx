@@ -70,7 +70,7 @@ export default function PromptConstructionSummarize() {
       
       <ModuleNavigation 
         previousRoute="/module/prompt-construction" 
-        nextRoute="/module/prompt-construction/specificity"
+        nextRoute="/module/prompt-construction/specificity/response"
       />
     </div>
   );
