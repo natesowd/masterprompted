@@ -59,10 +59,5 @@ export default function Specificity() {
           </Card>
         </div>
       </main>
-      
-      <ModuleNavigation 
-        previousRoute="/module/prompt-construction" 
-        nextRoute="/module/prompt-construction/summarize"
-      />
     </div>;
 }
