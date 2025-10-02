@@ -82,10 +82,9 @@ export default function SpecificityResponse() {
               </div>
               
               {/* Navigation */}
-              <div className="mt-12 flex justify-between items-center">
-                <div></div>
+              <div className="mt-12 flex justify-start items-center">
                 <Button variant="secondary" className="px-8 py-2 rounded-full">
-                  Next →
+                  Takeaways
                 </Button>
               </div>
               
