@@ -44,7 +44,7 @@ export default function PromptConstructionSummarize() {
             }}
             onClick={handleAddDocument}
           >
-            <CardContent className="p-4">
+            <CardContent className="p-6">
               {!isDocumentAttached ? (
                 <div className="flex items-center gap-4 text-gray-700">
                   <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
