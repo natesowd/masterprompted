@@ -117,7 +117,7 @@ export default function SpecificityResponse() {
             </div>
             
             {/* Navigation Button - Fixed at bottom */}
-            <div className="bg-white rounded-lg rounded-t-none border-t border-gray-200 p-8 pt-6">
+            <div className="bg-white rounded-lg rounded-t-none p-8 pt-6">
               <Button 
                 variant="secondary" 
                 className="px-8 py-2 rounded-full"
