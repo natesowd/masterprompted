@@ -111,11 +111,6 @@ export default function PromptConstruction() {
           </Card>
         </div>
       </main>
-      
-      <ModuleNavigation 
-        previousRoute="/modules" 
-        nextRoute="/module/prompt-construction/specificity"
-      />
     </div>
   );
 }
