@@ -1,11 +1,11 @@
 import { Paperclip } from "lucide-react";
 
-type SentPromptProps = {
+type ChatPromptProps = {
   text: string;
   fileName?: string;
 };
 
-const SentPrompt = ({ text, fileName }: SentPromptProps) => {
+const ChatPrompt = ({ text, fileName }: ChatPromptProps) => {
   return (
     <div 
       className="mb-8 max-w-fit ml-auto bg-secondary"
@@ -41,4 +41,4 @@ const SentPrompt = ({ text, fileName }: SentPromptProps) => {
   );
 };
 
-export default SentPrompt;
+export default ChatPrompt;

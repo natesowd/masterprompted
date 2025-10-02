@@ -1,10 +1,10 @@
 import { Paperclip } from "lucide-react";
 
-type SentPromptProps = {
+type ChatAnswerProps = {
   text: string;
 };
 
-const Answer = ({ text }: SentPromptProps) => {
+const ChatAnswer = ({ text }: ChatAnswerProps) => {
   return (
     <div 
       className="mb-8 max-w-fit mr-auto, bg-brand-green-bg/50"
@@ -30,4 +30,4 @@ const Answer = ({ text }: SentPromptProps) => {
   );
 };
 
-export default Answer;
+export default ChatAnswer;

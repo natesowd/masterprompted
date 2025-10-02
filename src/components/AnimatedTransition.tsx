@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Chatbox from "@/components/ChatBox";
-import SentPrompt from "@/components/SentPrompt";
+import ChatPrompt from "@/components/ChatPrompt";
 import LoadingDots from "@/components/LoadingDots";
 import TypewriterText from "@/components/TypewriterText";
 import Header from "@/components/Header";
@@ -133,7 +133,7 @@ const AnimatedTransition = ({
                 
                 {(phase === "sent" || phase === "responding" || phase === "streaming" || phase === "streamingComplete" || phase === "showHeadline" || phase === "showEvaluation" || phase === "complete") && (
                   <div className="animate-fade-in duration-500">
-                    <SentPrompt text={promptText} fileName={fileName} />
+                    <ChatPrompt text={promptText} fileName={fileName} />
                   </div>
                 )}
               </div>

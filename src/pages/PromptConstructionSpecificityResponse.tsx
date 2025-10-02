@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import SentPrompt from "@/components/SentPrompt";
+import ChatPrompt from "@/components/ChatPrompt";
 import PromptControls from "@/components/PromptControls";
 import TextFlag from "@/components/TextFlag";
 export default function SpecificityResponse() {
@@ -20,7 +20,7 @@ export default function SpecificityResponse() {
           {/* Left Sidebar - Sent Prompt and Controls */}
           <div className="w-80 flex-shrink-0 space-y-6">
             {/* Sent Prompt */}
-            <SentPrompt text="Give me a summary of the main points in the AI Act." fileName="EU_AI_Act.pdf" />
+            <ChatPrompt text="Give me a summary of the main points in the AI Act." fileName="EU_AI_Act.pdf" />
             
             {/* Prompt Controls */}
             <PromptControls showSpecificity={true} showStyle={true} showContext={true} showBias={true} />

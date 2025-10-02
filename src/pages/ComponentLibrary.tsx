@@ -2,12 +2,12 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import SentPrompt from "@/components/SentPrompt";
+import ChatPrompt from "@/components/ChatPrompt";
 import VideoLightbox from "@/components/VideoLightbox";
 import DialogPopup from "@/components/DialogPopup";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { MiniTask } from "@/components/MiniTask";
-import Answer from "@/components/Answer";
+import ChatAnswer from "@/components/ChatAnswer";
 import Chatbox from "@/components/ChatBox";
 import GuidanceTooltip from "@/components/GuidanceTooltip";
 import LoadingDots from "@/components/LoadingDots";
@@ -200,7 +200,7 @@ const ComponentLibrary = () => {
                   <CardDescription>User message display component</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <SentPrompt
+                  <ChatPrompt
                     text="This is an example of a sent prompt message with an attachment"
                     fileName="example_document.pdf"
                   />
@@ -253,7 +253,7 @@ const ComponentLibrary = () => {
                   <CardDescription>AI response display component</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Answer text="This is an example of an AI-generated answer displayed using the Answer component." />
+                  <ChatAnswer text="This is an example of an AI-generated answer displayed using the Answer component." />
                 </CardContent>
               </Card>
 

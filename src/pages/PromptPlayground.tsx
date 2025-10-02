@@ -2,18 +2,18 @@ import Header from "@/components/Header";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import Chatbox from "@/components/ChatBox";
 import PromptControls from "@/components/PromptControls";
-import SentPrompt from "@/components/SentPrompt";
+import ChatPrompt from "@/components/ChatPrompt";
 import { useState, useRef, useEffect } from "react";
-import Answer from "@/components/Answer";
+import ChatAnswer from "@/components/ChatAnswer";
 
 function ChatBody({ submittedPrompts, submittedResponses }: { submittedPrompts: string[], submittedResponses: string[] }) {
   return (
     <div className="mt-6 space-y-4">
       {submittedPrompts.map((prompt, index) => (
         <div key={index}>
-          <SentPrompt text={prompt} />
+          <ChatPrompt text={prompt} />
           {submittedResponses[index] && (
-            <Answer text={submittedResponses[index]} />
+            <ChatAnswer text={submittedResponses[index]} />
           )}
         </div>
       ))}

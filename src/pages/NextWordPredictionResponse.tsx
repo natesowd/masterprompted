@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import SentPrompt from "@/components/SentPrompt";
+import ChatPrompt from "@/components/ChatPrompt";
 import { MiniTask } from "@/components/MiniTask";
 import TextFlag from "@/components/TextFlag";
 import ModuleNavigation from "@/components/ModuleNavigation";
@@ -209,7 +209,7 @@ export default function HeadlineResponse() {
             <div className="lg:col-span-8">
               {/* Original Prompt */}
               <div className="mb-8">
-                <SentPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
+                <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
               </div>
 
               {/* AI Response */}
