@@ -6,7 +6,8 @@ import ModuleNavigation from "@/components/ModuleNavigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import GuidedPromptControls from "@/components/GuidedPromptControls";
+import ChatPrompt from "@/components/ChatPrompt";
+import PromptControls from "@/components/PromptControls";
 import TextFlag from "@/components/TextFlag";
 export default function SpecificityResponse() {
   const navigate = useNavigate();
@@ -17,14 +18,16 @@ export default function SpecificityResponse() {
         <Breadcrumb />
         <div className="mb-5"></div>
         <div className="flex gap-6 max-w-7xl mx-auto">
-          {/* Left Sidebar - Guided Prompt Controls */}
-          <div className="w-80 flex-shrink-0">
-            <GuidedPromptControls 
-              showSpecificity={true} 
-              showStyle={true} 
-              showContext={true} 
-              showBias={true} 
-            />
+          {/* Left Sidebar - Sent Prompt and Controls */}
+          <div className="w-80 flex-shrink-0 space-y-6">
+            {/* Sent Prompt */}
+            <ChatPrompt text="Give me a summary of the main points in the AI Act." fileName="EU_AI_Act.pdf" />
+            
+            {/* Prompt Controls */}
+            <PromptControls showSpecificity={true} showStyle={true} showContext={true} showBias={true} />
+            
+            {/* Modify Prompt Button */}
+            
           </div>
 
           {/* Main Content */}
