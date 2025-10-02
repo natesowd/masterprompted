@@ -83,8 +83,12 @@ export default function SpecificityResponse() {
               
               {/* Navigation */}
               <div className="mt-12 flex justify-start items-center">
-                <Button variant="secondary" className="px-8 py-2 rounded-full">
-                  Takeaways
+                <Button 
+                  variant="secondary" 
+                  className="px-8 py-2 rounded-full"
+                  onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
+                >
+                  Takeaways →
                 </Button>
               </div>
               
