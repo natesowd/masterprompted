@@ -39,6 +39,8 @@ const PromptPlayground = () => {
   // editingText is the live text being edited in the Chatbox (controlled)
   const [editingText, setEditingText] = useState<string>("");
 
+  const [sentBasePrompt, setSentBasePrompt] = useState<boolean>(false);
+
   // Handler functions lifted from PromptControls
   const handleReset = () => {
     setSpecificity("General");
@@ -46,16 +48,6 @@ const PromptPlayground = () => {
     setContext("No Background");
     setBias("No Bias");
   };
-
-  const handleApplyChanges = () => {
-    // Handle submit logic here
-    // The values to use are specificity, style, context, and bias
-    console.log("Applying changes from PromptPlayground:");
-    console.log("Specificity:", specificity);
-    console.log("Style:", style);
-    console.log("Context:", context);
-    console.log("Bias:", bias);
-  }
 
   const handlePromptOptimize = async (
     prompt: string,
@@ -102,6 +94,7 @@ const PromptPlayground = () => {
     // Update currentPrompt and editing buffer to the submitted text
     setCurrentPrompt(submittedText);
     setEditingText(submittedText);
+    setSentBasePrompt(true);
 
     // Call the async submitter (fire-and-forget)
     void submitPromptAsync(submittedText);
@@ -173,7 +166,7 @@ const PromptPlayground = () => {
               value={editingText}
               onChange={setEditingText}
               onSubmit={handleChatSubmit}
-              canType={true}
+              canType={sentBasePrompt === false}
               submitButtonId="prompt-playground-submit"
             />
             <div className='flex-1 overflow-y-auto' ref={chatEndRef}>
