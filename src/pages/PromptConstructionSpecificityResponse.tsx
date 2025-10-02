@@ -93,9 +93,6 @@ export default function SpecificityResponse() {
                 </Button>
               </div>
               
-              <div className="mt-6 text-sm text-gray-500">
-                Note: To optimise prompts and generate outputs Llama 3.1 8B is used.
-              </div>
             </div>
           </div>
 
@@ -103,6 +100,11 @@ export default function SpecificityResponse() {
           <div className="w-80 flex-shrink-0">
             <EvaluationPanel />
           </div>
+        </div>
+        
+        {/* Full Width Note */}
+        <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">
+          Note: To optimise prompts and generate outputs Llama 3.1 8B is used.
         </div>
       </main>
       
