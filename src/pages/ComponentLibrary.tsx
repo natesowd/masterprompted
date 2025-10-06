@@ -89,13 +89,6 @@ const ComponentLibrary = () => {
     setter(true);
   };
 
-  const showToast = () => {
-    toast({
-      title: "Toast Example",
-      description: "This is a sample toast notification",
-    });
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -568,9 +561,6 @@ const ComponentLibrary = () => {
                   </Tooltip>
                 </TooltipProvider>
 
-                <Button onClick={showToast} variant="outline">
-                  Show Toast
-                </Button>
               </CardContent>
             </Card>
           </section>
