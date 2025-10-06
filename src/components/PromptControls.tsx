@@ -66,23 +66,26 @@ function Parameter({
             value={selectedValue} 
             onValueChange={handleValueChange} 
             orientation="horizontal" 
-            className="flex w-full justify-between gap-0 p-1"
+            className="relative flex w-full justify-between gap-0 p-1"
         >
+            {/* spectrum lines between radios */}
+            <div className="pointer-events-none absolute top-[12px] left-[calc(16.666%+14px)] w-[calc(33.333%-26px)] h-px bg-gray-300" />
+            <div className="pointer-events-none absolute top-[12px] left-[calc(50%+12px)] w-[calc(33.333%-26px)] h-px bg-gray-300" />
             {/* Left Parameter - flex-1 makes it use 1/3 of the space */}
-            <div className="flex flex-1 flex-col items-center gap-1">
+            <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
                 <RadioGroupItem value={leftParameter} id={`${parameterTitle}-r1`} />
                 {/* Smallest font, nowrap, and reduced horizontal padding on the label itself */}
                 <Label htmlFor={`${parameterTitle}-r1`} className="text-[10px] font-normal whitespace-nowrap px-1">{leftParameter}</Label>
             </div>
             
             {/* Middle "No Change" Parameter - flex-1 makes it use 1/3 of the space */}
-            <div className="flex flex-1 flex-col items-center gap-1">
+            <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
                 <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
                 <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">No Change</Label>
             </div>
             
             {/* Right Parameter - flex-1 makes it use 1/3 of the space */}
-            <div className="flex flex-1 flex-col items-center gap-1">
+            <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
                 <RadioGroupItem value={rightParameter} id={`${parameterTitle}-r3`} />
                 <Label htmlFor={`${parameterTitle}-r3`} className="text-[10px] font-normal whitespace-nowrap px-1">{rightParameter}</Label>
             </div>

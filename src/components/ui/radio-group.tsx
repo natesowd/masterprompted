@@ -10,7 +10,7 @@ const RadioGroup = React.forwardRef<
 >(({ className, orientation = 'vertical', ...props }, ref) => {
   // Use flex row for horizontal orientation, grid for vertical
   const containerClass = cn(
-    orientation === 'horizontal' ? 'flex gap-20 items-center' : 'grid gap-2',
+    orientation === 'horizontal' ? 'relative flex gap-20 items-center' : 'grid gap-2',
     className,
   );
 
@@ -33,7 +33,7 @@ const RadioGroupItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        "aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "relative z-10 aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...props}

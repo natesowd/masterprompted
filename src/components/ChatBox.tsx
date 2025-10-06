@@ -61,7 +61,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
   };
 
   return (
-    <div className="relative mb-4 max-w-3xl bg-white border border-gray-200 shadow-lg rounded-3xl pl-6 pr-16 py-4">
+    <div className="relative max-w-3xl bg-white border border-gray-200 shadow-lg rounded-3xl pl-6 pr-16 py-4">
       {/* Submit button - positioned in top right */}
       <div className="absolute top-4 right-4">
         <SubmitButton onClick={handleSubmit} id={submitButtonId} />
