@@ -92,6 +92,7 @@ interface PromptControlsWithPromptProps {
     onBiasChange?: (value: string) => void;
     onReset?: () => void;
     onSubmit?: () => void;
+    hasUnappliedChanges?: boolean;
 }
 
 export default function PromptControlsWithPrompt({
@@ -113,7 +114,8 @@ export default function PromptControlsWithPrompt({
     onContextChange,
     onBiasChange,
     onReset,
-    onSubmit
+    onSubmit,
+    hasUnappliedChanges
 }: PromptControlsWithPromptProps) {
     const [localSpecificity, setLocalSpecificity] = useState<string>(specificity ?? "");
     const [localStyle, setLocalStyle] = useState<string>(style ?? "");
@@ -204,7 +206,7 @@ export default function PromptControlsWithPrompt({
                         variant="default" 
                         size="sm" 
                         className="flex-1"
-                        disabled={!(specificity || style || context || bias)}
+                        disabled={hasUnappliedChanges !== undefined ? !hasUnappliedChanges : !((specificity ?? localSpecificity) || (style ?? localStyle) || (context ?? localContext) || (bias ?? localBias))}
                     > 
                         Apply Changes
                     </Button>
