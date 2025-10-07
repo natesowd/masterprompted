@@ -31,6 +31,9 @@ export default function SpecificityResponse() {
   const showBiasedOutput = appliedBias === "With Bias";
   const showNoBackgroundOutput = appliedContext === "No Background";
   
+  // Check if there are unapplied changes
+  const hasUnappliedChanges = bias !== appliedBias || context !== appliedContext;
+  
   return <div className="min-h-screen bg-background">
       <Header />
       
@@ -52,6 +55,7 @@ export default function SpecificityResponse() {
               onBiasChange={setBias}
               onContextChange={setContext}
               onSubmit={handleApplyChanges}
+              hasUnappliedChanges={hasUnappliedChanges}
             />
           </div>
 
