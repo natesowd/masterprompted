@@ -79,6 +79,8 @@ const ComponentLibrary = () => {
   const [showMultiStep, setShowMultiStep] = useState(false);
   // demo state for Chatbox in component library
   const [demoChatValue, setDemoChatValue] = useState<string>("Type your message here...");
+  // demo state for MiniTask popup
+  const [showMiniTaskPopup, setShowMiniTaskPopup] = useState(false);
 
 
   interface PopupSetter {
@@ -112,6 +114,14 @@ const ComponentLibrary = () => {
         <PopoverSeries
           steps={multiStepTour}
           onClose={() => setShowMultiStep(false)}
+        />
+      )}
+
+      {showMiniTaskPopup && (
+        <MiniTask
+          title="Example Task"
+          description="This is an example of the MiniTask component"
+          onStartTask={() => setShowMiniTaskPopup(false)}
         />
       )}
 
@@ -223,18 +233,16 @@ const ComponentLibrary = () => {
                 </CardContent>
               </Card>
 
-              {/* MiniTask Component */}
+              {/* MiniTask Component (Removed inline preview to avoid auto-open) */}
+
+              {/* MiniTask Popup Demo */}
               <Card>
                 <CardHeader>
-                  <CardTitle>MiniTask</CardTitle>
-                  <CardDescription>Interactive task guidance component with spotlight effect</CardDescription>
+                  <CardTitle>MiniTask (Popup Demo)</CardTitle>
+                  <CardDescription>Opens MiniTask via button; Start closes it</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <MiniTask
-                    title="Example Task"
-                    description="This is an example of the MiniTask component"
-                    onStartTask={() => console.log("Task started")}
-                  />
+                  <Button onClick={() => setShowMiniTaskPopup(true)}>Open MiniTask</Button>
                 </CardContent>
               </Card>
 

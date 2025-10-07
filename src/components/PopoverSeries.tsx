@@ -131,13 +131,11 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
         <PopoverContent
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="space-y-4"
-          side="bottom"
-          align="center"
         >
           <div className="flex justify-between align-top">
-            <div className="mt-2">{currentStepData.content}</div>
+            <div className="mt-2 mr-6">{currentStepData.content}</div>
             <Button
-              className="absolute top-1 right-1 rounded-full p-2"
+              className="absolute top-1 right-1 rounded-full p-2 transition-colors hover:bg-gray-100/50"
               onClick={close}
               variant="ghost"
               size="icon"
