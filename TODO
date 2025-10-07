@@ -1,9 +1,16 @@
 TODO:
+- PP: make the chat rich text-formatted
 - disable clicks on dimmed-out screen
 - radio group icons are slightly off center
 - align theming with greater AI-Code design philosophy
 - remove scrolling where possible
 - look into scraping data from google sheets
+- PP: maybe change the position of the chatbox
+- PP: diff changes--> displace deleted text, add replace function
+- PP: add chat versions to chat component
+- PP: make chatbox typeable always
+- PP: optimize and send simoultaneously
+- PP: show some way to communicate what prompt is being targeted for modification
 
 IN PROGRESS:
 - 
