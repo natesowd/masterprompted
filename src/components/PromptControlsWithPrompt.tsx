@@ -121,15 +121,39 @@ export default function PromptControlsWithPrompt({
     const [localBias, setLocalBias] = useState<string>(bias ?? "");
 
     const handleSpecificityChange = (val: string) => {
+        // Reset all other parameters to "no change" if this parameter is being changed
+        if (val !== "") {
+            if (onStyleChange) onStyleChange(""); else setLocalStyle("");
+            if (onContextChange) onContextChange(""); else setLocalContext("");
+            if (onBiasChange) onBiasChange(""); else setLocalBias("");
+        }
         if (onSpecificityChange) onSpecificityChange(val); else setLocalSpecificity(val);
     };
     const handleStyleChange = (val: string) => {
+        // Reset all other parameters to "no change" if this parameter is being changed
+        if (val !== "") {
+            if (onSpecificityChange) onSpecificityChange(""); else setLocalSpecificity("");
+            if (onContextChange) onContextChange(""); else setLocalContext("");
+            if (onBiasChange) onBiasChange(""); else setLocalBias("");
+        }
         if (onStyleChange) onStyleChange(val); else setLocalStyle(val);
     };
     const handleContextChange = (val: string) => {
+        // Reset all other parameters to "no change" if this parameter is being changed
+        if (val !== "") {
+            if (onSpecificityChange) onSpecificityChange(""); else setLocalSpecificity("");
+            if (onStyleChange) onStyleChange(""); else setLocalStyle("");
+            if (onBiasChange) onBiasChange(""); else setLocalBias("");
+        }
         if (onContextChange) onContextChange(val); else setLocalContext(val);
     };
     const handleBiasChange = (val: string) => {
+        // Reset all other parameters to "no change" if this parameter is being changed
+        if (val !== "") {
+            if (onSpecificityChange) onSpecificityChange(""); else setLocalSpecificity("");
+            if (onStyleChange) onStyleChange(""); else setLocalStyle("");
+            if (onContextChange) onContextChange(""); else setLocalContext("");
+        }
         if (onBiasChange) onBiasChange(val); else setLocalBias(val);
     };
     const handleResetClick = () => {
