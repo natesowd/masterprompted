@@ -11,7 +11,11 @@ const Landing = () => {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   const handleStartSimulator = () => {
-    navigate("/module/introduction");
+    navigate("/module/intro");
+  };
+
+  const handleStartPlayground = () => {
+    navigate("/playground");
   };
 
   const handleWatchTrailer = () => {
@@ -21,7 +25,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* Hero Background */}
-      <div 
+      <div
         className="absolute inset-0 z-0"
         style={{
           backgroundImage: `url("/hero.png")`,
@@ -31,38 +35,38 @@ const Landing = () => {
           backgroundAttachment: "fixed"
         }}
       />
-      
+
       {/* Content overlay */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header transparent />
-        
+
         {/* Hero Section */}
         <main className="flex-1 relative overflow-hidden">
           <div className="relative px-6 py-16 text-center text-white min-h-[60vh] max-h-[70vh] flex flex-col justify-center">
-          <div className="max-w-6xl mx-auto space-y-12">
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-6xl font-barlow-semi font-bold leading-tight">
-                PromptED: Responsible AI use in Journalism
-              </h1>
-              
-              <p className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-                A hands-on exploration and practice for journalists to observe how large language models function, their limitations, and how to use them for more trustworthy content production.
-              </p>
-              
-              {/* Watch Trailer Button */}
-              <div className="flex justify-center">
-                <Button 
-                  onClick={handleWatchTrailer}
-                  className="bg-white text-black hover:bg-white/90 px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-3 h-20"
-                >
-                  <img src="/play_circle.png" alt="Play" className="w-6 h-6" />
-                  Watch Trailer
-                </Button>
+            <div className="max-w-6xl mx-auto space-y-12">
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-6xl font-barlow-semi font-bold leading-tight">
+                  PromptED: Responsible AI use in Journalism
+                </h1>
+
+                <p className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
+                  A hands-on exploration and practice for journalists to observe how large language models function, their limitations, and how to use them for more trustworthy content production.
+                </p>
+
+                {/* Watch Trailer Button */}
+                <div className="flex justify-center">
+                  <Button
+                    onClick={handleWatchTrailer}
+                    className="bg-white text-black hover:bg-white/90 px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-3 h-20"
+                  >
+                    <img src="/play_circle.png" alt="Play" className="w-6 h-6" />
+                    Watch Trailer
+                  </Button>
+                </div>
               </div>
+
             </div>
-            
           </div>
-        </div>
         </main>
 
         {/* Features Section with Gradient Background */}
@@ -71,7 +75,7 @@ const Landing = () => {
         }}>
           <div className="max-w-6xl mx-auto px-6">
             <div className="grid md:grid-cols-3 gap-6">
-              <Card 
+              <Card
                 className="bg-black/90 backdrop-blur-sm border border-white/10 hover:bg-black/80 hover:scale-105 transition-all duration-500 cursor-pointer group"
                 onClick={handleStartSimulator}
               >
@@ -87,8 +91,11 @@ const Landing = () => {
                   </div>
                 </CardContent>
               </Card>
-              
-              <Card className="bg-black/90 backdrop-blur-sm border border-white/10 hover:bg-black/80 hover:scale-105 transition-all duration-500 cursor-pointer group">
+
+              <Card
+                className="bg-black/90 backdrop-blur-sm border border-white/10 hover:bg-black/80 hover:scale-105 transition-all duration-500 cursor-pointer group"
+                onClick={handleStartPlayground}
+              >
                 <CardContent className="p-8 space-y-6">
                   <h3 className="text-xl font-semibold text-white">Prompt Playground</h3>
                   <p className="text-white/80 text-sm">
@@ -101,7 +108,7 @@ const Landing = () => {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-black/90 backdrop-blur-sm border border-white/10 hover:bg-black/80 hover:scale-105 transition-all duration-500 cursor-pointer group">
                 <CardContent className="p-8 space-y-6">
                   <h3 className="text-xl font-semibold text-white">AI Claim Debunker</h3>
@@ -117,13 +124,13 @@ const Landing = () => {
               </Card>
             </div>
           </div>
-          
+
           {/* EU Funding Notice */}
           <div className="flex justify-center mt-16">
             <div className="flex items-center gap-3 text-white/90 text-sm">
-              <img 
-                src="/lovable-uploads/2392e8d9-dc60-4606-a42e-f8bdd4c76835.png" 
-                alt="European Union Flag" 
+              <img
+                src="/lovable-uploads/2392e8d9-dc60-4606-a42e-f8bdd4c76835.png"
+                alt="European Union Flag"
                 className="w-8 h-6"
               />
               Funded by the European Union's Horizon Europe Programme (Grant 101135437)
@@ -143,7 +150,7 @@ const Landing = () => {
                 <p><strong>Prompt Playground:</strong> To optimize prompts, generate outputs and to identify factual inaccuracies and bias.</p>
               </div>
             </div>
-            
+
             <div className="pt-8 border-t border-gray-200">
               <p className="text-gray-600">
                 <strong>Models used:</strong> Llama 3.1 8B, Mistral, Claude, ChatGPT
@@ -152,8 +159,8 @@ const Landing = () => {
           </div>
         </footer>
       </div>
-      
-      <VideoLightbox 
+
+      <VideoLightbox
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
         videoUrl="https://www.youtube.com/watch?v=2PjWP60KUAk"

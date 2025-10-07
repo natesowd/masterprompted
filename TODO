@@ -1,6 +1,5 @@
 TODO:
 - disable clicks on dimmed-out screen
-- fix link to guided simulator in landing page
 - radio group icons are slightly off center
 - align theming with greater AI-Code design philosophy
 - remove scrolling where possible
@@ -13,4 +12,6 @@ DONE:
 - Please have a look at the popover on NWP - the text box is now on another part of the screen!
 - Fix breadcrumb to the same position (below the nav bar) across pages
 - fix element ordering in popoverSeries (absolute to flex)
+- fix link to guided simulator in landing page
+
 
