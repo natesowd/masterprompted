@@ -17,9 +17,13 @@ export default function SpecificityResponse() {
     setAppliedBias(bias);
   };
   
-  const inputPrompt = appliedBias === "With Bias" 
+  // Input prompt changes immediately
+  const inputPrompt = bias === "With Bias" 
     ? "Summarize how the EU AI Act stifles AI research"
     : "Give me a summary of the main points in the AI Act.";
+  
+  // Output content only changes after Apply Changes is clicked
+  const showBiasedOutput = appliedBias === "With Bias";
   
   return <div className="min-h-screen bg-background">
       <Header />
@@ -48,7 +52,7 @@ export default function SpecificityResponse() {
             {/* Article Content with scroll */}
             <div className="bg-white rounded-lg rounded-b-none p-8 max-h-[600px] overflow-y-auto flex-1">
               
-              {appliedBias === "With Bias" ? (
+              {showBiasedOutput ? (
                 // Biased content about EU AI Act stifling research
                 <div className="space-y-4">
                   <p className="text-gray-800 leading-relaxed text-base">
