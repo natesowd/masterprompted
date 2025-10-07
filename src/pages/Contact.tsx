@@ -25,7 +25,7 @@ const contactSchema = z.object({
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
-const Help = () => {
+const Contact = () => {
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
@@ -53,7 +53,7 @@ const Help = () => {
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-foreground mb-6">
-            Help & Contact
+            Contact
           </h1>
           
           <div className="bg-card rounded-lg border p-8 mb-6">
@@ -151,4 +151,4 @@ const Help = () => {
   );
 };
 
-export default Help;
+export default Contact;

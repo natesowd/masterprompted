@@ -25,7 +25,7 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
   const navigationItems = [
     { label: "Prompt Playground", path: "/playground" },
     { label: "About", path: "/about" },
-    { label: "Help", path: "/help" },
+    { label: "Contact", path: "/contact" },
     { label: "Imprint", path: "/imprint" },
     { label: "DEV: Components", path: "/components" } // Dev link
   ];
