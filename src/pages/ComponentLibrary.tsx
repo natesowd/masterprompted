@@ -13,6 +13,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import LoadingDots from "@/components/LoadingDots";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import PromptControls from "@/components/PromptControls";
+import PromptControlsWithPrompt from "@/components/PromptControlsWithPrompt";
 import TextFlag from "@/components/TextFlag";
 import TypewriterText from "@/components/TypewriterText";
 
@@ -318,6 +319,27 @@ const ComponentLibrary = () => {
                     showStyle={true}
                     showContext={true}
                     showBias={true}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* PromptControlsWithPrompt Component */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>PromptControlsWithPrompt</CardTitle>
+                  <CardDescription>Prompt controls with text display</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PromptControlsWithPrompt
+                    promptText="This is an example prompt that will be displayed above the controls."
+                    showSpecificity={true}
+                    showStyle={true}
+                    showContext={true}
+                    showBias={true}
+                    specificity=""
+                    style=""
+                    context=""
+                    bias=""
                   />
                 </CardContent>
               </Card>
