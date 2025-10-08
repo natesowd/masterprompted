@@ -168,12 +168,8 @@ export default function SpecificityResponse() {
                     </div>
                   </div>
 
-                  <SectionFlag 
-                    evaluationFactor="relevance"
-                    explanation="When the voice of the prompt becomes technical, the output will respond in a similar manner. Writing in a technical manner allows for a more concise answer that is easier to analyse."
-                  >
-                    <div>
-                      <p className="text-base font-semibold text-gray-900 mb-2">Rules for High-Risk AI Systems</p>
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">Rules for High-Risk AI Systems</p>
                     <p className="text-gray-700 text-base leading-relaxed mb-2">High-risk AI systems must comply with the following key requirements:</p>
                     
                     <ul className="space-y-2 text-gray-700 ml-4">
@@ -185,8 +181,7 @@ export default function SpecificityResponse() {
                       <li className="text-base leading-relaxed"><strong>Robustness, Accuracy, and Cybersecurity:</strong> Systems must perform consistently and reliably and be resilient against attempts to manipulate or attack them.</li>
                       <li className="text-base leading-relaxed"><strong>Conformity Assessment:</strong> Before market deployment, high-risk AI systems must undergo conformity assessments to verify compliance with the Act's requirements.</li>
                     </ul>
-                    </div>
-                  </SectionFlag>
+                  </div>
                 </div>
               ) : showConversationalOutput ? (
                 // Conversational content
@@ -214,9 +209,14 @@ export default function SpecificityResponse() {
                   <p className="text-gray-700 text-base leading-relaxed">
                     <strong>Risk Categories:</strong> AI systems are sorted by risk levels, from high to minimal.
                   </p>
-                  <p className="text-gray-700 text-base leading-relaxed">
-                    • <strong>Regulations for High-Risk:</strong> Strict rules apply to AI in critical areas like healthcare and policing.
-                  </p>
+                  <SectionFlag 
+                    evaluationFactor="relevance"
+                    explanation="When the voice of the prompt becomes technical, the output will respond in a similar manner. Writing in a technical manner allows for a more concise answer that is easier to analyse."
+                  >
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      • <strong>Regulations for High-Risk:</strong> Strict rules apply to AI in critical areas like healthcare and policing.
+                    </p>
+                  </SectionFlag>
                   <p className="text-gray-700 text-base leading-relaxed">
                     • <strong>Transparency:</strong> AI must be identifiable, and users informed when they interact with AI.
                   </p>
