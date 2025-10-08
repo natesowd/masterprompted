@@ -214,22 +214,39 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
             </div>
 
             {/* Sent Prompt Display */}
-            {(((context ?? localContext) === "No Background") || !!promptText) && (
-                <div 
-                    className="mb-6 bg-secondary rounded-lg p-4"
-                >
-                    <p 
-                        className="text-gray-900 leading-relaxed text-sm"
-                        style={{
-                            fontFamily: 'Manrope',
-                        }}
-                    >
-                        {(context ?? localContext) === "No Background" 
-                            ? "Input: Summarize the main points in the AI Act."
-                            : (promptText ?? "")}
-                    </p>
-                </div>
-            )}
+            {(() => {
+                const currentSpecificity = specificity ?? localSpecificity;
+                const currentStyle = style ?? localStyle;
+                const currentContext = context ?? localContext;
+                const currentBias = bias ?? localBias;
+                const allNoChange = !currentSpecificity && !currentStyle && !currentContext && !currentBias;
+                
+                const shouldShow = allNoChange || (currentContext === "No Background") || !!promptText;
+                
+                if (!shouldShow) return null;
+                
+                let displayText = "";
+                if (allNoChange) {
+                    displayText = "Certainly! The AI Act is a significant piece of legislation aimed at regulating artificial intelligence within the European Union. Here's a summary of its main points: Risk-Based Classification: AI systems are classified according to their risk level: Unacceptable Risk: Prohibited, e.g., social scoring and manipulative AI. High-Risk: Subject to strict regulation. Limited Risk: Requires transparency to users, e.g., chatbots and deepfakes. Minimal Risk: Mostly unregulated, e.g., AI-enabled video games and spam filters. Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU. User Responsibilities: Users (deployers) of high-risk AI systems have certain obligations, though less than providers. General Purpose AI (GPAI): Providers of GPAI models must provide technical documentation, instructions for use, comply with the Copyright Directive, and publish a summary of the training data used. Prohibited AI Systems: Certain types of AI systems are banned, including those that deploy subliminal techniques or exploit vulnerabilities related to age, disability, or socio-economic circumstances. The AI Act is part of a broader set of proposals to regulate digital services and aims to harmonize rules for AI development and usage while ensuring ethical safeguards and transparency. It's designed to become a global standard for AI regulation, similar to how GDPR has become for data protection.";
+                } else if (currentContext === "No Background") {
+                    displayText = "Input: Summarize the main points in the AI Act.";
+                } else {
+                    displayText = promptText ?? "";
+                }
+                
+                return (
+                    <div className="mb-6 bg-secondary rounded-lg p-4">
+                        <p 
+                            className="text-gray-900 leading-relaxed text-sm"
+                            style={{
+                                fontFamily: 'Manrope',
+                            }}
+                        >
+                            {displayText}
+                        </p>
+                    </div>
+                );
+            })()}
 
             <div>
                 <div className="relative">
