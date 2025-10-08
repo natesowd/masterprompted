@@ -39,6 +39,8 @@ export default function SpecificityResponse() {
     ? "Can you give me a summary of the main points in the AI Act?"
     : specificity === "Specific"
     ? "Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems"
+    : specificity === "General"
+    ? "Tell me about the AI Act."
     : "Summarize the main points in the AI Act.";
   
   // Output content only changes after Apply Changes is clicked
@@ -48,6 +50,7 @@ export default function SpecificityResponse() {
   const showInstructionalOutput = appliedStyle === "Instructional";
   const showConversationalOutput = appliedStyle === "Conversational";
   const showSpecificOutput = appliedSpecificity === "Specific";
+  const showGeneralOutput = appliedSpecificity === "General";
   const showBaseOutput = !appliedBias && !appliedContext && !appliedStyle && !appliedSpecificity;
   
   // Check if there are unapplied changes
@@ -87,7 +90,20 @@ export default function SpecificityResponse() {
             {/* Article Content with scroll */}
             <div className="bg-white rounded-lg rounded-b-none p-8 max-h-[600px] overflow-y-auto flex-1">
               
-              {showSpecificOutput ? (
+              {showGeneralOutput ? (
+                // General content
+                <div className="space-y-4">
+                  <p className="text-gray-800 leading-relaxed text-base">
+                    The EU AI Act is a comprehensive regulation for artificial intelligence adopted by the European Union in 2024. It's the first major legal framework in the world specifically created to govern AI systems.
+                  </p>
+                  <p className="text-gray-800 leading-relaxed text-base">
+                    The Act organizes AI systems into risk categories. Some AI uses are completely prohibited, such as social scoring by governments or systems that manipulate people's behavior in harmful ways. High-risk AI systems - like those used in hiring, credit scoring, law enforcement, or critical infrastructure - face strict requirements around transparency, data quality, human oversight, and safety. Lower-risk systems mainly need to be transparent about being AI (like chatbots disclosing they're not human). Most AI applications are considered minimal risk and aren't heavily regulated.
+                  </p>
+                  <p className="text-gray-800 leading-relaxed text-base">
+                    The legislation aims to balance protecting people's rights and safety with encouraging AI innovation. It applies to companies and organizations that offer AI systems in the EU, no matter where they're located.
+                  </p>
+                </div>
+              ) : showSpecificOutput ? (
                 // Specific content - detailed summary
                 <div className="space-y-4">
                   <p className="text-gray-800 leading-relaxed text-base">
