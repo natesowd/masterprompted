@@ -214,7 +214,7 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
             </div>
 
             {/* Sent Prompt Display */}
-            {promptText && (
+            {(((context ?? localContext) === "No Background") || !!promptText) && (
                 <div 
                     className="mb-6 bg-secondary rounded-lg p-4"
                 >
@@ -224,7 +224,9 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
                             fontFamily: 'Manrope',
                         }}
                     >
-                        {promptText}
+                        {(context ?? localContext) === "No Background" 
+                            ? "Input: Summarize the main points in the AI Act."
+                            : (promptText ?? "")}
                     </p>
                 </div>
             )}
