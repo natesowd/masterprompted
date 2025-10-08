@@ -68,7 +68,85 @@ export default function SpecificityResponse() {
               {showBiasedOutput ? (
                 // Biased content about EU AI Act stifling research
                 <div className="space-y-4">
-...
+                  <p className="text-gray-800 leading-relaxed text-base">
+                    The EU AI Act is the world's first comprehensive legal framework for artificial intelligence, but critics argue that it could stifle AI research and innovation in several ways:
+                  </p>
+
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">High Compliance Costs</p>
+                    <ul className="space-y-2 text-gray-700 ml-4">
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">Researchers and startups may face heavy administrative and technical burdens (e.g., documentation, conformity assessments, transparency obligations).</p>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">This favors large corporations with legal and compliance teams, while discouraging small labs and academic projects.</p>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">Regulation Before Maturity</p>
+                    <ul className="space-y-2 text-gray-700 ml-4">
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">The Act imposes strict rules even though many AI techniques are still experimental.</p>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">Researchers fear it "locks in" today's categories of risk, making it harder to explore new methods without legal uncertainty.</p>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">Chilling Effect on Open Source</p>
+                    <ul className="space-y-2 text-gray-700 ml-4">
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">Open-source AI models may fall under obligations (such as transparency on training data and design choices) that individual researchers cannot realistically meet.</p>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">This could push innovation away from Europe toward regions with lighter regulation.</p>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">Ambiguity and Legal Uncertainty</p>
+                    <ul className="space-y-2 text-gray-700 ml-4">
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">Definitions of "high-risk" or "general-purpose" AI are broad and not always clear.</p>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">Labs may avoid entire research areas to reduce the risk of future legal liabilities.</p>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">Slower Experimentation</p>
+                    <p className="text-gray-700 text-base leading-relaxed">Requirements like human oversight, robustness testing, and bias auditing—though important for safety—could slow down iterative experimentation in early-stage research.</p>
+                  </div>
+
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">Brain Drain & Investment Flight</p>
+                    <ul className="space-y-2 text-gray-700 ml-4">
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">Researchers and startups may relocate to the U.S., U.K., or Asia, where the regulatory environment is more flexible.</p>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <p className="text-base leading-relaxed">Investors might shy away from European AI ventures because of the added legal risks.</p>
+                      </li>
+                    </ul>
+                  </div>
+
                   <p className="text-gray-800 leading-relaxed text-base mt-4">
                     👉 In short: while the EU AI Act is intended to ensure safety, transparency, and trust in AI, critics argue that its rigid structure, compliance burden, and uncertainty could discourage open research, slow down innovation, and push talent and investment out of Europe.
                   </p>
