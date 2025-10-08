@@ -402,7 +402,13 @@ export default function SpecificityResponse() {
                   </p>
 
                   <div>
-                    <p className="text-base font-semibold text-gray-900 mb-3">🧠 Overview of the EU AI Act</p>
+                    <p className="text-base font-semibold text-gray-900 mb-3">
+                      <TextFlag 
+                        text="🧠" 
+                        evaluationFactor="voice"
+                        explanation="The use of emojis here indicates that either the LLM used a default persona that is more informal, or it has decided it is appropriate due to the human-like interaction style. Either way, this can be controlled via prompts."
+                      /> Overview of the EU AI Act
+                    </p>
                     <p className="text-gray-700 text-base leading-relaxed">
                       The EU Artificial Intelligence Act (AI Act) is the first comprehensive legal framework for AI regulation globally. Adopted in 2024, it aims to ensure that AI systems in the EU are safe, transparent, and respect fundamental rights. The Act employs a risk-based approach, imposing varying levels of obligations depending on the potential impact of AI systems.
                     </p>
