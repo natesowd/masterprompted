@@ -58,19 +58,19 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <span className={`inline-flex items-center gap-0.5 cursor-pointer ${className}`}>
-          <Icon className="h-4 w-4 text-destructive flex-shrink-0" />
+        <span className={`inline cursor-pointer ${className}`}>
+          <Icon className="h-4 w-4 text-destructive inline align-baseline mr-0.5" />
           {href ? (
             <a 
               href={href} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="underline decoration-destructive decoration-2 underline-offset-2 text-current ml-0.5 hover:opacity-80"
+              className="underline decoration-destructive decoration-2 underline-offset-2 text-current hover:opacity-80"
             >
               {text}
             </a>
           ) : (
-            <span className="underline decoration-destructive decoration-2 underline-offset-2 text-current ml-0.5">
+            <span className="underline decoration-destructive decoration-2 underline-offset-2 text-current">
               {text}
             </span>
           )}
