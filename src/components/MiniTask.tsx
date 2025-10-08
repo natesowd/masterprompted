@@ -69,6 +69,8 @@ export function MiniTask({
     };
   }, []);
   return <>
+      {/* Dimmed overlay */}
+      <div className="fixed inset-0 bg-black/50 z-40 pointer-events-none" />
       
       {/* Combined spotlight covering both words */}
       {(spotlightRects.unite || spotlightRects.on) && (() => {
@@ -92,18 +94,20 @@ export function MiniTask({
     })()}
 
 
-      {/* MiniTask component */}
-      <div className={`bg-card border border-border rounded-lg p-6 shadow-lg ${className}`}>
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-            <AlignJustify className="w-5 h-5 text-primary" />
-          </div>
-          <div className="flex-1 space-y-3">
-            <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
-            <Button onClick={onStartTask} variant="default" size="sm">
-              Start Task
-            </Button>
+      {/* MiniTask component - fixed to bottom with card styling */}
+      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-[25vw] ${className}`}>
+        <div className="bg-card border border-border rounded-lg p-6 shadow-lg">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <AlignJustify className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+              <p className="text-sm text-muted-foreground">{description}</p>
+              <Button onClick={onStartTask} variant="default" size="sm">
+                Start Task
+              </Button>
+            </div>
           </div>
         </div>
       </div>
