@@ -677,7 +677,9 @@ export default function SpecificityResponse() {
         
         {/* Full Width Note */}
         <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">
-          Note: To optimise prompts and generate outputs Llama 3.1 8B is used.
+          LLMs have been used in the following places:<br />
+          The creation of prompt output examples in the Guided Exploration<br />
+          LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
         </div>
       </main>
       
