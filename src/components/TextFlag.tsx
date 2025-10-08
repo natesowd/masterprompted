@@ -36,8 +36,8 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
       const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') || 
                             criterionElement.querySelector('.flex.items-center.justify-between');
       if (triggerElement) {
-        triggerElement.classList.add('ring-2', 'ring-red-500', 'bg-red-50');
-        triggerElement.classList.remove('bg-gray-50', 'hover:bg-gray-100');
+        triggerElement.classList.add('ring-2', 'ring-destructive', 'bg-destructive/10');
+        triggerElement.classList.remove('bg-muted', 'hover:bg-muted/80');
       }
     }
 
@@ -47,8 +47,8 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
         const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') || 
                               criterionElement.querySelector('.flex.items-center.justify-between');
         if (triggerElement) {
-          triggerElement.classList.remove('ring-2', 'ring-red-500', 'bg-red-50');
-          triggerElement.classList.add('bg-gray-50', 'hover:bg-gray-100');
+          triggerElement.classList.remove('ring-2', 'ring-destructive', 'bg-destructive/10');
+          triggerElement.classList.add('bg-muted', 'hover:bg-muted/80');
         }
       }
     };
@@ -58,22 +58,22 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
     <HoverCard>
       <HoverCardTrigger asChild>
         <span className={`inline-flex items-center gap-0.5 cursor-pointer ${className}`}>
-          <Icon className="h-4 w-4 text-red-500 flex-shrink-0" />
-          <span className="underline decoration-red-500 decoration-2 underline-offset-2 text-current ml-0.5">
+          <Icon className="h-4 w-4 text-destructive flex-shrink-0" />
+          <span className="underline decoration-destructive decoration-2 underline-offset-2 text-current ml-0.5">
             {text}
           </span>
         </span>
       </HoverCardTrigger>
       <HoverCardContent 
-        className="w-80 bg-white border border-red-200 shadow-lg rounded-lg p-4"
+        className="w-80 bg-card border-destructive/20 shadow-lg rounded-lg p-4"
         sideOffset={5}
       >
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Icon className="h-4 w-4 text-red-500" />
-            <h4 className="font-semibold text-red-700 text-sm">{label}</h4>
+            <Icon className="h-4 w-4 text-destructive" />
+            <h4 className="font-semibold text-destructive text-sm">{label}</h4>
           </div>
-          <p className="text-sm text-gray-700 leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             {explanation}
           </p>
         </div>
