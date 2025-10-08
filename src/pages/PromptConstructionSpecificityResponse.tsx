@@ -251,11 +251,11 @@ export default function SpecificityResponse() {
                         <ul className="space-y-2 text-gray-700 ml-4">
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">The Act places heavy documentation, transparency, and conformity-assessment obligations on AI systems, especially for high-risk or general purpose AI. This increases costs and administrative overhead for research teams.<br/><span className="text-sm text-gray-500 italic">Symbio6 +3 IREF Europe +3 Computerworld +3</span></p>
+                            <p className="text-base leading-relaxed">The Act places heavy documentation, transparency, and conformity-assessment obligations on AI systems, especially for high-risk or general purpose AI. This increases costs and administrative overhead for research teams.<br/><span className="text-sm text-gray-500 italic">Symbio6, IREF Europe, Computerworld</span></p>
                           </li>
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Time-to-market or time-to-research can suffer because new systems have to satisfy risk assessments, safety checks etc., delaying experimentation and deployment.<br/><span className="text-sm text-gray-500 italic">IREF Europe +3 euronews +3 Shieldbase +3</span></p>
+                            <p className="text-base leading-relaxed">Time-to-market or time-to-research can suffer because new systems have to satisfy risk assessments, safety checks etc., delaying experimentation and deployment.<br/><span className="text-sm text-gray-500 italic">IREF Europe, euronews, Shieldbase</span></p>
                           </li>
                         </ul>
                       </div>
@@ -265,11 +265,11 @@ export default function SpecificityResponse() {
                         <ul className="space-y-2 text-gray-700 ml-4">
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Key terms like "general purpose AI," "high risk," "vulnerability," "explainability," etc., are not precisely defined, so research teams may not know whether, or how, they are regulated.<br/><span className="text-sm text-gray-500 italic">heise online +2 IREF Europe +2</span></p>
+                            <p className="text-base leading-relaxed">Key terms like "general purpose AI," "high risk," "vulnerability," "explainability," etc., are not precisely defined, so research teams may not know whether, or how, they are regulated.<br/><span className="text-sm text-gray-500 italic">heise online, IREF Europe</span></p>
                           </li>
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Lack of clarity over what counts as acceptable use of training data, especially for generative models. This uncertainty can cause risk-averse behaviour.<br/><span className="text-sm text-gray-500 italic">euronews +2 heise online +2</span></p>
+                            <p className="text-base leading-relaxed">Lack of clarity over what counts as acceptable use of training data, especially for generative models. This uncertainty can cause risk-averse behaviour.<br/><span className="text-sm text-gray-500 italic">euronews, heise online</span></p>
                           </li>
                         </ul>
                       </div>
@@ -279,11 +279,11 @@ export default function SpecificityResponse() {
                         <ul className="space-y-2 text-gray-700 ml-4">
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Research and open source projects may be disproportionately affected because they often have limited funding and legal resources to handle compliance.<br/><span className="text-sm text-gray-500 italic">euronews +3 IREF Europe +3 Computerworld +3</span></p>
+                            <p className="text-base leading-relaxed">Research and open source projects may be disproportionately affected because they often have limited funding and legal resources to handle compliance.<br/><span className="text-sm text-gray-500 italic">euronews, IREF Europe, Computerworld</span></p>
                           </li>
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Some worry that constraints on "general purpose AI" or requirements for transparency / explainability may push researchers to use more interpretable but less powerful models, avoiding black-box methods, which may reduce innovation.<br/><span className="text-sm text-gray-500 italic">Shieldbase +2 heise online +2</span></p>
+                            <p className="text-base leading-relaxed">Some worry that constraints on "general purpose AI" or requirements for transparency / explainability may push researchers to use more interpretable but less powerful models, avoiding black-box methods, which may reduce innovation.<br/><span className="text-sm text-gray-500 italic">Shieldbase, heise online</span></p>
                           </li>
                         </ul>
                       </div>
@@ -293,11 +293,11 @@ export default function SpecificityResponse() {
                         <ul className="space-y-2 text-gray-700 ml-4">
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Because of stricter regulation in the EU, research labs and companies may find it easier to do riskier, cutting-edge work elsewhere (e.g. in more lightly regulated environments), leading to brain drain of talent and investment.<br/><span className="text-sm text-gray-500 italic">Symbio6 +3 IREF Europe +3 AI Tech Suite +3</span></p>
+                            <p className="text-base leading-relaxed">Because of stricter regulation in the EU, research labs and companies may find it easier to do riskier, cutting-edge work elsewhere (e.g. in more lightly regulated environments), leading to brain drain of talent and investment.<br/><span className="text-sm text-gray-500 italic">Symbio6, IREF Europe, AI Tech Suite</span></p>
                           </li>
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Smaller players or start-ups may find it especially hard to compete with big organisations that can absorb regulatory costs and legal risk.<br/><span className="text-sm text-gray-500 italic">Computerworld +2 IREF Europe +2</span></p>
+                            <p className="text-base leading-relaxed">Smaller players or start-ups may find it especially hard to compete with big organisations that can absorb regulatory costs and legal risk.<br/><span className="text-sm text-gray-500 italic">Computerworld, IREF Europe</span></p>
                           </li>
                         </ul>
                       </div>
@@ -307,11 +307,11 @@ export default function SpecificityResponse() {
                         <ul className="space-y-2 text-gray-700 ml-4">
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">The possibility that many projects will avoid exploring some innovations because the regulatory risk/penalties are high, or because meeting all obligations is seen as too onerous.<br/><span className="text-sm text-gray-500 italic">IREF Europe +2 euronews +2</span></p>
+                            <p className="text-base leading-relaxed">The possibility that many projects will avoid exploring some innovations because the regulatory risk/penalties are high, or because meeting all obligations is seen as too onerous.<br/><span className="text-sm text-gray-500 italic">IREF Europe, euronews</span></p>
                           </li>
                           <li className="flex items-start">
                             <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <p className="text-base leading-relaxed">Delays and lack of guidance (e.g. missing standards, unclear procedures) exacerbate this uncertainty.<br/><span className="text-sm text-gray-500 italic">Storyboard18 +2 Symbio6 +2</span></p>
+                            <p className="text-base leading-relaxed">Delays and lack of guidance (e.g. missing standards, unclear procedures) exacerbate this uncertainty.<br/><span className="text-sm text-gray-500 italic">Storyboard18, Symbio6</span></p>
                           </li>
                         </ul>
                       </div>
@@ -327,7 +327,7 @@ export default function SpecificityResponse() {
                       </li>
                       <li className="flex items-start">
                         <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <p className="text-base leading-relaxed">The intended use of regulatory sandboxes: these are meant to allow experimentation under regulatory oversight, offering a way to reduce barriers—but their effectiveness depends heavily on implementation (capacity, clarity, consistency).<br/><span className="text-sm text-gray-500 italic">arXiv +1</span></p>
+                        <p className="text-base leading-relaxed">The intended use of regulatory sandboxes: these are meant to allow experimentation under regulatory oversight, offering a way to reduce barriers—but their effectiveness depends heavily on implementation (capacity, clarity, consistency).<br/><span className="text-sm text-gray-500 italic">arXiv</span></p>
                       </li>
                       <li className="flex items-start">
                         <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
