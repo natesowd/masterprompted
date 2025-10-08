@@ -239,7 +239,11 @@ export default function SpecificityResponse() {
                 // Biased content about EU AI Act stifling research
                 <div className="space-y-4">
                   <p className="text-gray-800 leading-relaxed text-lg">
-                    Here's a summary of key criticisms of how the EU AI Act may stifle AI research, along with the uncertainties. Happy to go deeper into any one of these if you like:
+                    <TextFlag 
+                      text="Here's a summary of key criticisms of how the EU AI Act may stifle AI research, along with the uncertainties. Happy to go deeper into any one of these if you like:"
+                      evaluationFactor="voice"
+                      explanation="Output's voice mimics the certainty and the suggestiveness of a biased and commanding prompt, confirming the expressed belief. The unquestioning, certain tone could cause a false sense of output's trustworthiness. Some users called this confirmatory style of the output &quot;people pleasing&quot;."
+                    />
                   </p>
 
                   <div>
