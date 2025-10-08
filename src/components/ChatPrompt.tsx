@@ -1,4 +1,5 @@
 import { Paperclip } from "lucide-react";
+import RichText from "./RichText";
 
 type ChatPromptProps = {
   text: string;
@@ -16,17 +17,11 @@ const ChatPrompt = ({ text, fileName }: ChatPromptProps) => {
       }}
     >
       {/* Main message text */}
-      <p 
+      <RichText 
+        text={text}
         className="text-gray-900 leading-relaxed"
-        style={{
-          fontFamily: 'Manrope',
-          fontSize: '16px',
-          lineHeight: '24px',
-          margin: 0
-        }}
-      >
-        {text}
-      </p>
+        as="p"
+      />
 
       {/* Attachment section */}
       {fileName && (

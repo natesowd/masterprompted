@@ -3,6 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import * as jsdiff from "diff";
+import RichText from "./RichText";
 
 type ChatAnswerProps = {
   text: string;
@@ -76,17 +77,25 @@ const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProp
       )}
       
       {/* Main message text */}
-      <div 
-        className="text-gray-900 leading-relaxed"
-        style={{
-          fontFamily: 'Manrope',
-          fontSize: '16px',
-          lineHeight: '24px',
-          margin: 0
-        }}
-      >
-        {showDiff && canShowDiff ? renderDiff() : text}
-      </div>
+      {showDiff && canShowDiff ? (
+        <div 
+          className="text-gray-900 leading-relaxed"
+          style={{
+            fontFamily: 'Manrope',
+            fontSize: '16px',
+            lineHeight: '24px',
+            margin: 0
+          }}
+        >
+          {renderDiff()}
+        </div>
+      ) : (
+        <RichText 
+          text={text}
+          className="text-gray-900 leading-relaxed"
+          as="div"
+        />
+      )}
     </div>
   );
 };
