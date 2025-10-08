@@ -30,6 +30,7 @@ export default function SpecificityResponse() {
   // Output content only changes after Apply Changes is clicked
   const showBiasedOutput = appliedBias === "With Bias";
   const showWithBackgroundOutput = appliedContext === "With Background";
+  const showBaseOutput = !appliedBias && !appliedContext;
   
   // Check if there are unapplied changes
   const hasUnappliedChanges = bias !== appliedBias || context !== appliedContext;
@@ -141,8 +142,40 @@ export default function SpecificityResponse() {
                     <p className="text-gray-700 text-base leading-relaxed">The Act establishes penalties for non-compliance and applies to providers and deployers of AI systems in the EU market regardless of their geographic location.</p>
                   </div>
                 </div>
+              ) : showBaseOutput ? (
+                // Base output when all controls are "No Change"
+                <div className="space-y-4">
+                  <p className="text-gray-800 leading-relaxed text-base">
+                    The AI Act is the EU&apos;s regulation for artificial intelligence, adopted in 2024. Here are the main points:
+                  </p>
+
+                  <p className="text-gray-700 text-base leading-relaxed">Risk-based approach: AI systems are categorized by risk level:</p>
+
+                  <ul className="space-y-2 text-gray-700 ml-6 list-none">
+                    <li className="text-base leading-relaxed">Unacceptable risk systems are banned (e.g., government social scoring, manipulative AI)</li>
+                    <li className="text-base leading-relaxed">High-risk systems face strict requirements (e.g., AI in employment, law enforcement, credit scoring, critical infrastructure)</li>
+                    <li className="text-base leading-relaxed">Limited risk systems need transparency (e.g., chatbots must disclose they&apos;re AI)</li>
+                    <li className="text-base leading-relaxed">Minimal risk systems have few requirements</li>
+                  </ul>
+
+                  <p className="text-gray-700 text-base leading-relaxed mt-4">Requirements for high-risk AI:</p>
+
+                  <ul className="space-y-2 text-gray-700 ml-6 list-none">
+                    <li className="text-base leading-relaxed">Risk management throughout the system&apos;s lifecycle</li>
+                    <li className="text-base leading-relaxed">High-quality training data to minimize bias</li>
+                    <li className="text-base leading-relaxed">Technical documentation and record-keeping</li>
+                    <li className="text-base leading-relaxed">Transparency about capabilities and limitations</li>
+                    <li className="text-base leading-relaxed">Human oversight mechanisms</li>
+                    <li className="text-base leading-relaxed">Robustness, accuracy, and cybersecurity</li>
+                    <li className="text-base leading-relaxed">Conformity assessments before deployment</li>
+                  </ul>
+
+                  <p className="text-gray-700 text-base leading-relaxed mt-4">Scope: Applies to AI providers and deployers in the EU market, regardless of location.</p>
+
+                  <p className="text-gray-700 text-base leading-relaxed mt-2">Goals: Protect fundamental rights and safety while promoting innovation and creating harmonized rules across EU member states.</p>
+                </div>
               ) : (
-                // Default content (No Background)
+                // Default content (No Background) - shown when context is selected but not applied
                 <div className="space-y-4">
                   <p className="text-gray-800 leading-relaxed text-base">
                     <strong>Input:</strong> Summarize the main points in the AI Act.
