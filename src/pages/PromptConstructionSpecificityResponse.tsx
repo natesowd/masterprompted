@@ -14,10 +14,13 @@ export default function SpecificityResponse() {
   const [appliedBias, setAppliedBias] = useState("");
   const [context, setContext] = useState("");
   const [appliedContext, setAppliedContext] = useState("");
+  const [style, setStyle] = useState("");
+  const [appliedStyle, setAppliedStyle] = useState("");
   
   const handleApplyChanges = () => {
     setAppliedBias(bias);
     setAppliedContext(context);
+    setAppliedStyle(style);
   };
   
   // Input prompt changes immediately
@@ -27,16 +30,19 @@ export default function SpecificityResponse() {
     ? "Summarize the main points in the AI Act without bias."
     : context === "With Background"
     ? "I'm researching recent regulations on artificial intelligence. Please give me a summary of the main points in the AI Act, focusing on its key rules and how it aims to regulate AI systems."
+    : style === "Instructional"
+    ? "TDLR"
     : "Summarize the main points in the AI Act.";
   
   // Output content only changes after Apply Changes is clicked
   const showBiasedOutput = appliedBias === "With Bias";
   const showNoBiasOutput = appliedBias === "No Bias";
   const showWithBackgroundOutput = appliedContext === "With Background";
-  const showBaseOutput = !appliedBias && !appliedContext;
+  const showInstructionalOutput = appliedStyle === "Instructional";
+  const showBaseOutput = !appliedBias && !appliedContext && !appliedStyle;
   
   // Check if there are unapplied changes
-  const hasUnappliedChanges = bias !== appliedBias || context !== appliedContext;
+  const hasUnappliedChanges = bias !== appliedBias || context !== appliedContext || style !== appliedStyle;
   
   return <div className="min-h-screen bg-background">
       <Header />
@@ -56,8 +62,10 @@ export default function SpecificityResponse() {
               showBias={true}
               bias={bias}
               context={context}
+              style={style}
               onBiasChange={setBias}
               onContextChange={setContext}
+              onStyleChange={setStyle}
               onSubmit={handleApplyChanges}
               hasUnappliedChanges={hasUnappliedChanges}
             />
@@ -68,7 +76,36 @@ export default function SpecificityResponse() {
             {/* Article Content with scroll */}
             <div className="bg-white rounded-lg rounded-b-none p-8 max-h-[600px] overflow-y-auto flex-1">
               
-              {showBiasedOutput ? (
+              {showInstructionalOutput ? (
+                // Instructional content - TL;DR format
+                <div className="space-y-4">
+                  <p className="text-gray-800 leading-relaxed text-base">
+                    The AI Act is the EU's legislative proposal to regulate artificial intelligence.
+                  </p>
+                  <p className="text-base font-semibold text-gray-900">Here's the TL;DR:</p>
+                  <p className="text-gray-700 text-base leading-relaxed">
+                    <strong>Risk Categories:</strong> AI systems are sorted by risk levels, from high to minimal.
+                  </p>
+                  <p className="text-gray-700 text-base leading-relaxed">
+                    • <strong>Regulations for High-Risk:</strong> Strict rules apply to AI in critical areas like healthcare and policing.
+                  </p>
+                  <p className="text-gray-700 text-base leading-relaxed">
+                    • <strong>Transparency:</strong> AI must be identifiable, and users informed when they interact with AI.
+                  </p>
+                  <p className="text-gray-700 text-base leading-relaxed">
+                    • <strong>Bans on Certain AI:</strong> No AI that manipulates human behavior or violates rights.
+                  </p>
+                  <p className="text-gray-700 text-base leading-relaxed">
+                    • <strong>Data and Bias:</strong> High-risk AI must use quality data to prevent discrimination.
+                  </p>
+                  <p className="text-gray-700 text-base leading-relaxed">
+                    • <strong>Fines for Violations:</strong> Heavy penalties for non-compliance, up to 6% of annual turnover.
+                  </p>
+                  <p className="text-gray-800 leading-relaxed text-base mt-4">
+                    It's designed to foster innovation while protecting individuals' rights and safety in the AI era.
+                  </p>
+                </div>
+              ) : showBiasedOutput ? (
                 // Biased content about EU AI Act stifling research
                 <div className="space-y-4">
                   <p className="text-gray-800 leading-relaxed text-base">
