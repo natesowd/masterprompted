@@ -542,7 +542,11 @@ export default function SpecificityResponse() {
                     <p className="text-base font-semibold text-gray-900 mb-2">Risk-Based Classification:</p>
                     <p className="text-gray-700 text-base leading-relaxed mb-2">AI systems are classified according to their risk level:</p>
                     <ul className="space-y-2 text-gray-700 ml-6 list-disc">
-                      <li className="text-base leading-relaxed"><strong>Unacceptable Risk:</strong> Prohibited, e.g., social scoring and manipulative AI.</li>
+                      <li className="text-base leading-relaxed"><strong>Unacceptable Risk:</strong> <TextFlag 
+                        text="Prohibited, e.g., social scoring and manipulative AI." 
+                        evaluationFactor="plagiarism"
+                        explanation="This sentence has been taken directly from the official summary of the AI Act and is listed without citation in this output."
+                      /></li>
                       <li className="text-base leading-relaxed"><strong>High-Risk:</strong> Subject to strict regulation.</li>
                       <li className="text-base leading-relaxed"><strong>Limited Risk:</strong> Requires transparency to users, e.g., chatbots and deepfakes.</li>
                       <li className="text-base leading-relaxed"><strong>Minimal Risk:</strong> Mostly unregulated, e.g., AI-enabled video games and spam filters.</li>
