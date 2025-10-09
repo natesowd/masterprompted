@@ -218,7 +218,11 @@ export default function SpecificityResponse() {
                     The Act works on a risk-based system. AI systems are grouped by how risky they are. Some AI uses are completely banned - things like government social scoring or AI that manipulates vulnerable people. High-risk AI (used in areas like hiring, law enforcement, credit decisions, or critical infrastructure) has to meet strict rules: good data governance, transparency about how it works, human oversight, and proper risk management.
                   </p>
                   <p className="text-gray-800 leading-relaxed text-lg">
-                    AI with lower risks mainly needs to be transparent - like chatbots telling you they're AI. Most AI systems are minimal risk and don't have many requirements.
+                    AI with lower risks mainly needs to be transparent - <TextFlag 
+                      text="like chatbots telling you they're AI."
+                      evaluationFactor="voice"
+                      explanation="The output has followed the conversational tone by using the 2nd person, encouraging the idea that the LLM is actively responding to you and that it is a cognisant system. This is dangerous as the output may now sound more trustable, thus increasing the possibility of misinformation spreading."
+                    /> Most AI systems are minimal risk and don't have many requirements.
                   </p>
                   <p className="text-gray-800 leading-relaxed text-lg">
                     The goal is to keep people safe and protect their rights while still letting AI innovation happen. It applies to anyone who wants to use AI systems in the EU market, whether they're based in Europe or not.
