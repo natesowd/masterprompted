@@ -672,7 +672,7 @@ export default function SpecificityResponse() {
                     The AI Act is the EU&apos;s regulation for artificial intelligence, <TextFlag 
                       text="adopted in 2024."
                       evaluationFactor="relevance"
-                      explanation="It is true that the EU AI Act was adopted in 2024. However, what does this mean? At this point in time, none of the requirements apply. The AI has decided what is relevant for you and what is not."
+                      explanation={<>The LLM has decided to go into detail on the requirements for high-risk AI. Follow <a href="https://artificialintelligenceact.eu/high-level-summary/" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">this link</a> to see what the EU Act Website has decided to be the most relevant points.</>}
                     /> Here are the main points:
                   </p>
 
@@ -685,11 +685,7 @@ export default function SpecificityResponse() {
                     <li className="text-base leading-relaxed">Minimal risk systems have few requirements</li>
                   </ul>
 
-                  <p className="text-gray-700 text-base leading-relaxed mt-4"><TextFlag 
-                      text="Requirements for high-risk AI:"
-                      evaluationFactor="relevance"
-                      explanation={<>The LLM has decided to go into detail on the requirements for high-risk AI. Follow <a href="https://artificialintelligenceact.eu/high-level-summary/" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">this link</a> to see what the EU Act Website has decided to be the most relevant points.</>}
-                    /></p>
+                  <p className="text-gray-700 text-base leading-relaxed mt-4">Requirements for high-risk AI:</p>
 
                   <ul className="space-y-2 text-gray-700 ml-6 list-disc">
                     <li className="text-base leading-relaxed">Risk management throughout the system&apos;s lifecycle</li>
