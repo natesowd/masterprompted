@@ -94,15 +94,11 @@ const AnimatedTransition = ({
         
         <div className="max-w-7xl mx-auto">
           {/* Layout morphing animation */}
-          <div className={`transition-all duration-[800ms] ease-in-out ${
-            showResponseElements 
-              ? "grid grid-cols-1 lg:grid-cols-12 gap-8" 
-              : "flex justify-center"
-          }`}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Main content area */}
             <div className={`transition-all duration-[800ms] ease-in-out ${
-              showResponseElements ? "lg:col-span-8" : "max-w-2xl w-full"
+              showResponseElements ? "lg:col-span-8" : "lg:col-span-12 max-w-2xl mx-auto w-full"
             }`}>
               
               {/* Prompt area with smooth transformation */}
@@ -154,10 +150,10 @@ const AnimatedTransition = ({
                         text="Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:"
                         delay={80}
                         onComplete={() => setPhase("streamingComplete")}
-                        className="text-gray-700 text-lg"
+                        className="text-foreground text-lg leading-loose"
                       />
                     ) : (
-                      <p className="text-gray-700 text-lg">
+                      <p className="text-foreground text-lg leading-loose">
                         Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
                       </p>
                     )}
@@ -169,7 +165,7 @@ const AnimatedTransition = ({
                       <TypewriterText
                         text="European Union Unites On Historic AI Ethics Framework, Charting Path For Responsible Technology Development"
                         delay={100}
-                        className="text-2xl text-gray-900 leading-loose font-normal md:text-4xl block"
+                        className="text-2xl text-foreground leading-loose font-normal md:text-4xl block"
                       />
                     </div>
                   )}
@@ -177,12 +173,12 @@ const AnimatedTransition = ({
               )}
             </div>
 
-            {/* Right sidebar - Evaluation Panel appears last */}
-            {showResponseElements && showEvaluation && (
-              <div className="lg:col-span-4 animate-fade-in duration-[800ms] animate-slide-in-right">
-                <EvaluationPanel />
-              </div>
-            )}
+            {/* Right sidebar - Evaluation Panel always visible */}
+            <div className={`lg:col-span-4 transition-all duration-[800ms] ${
+              showResponseElements ? 'opacity-100' : 'opacity-0 lg:opacity-100'
+            }`}>
+              <EvaluationPanel />
+            </div>
           </div>
         </div>
       </main>
