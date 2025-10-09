@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import EvaluationPanel from "@/components/EvaluationPanel";
-import Chatbox from "@/components/ChatBox";
 import PromptControls from "@/components/PromptControls";
 import ChatPrompt from "@/components/ChatPrompt";
 import { useState, useRef, useEffect } from "react";
@@ -160,11 +159,11 @@ const PromptPlayground = () => {
   return (
     <div className="min-h-screen max-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-6 py-6">
-        <div className="flex gap-8">
+      <main className="container mx-auto px-6 py-4">
+        <div className="flex gap-8 h-[calc(100vh-8rem)]">
           {/* Left Sidebar */}
-          <div className="flex-none">
-            <div className="sticky top-4">
+          <div className="flex-none h-full">
+            <div className="sticky top-4 h-[calc(100vh-8rem)]">
               <PromptControls
               specificity={specificity}
               style={style}
@@ -178,19 +177,16 @@ const PromptPlayground = () => {
               onSubmit={() => handlePromptOptimize(currentPrompt, specificity, style, context, bias)}
               undoEnabled={Boolean(previousPrompt && previousPrompt !== currentPrompt)}
               onUndo={handleUndo}
+              chatValue={editingText}
+              onChatChange={setEditingText}
+              onChatSubmit={handleChatSubmit}
+              chatSubmitButtonId="prompt-playground-submit"
               />
             </div>
           </div>
 
           {/* Main Content */}
           <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-8rem)]">
-            <Chatbox
-              value={editingText}
-              onChange={setEditingText}
-              onSubmit={handleChatSubmit}
-              // canType={sentBasePrompt === false}
-              submitButtonId="prompt-playground-submit"
-            />
             <div className='flex-1 overflow-y-auto' ref={chatEndRef}>
               <ChatBody submittedPrompts={submittedPrompts} submittedResponses={submittedResponses} />
             </div>

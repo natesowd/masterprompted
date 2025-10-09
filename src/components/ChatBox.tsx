@@ -2,7 +2,7 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Paperclip, ArrowUp } from "lucide-react";
+import { Paperclip, SendHorizontal } from "lucide-react";
 
 // SubmitButton component
 function SubmitButton({ onClick, id }: { onClick?: (e?: React.MouseEvent) => void; id?: string }) {
@@ -14,7 +14,7 @@ function SubmitButton({ onClick, id }: { onClick?: (e?: React.MouseEvent) => voi
       size="icon"
       className="rounded-full h-10 w-10"
     >
-      <ArrowUp className="h-5 w-5" />
+      <SendHorizontal className="h-5 w-5" />
     </Button>
   );
 };
@@ -23,13 +23,14 @@ function SubmitButton({ onClick, id }: { onClick?: (e?: React.MouseEvent) => voi
 function UploadFile({ onClick, fileName }: { onClick?: () => void; fileName?: string }) {
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" className="rounded-full h-6 w-6" onClick={onClick}>
+      {/* **temporarily disabled** */}
+      <Button variant="ghost" size="icon" className="rounded-full h-6 w-6" onClick={onClick} disabled={true}> 
         <Paperclip className="h-4 w-4 text-gray-600" />
       </Button>
-      {fileName && ( 
-        <span className="text-sm text-gray-600 overflow-hidden text-ellipsis max-w-[200px]">
+      {fileName && (
+        <span className="text-sm text-gray-600 overflow-hidden text-ellipsis max-w-[100px]">
           {fileName}
-        </span> 
+        </span>
       )}
     </div>
   );
@@ -44,9 +45,11 @@ type ChatboxProps = {
   onUpload?: () => void;
   fileName?: string;
   submitButtonId?: string;
+  // When true, the chatbox will expand to fill its parent's height
+  fullHeight?: boolean;
 };
 
-const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId }: ChatboxProps) => {
+const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId, fullHeight = false }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -61,16 +64,13 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
   };
 
   return (
-    <div className="relative max-w-3xl bg-white border border-gray-200 shadow-lg rounded-3xl pl-6 pr-16 py-4">
+    <div className={`relative bg-white border border-gray-200 rounded-md px-3 py-3 ${fullHeight ? 'h-full flex flex-col min-h-0' : 'max-w-3xl'}`}>
       {/* Submit button - positioned in top right */}
-      <div className="absolute top-4 right-4">
-        <SubmitButton onClick={handleSubmit} id={submitButtonId} />
-      </div>
-      
+
       {/* Text area - takes up most of the space */}
       <Textarea
         placeholder="Type your message here..."
-        className="mb-6 border-none bg-transparent resize-none focus-visible:ring-0 focus-visible:ring-offset-0 p-0 min-h-[100px] text-base leading-6 text-gray-900 font-['Manrope']"
+        className={`mb-6 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-base leading-6 text-gray-900 font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
         disabled={!canType}
         value={value}
         onChange={handleInputChange}
@@ -81,10 +81,11 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
           }
         }}
       />
-      
-      {/* Upload file button - positioned in bottom left */}
-      <div className="absolute bottom-4 left-6">
+      <div className="flex justify-between align-middle">
+
         <UploadFile onClick={onUpload} fileName={fileName} />
+
+        <SubmitButton onClick={handleSubmit} id={submitButtonId} />
       </div>
     </div>
   );

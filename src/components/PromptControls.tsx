@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import Chatbox from "./ChatBox";
 
 // 1. Updated ParameterProps for RadioGroup usage and added a middle option
 interface ParameterProps {
@@ -122,6 +124,12 @@ interface PromptControlsProps {
     // Undo support
     undoEnabled?: boolean;
     onUndo?: () => void;
+
+    // ChatBox control props from parent
+    chatValue?: string;
+    onChatChange?: (value: string) => void;
+    onChatSubmit?: (value: string) => void;
+    chatSubmitButtonId?: string;
 }
 export default function PromptControls({
     showSpecificity = true,
@@ -143,7 +151,11 @@ export default function PromptControls({
     onReset,
     onSubmit,
     undoEnabled = false,
-    onUndo
+    onUndo,
+    chatValue = "",
+    onChatChange,
+    onChatSubmit,
+    chatSubmitButtonId
 }: PromptControlsProps) {
     // Local state remains the same
     const [localSpecificity, setLocalSpecificity] = useState<string>(specificity ?? "");
@@ -180,14 +192,23 @@ export default function PromptControls({
     const handleUndoClick = () => {
         if (onUndo && undoEnabled) onUndo();
     };
-    // The main PromptControls Card keeps its fixed width
-    return <Card className="bg-white border border-gray-200 rounded-lg max-w-sm">
-        <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-
-                <h3 className="font-semibold text-gray-900">Prompt Controls</h3>
+    // The main PromptControls Card becomes a column that fills height
+    return <Card className="bg-white border border-gray-200 rounded-lg max-w-sm h-full">
+        <CardContent className="p-4 h-full flex flex-col gap-4">
+            {/* Chatbox above the title, grows to fill */}
+            <div className="flex-1 min-h-0">
+                <Chatbox
+                    value={chatValue}
+                    onChange={onChatChange ?? (() => {})}
+                    onSubmit={onChatSubmit}
+                    submitButtonId={chatSubmitButtonId}
+                    fullHeight
+                />
             </div>
-            <div>
+
+            <div className="flex flex-col gap-2 overflow-y-auto">
+            <h3 className="font-semibold text-gray-900 text-center whitespace-nowrap">Prompt Controls</h3>
+            <Separator/>
                 <div className="relative">
                     {/* Selectors are now controlled by props from the parent */}
                     <Parameter parameterTitle="Prompt Specificity" leftParameter="General" rightParameter="Specific" showParameter={showSpecificity} enabled={enableSpecificity} currentValue={specificity ?? localSpecificity} onParameterChange={handleSpecificityChange} />
@@ -196,7 +217,7 @@ export default function PromptControls({
                     <Parameter parameterTitle="Bias" leftParameter="No Bias" rightParameter="With Bias" showParameter={showBias} enabled={enableBias} currentValue={bias ?? localBias} onParameterChange={handleBiasChange} />
                 </div>
 
-                <div className="flex gap-2 items-stretch">
+                <div className="flex gap-2 items-stretch mt-2">
                     <Button 
                     onClick={handleUndoClick} 
                     variant="secondary" 
