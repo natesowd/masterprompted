@@ -64,7 +64,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
   };
 
   return (
-    <div className={`relative bg-white border border-gray-200 rounded-md px-3 py-3 ${fullHeight ? 'h-full flex flex-col min-h-0' : 'max-w-3xl'}`}>
+    <div className={`relative bg-white border border-gray-200 rounded-2xl px-3 py-3 ${fullHeight ? 'h-full flex flex-col min-h-0' : 'max-w-3xl'}`}>
       {/* Submit button - positioned in top right */}
 
       {/* Text area - takes up most of the space */}
