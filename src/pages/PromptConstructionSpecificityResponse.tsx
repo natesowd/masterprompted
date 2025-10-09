@@ -95,7 +95,11 @@ export default function SpecificityResponse() {
                 // General content
                 <div className="space-y-4">
                   <p className="text-gray-800 leading-relaxed text-lg">
-                    The EU AI Act is a comprehensive regulation for artificial intelligence adopted by the European Union in 2024. It's the first major legal framework in the world specifically created to govern AI systems.
+                    The EU AI Act is a comprehensive regulation for artificial intelligence <TextFlag 
+                      text="adopted by the European Union in 2024."
+                      evaluationFactor="relevance"
+                      explanation="It is true that the EU AI Act was adopted in 2024. However, what does this mean? At this point in time, none of the requirements apply. The AI has decided what is relevant for you and what is not."
+                    /> It's the first major legal framework in the world specifically created to govern AI systems.
                   </p>
                   <p className="text-gray-800 leading-relaxed text-lg">
                     The Act organizes AI systems into risk categories. Some AI uses are completely prohibited, such as social scoring by governments or systems that manipulate people's behavior in harmful ways. High-risk AI systems - like those used in hiring, credit scoring, law enforcement, or critical infrastructure - face strict requirements around transparency, data quality, human oversight, and safety. Lower-risk systems mainly need to be transparent about being AI (like chatbots disclosing they're not human). Most AI applications are considered minimal risk and aren't heavily regulated.
