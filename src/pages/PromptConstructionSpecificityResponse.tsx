@@ -689,6 +689,7 @@ export default function SpecificityResponse() {
                       text="Requirements for high-risk AI:"
                       evaluationFactor="relevance"
                       explanation="The LLM has decided to go into detail on the requirements for high-risk AI. Follow this link to see what the EU Act Website has decided to be the most relevant points."
+                      href="https://artificialintelligenceact.eu/high-level-summary/"
                     /></p>
 
                   <ul className="space-y-2 text-gray-700 ml-6 list-disc">
