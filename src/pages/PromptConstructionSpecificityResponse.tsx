@@ -120,53 +120,58 @@ export default function SpecificityResponse() {
                     </p>
                   </div>
 
-                  <div>
-                    <p className="text-base font-semibold text-gray-900 mb-2">Risk Categories of AI Systems</p>
-                    
-                    <div className="ml-4 space-y-3">
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">Unacceptable Risk</p>
-                        <ul className="space-y-1 text-gray-700 ml-4 mt-1">
-                          <li className="text-base leading-relaxed">AI systems that pose a clear threat to safety, fundamental rights, or people's well-being.</li>
-                          <li className="text-base leading-relaxed">Examples: Social scoring by governments, systems that manipulate behavior causing harm, or exploit vulnerabilities of children or disabled people.</li>
-                          <li className="text-base leading-relaxed">These are banned outright.</li>
-                        </ul>
-                      </div>
-
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">High Risk</p>
-                        <ul className="space-y-1 text-gray-700 ml-4 mt-1">
-                          <li className="text-base leading-relaxed">AI systems that have significant potential to impact people's lives or rights.</li>
-                          <li className="text-base leading-relaxed">Examples include AI used in:</li>
-                          <ul className="ml-4 space-y-1">
-                            <li className="text-base leading-relaxed">• Critical infrastructure (e.g., transport safety)</li>
-                            <li className="text-base leading-relaxed">• Education or vocational training (affecting access/opportunities)</li>
-                            <li className="text-base leading-relaxed">• Employment (recruitment, performance evaluation)</li>
-                            <li className="text-base leading-relaxed">• Law enforcement and border control</li>
-                            <li className="text-base leading-relaxed">• Access to essential services (e.g., credit scoring)</li>
-                            <li className="text-base leading-relaxed">• Biometric identification and management of critical public functions</li>
+                  <SectionFlag
+                    evaluationFactor="relevance"
+                    explanation="Since the prompt emphasised wanting knowledge on the risk system, the output has gone further in depth on the topic"
+                  >
+                    <div>
+                      <p className="text-base font-semibold text-gray-900 mb-2">Risk Categories of AI Systems</p>
+                      
+                      <div className="ml-4 space-y-3">
+                        <div>
+                          <p className="text-base font-semibold text-gray-900">Unacceptable Risk</p>
+                          <ul className="space-y-1 text-gray-700 ml-4 mt-1">
+                            <li className="text-base leading-relaxed">AI systems that pose a clear threat to safety, fundamental rights, or people's well-being.</li>
+                            <li className="text-base leading-relaxed">Examples: Social scoring by governments, systems that manipulate behavior causing harm, or exploit vulnerabilities of children or disabled people.</li>
+                            <li className="text-base leading-relaxed">These are banned outright.</li>
                           </ul>
-                          <li className="text-base leading-relaxed">These systems are subject to strict obligations before they can be placed on the market or put into service.</li>
-                        </ul>
-                      </div>
+                        </div>
 
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">Limited Risk</p>
-                        <ul className="space-y-1 text-gray-700 ml-4 mt-1">
-                          <li className="text-base leading-relaxed">AI systems with specific transparency obligations.</li>
-                          <li className="text-base leading-relaxed">Users must be informed they are interacting with an AI system (e.g., chatbots).</li>
-                        </ul>
-                      </div>
+                        <div>
+                          <p className="text-base font-semibold text-gray-900">High Risk</p>
+                          <ul className="space-y-1 text-gray-700 ml-4 mt-1">
+                            <li className="text-base leading-relaxed">AI systems that have significant potential to impact people's lives or rights.</li>
+                            <li className="text-base leading-relaxed">Examples include AI used in:</li>
+                            <ul className="ml-4 space-y-1">
+                              <li className="text-base leading-relaxed">• Critical infrastructure (e.g., transport safety)</li>
+                              <li className="text-base leading-relaxed">• Education or vocational training (affecting access/opportunities)</li>
+                              <li className="text-base leading-relaxed">• Employment (recruitment, performance evaluation)</li>
+                              <li className="text-base leading-relaxed">• Law enforcement and border control</li>
+                              <li className="text-base leading-relaxed">• Access to essential services (e.g., credit scoring)</li>
+                              <li className="text-base leading-relaxed">• Biometric identification and management of critical public functions</li>
+                            </ul>
+                            <li className="text-base leading-relaxed">These systems are subject to strict obligations before they can be placed on the market or put into service.</li>
+                          </ul>
+                        </div>
 
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">Minimal or No Risk</p>
-                        <ul className="space-y-1 text-gray-700 ml-4 mt-1">
-                          <li className="text-base leading-relaxed">Most AI systems fall here.</li>
-                          <li className="text-base leading-relaxed">No specific legal requirements under the Act.</li>
-                        </ul>
+                        <div>
+                          <p className="text-base font-semibold text-gray-900">Limited Risk</p>
+                          <ul className="space-y-1 text-gray-700 ml-4 mt-1">
+                            <li className="text-base leading-relaxed">AI systems with specific transparency obligations.</li>
+                            <li className="text-base leading-relaxed">Users must be informed they are interacting with an AI system (e.g., chatbots).</li>
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="text-base font-semibold text-gray-900">Minimal or No Risk</p>
+                          <ul className="space-y-1 text-gray-700 ml-4 mt-1">
+                            <li className="text-base leading-relaxed">Most AI systems fall here.</li>
+                            <li className="text-base leading-relaxed">No specific legal requirements under the Act.</li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </SectionFlag>
 
                   <div>
                     <p className="text-base font-semibold text-gray-900 mb-2">Rules for High-Risk AI Systems</p>
