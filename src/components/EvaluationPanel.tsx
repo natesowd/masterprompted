@@ -1,5 +1,4 @@
 import { CheckCircle, Target, Mic, Scale, Copy, ChevronDown } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
 
@@ -36,7 +35,16 @@ const evaluationCriteria = [
   }
 ];
 
-export default function EvaluationPanel() {
+// Define props for the component, including the optional initialIsOpen prop
+interface EvaluationPanelProps {
+  initialIsOpen?: boolean;
+}
+
+// Update the component signature to accept the props
+export default function EvaluationPanel({ initialIsOpen = true }: EvaluationPanelProps) {
+  // Use state to manage the main panel open state, defaulting to initialIsOpen prop
+  const [isPanelOpen, setIsPanelOpen] = useState(initialIsOpen);
+  // State for managing which criteria item is open
   const [openItem, setOpenItem] = useState<string | null>(null);
 
   const toggleItem = (id: string) => {
@@ -44,12 +52,23 @@ export default function EvaluationPanel() {
   };
 
   return (
-    <Card className="w-[20rem] bg-white border border-gray-200 rounded-2xl shadow-sm">  <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-gray-900">
-          Journalistic Evaluation
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    // Use isPanelOpen state for the main Collapsible component
+    <Collapsible 
+      open={isPanelOpen} 
+      onOpenChange={setIsPanelOpen}
+      className="w-[20rem] bg-white border border-gray-200 rounded-2xl shadow-sm px-4 py-4"
+    > 
+      {/* Update the main trigger to include the chevron and occupy full width */}
+      <CollapsibleTrigger className="w-full flex items-center justify-between text-lg font-semibold text-gray-900">
+        Journalistic Evaluation
+        {/* Add the Chevron icon and apply rotation based on isPanelOpen state */}
+        <ChevronDown
+          className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
+            isPanelOpen ? 'rotate-180' : ''
+          }`}
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-3 mt-4">
         {evaluationCriteria.map((criterion) => (
           <Collapsible
             key={criterion.id}
@@ -76,7 +95,7 @@ export default function EvaluationPanel() {
             </CollapsibleContent>
           </Collapsible>
         ))}
-      </CardContent>
-    </Card>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

@@ -290,7 +290,7 @@ const PromptPlayground = () => {
 
           {/* Right Sidebar */}
           <div className="flex-none">
-            <EvaluationPanel />
+            <EvaluationPanel initialIsOpen={false}/>
           </div>
         </div>
       </main >
