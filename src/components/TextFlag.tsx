@@ -39,7 +39,7 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
                             criterionElement.querySelector('button') ||
                             criterionElement.querySelector('[role="button"]');
       if (triggerElement) {
-        triggerElement.classList.add('ring-2', 'ring-destructive', 'bg-destructive/10');
+        triggerElement.classList.add('ring-2', 'ring-red-500', 'bg-red-50');
         triggerElement.classList.remove('bg-muted', 'hover:bg-muted/80');
       }
     }
@@ -48,9 +48,11 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
     return () => {
       if (criterionElement) {
         const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') || 
-                              criterionElement.querySelector('.flex.items-center.justify-between');
+                              criterionElement.querySelector('.flex.items-center.justify-between') ||
+                              criterionElement.querySelector('button') ||
+                              criterionElement.querySelector('[role="button"]');
         if (triggerElement) {
-          triggerElement.classList.remove('ring-2', 'ring-destructive', 'bg-destructive/10');
+          triggerElement.classList.remove('ring-2', 'ring-red-500', 'bg-red-50');
           triggerElement.classList.add('bg-muted', 'hover:bg-muted/80');
         }
       }
