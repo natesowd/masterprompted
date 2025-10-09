@@ -25,10 +25,10 @@ function UploadFile({ onClick, fileName }: { onClick?: () => void; fileName?: st
     <div className="flex items-center gap-2">
       {/* **temporarily disabled** */}
       <Button variant="ghost" size="icon" className="rounded-full h-6 w-6" onClick={onClick} disabled={true}> 
-        <Paperclip className="h-4 w-4 text-gray-600" />
+        <Paperclip className="h-4 w-4 text-muted-foreground" />
       </Button>
       {fileName && (
-        <span className="text-sm text-gray-600 overflow-hidden text-ellipsis max-w-[100px]">
+        <span className="text-sm text-muted-foreground overflow-hidden text-ellipsis max-w-[100px]">
           {fileName}
         </span>
       )}
@@ -64,7 +64,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
   };
 
   return (
-    <div className={`relative bg-white border border-gray-200 rounded-2xl ${fullHeight ? 'h-full flex flex-col min-h-0' : 'max-w-3xl'}`}>
+    <div className={`relative bg-card border border-border rounded-lg ${fullHeight ? 'h-full flex flex-col min-h-0' : 'max-w-3xl'}`}>
       {/* Submit button - positioned in top right */}
       <div className="absolute top-4 right-4 z-10">
         <SubmitButton onClick={handleSubmit} id={submitButtonId} />
@@ -73,7 +73,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
       {/* Text area - takes up most of the space */}
       <Textarea
         placeholder="Type your message here..."
-        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-base leading-6 text-gray-900 font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
+        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-base leading-6 text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
         disabled={!canType}
         value={value}
         onChange={handleInputChange}

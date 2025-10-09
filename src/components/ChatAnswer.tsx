@@ -104,20 +104,20 @@ const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProp
     <div className="mb-20 w-full">
       {/* Show Diff Toggle */}
       {canShowDiff && (
-        <div className="flex items-center space-x-2 mb-3 pb-2 border-b border-gray-200">
+        <div className="flex items-center space-x-2 mb-3 pb-2 border-b border-border">
           <Switch
             id="show-diff"
             checked={showDiff}
             onCheckedChange={setShowDiff}
           />
-          <Label htmlFor="show-diff" className="text-sm text-gray-600">
+          <Label htmlFor="show-diff" className="text-sm text-muted-foreground">
             Show Diff
           </Label>
         </div>
       )}
       
       {/* Main message text */}
-      <div className="prose max-w-none text-gray-900 leading-relaxed">
+      <div className="prose max-w-none text-foreground leading-relaxed">
         {showDiff && canShowDiff ? (
           renderDiff()
         ) : (

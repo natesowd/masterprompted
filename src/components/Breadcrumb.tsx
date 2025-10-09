@@ -82,17 +82,17 @@ export default function Breadcrumb() {
   }
 
   return (
-    <nav className="flex items-center text-sm text-gray-600 mb-5">
+    <nav className="flex items-center text-sm text-muted-foreground mb-5">
       {breadcrumbItems.map((item, index) => (
         <div key={item.path} className="flex items-center">
-          {index > 0 && <ChevronRight className="h-4 w-4 mx-2 text-gray-400" />}
+          {index > 0 && <ChevronRight className="h-4 w-4 mx-2 text-muted-foreground/50" />}
           
           {item.isLast ? (
-            <span className="text-gray-900 font-medium">{item.label}</span>
+            <span className="text-foreground font-medium">{item.label}</span>
           ) : (
             <Link 
               to={item.label === "Guided Simulation" ? "/module/intro" : item.path}
-              className="hover:text-gray-900 transition-colors"
+              className="hover:text-foreground transition-colors"
             >
               {item.label}
             </Link>

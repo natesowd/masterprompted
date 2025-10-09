@@ -41,10 +41,10 @@ function Parameter({
     };
 
     return <fieldset 
-        className={`my-3 p-0 px-1 border border-gray-200 rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
+        className={`my-3 p-0 px-1 border border-border rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
         disabled={!enabled}
     >
-        <legend className="text-xs font-medium text-gray-700 px-2 mx-auto">
+        <legend className="text-xs font-medium text-muted-foreground px-2 mx-auto">
             {parameterTitle}
         </legend>
         
@@ -207,10 +207,10 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
         if (onSubmit) onSubmit();
     };
 
-    return <Card className="bg-white border border-gray-200 rounded-2xl shadow-sm max-w-sm">
+    return <Card className="bg-card border border-border rounded-lg shadow-sm max-w-sm">
         <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Prompt Controls</h3>
+                <h3 className="text-lg font-semibold text-card-foreground">Prompt Controls</h3>
             </div>
 
             {/* Sent Prompt Display */}
@@ -235,7 +235,7 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
                 return (
                     <div className="mb-6 bg-secondary rounded-lg p-4">
                         <p 
-                            className="text-gray-900 leading-relaxed text-sm"
+                            className="text-foreground leading-relaxed text-sm"
                             style={{
                                 fontFamily: 'Manrope',
                             }}

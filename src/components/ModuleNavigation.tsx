@@ -24,7 +24,7 @@ const ModuleNavigation = ({
         <Button
           variant="ghost"
           onClick={() => navigate(previousRoute)}
-          className="hover:bg-gray-100 rounded-full p-2"
+          className="hover:bg-muted rounded-full p-2"
           size="icon"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -33,13 +33,13 @@ const ModuleNavigation = ({
         <div className="w-8 h-8"></div>
       )}
       
-      <div className="w-px h-6 bg-gray-300"></div>
+      <div className="w-px h-6 bg-border"></div>
       
       {nextRoute ? (
         <Button
           variant="ghost"
           onClick={() => navigate(nextRoute)}
-          className="hover:bg-gray-100 rounded-full p-2"
+          className="hover:bg-muted rounded-full p-2"
           size="icon"
         >
           <ChevronRight className="h-4 w-4" />

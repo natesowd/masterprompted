@@ -24,7 +24,7 @@ const ChatPrompt = ({ text, fileName, versionIndex = 0, versionCount = 1, onPrev
       {/* Main message text */}
       <RichText
         text={text}
-        className="text-gray-900 leading-relaxed"
+        className="text-foreground leading-relaxed"
         as="p"
       />
       {(fileName || versionCount > 1) && (
@@ -33,8 +33,8 @@ const ChatPrompt = ({ text, fileName, versionIndex = 0, versionCount = 1, onPrev
           {/* Attachment section */}
           {fileName && (
             <div className="inline-flex items-center gap-2">
-              <Paperclip className="h-4 w-4 text-gray-600" />
-              <span className="text-sm text-gray-700 font-medium">
+              <Paperclip className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-foreground font-medium">
                 {fileName}
               </span>
             </div>
@@ -42,7 +42,7 @@ const ChatPrompt = ({ text, fileName, versionIndex = 0, versionCount = 1, onPrev
 
           {/* Version navigation - only if more than one version */}
           {versionCount > 1 && (
-            <div className="flex items-center gap-1 text-sm text-gray-600 justify-end col-start-2">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground justify-end col-start-2">
               <button
                 type="button"
                 onClick={onPrevVersion}

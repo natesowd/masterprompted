@@ -55,11 +55,11 @@ function Parameter({
     // 3. Each option is given flex-1 to distribute width evenly.
     return <fieldset 
         // Minimized padding and margin
-        className={`my-3 p-0 px-1 border border-gray-200 rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
+        className={`my-3 p-0 px-1 border border-border rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
         disabled={!enabled}
     >
         {/* Title uses text-xs and a small margin/padding */}
-        <legend className="text-xs font-medium text-gray-700 px-2 mx-auto">
+        <legend className="text-xs font-medium text-muted-foreground px-2 mx-auto">
             {parameterTitle}
         </legend>
         
@@ -193,7 +193,7 @@ export default function PromptControls({
         if (onUndo && undoEnabled) onUndo();
     };
     // The main PromptControls Card becomes a column that fills height
-    return <Card className="bg-white border border-gray-200 rounded-lg max-w-sm h-full">
+    return <Card className="bg-card border border-border rounded-lg max-w-sm h-full">
         <CardContent className="p-4 h-full flex flex-col gap-4">
             {/* Chatbox above the title, grows to fill */}
             <div className="flex-1 min-h-0">
@@ -207,7 +207,7 @@ export default function PromptControls({
             </div>
 
             <div className="flex flex-col gap-2 overflow-y-auto">
-            <h3 className="font-semibold text-gray-900 text-center whitespace-nowrap">Prompt Controls</h3>
+            <h3 className="font-semibold text-card-foreground text-center whitespace-nowrap">Prompt Controls</h3>
             <Separator/>
                 <div className="relative">
                     {/* Selectors are now controlled by props from the parent */}

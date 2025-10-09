@@ -56,14 +56,14 @@ export default function EvaluationPanel({ initialIsOpen = true }: EvaluationPane
     <Collapsible 
       open={isPanelOpen} 
       onOpenChange={setIsPanelOpen}
-      className="w-[20rem] bg-white border border-gray-200 rounded-2xl shadow-sm px-4 py-4"
+      className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4"
     > 
       {/* Update the main trigger to include the chevron and occupy full width */}
-      <CollapsibleTrigger className="w-full flex items-center justify-between text-lg font-semibold text-gray-900">
+      <CollapsibleTrigger className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground">
         Journalistic Evaluation
         {/* Add the Chevron icon and apply rotation based on isPanelOpen state */}
         <ChevronDown
-          className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
+          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
             isPanelOpen ? 'rotate-180' : ''
           }`}
         />
@@ -79,17 +79,17 @@ export default function EvaluationPanel({ initialIsOpen = true }: EvaluationPane
             <CollapsibleTrigger className="w-full">
               <div className="flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer bg-muted hover:bg-muted/80">
                 <div className="flex items-center gap-3 mr-20">
-                  <criterion.icon className="h-4 w-4 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">{criterion.label}</span>
+                  <criterion.icon className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">{criterion.label}</span>
                 </div>
                 <ChevronDown
-                  className={`h-4 w-4 text-gray-500 transition-transform ${openItem === criterion.id ? 'rotate-180' : ''
+                  className={`h-4 w-4 text-muted-foreground transition-transform ${openItem === criterion.id ? 'rotate-180' : ''
                     }`}
                 />
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="px-3 pb-3">
-              <p className="text-sm text-gray-600 leading-relaxed mt-2 whitespace-normal">
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2 whitespace-normal">
                 {criterion.description}
               </p>
             </CollapsibleContent>
