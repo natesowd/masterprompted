@@ -51,7 +51,7 @@ export default function PromptConstructionSpecificityTakeaways() {
             </div>
           </div>
           
-          <div className="mt-16">
+          <div className="mt-16 hidden">
             <button 
               onClick={handleContinue}
               className="bg-green-400 hover:bg-green-500 text-black font-medium px-8 py-3 rounded-full transition-colors"
