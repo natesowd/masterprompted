@@ -669,12 +669,14 @@ export default function SpecificityResponse() {
                 // Default content (No Background) - shown when context is selected but not applied
                 <div className="space-y-4">
                   <p className="text-gray-800 leading-relaxed text-lg">
-                    The AI Act is the EU&apos;s regulation for artificial intelligence, <TextFlag 
+                    The AI Act is the EU&apos;s regulation for artificial intelligence,{" "}
+                    <TextFlag 
                       text="adopted in 2024."
                       evaluationFactor="relevance"
                       explanation={<>The LLM has decided to go into detail on the requirements for high-risk AI. Follow <a href="https://artificialintelligenceact.eu/high-level-summary/" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">this link</a> to see what the EU Act Website has decided to be the most relevant points.</>}
-                    /> Here are the main points:
+                    />
                   </p>
+                  <p className="text-gray-800 leading-relaxed text-lg">Here are the main points:</p>
 
                   <p className="text-gray-700 text-base leading-relaxed">Risk-based approach: AI systems are categorized by risk level:</p>
 
