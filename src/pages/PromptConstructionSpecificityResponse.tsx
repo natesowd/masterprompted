@@ -688,8 +688,7 @@ export default function SpecificityResponse() {
                   <p className="text-gray-700 text-base leading-relaxed mt-4"><TextFlag 
                       text="Requirements for high-risk AI:"
                       evaluationFactor="relevance"
-                      explanation="The LLM has decided to go into detail on the requirements for high-risk AI. Follow this link to see what the EU Act Website has decided to be the most relevant points."
-                      href="https://artificialintelligenceact.eu/high-level-summary/"
+                      explanation={<>The LLM has decided to go into detail on the requirements for high-risk AI. Follow <a href="https://artificialintelligenceact.eu/high-level-summary/" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">this link</a> to see what the EU Act Website has decided to be the most relevant points.</>}
                     /></p>
 
                   <ul className="space-y-2 text-gray-700 ml-6 list-disc">

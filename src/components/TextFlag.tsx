@@ -5,7 +5,8 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 interface TextFlagProps {
   text: string;
   evaluationFactor: "factual-accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
-  explanation: string;
+  explanation: React.ReactNode;
+  
   className?: string;
   href?: string;
 }
