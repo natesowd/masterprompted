@@ -7,7 +7,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Paperclip, ArrowUp } from "lucide-react";
+import { SendHorizontal } from "lucide-react";
 export default function Specificity() {
   const navigate = useNavigate();
   const [showTooltip, setShowTooltip] = useState(true);
@@ -51,8 +51,8 @@ export default function Specificity() {
                 </div>
                 
                 {/* Arrow button */}
-                <Button onClick={handleSubmit} className="bg-gray-800 hover:bg-gray-700 text-white rounded-full p-3 ml-4">
-                  <ArrowUp className="h-5 w-5" />
+                <Button onClick={handleSubmit} variant="default" size="icon" className="rounded-full h-10 w-10 ml-4">
+                  <SendHorizontal className="h-5 w-5" />
                 </Button>
               </div>
             </CardContent>
