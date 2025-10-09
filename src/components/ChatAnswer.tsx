@@ -86,14 +86,7 @@ const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProp
   };
 
   return (
-    <div 
-      className="mb-8 max-w-fit mr-auto, bg-gray-100"
-      style={{
-        borderRadius: '20px',
-        padding: '20px 24px',
-        maxWidth: '80%'
-      }}
-    >
+    <div className="mb-20 w-full">
       {/* Show Diff Toggle - only visible when there's a previous answer */}
       {canShowDiff && (
         <div className="flex items-center space-x-2 mb-3 pb-2 border-b border-gray-200">
@@ -110,15 +103,7 @@ const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProp
       
       {/* Main message text */}
       {showDiff && canShowDiff ? (
-        <div 
-          className="text-gray-900 leading-relaxed"
-          style={{
-            fontFamily: 'Manrope',
-            fontSize: '16px',
-            lineHeight: '24px',
-            margin: 0
-          }}
-        >
+        <div className="text-gray-900 leading-relaxed" style={{ fontFamily: 'Manrope', fontSize: '16px', lineHeight: '24px', margin: 0 }}>
           {renderDiff()}
         </div>
       ) : (
