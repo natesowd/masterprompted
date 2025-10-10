@@ -19,20 +19,8 @@ const AboutSimulator = () => {
         <Breadcrumb />
         <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[600px] relative">
           <Card 
-            className="transition-all duration-200"
+            className="w-full max-w-4xl transition-all duration-200 flex flex-col md:flex-row items-start p-8 md:p-10 gap-6 md:gap-8"
             style={{
-              boxSizing: 'border-box',
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              padding: '40px 50px 50px',
-              gap: '30px',
-              isolation: 'isolate',
-              position: 'absolute',
-              width: '845px',
-              minHeight: 'auto',
-              left: 'calc(50% - 845px/2 + 0.5px)',
-              top: '100px',
               background: '#FFFFFF',
               border: '1px solid #C5C5C5',
               boxShadow: '0px 6px 15px rgba(62, 62, 62, 0.15)',
@@ -43,8 +31,7 @@ const AboutSimulator = () => {
             <img 
               src="/whatis.png" 
               alt="What is simulator cone" 
-              className="w-[325px] h-auto flex-shrink-0"
-              style={{ marginTop: '10px' }}
+              className="w-full md:w-[325px] h-auto flex-shrink-0"
             />
             
             <CardContent className="p-0 w-full flex flex-col">
