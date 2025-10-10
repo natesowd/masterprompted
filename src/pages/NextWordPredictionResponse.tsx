@@ -213,9 +213,9 @@ export default function HeadlineResponse() {
         
         <div className="w-full">
           {/* Two-column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Left column - Main content */}
-            <div className="lg:col-span-8">
+            <div className="flex-1 min-w-0">
               {/* Original Prompt */}
               <div className="mb-8">
                 <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
@@ -372,7 +372,7 @@ export default function HeadlineResponse() {
             </div>
 
             {/* Right column - Evaluation panel */}
-            <div className="lg:col-span-4" data-evaluation-panel>
+            <div className="w-full lg:w-auto lg:flex-shrink-0" data-evaluation-panel>
               <EvaluationPanel />
             </div>
           </div>
