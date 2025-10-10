@@ -24,62 +24,18 @@ const AnimatedTransition = ({
   onComplete 
 }: AnimatedTransitionProps) => {
   const navigate = useNavigate();
-  const [phase, setPhase] = useState<AnimationPhase>("chatbox");
-  const [showResponseElements, setShowResponseElements] = useState(false);
-  const [showHeadline, setShowHeadline] = useState(false);
-  const [showEvaluation, setShowEvaluation] = useState(false);
+  const [phase] = useState<AnimationPhase>("complete");
+  const showResponseElements = true;
+  const showHeadline = true;
 
-  // Auto-start the animation as soon as this component mounts
+  // Navigate to target route after a brief moment
   useEffect(() => {
-    const t = setTimeout(() => setPhase("sending"), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  const handleSubmit = () => {
-    // Start the animation sequence
-    setPhase("sending");
-  };
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    switch (phase) {
-      case "sending":
-        timeout = setTimeout(() => setPhase("sent"), 100);
-        break;
-      case "sent":
-        timeout = setTimeout(() => setPhase("responding"), 100);
-        break;
-      case "responding":
-        timeout = setTimeout(() => setPhase("streaming"), 100);
-        break;
-      case "streaming":
-        // Streaming will trigger streamingComplete phase via TypewriterText onComplete
-        break;
-      case "streamingComplete":
-        timeout = setTimeout(() => setPhase("showHeadline"), 100);
-        break;
-      case "showHeadline":
-        setShowHeadline(true);
-        timeout = setTimeout(() => setPhase("showEvaluation"), 100);
-        break;
-      case "showEvaluation":
-        setShowResponseElements(true);
-        setShowEvaluation(true);
-        timeout = setTimeout(() => setPhase("complete"), 1000);
-        break;
-      case "complete":
-        timeout = setTimeout(() => {
-          navigate(targetRoute);
-          onComplete?.();
-        }, 400);
-        break;
-    }
-
-    return () => {
-      if (timeout) clearTimeout(timeout);
-    };
-  }, [phase, navigate, targetRoute, onComplete]);
+    const timeout = setTimeout(() => {
+      navigate(targetRoute);
+      onComplete?.();
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [navigate, targetRoute, onComplete]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -97,90 +53,32 @@ const AnimatedTransition = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Main content area */}
-            <div className={`transition-all duration-[800ms] ease-in-out ${
-              showResponseElements ? "lg:col-span-8" : "lg:col-span-12"
-            }`}>
-              <div className={`transition-all duration-[800ms] ease-in-out ${
-                showResponseElements ? "max-w-full" : "max-w-2xl mx-auto"
-              }`}>
+            <div className="lg:col-span-8">
               
-              {/* Prompt area with smooth transformation */}
+              {/* Prompt area */}
               <div className="mb-8">
-                {phase === "chatbox" && (
-                  <div className="transition-all duration-300">
-                    <Chatbox 
-                      canType={false} 
-                      value={promptText}
-                      onChange={() => {}}
-                      fileName={fileName}
-                      onSubmit={handleSubmit}
-                    />
-                  </div>
-                )}
-                
-                {phase === "sending" && (
-                  <div className="transform transition-all duration-600 scale-98 opacity-90">
-                    <Chatbox 
-                      canType={false} 
-                      value={promptText}
-                      onChange={() => {}}
-                      fileName={fileName}
-                      onSubmit={() => {}}
-                    />
-                  </div>
-                )}
-                
-                {(phase === "sent" || phase === "responding" || phase === "streaming" || phase === "streamingComplete" || phase === "showHeadline" || phase === "showEvaluation" || phase === "complete") && (
-                  <div className="animate-fade-in duration-500">
-                    <ChatPrompt text={promptText} fileName={fileName} />
-                  </div>
-                )}
+                <ChatPrompt text={promptText} fileName={fileName} />
               </div>
 
-              {/* Responding phase */}
-              {phase === "responding" && (
-                <div className="animate-fade-in duration-500 p-8">
-                  <LoadingDots text="Generating response" />
+              {/* Response content */}
+              <div className="space-y-6">
+                <div className="p-6">
+                  <p className="text-foreground text-lg leading-loose">
+                    Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
+                  </p>
                 </div>
-              )}
-
-              {/* Streaming response */}
-              {(phase === "streaming" || phase === "streamingComplete" || phase === "showHeadline" || phase === "showEvaluation" || phase === "complete") && (
-                <div className="animate-fade-in duration-500 space-y-6">
-                  <div className="p-6">
-                    {phase === "streaming" ? (
-                      <TypewriterText
-                        text="Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:"
-                        delay={80}
-                        onComplete={() => setPhase("streamingComplete")}
-                        className="text-foreground text-lg leading-loose"
-                      />
-                    ) : (
-                      <p className="text-foreground text-lg leading-loose">
-                        Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
-                      </p>
-                    )}
-                  </div>
-                  
-                  {/* Headline that appears after intro text */}
-                  {showHeadline && (
-                    <div className="animate-fade-in duration-600 p-6">
-                      <TypewriterText
-                        text="European Union Unites On Historic AI Ethics Framework, Charting Path For Responsible Technology Development"
-                        delay={100}
-                        className="text-2xl text-foreground leading-loose font-normal md:text-4xl block"
-                      />
-                    </div>
-                  )}
+                
+                {/* Headline */}
+                <div className="p-6">
+                  <p className="text-2xl text-foreground leading-loose font-normal md:text-4xl block">
+                    European Union Unites On Historic AI Ethics Framework, Charting Path For Responsible Technology Development
+                  </p>
                 </div>
-              )}
               </div>
             </div>
 
-            {/* Right sidebar - Evaluation Panel with smooth fade */}
-            <div className={`lg:col-span-4 transition-opacity duration-[800ms] ease-in-out ${
-              showResponseElements ? 'opacity-100' : 'opacity-0'
-            }`}>
+            {/* Right sidebar - Evaluation Panel */}
+            <div className="lg:col-span-4">
               <EvaluationPanel />
             </div>
           </div>
