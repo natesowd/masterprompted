@@ -68,21 +68,26 @@ export function MiniTask({
       window.removeEventListener('scroll', handleRecalc, true);
     };
   }, []);
+  const u = spotlightRects.unite;
+  const o = spotlightRects.on;
+  const left = Math.min(u?.left ?? Infinity, o?.left ?? Infinity) - 3;
+  const top = Math.min(u?.top ?? Infinity, o?.top ?? Infinity) - 3;
+  const right = Math.max(u ? u.left + u.width : -Infinity, o ? o.left + o.width : -Infinity) + 3;
+  const bottom = Math.max(u ? u.top + u.height : -Infinity, o ? o.top + o.height : -Infinity) + 3;
+  const width = Math.max(0, right - left);
+  const height = Math.max(0, bottom - top);
+  
+  // Calculate position for MiniTask - below the spotlight
+  const taskTop = bottom + 20; // 20px below spotlight
+  const taskLeft = left;
+
   return <>
       {/* Dimmed overlay */}
-      <div className="fixed inset-0 bg-black/0 z-40 pointer-events-none" />
+      <div className="fixed inset-0 bg-black/50 z-40 pointer-events-none" />
       
       {/* Combined spotlight covering both words */}
-      {(spotlightRects.unite || spotlightRects.on) && (() => {
-      const u = spotlightRects.unite;
-      const o = spotlightRects.on;
-      const left = Math.min(u?.left ?? Infinity, o?.left ?? Infinity) - 3;
-      const top = Math.min(u?.top ?? Infinity, o?.top ?? Infinity) - 3;
-      const right = Math.max(u ? u.left + u.width : -Infinity, o ? o.left + o.width : -Infinity) + 3;
-      const bottom = Math.max(u ? u.top + u.height : -Infinity, o ? o.top + o.height : -Infinity) + 3;
-      const width = Math.max(0, right - left);
-      const height = Math.max(0, bottom - top);
-      return <div className="fixed z-50 pointer-events-none" style={{
+      {(spotlightRects.unite || spotlightRects.on) && (
+      <div className="fixed z-50 pointer-events-none" style={{
         left,
         top,
         width,
@@ -90,26 +95,31 @@ export function MiniTask({
         background: 'transparent',
         borderRadius: '8px',
         boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`
-      }} />;
-    })()}
+      }} />
+    )}
 
 
-      {/* MiniTask component - fixed to bottom with card styling */}
-      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-[33vw] ${className}`}>
-        <div className="bg-card border border-border rounded-lg p-4 shadow-lg">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <AlignJustify className="w-5 h-5 text-primary" />
-            </div>
-            <div className="flex-1 space-y-3">
-              <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-              <p className="text-sm text-muted-foreground">{description}</p>
-              <Button onClick={onStartTask} variant="default" size="sm">
-                Start Task
-              </Button>
+      {/* MiniTask component - positioned near spotlight */}
+      {(spotlightRects.unite || spotlightRects.on) && (
+        <div className={`fixed z-50 w-full max-w-[33vw] ${className}`} style={{
+          top: taskTop,
+          left: taskLeft
+        }}>
+          <div className="bg-card border border-border rounded-lg p-4 shadow-lg">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <AlignJustify className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 space-y-3">
+                <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
+                <Button onClick={onStartTask} variant="default" size="sm">
+                  Start Task
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </>;
 }
