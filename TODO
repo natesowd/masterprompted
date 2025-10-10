@@ -7,7 +7,10 @@ TODO:
 - Prompt Playground
   - chatbox: move to prompt controls
   - make prompt controls part of a sidebar component maybe?
-  - diff: pull out deleted text, show on the side with a pointer
+  - DIFF: 
+    - deleted text as sidebar component
+    - clean up diff w/ newlines gore
+    - support bolding within diff
   - add chat versions to prompt component
   - journalistic eval is collapsibe
   - optimize and send simoultaneously
