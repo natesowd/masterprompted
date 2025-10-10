@@ -93,13 +93,16 @@ const AnimatedTransition = ({
         <div className="mb-5"></div>
         
         <div className="max-w-7xl mx-auto">
-          {/* Layout morphing animation */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Layout with consistent grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Main content area */}
             <div className={`transition-all duration-[800ms] ease-in-out ${
-              showResponseElements ? "lg:col-span-8" : "lg:col-span-12 max-w-2xl mx-auto w-full"
+              showResponseElements ? "lg:col-span-8" : "lg:col-span-12"
             }`}>
+              <div className={`transition-all duration-[800ms] ease-in-out ${
+                showResponseElements ? "max-w-full" : "max-w-2xl mx-auto"
+              }`}>
               
               {/* Prompt area with smooth transformation */}
               <div className="mb-8">
@@ -171,11 +174,12 @@ const AnimatedTransition = ({
                   )}
                 </div>
               )}
+              </div>
             </div>
 
-            {/* Right sidebar - Evaluation Panel always visible */}
-            <div className={`lg:col-span-4 transition-all duration-[800ms] ${
-              showResponseElements ? 'opacity-100' : 'opacity-0 lg:opacity-100'
+            {/* Right sidebar - Evaluation Panel with smooth fade */}
+            <div className={`lg:col-span-4 transition-opacity duration-[800ms] ease-in-out ${
+              showResponseElements ? 'opacity-100' : 'opacity-0'
             }`}>
               <EvaluationPanel />
             </div>
