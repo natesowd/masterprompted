@@ -195,16 +195,17 @@ export default function HeadlineResponse() {
         </div>
   }];
   return <div className="min-h-screen bg-background">
-      <Header />
-      
-      {/* MiniTask - render at top for immediate visibility */}
-      {showMiniTask && (
+          {showMiniTask && (
         <MiniTask
           title="Mini Task: Find the factual inaccuracy"
           description="Click on the green highlighted words to try out different combinations – each combination will generate a different outcome."
           onStartTask={() => setShowMiniTask(false)}
         />
       )}
+      <Header />
+      
+      {/* MiniTask - render at top for immediate visibility */}
+
       
       <main className="container mx-auto px-6 py-6 max-w-7xl">
         <div className="mb-6">
