@@ -70,7 +70,7 @@ export function MiniTask({
   }, []);
   return <>
       {/* Dimmed overlay */}
-      <div className="fixed inset-0 bg-black/0 z-40 pointer-events-none" />
+      <div className="fixed inset-0 bg-black/50 z-40 pointer-events-none" />
       
       {/* Combined spotlight covering both words */}
       {(spotlightRects.unite || spotlightRects.on) && (() => {
