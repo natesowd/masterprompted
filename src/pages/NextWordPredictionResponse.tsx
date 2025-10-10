@@ -215,7 +215,7 @@ export default function HeadlineResponse() {
           {/* Two-column layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left column - Main content */}
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-7">
               {/* Original Prompt */}
               <div className="mb-8">
                 <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
@@ -372,7 +372,7 @@ export default function HeadlineResponse() {
             </div>
 
             {/* Right column - Evaluation panel */}
-            <div className="lg:col-span-4" data-evaluation-panel>
+            <div className="lg:col-span-5" data-evaluation-panel>
               <EvaluationPanel />
             </div>
           </div>
