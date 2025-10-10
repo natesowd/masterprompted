@@ -25,7 +25,6 @@ const ChatPrompt = ({ text, fileName, versionIndex = 0, versionCount = 1, onPrev
       <RichText
         text={text}
         className="text-foreground leading-relaxed"
-        as="p"
       />
       {(fileName || versionCount > 1) && (
         <div className="grid grid-cols-2 items-between mt-2">
