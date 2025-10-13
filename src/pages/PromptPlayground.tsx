@@ -4,6 +4,10 @@ import PromptControls from "@/components/PromptControls";
 import ChatPrompt from "@/components/ChatPrompt";
 import { useState, useRef, useEffect, useCallback } from "react";
 import ChatAnswer from "@/components/ChatAnswer";
+import { PopoverSeries } from "@/components/PopoverSeries";
+import { Button } from "@/components/ui/button";
+import { CircleQuestionMark } from "lucide-react";
+import { set } from "zod";
 
 // --- REFACTORED: Defined a single type for all optimization parameters ---
 export type Parameters = {
@@ -68,6 +72,10 @@ const PromptPlayground = () => {
   });
 
   const [disableSend, setDisableSend] = useState(false);
+  const [disableOptimize, setDisableOptimize] = useState(false);
+
+  // numeric pulse to trigger UI animations in child components when optimize returns
+  const [optimizePulse, setOptimizePulse] = useState(0);
 
   // ChatBox text state
   const [currentPrompt, setCurrentPrompt] = useState<string>("");
@@ -79,6 +87,23 @@ const PromptPlayground = () => {
   const [enableSpecificity, setEnableSpecificity] = useState<boolean>(false)
   const [enableStyle, setEnableStyle] = useState<boolean>(false)
   const [enableContext, setEnableContext] = useState<boolean>(false)
+
+  // Popover should show on first-ever visit, then not again. Use localStorage to persist.
+  const LOCALSTORAGE_POPKEY = "promptPlayground.popoverSeen";
+  const [showPopover, setShowPopover] = useState<boolean>(false);
+
+  // On mount, open popover if not seen before
+  useEffect(() => {
+    try {
+      const seen = localStorage.getItem(LOCALSTORAGE_POPKEY);
+      if (!seen) {
+        setShowPopover(true);
+      }
+    } catch (e) {
+      // ignore localStorage errors and default to not showing
+      setShowPopover(false);
+    }
+  }, []);
 
 
   // --- REFACTORED: Consolidated handler for all parameter changes ---
@@ -146,31 +171,41 @@ const PromptPlayground = () => {
   ) => {
     if (!prompt.trim()) return;
 
+    console.log("handlePromptOptimize called with prompt:", prompt, { specificity, style, context, bias });
     setPreviousPrompt(prompt);
 
-    const optimize_prompt = await fetch(
-      "https://llm1.hochschule-stralsund.de:8000/optimize",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: prompt,
-          language: "en",
-          temperature: 0.7,
-          specificity: specificity,
-          communication_mode: style,
-          depth: context,
-          bias: bias,
-          length: "short",
-        }),
-      }
-    );
+    try {
+      const optimize_prompt = await fetch(
+        "https://llm1.hochschule-stralsund.de:8000/optimize",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: prompt,
+            language: "en",
+            temperature: 0.7,
+            specificity: specificity,
+            communication_mode: style,
+            depth: context,
+            bias: bias,
+            length: "short",
+          }),
+        }
+      );
 
-    const data = await optimize_prompt.json();
-    const optimized_prompt: string = data.optimized_prompt;
+      const data = await optimize_prompt.json();
+      const optimized_prompt: string = data.optimized_prompt;
 
-    setEditingText(optimized_prompt)
-
+      // write optimized prompt first
+      console.log("optimized done");
+      setEditingText(optimized_prompt);
+      setDisableOptimize(false);
+      // trigger pulse so parent UI can animate (e.g. chatbox bounce)
+      // Log the new value inside the functional updater to avoid reading stale state
+      setOptimizePulse(prev => prev + 1);
+    } catch (err) {
+      console.error("handlePromptOptimize failed:", err);
+    }
   }, []);
 
   // --- NEW: useEffect to automatically optimize the prompt when parameters change ---
@@ -178,7 +213,9 @@ const PromptPlayground = () => {
     if (!currentPrompt.trim()) return;
 
     if (Object.values(parameters).every(p => p === "")) {
+      // setOptimizePulse(prev => prev + 1);
       setEditingText(currentPrompt);
+      setDisableOptimize(true);
       return;
     }
 
@@ -193,6 +230,7 @@ const PromptPlayground = () => {
         false
       );
     }
+
   }, [parameters, currentPrompt, handlePromptOptimize]);
 
   // Undo handler: revert to the previous prompt (single-level undo)
@@ -207,6 +245,7 @@ const PromptPlayground = () => {
     if (!submittedText.trim()) return;
     setCurrentPrompt(submittedText);
     setDisableSend(true);
+    setDisableOptimize(true);
     void createNewThreadAndFetch(submittedText);
     setEnableSpecificity(true);
     setEnableBias(true);
@@ -219,6 +258,7 @@ const PromptPlayground = () => {
     // console.log(input)
     setEditingText(input);
     setDisableSend(false);
+    setDisableOptimize(true);
     setEnableSpecificity(false);
     setEnableBias(false);
     setEnableContext(false);
@@ -282,22 +322,22 @@ const PromptPlayground = () => {
     }
   };
 
-const prevThreadCount = useRef(threads.length);
-useEffect(() => {
-  if (threads.length !== prevThreadCount.current) {
-    if (chatEndRef.current) {
-      const latestVersionElement = chatEndRef.current.querySelector(`[versionindex="${threads[threads.length - 1].currentIndex}"]`);
-      if (latestVersionElement) {
-        const rect = latestVersionElement.getBoundingClientRect();
-        const offset = rect.top - chatEndRef.current.offsetTop + chatEndRef.current.scrollTop;
-        chatEndRef.current.scrollTo({ top: offset, behavior: 'smooth' });
-      } else {
-        chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight;
+  const prevThreadCount = useRef(threads.length);
+  useEffect(() => {
+    if (threads.length !== prevThreadCount.current) {
+      if (chatEndRef.current) {
+        const latestVersionElement = chatEndRef.current.querySelector(`[versionindex="${threads[threads.length - 1].currentIndex}"]`);
+        if (latestVersionElement) {
+          const rect = latestVersionElement.getBoundingClientRect();
+          const offset = rect.top - chatEndRef.current.offsetTop + chatEndRef.current.scrollTop;
+          chatEndRef.current.scrollTo({ top: offset, behavior: 'smooth' });
+        } else {
+          chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight;
+        }
       }
     }
-  }
-  prevThreadCount.current = threads.length;
-}, [threads.length]);
+    prevThreadCount.current = threads.length;
+  }, [threads.length]);
 
   const handlePrevVersion = (threadIndex: number) => {
     setThreads(prev => {
@@ -340,10 +380,12 @@ useEffect(() => {
                 onChatSubmit={handleChatSubmit}
                 chatSubmitButtonId="prompt-playground-submit"
                 disableSend={disableSend}
+                disableOptimize={disableOptimize}
                 enableBias={enableBias}
                 enableSpecificity={enableSpecificity}
                 enableContext={enableContext}
                 enableStyle={enableStyle}
+                chatAnimationKey={optimizePulse}
               />
             </div>
           </div>
@@ -360,11 +402,43 @@ useEffect(() => {
           </div>
 
           {/* Right Sidebar */}
-          <div className="flex-none">
+          <div className="w-[calc(18rem+2.5rem)] flex flex-col items-end gap-4">
+            <button
+              className="p-2 rounded-full hover:bg-muted/50"
+              onClick={() => setShowPopover(true)}
+            >
+              <CircleQuestionMark className="h-6 w-6 text-muted-foreground" />
+            </button>
             <EvaluationPanel initialIsOpen={false} />
           </div>
         </div>
+
       </main >
+      {showPopover && (
+        <PopoverSeries
+          steps={[
+            {
+              id: "submit-hint",
+              trigger: "#chatbox",
+              content: "Click here to submit your prompt and see the AI's response!"
+            },
+            {
+              id: "controls-hint",
+              trigger: "#parameters",
+              content: "You can use the prompt controls to optimize your prompt."
+            }
+          ]}
+          initialStep={0}
+          onClose={() => {
+            try {
+              localStorage.setItem(LOCALSTORAGE_POPKEY, "true");
+            } catch (e) {
+              /* ignore */
+            }
+            setShowPopover(false);
+          }}
+        />
+      )}
     </div >
   );
 };

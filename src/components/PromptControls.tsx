@@ -46,7 +46,7 @@ function Parameter({
     };
 
     return <fieldset 
-        className={`my-3 p-0 px-1 border border-border rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
+        className={`my-2 p-0 px-1 border border-border rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
         disabled={!enabled}
     >
         <legend className="text-xs font-medium text-muted-foreground px-2 mx-auto">
@@ -99,13 +99,17 @@ interface PromptControlsProps {
     onOptimize?: () => void;
     undoEnabled?: boolean;
     onUndo?: () => void;
+    disableSend?: boolean;
+    disableOptimize?: boolean;
 
     // ChatBox control props
     chatValue?: string;
     onChatChange?: (value: string) => void;
     onChatSubmit?: (value: string) => void;
     chatSubmitButtonId?: string;
-    disableSend?: boolean;
+
+    // external key to trigger chatbox animation
+    chatAnimationKey?: number;
 }
 export default function PromptControls({
     showSpecificity = true,
@@ -126,7 +130,9 @@ export default function PromptControls({
     onChatChange,
     onChatSubmit,
     chatSubmitButtonId,
-    disableSend
+    disableSend,
+    disableOptimize,
+    chatAnimationKey
 }: PromptControlsProps) {
     // --- REFACTORED: Removed local state and individual handlers ---
 
@@ -144,7 +150,7 @@ export default function PromptControls({
     const isAnyParameterSet = Object.values(parameters).some(p => p !== "");
 
     return <Card className="bg-card border border-border rounded-lg max-w-sm h-full">
-        <CardContent className="p-4 h-full flex flex-col gap-4">
+        <CardContent className="p-4 h-full flex flex-col gap-2">
             <div className="flex-1 min-h-0">
                 <Chatbox
                     value={chatValue}
@@ -153,14 +159,15 @@ export default function PromptControls({
                     submitButtonId={chatSubmitButtonId}
                     disableSend={disableSend}
                     fullHeight
+                    animationKey={chatAnimationKey}
                     
                 />
             </div>
 
-            <div className="flex flex-col gap-2 overflow-y-auto">
+            <div className="flex flex-col overflow-y-auto">
                 <h3 className="font-semibold text-card-foreground text-center whitespace-nowrap">Prompt Controls</h3>
                 <Separator/>
-                <div className="relative">
+                <div id='parameters' className="relative">
                     {/* --- REFACTORED: Parameter components now use consolidated props --- */}
                     <Parameter parameterTitle="Prompt Specificity" parameterKey="specificity" leftParameter="General" rightParameter="Specific" showParameter={showSpecificity} enabled={enableSpecificity} currentValue={parameters.specificity} onParameterChange={onParameterChange} />
                     <Parameter parameterTitle="Interaction Style" parameterKey="style" leftParameter="Conversational" rightParameter="Instructional" showParameter={showStyle} enabled={enableStyle} currentValue={parameters.style} onParameterChange={onParameterChange} />
@@ -174,7 +181,7 @@ export default function PromptControls({
                         variant="default" 
                         size="sm" 
                         className="flex-1 min-h-[48px] leading-tight rounded-full whitespace-normal text-center"
-                        disabled={!isAnyParameterSet}> 
+                        disabled={disableOptimize}> 
                         Send Optimized Prompt
                     </Button>
                 </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, forwardRef } from "react"
+import { createPortal } from "react-dom"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
@@ -91,33 +92,37 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
     return null;
   }
 
+  // Render an SVG mask overlay (via portal) so the transparent hole is
+  // robust across browsers and stacking contexts. We render to document.body
+  // so the overlay isn't constrained by parent stacking contexts.
+  const overlay = (isOpen && rect) ? (() => {
+    if (typeof document === 'undefined') return null;
+    const maskId = `popover-series-mask-${currentStepData?.id ?? 'mask'}`;
+    // Use a portal so the overlay sits at the top of the document.
+    return createPortal(
+      <svg
+        aria-hidden
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
+        style={{ position: 'fixed', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 50 }}
+      >
+        <defs>
+          <mask id={maskId} x="0" y="0" width="100%" height="100%">
+            {/* White means visible, black means transparent */}
+            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+            <rect x={rect.left} y={rect.top} width={rect.width} height={rect.height} rx={parseFloat(borderRadius) || 0} fill="black" />
+          </mask>
+        </defs>
+        <rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask={`url(#${maskId})`} />
+      </svg>,
+      document.body
+    );
+  })() : null;
+
   return (
     <>
-      {/* Spotlight/Mask Effect */}
-      {isOpen && rect && (
-        <>
-        {/* <div className="fixed inset-0 z-40" /> */}
-        <div
-          // MODIFICATION 2: Added `pointer-events-none`.
-          // This allows clicks and interactions to pass through the spotlight
-          // "hole" to the element underneath, making it interactable.
-          className="fixed z-41 pointer-events-none"
-          style={{
-            left: rect.left - 2,
-            top: rect.top - 2,
-            width: rect.width + 4,
-            height: rect.height + 4,
-            borderRadius: borderRadius,
-            // The box-shadow creates the overlay effect around the transparent hole.
-            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
-          }}
-        />
-        </>
-        // MODIFICATION 3: Removed the separate full-screen overlay div.
-        // It was redundant and blocked all interactions. The box-shadow above
-        // is sufficient to create the visual overlay.
-      )}
-
+      {overlay}
       {/* Popover Component */}
       <Popover
         key={currentStepData.id}

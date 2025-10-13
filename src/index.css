@@ -106,6 +106,24 @@ All colors MUST be HSL.
   }
 }
 
+  /* One-shot bounce animation for ChatBox feedback */
+  @keyframes bounce-once {
+    0% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+    60% { transform: translateY(2px); }
+    100% { transform: translateY(0); }
+  }
+
+  .bounce-once {
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bounce-once {
+      animation: bounce-once 350ms cubic-bezier(.25,.8,.25,1) both;
+    }
+  }
+
 @layer base {
   * {
     @apply border-border font-sans;

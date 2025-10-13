@@ -1,4 +1,4 @@
-import { CheckCircle, Target, Mic, Scale, Copy, ChevronDown } from "lucide-react";
+import { CheckCircle, Target, Mic, Scale, Copy, ChevronDown, ListChevronsUpDown, ListChevronsDownUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
 
@@ -52,50 +52,63 @@ export default function EvaluationPanel({ initialIsOpen = true }: EvaluationPane
   };
 
   return (
-    // Use isPanelOpen state for the main Collapsible component
-    <Collapsible 
-      open={isPanelOpen} 
-      onOpenChange={setIsPanelOpen}
-      className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4"
-    > 
-      {/* Update the main trigger to include the chevron and occupy full width */}
-      <CollapsibleTrigger className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground">
-        Journalistic Evaluation
-        {/* Add the Chevron icon and apply rotation based on isPanelOpen state */}
-        <ChevronDown
-          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
-            isPanelOpen ? 'rotate-180' : ''
-          }`}
-        />
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-3 mt-4">
-        {evaluationCriteria.map((criterion) => (
-          <Collapsible
-            key={criterion.id}
-            open={openItem === criterion.id}
-            onOpenChange={() => toggleItem(criterion.id)}
-            data-criterion-id={criterion.id}
+    <div className="relative">
+      {/* When closed, only render a small floating button. When open, render the full panel. */}
+      {isPanelOpen ? (
+        <div className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4 relative">
+          {/* Expand/Minimize button in top-right */}
+          <button
+            aria-label={isPanelOpen ? 'Minimize evaluation panel' : 'Expand evaluation panel'}
+            className="absolute top-1 right-1 p-1 rounded-full hover:bg-muted/50"
+            onClick={() => setIsPanelOpen(false)}
           >
-            <CollapsibleTrigger className="w-full">
-              <div className="flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer bg-muted hover:bg-muted/80">
-                <div className="flex items-center gap-3 mr-20">
-                  <criterion.icon className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">{criterion.label}</span>
-                </div>
-                <ChevronDown
-                  className={`h-4 w-4 text-muted-foreground transition-transform ${openItem === criterion.id ? 'rotate-180' : ''
-                    }`}
-                />
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="px-3 pb-3">
-              <p className="text-sm text-muted-foreground leading-relaxed mt-2 whitespace-normal">
-                {criterion.description}
-              </p>
-            </CollapsibleContent>
-          </Collapsible>
-        ))}
-      </CollapsibleContent>
-    </Collapsible>
+            <ListChevronsDownUp className="h-5 w-5 text-muted-foreground" />
+          </button>
+
+          <div className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground mb-2">
+            <span>Journalistic Evaluation</span>
+          </div>
+
+          <div className="space-y-3 mt-4">
+            {evaluationCriteria.map((criterion) => (
+              <Collapsible
+                key={criterion.id}
+                open={openItem === criterion.id}
+                onOpenChange={() => toggleItem(criterion.id)}
+                data-criterion-id={criterion.id}
+              >
+                <CollapsibleTrigger className="w-full">
+                  <div className="flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer bg-muted hover:bg-muted/80">
+                    <div className="flex items-center gap-3 mr-20">
+                      <criterion.icon className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">{criterion.label}</span>
+                    </div>
+                    <ChevronDown
+                      className={`h-4 w-4 text-muted-foreground transition-transform ${openItem === criterion.id ? 'rotate-180' : ''
+                        }`}
+                    />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-3 pb-3">
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-2 whitespace-normal">
+                    {criterion.description}
+                  </p>
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="w-10 h-10">
+          <button
+            aria-label="Open evaluation panel"
+            className="p-2 rounded-full hover:bg-muted/50"
+            onClick={() => setIsPanelOpen(true)}
+          >
+            <ListChevronsUpDown className="h-5 w-5 text-muted-foreground" />
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

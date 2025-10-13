@@ -40,3 +40,22 @@
 .read-the-docs {
   color: #888;
 }
+
+/* One-shot bounce animation for UI feedback */
+@keyframes bounce-once {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+  60% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+.bounce-once {
+  /* Fallback: ensure no animation when reduced-motion is requested. Actual animation applied below in media query. */
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bounce-once {
+    animation: bounce-once 350ms cubic-bezier(.25,.8,.25,1) both;
+  }
+}

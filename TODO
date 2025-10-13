@@ -3,14 +3,17 @@ TODO:
 - align theming with greater AI-Code design philosophy
 - remove scrolling where possible
 - look into scraping data from google sheets
-- PROMPT PLAYGROUND:
-  - DIFF: 
-    - put deleted text as sidebar component
-    - clean up diff w/ newlines gore
-    - support bolding within diff
-  - edit button for chats
-  - scroll behavior: go down as far as posisble while keep most recent prompt on-screen
-  - add info tips and overlays
+- allow directional placement of popoverseries
+- add info to parameters
+- add loading component while waiting on GPT
+- minor: add bounce to only manual revert neutral parameters, not send prompt as well
+- some way to pull old prompts back into chatbox easily (click on chatprompt component?)
+- DIFF: 
+  - put deleted text as sidebar component
+  - clean up diff w/ newlines gore
+  - support bolding within diff
+- edit button for chats
+- scroll behavior: go down as far as posisble while keep most recent prompt on-screen
 
 IN PROGRESS:
 - 
@@ -28,6 +31,8 @@ DONE:
 - add chat versions to prompt component
 - make prompt controls part of a sidebar component maybe?
 - chatbox: move to prompt controls
+- imrpove journalistic eval minimization
+
 
 
 
