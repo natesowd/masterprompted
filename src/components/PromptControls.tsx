@@ -101,6 +101,7 @@ interface PromptControlsProps {
     onUndo?: () => void;
     disableSend?: boolean;
     disableOptimize?: boolean;
+    waitingforOptimization?: boolean;
 
     // ChatBox control props
     chatValue?: string;
@@ -132,7 +133,8 @@ export default function PromptControls({
     chatSubmitButtonId,
     disableSend,
     disableOptimize,
-    chatAnimationKey
+    chatAnimationKey,
+    waitingforOptimization = false
 }: PromptControlsProps) {
     // --- REFACTORED: Removed local state and individual handlers ---
 
@@ -160,6 +162,7 @@ export default function PromptControls({
                     disableSend={disableSend}
                     fullHeight
                     animationKey={chatAnimationKey}
+                    waitingforOptimization={waitingforOptimization}
                     
                 />
             </div>
@@ -169,10 +172,34 @@ export default function PromptControls({
                 <Separator/>
                 <div id='parameters' className="relative">
                     {/* --- REFACTORED: Parameter components now use consolidated props --- */}
-                    <Parameter parameterTitle="Prompt Specificity" parameterKey="specificity" leftParameter="General" rightParameter="Specific" showParameter={showSpecificity} enabled={enableSpecificity} currentValue={parameters.specificity} onParameterChange={onParameterChange} />
-                    <Parameter parameterTitle="Interaction Style" parameterKey="style" leftParameter="Conversational" rightParameter="Instructional" showParameter={showStyle} enabled={enableStyle} currentValue={parameters.style} onParameterChange={onParameterChange} />
-                    <Parameter parameterTitle="Context" parameterKey="context" leftParameter="No Background" rightParameter="With Background" showParameter={showContext} enabled={enableContext} currentValue={parameters.context} onParameterChange={onParameterChange} />
-                    <Parameter parameterTitle="Bias" parameterKey="bias" leftParameter="No Bias" rightParameter="With Bias" showParameter={showBias} enabled={enableBias} currentValue={parameters.bias} onParameterChange={onParameterChange} />
+                    <Parameter 
+                    parameterTitle="Prompt Specificity" parameterKey="specificity" 
+                    leftParameter="General" rightParameter="Specific" 
+                    showParameter={showSpecificity} enabled={enableSpecificity} 
+                    currentValue={parameters.specificity} 
+                    onParameterChange={onParameterChange} 
+                    />
+                    <Parameter 
+                    parameterTitle="Interaction Style" parameterKey="style" 
+                    leftParameter="Conversational" rightParameter="Instructional" 
+                    showParameter={showStyle} enabled={enableStyle} 
+                    currentValue={parameters.style} 
+                    onParameterChange={onParameterChange} 
+                    />
+                    <Parameter 
+                    parameterTitle="Context" parameterKey="context" 
+                    leftParameter="No Background" rightParameter="With Background" 
+                    showParameter={showContext} enabled={enableContext} 
+                    currentValue={parameters.context} 
+                    onParameterChange={onParameterChange} 
+                    />
+                    <Parameter 
+                    parameterTitle="Bias" parameterKey="bias" 
+                    leftParameter="No Bias" rightParameter="With Bias" 
+                    showParameter={showBias} enabled={enableBias} 
+                    currentValue={parameters.bias} 
+                    onParameterChange={onParameterChange} 
+                    />
                 </div>
 
                 <div className="flex gap-2 items-stretch">

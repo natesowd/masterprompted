@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Paperclip, SendHorizontal } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // SubmitButton component
 function SubmitButton({ onClick, id, disableSend }: { onClick?: (e?: React.MouseEvent) => void; id?: string; disableSend?: boolean }) {
@@ -53,9 +54,10 @@ type ChatboxProps = {
   // When true, the chatbox will expand to fill its parent's height
   fullHeight?: boolean;
   id?: string;
+  waitingforOptimization?: boolean;
 };
 
-const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId, id='chatbox', fullHeight = false, disableSend = false, animationKey }: ChatboxProps) => {
+const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId, id='chatbox', fullHeight = false, disableSend = false, animationKey, waitingforOptimization }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -100,7 +102,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
       return;
     }
 
-    console.log('Chatbox: triggering bounce animation (animationKey=', animationKey, ')');
+    // console.log('Chatbox: triggering bounce animation (animationKey=', animationKey, ')');
     // Try Web Animations API first for reliable control
     const keyframes: Keyframe[] = [
       { transform: 'translateY(0)' },
@@ -116,7 +118,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
         setIsBouncing(true);
         wa = (el as any).animate(keyframes, options);
         wa.addEventListener('finish', () => {
-          console.log('Chatbox WA finished');
+          // console.log('Chatbox WA finished');
           setIsBouncing(false);
         });
         // Safety: if the animation is cancelled or doesn't finish, clear after a timeout
@@ -149,7 +151,8 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
       </div>
 
       {/* Text area - takes up most of the space */}
-      <Textarea
+      {!waitingforOptimization && ( 
+        <Textarea
         placeholder="Type your message here..."
         className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-base leading-6 text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
         disabled={!canType}
@@ -157,12 +160,21 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
         onChange={handleInputChange}
         ref={textareaRef}
         onKeyDown={e => {
-          if (e.key === "Enter" && !e.shiftKey) {
+          if (e.key === "Enter") {
             e.preventDefault();
+            if (!e.shiftKey && !disableSend)
             handleSubmit();
           }
         }}
       />
+      )}
+      {waitingforOptimization && (
+        <div 
+        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-base leading-6 text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}>
+        <Skeleton className="mt-2 h-6 w-[180px]" />
+        <Skeleton className="mt-2 h-6 w-[150px]" />
+        </div>
+      )}
     </div>
   );
 };

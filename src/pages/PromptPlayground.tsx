@@ -5,9 +5,8 @@ import ChatPrompt from "@/components/ChatPrompt";
 import { useState, useRef, useEffect, useCallback } from "react";
 import ChatAnswer from "@/components/ChatAnswer";
 import { PopoverSeries } from "@/components/PopoverSeries";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton"
 import { CircleQuestionMark } from "lucide-react";
-import { set } from "zod";
 
 // --- REFACTORED: Defined a single type for all optimization parameters ---
 export type Parameters = {
@@ -42,6 +41,12 @@ function ChatBody({
               onPrevVersion={() => onPrevVersion(threadIndex)}
               onNextVersion={() => onNextVersion(threadIndex)}
             />
+            {!current.answer && (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[500px]" />
+                <Skeleton className="h-4 w-[300px]" />
+              </div>
+            )}
             {current.answer && (
               <ChatAnswer
                 text={current.answer}
@@ -71,8 +76,8 @@ const PromptPlayground = () => {
     bias: "",
   });
 
-  const [disableSend, setDisableSend] = useState(false);
-  const [disableOptimize, setDisableOptimize] = useState(false);
+  const [disableSend, setDisableSend] = useState(true);
+  const [disableOptimize, setDisableOptimize] = useState(true);
 
   // numeric pulse to trigger UI animations in child components when optimize returns
   const [optimizePulse, setOptimizePulse] = useState(0);
@@ -82,15 +87,21 @@ const PromptPlayground = () => {
   const [editingText, setEditingText] = useState<string>("");
   // Stores the previous prompt to enable single-level undo
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
+  // Track if user has manually edited the input (signals need for new thread)
+  const [hasManualEdit, setHasManualEdit] = useState<boolean>(false);
 
   const [enableBias, setEnableBias] = useState<boolean>(false);
   const [enableSpecificity, setEnableSpecificity] = useState<boolean>(false)
   const [enableStyle, setEnableStyle] = useState<boolean>(false)
   const [enableContext, setEnableContext] = useState<boolean>(false)
 
+  const [fullReset, setFullReset] = useState<boolean>(false);
+
   // Popover should show on first-ever visit, then not again. Use localStorage to persist.
   const LOCALSTORAGE_POPKEY = "promptPlayground.popoverSeen";
   const [showPopover, setShowPopover] = useState<boolean>(false);
+
+  const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
 
   // On mount, open popover if not seen before
   useEffect(() => {
@@ -114,15 +125,15 @@ const PromptPlayground = () => {
     }));
   };
 
-  // --- REFACTORED: Reset handler now clears the single parameters object ---
-  const handleReset = useCallback(() => {
+  const handleReset = () => {
+    setFullReset(true);
     setParameters({
       specificity: "",
       style: "",
       context: "",
       bias: "",
     });
-  }, []);
+  };
 
   // Perform network call and write answer into a specific thread/version
   const submitAnswerForThreadVersion = useCallback(async (threadIndex: number, versionIndex: number, promptText: string) => {
@@ -171,7 +182,9 @@ const PromptPlayground = () => {
   ) => {
     if (!prompt.trim()) return;
 
-    console.log("handlePromptOptimize called with prompt:", prompt, { specificity, style, context, bias });
+    setWaitingForOptimization(true);
+
+    // console.log("handlePromptOptimize called with prompt:", prompt, { specificity, style, context, bias });
     setPreviousPrompt(prompt);
 
     try {
@@ -197,12 +210,15 @@ const PromptPlayground = () => {
       const optimized_prompt: string = data.optimized_prompt;
 
       // write optimized prompt first
-      console.log("optimized done");
+      // console.log("optimized done");
       setEditingText(optimized_prompt);
       setDisableOptimize(false);
       // trigger pulse so parent UI can animate (e.g. chatbox bounce)
       // Log the new value inside the functional updater to avoid reading stale state
       setOptimizePulse(prev => prev + 1);
+
+      setWaitingForOptimization(false);
+
     } catch (err) {
       console.error("handlePromptOptimize failed:", err);
     }
@@ -210,25 +226,45 @@ const PromptPlayground = () => {
 
   // --- NEW: useEffect to automatically optimize the prompt when parameters change ---
   useEffect(() => {
-    if (!currentPrompt.trim()) return;
+
+    // console.log("Parameters changed, current parameters:", parameters);
+    if ((!currentPrompt.trim()) && (!editingText.trim())) return;
 
     if (Object.values(parameters).every(p => p === "")) {
-      // setOptimizePulse(prev => prev + 1);
-      setEditingText(currentPrompt);
-      setDisableOptimize(true);
+      if (!fullReset) {
+        // setOptimizePulse(prev => prev + 1);
+        setEditingText(currentPrompt);
+        setDisableOptimize(true);
+      }
+      setFullReset(false);
       return;
+
     }
 
     // Only optimize if at least one parameter is set
     if (Object.values(parameters).some(p => p !== "")) {
-      handlePromptOptimize(
-        currentPrompt,
-        parameters.specificity,
-        parameters.style,
-        parameters.context,
-        parameters.bias,
-        false
-      );
+      // console.log("Parameters changed, re-optimizing prompt:", parameters);
+      setDisableSend(true);
+      if (currentPrompt.trim()) {
+        handlePromptOptimize(
+          currentPrompt,
+          parameters.specificity,
+          parameters.style,
+          parameters.context,
+          parameters.bias,
+          false
+        );
+      } else {
+        setCurrentPrompt(editingText);
+        handlePromptOptimize(
+          editingText,
+          parameters.specificity,
+          parameters.style,
+          parameters.context,
+          parameters.bias,
+          false
+        );
+      }
     }
 
   }, [parameters, currentPrompt, handlePromptOptimize]);
@@ -241,30 +277,6 @@ const PromptPlayground = () => {
     setPreviousPrompt("");
   };
 
-  const handleChatSubmit = (submittedText: string) => {
-    if (!submittedText.trim()) return;
-    setCurrentPrompt(submittedText);
-    setDisableSend(true);
-    setDisableOptimize(true);
-    void createNewThreadAndFetch(submittedText);
-    setEnableSpecificity(true);
-    setEnableBias(true);
-    setEnableContext(true);
-    setEnableStyle(true);
-    handleReset();
-  };
-
-  const handleInputChange = (input: string) => {
-    // console.log(input)
-    setEditingText(input);
-    setDisableSend(false);
-    setDisableOptimize(true);
-    setEnableSpecificity(false);
-    setEnableBias(false);
-    setEnableContext(false);
-    setEnableStyle(false);
-  }
-
   const createNewThreadAndFetch = async (submittedText: string) => {
     let newThreadIndex = -1;
     setThreads(prev => {
@@ -275,19 +287,17 @@ const PromptPlayground = () => {
   };
 
   // Helper to submit answer for the latest thread's latest version
-
-  const submitAnswerForLatestVersion = async () => {
+  const submitAnswerForLatestVersion = async (promptText: string) => {
     if (threads.length === 0) return;
     const threadIndex = threads.length - 1;
-    const versionIndex = threads[threadIndex].versions.length - 1;
-    const promptText = threads[threadIndex].versions[versionIndex]?.prompt;
+    const lastVersionPrompt = threads[threadIndex].versions[threads[threadIndex].versions.length - 1]?.prompt;
 
     // Add new version if prompt has changed
-    if (editingText !== promptText) {
+    if (promptText !== lastVersionPrompt) {
       setThreads(prev => {
         const copy = [...prev];
         const t = { ...copy[threadIndex] };
-        t.versions = [...t.versions, { prompt: editingText, answer: null }];
+        t.versions = [...t.versions, { prompt: promptText, answer: undefined }];
         t.currentIndex = t.versions.length - 1;
         copy[threadIndex] = t;
         return copy;
@@ -299,7 +309,7 @@ const PromptPlayground = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            prompt: editingText,
+            prompt: promptText,
             temperature: 0.7,
             fileIds: [],
           }),
@@ -312,15 +322,75 @@ const PromptPlayground = () => {
         const copy = [...prev];
         const t = { ...copy[threadIndex] };
         const versions = [...t.versions];
-        versions[t.currentIndex] = { prompt: editingText, answer };
+        versions[t.currentIndex] = { prompt: promptText, answer };
         t.versions = versions;
         copy[threadIndex] = t;
         return copy;
       });
       handleReset();
-      setCurrentPrompt(editingText)
     }
   };
+
+  // Consolidated submit handler - creates new thread or adds version based on context
+  const handleSubmit = async (submittedText: string, isNewThread: boolean = false) => {
+    if (!submittedText.trim()) return;
+
+    setCurrentPrompt(submittedText);
+    setDisableSend(true);
+    setDisableOptimize(true);
+    setHasManualEdit(false); // Reset manual edit flag after submit
+
+    // Enable all controls after first submit
+    setEnableSpecificity(true);
+    setEnableBias(true);
+    setEnableContext(true);
+    setEnableStyle(true);
+
+    // Create new thread if: no threads exist, manual edit occurred, or explicitly requested
+    if (threads.length === 0 || isNewThread || hasManualEdit) {
+      handleReset();
+      await createNewThreadAndFetch(submittedText);
+    } else {
+      // Add as new version to existing thread
+      await submitAnswerForLatestVersion(submittedText);
+    }
+  };
+
+  const handleChatSubmit = (submittedText: string) => {
+    void handleSubmit(submittedText, true); // Always create new thread on chat submit
+  };
+
+  const handleOptimizeSubmit = async () => {
+    if (!editingText.trim()) return;
+
+    handleReset();
+    void handleSubmit(editingText, false); // Use context to determine thread behavior
+  };
+
+  // only triggers upon manual user input
+  const handleInputChange = (input: string) => {
+    // Mark that user has manually edited - next submit should create new thread
+    setHasManualEdit(true);
+
+    handleReset();
+    setEditingText(input);
+    setCurrentPrompt(input);
+    if (!input.trim()) {
+      setDisableSend(true);
+      setDisableOptimize(true);
+      setEnableSpecificity(false);
+      setEnableBias(false);
+      setEnableContext(false);
+      setEnableStyle(false);
+    } else {
+      setDisableSend(false);
+      setDisableOptimize(true);
+      setEnableSpecificity(true);
+      setEnableBias(true);
+      setEnableContext(true);
+      setEnableStyle(true);
+    }
+  }
 
   const prevThreadCount = useRef(threads.length);
   useEffect(() => {
@@ -373,7 +443,7 @@ const PromptPlayground = () => {
                 parameters={parameters}
                 onParameterChange={handleParameterChange}
                 onReset={handleReset}
-                onOptimize={submitAnswerForLatestVersion}
+                onOptimize={handleOptimizeSubmit}
                 onUndo={handleUndo}
                 chatValue={editingText}
                 onChatChange={handleInputChange}
@@ -386,6 +456,7 @@ const PromptPlayground = () => {
                 enableContext={enableContext}
                 enableStyle={enableStyle}
                 chatAnimationKey={optimizePulse}
+                waitingforOptimization={waitingforOptimization}
               />
             </div>
           </div>
