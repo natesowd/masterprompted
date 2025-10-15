@@ -270,7 +270,7 @@ const PromptPlayground = () => {
         handlePromptOptimize(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
       }
     }
-  }, [parameters, currentPrompt, editingText, fullReset, handlePromptOptimize]);
+  }, [parameters, handlePromptOptimize]);
 
   const handleUndo = () => {
     if (!previousPrompt) return;

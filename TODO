@@ -7,10 +7,12 @@ TODO:
 - add info to parameters
 - minor: add bounce to only manual revert neutral parameters, not send prompt as well
 - some way to pull old prompts back into chatbox easily (click on chatprompt component?)
-- DIFF: 
-  - put deleted text as sidebar component
+- DIFF BRANCH: 
   - clean up diff w/ newlines gore
-  - support bolding within diff
+  - new line gore within deleted text now
+  - make corresponding deleted text scroll to be of equal height instead of scrolling to the top of the component.
+  - Stop the column from automatically scrolling when the mouse is over a deleted text part and make scrollable via manual user input.
+  - implement connectorlines.tsx
 - edit button for chats
 - scroll behavior: go down as far as posisble while keep most recent prompt on-screen
   - also needs to work for send optimized prompt
