@@ -55,7 +55,7 @@ export default function EvaluationPanel({ initialIsOpen = true }: EvaluationPane
     <div className="relative">
       {/* When closed, only render a small floating button. When open, render the full panel. */}
       {isPanelOpen ? (
-        <div className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4 relative">
+        <div className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4 relative absolute top-0 right-0 z-10">
           {/* Expand/Minimize button in top-right */}
           <button
             aria-label={isPanelOpen ? 'Minimize evaluation panel' : 'Expand evaluation panel'}

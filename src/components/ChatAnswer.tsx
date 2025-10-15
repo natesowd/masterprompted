@@ -1,21 +1,42 @@
-// ChatAnswer.tsx
+// src/components/ChatAnswer.tsx
 
-import { Plus, Minus } from "lucide-react";
+import { Minus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import * as jsdiff from "diff";
-// ⭐️ FIX: Import the simplified and more powerful RichText component.
 import RichText from "@/components/RichText.tsx";
 
 type ChatAnswerProps = {
   text: string;
   answerArray?: string[];
   currentIndex?: number;
+  threadIndex: number;
+  showDiff: boolean;
+  onToggleDiff: (checked: boolean) => void;
+  hoveredCommentId: string | null;
+  onHoverComment: (id: string | null) => void;
+  scrollContainerRef: React.RefObject<HTMLDivElement>;
+  onUpdateCommentPosition: (id: string, top: number) => void;
+  inlineCommentIds: Set<string>;
+  onCommentClick: (id: string) => void;
 };
 
-const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProps) => {
-  const [showDiff, setShowDiff] = useState(false);
+const ChatAnswer = ({
+  text,
+  answerArray = [],
+  currentIndex = 0,
+  threadIndex,
+  showDiff,
+  onToggleDiff,
+  hoveredCommentId,
+  onHoverComment,
+  scrollContainerRef,
+  onUpdateCommentPosition,
+  inlineCommentIds,
+  onCommentClick,
+}: ChatAnswerProps) => {
+  const markerRefs = useRef<Map<string, HTMLElement | null>>(new Map());
 
   // Convert escaped newline sequences (\\n) into real newline characters.
   const formattedText = text.replace(/\\n/g, '\n');
@@ -24,64 +45,70 @@ const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProp
   const originalAnswer = canShowDiff ? answerArray[0].replace(/\\n/g, '\n') : "";
   const diffResult = showDiff && canShowDiff ? jsdiff.diffWords(originalAnswer, formattedText) : [];
   
-  const [collapsedParts, setCollapsedParts] = useState<Record<number, boolean>>({});
+  // Measure and report the vertical position of each inline marker.
+  useLayoutEffect(() => {
+    if (showDiff && scrollContainerRef.current) {
+      const scrollContainerTop = scrollContainerRef.current.getBoundingClientRect().top;
+      
+      markerRefs.current.forEach((el, id) => {
+        if (el) {
+          const markerTop = el.getBoundingClientRect().top;
+          const relativeTop = markerTop - scrollContainerTop + scrollContainerRef.current!.scrollTop;
+          onUpdateCommentPosition(id, relativeTop);
+        }
+      });
+    }
+  }, [diffResult, showDiff, onUpdateCommentPosition, scrollContainerRef, inlineCommentIds]);
 
-  const togglePart = (index: number, defaultCollapsed: boolean) => {
-    setCollapsedParts(prev => ({ ...prev, [index]: !(prev[index] ?? defaultCollapsed) }));
-  };
 
   const renderDiff = () => {
     return (
       <>
         {diffResult.map((part, index) => {
           if (part.added) {
-            const defaultCollapsed = false;
-            const isCollapsed = collapsedParts[index] ?? defaultCollapsed;
-            return isCollapsed ? (
-              <button
-                key={index}
-                onClick={() => togglePart(index, defaultCollapsed)}
-                className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 border-green-600 text-green-700 hover:bg-green-600 hover:text-white"
-                aria-label="Expand added text"
-              >
-                <Plus className="h-3.5 w-3.5" />
-              </button>
-            ) : (
-              // ⭐️ FIX: Wrap the RichText component for styling and interaction.
+            return (
               <span
                 key={index}
-                onClick={() => togglePart(index, defaultCollapsed)}
                 className="bg-green-200 text-green-800 px-1 rounded cursor-pointer align-middle"
-                aria-label="Collapse added text"
               >
                 <RichText text={part.value} inline />
               </span>
             );
           } else if (part.removed) {
-            const defaultCollapsed = true;
-            const isCollapsed = collapsedParts[index] ?? defaultCollapsed;
-            return isCollapsed ? (
+            const commentId = `comment-${threadIndex}-${currentIndex}-${index}`;
+            const isInline = inlineCommentIds.has(commentId);
+
+            if (isInline) {
+              return (
+                <span
+                  key={index}
+                  ref={(el) => markerRefs.current.set(commentId, el)}
+                  onClick={() => onCommentClick(commentId)}
+                  className="bg-red-200/60 text-red-800 px-1 rounded line-through cursor-pointer align-middle inline-flex items-center"
+                  aria-label="Hide removed text"
+                >
+                  <Minus className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
+                  <RichText text={part.value} inline />
+                </span>
+              );
+            }
+
+            return (
               <button
                 key={index}
-                onClick={() => togglePart(index, defaultCollapsed)}
-                className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2
-                 border-red-600 text-red-700 hover:bg-red-600 hover:text-white"
-                aria-label="Expand removed text"
+                ref={(el) => markerRefs.current.set(commentId, el as HTMLElement)}
+                onClick={() => onCommentClick(commentId)}
+                onMouseEnter={() => onHoverComment(commentId)}
+                onMouseLeave={() => onHoverComment(null)}
+                className={`inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm
+                 border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors
+                 ${hoveredCommentId === commentId ? 'bg-red-600 text-white' : ''}`}
+                aria-label="Show removed text"
               >
                 <Minus className="h-3.5 w-3.5" />
               </button>
-            ) : (
-              <span
-                key={index}
-                onClick={() => togglePart(index, defaultCollapsed)}
-                className="bg-red-200 text-red-800 px-1 rounded line-through cursor-pointer align-middle"
-                aria-label="Collapse removed text"
-              >
-                <RichText text={part.value + " "} inline />
-              </span>
             );
           } else {
-            // ⭐️ FIX: Render unchanged parts directly with the RichText component.
             return <RichText key={index} text={part.value} inline />;
           }
         })}
@@ -95,11 +122,11 @@ const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProp
       {canShowDiff && (
         <div className="flex items-center space-x-2 mb-3 pb-2 border-b border-border">
           <Switch
-            id="show-diff"
+            id={`show-diff-${threadIndex}`}
             checked={showDiff}
-            onCheckedChange={setShowDiff}
+            onCheckedChange={onToggleDiff}
           />
-          <Label htmlFor="show-diff" className="text-sm text-muted-foreground">
+          <Label htmlFor={`show-diff-${threadIndex}`} className="text-sm text-muted-foreground">
             Show Changes
           </Label>
         </div>
@@ -110,8 +137,6 @@ const ChatAnswer = ({ text, answerArray = [], currentIndex = 0 }: ChatAnswerProp
         {showDiff && canShowDiff ? (
           renderDiff()
         ) : (
-          // The RichText component is used here without the 'inline' prop
-          // to render full paragraphs correctly.
           <RichText text={formattedText} />
         )}
       </div>
