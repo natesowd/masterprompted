@@ -4,11 +4,11 @@ import Header from "@/components/Header";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import PromptControls from "@/components/PromptControls";
 import ChatPrompt from "@/components/ChatPrompt";
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import ChatAnswer from "@/components/ChatAnswer";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { Skeleton } from "@/components/ui/skeleton"
-import { CircleQuestionMark } from "lucide-react";
+import { CircleQuestionMark, Minus } from "lucide-react";
 import RemovedTextSidebar from "@/components/RemovedTextSidebar";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
 
@@ -23,31 +23,31 @@ type ThreadVersion = { prompt: string; answer?: string };
 type Thread = { versions: ThreadVersion[]; currentIndex: number };
 type RemovedComment = { id: string; value: string };
 
-function ChatBody({
+// Memoizing ChatBody to prevent unnecessary re-renders
+const ChatBody = memo(function ChatBody({
   threads,
   onPrevVersion,
   onNextVersion,
   showDiff,
   onToggleDiff,
-  hoveredCommentId,
   onHoverComment,
   scrollContainerRef,
   onUpdateCommentPosition,
   inlineCommentIds,
   onCommentClick,
+  toggleDiffHelp
 }: {
   threads: Thread[];
   onPrevVersion: (threadIndex: number) => void;
   onNextVersion: (threadIndex: number) => void;
   showDiff: boolean;
   onToggleDiff: (checked: boolean) => void;
-  hoveredCommentId: string | null;
-  // Updated signature to include source of hover
-  onHoverComment: (id: string | null, source: 'chat' | 'sidebar') => void; 
+  onHoverComment: (id: string | null) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   onUpdateCommentPosition: (id: string, top: number) => void;
   inlineCommentIds: Set<string>;
   onCommentClick: (id: string) => void;
+  toggleDiffHelp: () => void;
 }) {
   return (
     <div className="mt-6 space-y-4">
@@ -76,12 +76,12 @@ function ChatBody({
                 threadIndex={threadIndex}
                 showDiff={showDiff}
                 onToggleDiff={onToggleDiff}
-                hoveredCommentId={hoveredCommentId}
                 onHoverComment={onHoverComment}
                 scrollContainerRef={scrollContainerRef}
                 onUpdateCommentPosition={onUpdateCommentPosition}
                 inlineCommentIds={inlineCommentIds}
                 onCommentClick={onCommentClick}
+                toggleDiffHelp={toggleDiffHelp}
               />
             )}
           </div>
@@ -89,33 +89,30 @@ function ChatBody({
       })}
     </div>
   );
-}
+});
 
-/**
- * Checks if a target element is fully visible within its scroll container.
- * @param container The scrolling element (e.g., chat body, sidebar).
- * @param target The element to check for visibility (e.g., icon, sidebar text).
- * @returns boolean
- */
+
 const isElementInView = (container: HTMLElement, target: HTMLElement): boolean => {
   const containerRect = container.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
-
-  // Check if the target is within the container's vertical bounds
   const isTopInView = targetRect.top >= containerRect.top;
   const isBottomInView = targetRect.bottom <= containerRect.bottom;
-
   return isTopInView && isBottomInView;
 };
 
 const PromptPlayground = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const lastHoveredId = useRef<string | null>(null);
+  const isHoverScrolling = useRef(false);
+
+  // --- REFS FOR SMOOTH SCROLLING ---
+  const sidebarScrollTarget = useRef(0);
+  const isFrameScheduled = useRef(false);
+  const animationFrameId = useRef<number | null>(null);
 
   const [threads, setThreads] = useState<Thread[]>([]);
-  const [parameters, setParameters] = useState<Parameters>({
-    specificity: "", style: "", context: "", bias: "",
-  });
+  const [parameters, setParameters] = useState<Parameters>({ specificity: "", style: "", context: "", bias: "" });
   const [disableSend, setDisableSend] = useState(true);
   const [disableOptimize, setDisableOptimize] = useState(true);
   const [optimizePulse, setOptimizePulse] = useState(0);
@@ -129,12 +126,11 @@ const PromptPlayground = () => {
   const [enableContext, setEnableContext] = useState<boolean>(false);
   const [fullReset, setFullReset] = useState<boolean>(false);
   const LOCALSTORAGE_POPKEY = "promptPlayground.popoverSeen";
-  const [showPopover, setShowPopover] = useState<boolean>(false);
+  const [showControlPanelPopover, setShowControlPanelPopover] = useState<boolean>(false);
+  const [showDiffPopover, setShowDiffPopover] = useState<boolean>(false);
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
 
-  // --- State for Diffing, Comments, and Scrolling ---
   const [showDiff, setShowDiff] = useState(false);
-  const [hoveredCommentId, setHoveredCommentId] = useState<string | null>(null);
   const [commentPositions, setCommentPositions] = useState<Record<string, number>>({});
   const [inlineCommentIds, setInlineCommentIds] = useState(() => new Set<string>());
 
@@ -167,6 +163,10 @@ const PromptPlayground = () => {
     setShowDiff(checked);
   };
 
+  const toggleDiffHelp = () => {
+    setShowDiffPopover(true);
+  }
+
   const handleUpdateCommentPosition = useCallback((id: string, top: number) => {
     setCommentPositions(prev => {
       if (prev[id] === top) return prev;
@@ -177,87 +177,116 @@ const PromptPlayground = () => {
   const handleCommentClick = (id: string) => {
     setInlineCommentIds(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
       return newSet;
     });
   };
 
-  /**
-   * Manages setting the hovered ID and triggering cross-container scroll synchronization.
-   * Scrolling only happens if the target element in the non-hovered container is out of view.
-   */
-  const handleHoverComment = useCallback((id: string | null, source: 'chat' | 'sidebar') => {
-    setHoveredCommentId(id);
+  const handleHoverComment = useCallback((id: string | null) => {
+    const HIGHLIGHT_COMMENT_CLASSES = ['bg-red-200'];
+    const HIGHLIGHT_ICON_CLASSES = ['bg-red-600', 'text-white'];
 
-    if (!id || !chatEndRef.current || !sidebarRef.current) return;
+    if (lastHoveredId.current) {
+      const lastIconEl = document.getElementById(lastHoveredId.current);
+      const lastSidebarEl = document.getElementById(`sidebar-${lastHoveredId.current}`);
+      lastIconEl?.classList.remove(...HIGHLIGHT_ICON_CLASSES);
+      lastSidebarEl?.classList.remove(...HIGHLIGHT_COMMENT_CLASSES);
+    }
 
+    if (id) {
+      const chatIconEl = document.getElementById(id);
+      const sidebarCommentEl = document.getElementById(`sidebar-${id}`);
+
+      chatIconEl?.classList.add(...HIGHLIGHT_ICON_CLASSES);
+      sidebarCommentEl?.classList.add(...HIGHLIGHT_COMMENT_CLASSES);
+
+      lastHoveredId.current = id;
+
+      if (sidebarRef.current && sidebarCommentEl && !isElementInView(sidebarRef.current, sidebarCommentEl)) {
+        isHoverScrolling.current = true;
+        const sidebarRect = sidebarRef.current.getBoundingClientRect();
+        const commentRect = sidebarCommentEl.getBoundingClientRect();
+
+        let targetScrollTop;
+        if (commentRect.top < sidebarRect.top) {
+          targetScrollTop = sidebarCommentEl.offsetTop;
+        } else {
+          targetScrollTop = sidebarCommentEl.offsetTop + commentRect.height - sidebarRect.height;
+        }
+
+        // When hover-scrolling, update the target and let the animation frame handle it for smoothness
+        sidebarScrollTarget.current = targetScrollTop;
+        if (!isFrameScheduled.current) {
+          isFrameScheduled.current = true;
+          animationFrameId.current = requestAnimationFrame(() => {
+            if (sidebarRef.current) {
+              sidebarRef.current.scrollTop = sidebarScrollTarget.current;
+            }
+            isFrameScheduled.current = false;
+          });
+        }
+      }
+    } else {
+      lastHoveredId.current = null;
+      isHoverScrolling.current = false;
+    }
+  }, []);
+
+  useEffect(() => {
     const chatContainer = chatEndRef.current;
-    const sidebarContainer = sidebarRef.current;
+    if (!chatContainer) return;
 
-    // The chat icon ID is the comment ID. The sidebar text ID is prefixed.
-    const chatIconEl = document.getElementById(id); 
-    const sidebarCommentEl = document.getElementById(`sidebar-comment-${id}`); 
-
-    if (!chatIconEl || !sidebarCommentEl) {
-      return;
-    }
-    
-    if (source === 'chat') {
-      // Chat Icon is hovered (stationary). Target: Sidebar Text.
-      if (isElementInView(sidebarContainer, sidebarCommentEl)) {
-        return; // Already in view, do nothing
+    // This function runs in the animation frame, ensuring a smooth update.
+    const updateSidebarScroll = () => {
+      if (sidebarRef.current) {
+        sidebarRef.current.scrollTop = sidebarScrollTarget.current;
       }
-      
-      const sidebarRect = sidebarContainer.getBoundingClientRect();
-      const commentRect = sidebarCommentEl.getBoundingClientRect();
-      
-      // Calculate scroll position to center the sidebar text
-      const commentScrollY = commentRect.top + sidebarContainer.scrollTop - sidebarRect.top;
-      const commentHeight = commentRect.height;
-      const containerHeight = sidebarRect.height;
-      
-      const targetScrollTop = commentScrollY - (containerHeight / 2) + (commentHeight / 2);
+      // Reset the flag so the next scroll event can schedule a new frame.
+      isFrameScheduled.current = false;
+      animationFrameId.current = null;
+    };
 
-      sidebarContainer.scrollTo({
-        top: targetScrollTop,
-        behavior: 'smooth'
-      });
-      
-    } else if (source === 'sidebar') {
-      // Sidebar Text is hovered (stationary). Target: Chat Icon.
-      if (isElementInView(chatContainer, chatIconEl)) {
-        return; // Already in view, do nothing
+    const handleScroll = () => {
+      if (isHoverScrolling.current) {
+        isHoverScrolling.current = false;
       }
 
-      const chatContainerRect = chatContainer.getBoundingClientRect();
-      const chatIconRect = chatIconEl.getBoundingClientRect();
-      
-      // Icon's position relative to the chat container's scroll start
-      const iconScrollY = chatIconRect.top + chatContainer.scrollTop - chatContainerRect.top;
-      const iconHeight = chatIconRect.height;
-      const containerHeight = chatContainerRect.height;
-      
-      // Target scroll position centers the icon:
-      const targetScrollTop = iconScrollY - (containerHeight / 2) + (iconHeight / 2);
+      if (!sidebarRef.current) return;
 
-      chatContainer.scrollTo({
-        top: targetScrollTop,
-        behavior: 'smooth'
-      });
-    }
-  }, []); // Removed commentPositions dependency as it's not strictly needed for this centered scrolling logic
+      const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+      // Prevent division by zero if content is not scrollable.
+      const scrollRatio = (scrollHeight - clientHeight > 0) ? scrollTop / (scrollHeight - clientHeight) : 0;
 
-  // Removed the previous continuous scroll synchronization effect as requested.
+      const sidebar = sidebarRef.current;
+      const sidebarScrollHeight = sidebar.scrollHeight;
+      const sidebarClientHeight = sidebar.clientHeight;
+
+      // Update the target scroll position.
+      sidebarScrollTarget.current = scrollRatio * (sidebarScrollHeight - sidebarClientHeight);
+
+      // Schedule an update for the next frame if one isn't already scheduled.
+      if (!isFrameScheduled.current) {
+        isFrameScheduled.current = true;
+        animationFrameId.current = requestAnimationFrame(updateSidebarScroll);
+      }
+    };
+
+    chatContainer.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      chatContainer.removeEventListener('scroll', handleScroll);
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     try {
       const seen = localStorage.getItem(LOCALSTORAGE_POPKEY);
-      if (!seen) setShowPopover(true);
-    } catch (e) { setShowPopover(false); }
+      if (!seen) setShowControlPanelPopover(true);
+    } catch (e) { setShowControlPanelPopover(false); }
   }, []);
 
   const handleParameterChange = (paramKey: keyof Parameters, value: string) => {
@@ -293,9 +322,7 @@ const PromptPlayground = () => {
       const response = await fetch("https://llm1.hochschule-stralsund.de:8000/optimize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt, language: "en", temperature: 0.7, specificity, communication_mode: style, depth: context, bias, length: "short",
-        }),
+        body: JSON.stringify({ prompt, language: "en", temperature: 0.7, specificity, communication_mode: style, depth: context, bias, length: "short" }),
       });
       const data = await response.json();
       setEditingText(data.optimized_prompt);
@@ -383,11 +410,10 @@ const PromptPlayground = () => {
     setEnableSpecificity(!isEmpty); setEnableBias(!isEmpty); setEnableContext(!isEmpty); setEnableStyle(!isEmpty);
   };
 
-  // only scrolls when a new thread is added
   useEffect(() => { if (chatEndRef.current) chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight; }, [threads.length]);
 
-  const handlePrevVersion = (threadIndex: number) => setThreads(prev => { const c = [...prev]; c[threadIndex].currentIndex = Math.max(0, c[threadIndex].currentIndex - 1); return c; });
-  const handleNextVersion = (threadIndex: number) => setThreads(prev => { const c = [...prev]; c[threadIndex].currentIndex = Math.min(c[threadIndex].versions.length - 1, c[threadIndex].currentIndex + 1); return c; });
+  const handlePrevVersion = useCallback((threadIndex: number) => setThreads(prev => { const c = [...prev]; c[threadIndex].currentIndex = Math.max(0, c[threadIndex].currentIndex - 1); return c; }), []);
+  const handleNextVersion = useCallback((threadIndex: number) => setThreads(prev => { const c = [...prev]; c[threadIndex].currentIndex = Math.min(c[threadIndex].versions.length - 1, c[threadIndex].currentIndex + 1); return c; }), []);
 
   return (
     <div className="min-h-screen max-h-screen bg-background">
@@ -401,16 +427,15 @@ const PromptPlayground = () => {
           </div>
           <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-8rem)] relative">
             <div className='flex-1 overflow-y-auto' ref={chatEndRef}>
-              <ChatBody {...{ threads, onPrevVersion: handlePrevVersion, onNextVersion: handleNextVersion, showDiff, onToggleDiff: handleToggleDiff, hoveredCommentId, onHoverComment: handleHoverComment, scrollContainerRef: chatEndRef, onUpdateCommentPosition: handleUpdateCommentPosition, inlineCommentIds, onCommentClick: handleCommentClick }} />
+              <ChatBody {...{ threads, onPrevVersion: handlePrevVersion, onNextVersion: handleNextVersion, showDiff, onToggleDiff: handleToggleDiff, onHoverComment: handleHoverComment, scrollContainerRef: chatEndRef, onUpdateCommentPosition: handleUpdateCommentPosition, inlineCommentIds, onCommentClick: handleCommentClick, toggleDiffHelp }} />
             </div>
           </div>
           <div className="flex-none w-[calc(18rem+2.5rem)] h-full flex">
-            {/* Changed from overflow-y-hidden to overflow-y-auto to allow independent scrolling */}
-            <div className="flex-1 h-full overflow-y-auto" ref={sidebarRef}>
-              {showDiff && <RemovedTextSidebar {...{ comments: activeComments, positions: commentPositions, hoveredCommentId, onHover: handleHoverComment, inlineCommentIds, onCommentClick: handleCommentClick }} />}
+            <div id="removed-text-sidebar" className="flex-1 h-full overflow-y-hidden" ref={sidebarRef}>
+              {showDiff && <RemovedTextSidebar {...{ comments: activeComments, positions: commentPositions, onHover: handleHoverComment, inlineCommentIds, onCommentClick: handleCommentClick }} />}
             </div>
             <div className="w-[2.5rem] flex-none flex flex-col items-end gap-4 relative">
-              <button className="p-2 rounded-full hover:bg-muted/50" onClick={() => setShowPopover(true)}>
+              <button className="p-2 rounded-full hover:bg-muted/50" onClick={() => setShowControlPanelPopover(true)}>
                 <CircleQuestionMark className="h-6 w-6 text-muted-foreground" />
               </button>
               <EvaluationPanel initialIsOpen={false} />
@@ -418,9 +443,46 @@ const PromptPlayground = () => {
           </div>
         </div>
       </main>
-      {showPopover && <PopoverSeries steps={[{ id: "submit-hint", trigger: "#chatbox", content: "Click here to submit your prompt and see the AI's response!" }, { id: "controls-hint", trigger: "#parameters", content: "You can use the prompt controls to optimize your prompt." }]} initialStep={0} onClose={() => { try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ } setShowPopover(false); }} />}
+      {showControlPanelPopover && <PopoverSeries steps={[
+        { id: "submit-hint", trigger: "#chatbox", content: "Click here to submit your prompt and see the AI's response!" },
+        { id: "controls-hint", trigger: "#parameters", content: "You can use the prompt controls to optimize your prompt." }
+      ]} initialStep={0} onClose={() => { try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ } setShowControlPanelPopover(false); }} />}
+      {showDiffPopover && <PopoverSeries steps={[
+        { id: "diff-hint", trigger: "#chat-body", content: 'You can use "Show Changes" to show how the current output version is different from the original ouput.' },
+        {
+          id: "diff-hint",
+          trigger: "#chat-body",
+          content: (
+            <span>
+              <span className="bg-green-200 text-green-900 px-1.5 py-0.5 rounded-md">
+                Green text
+              </span>
+              {' has been added, '}
+              {/* <span className="bg-red-200 text-red-900 line-through px-1.5 py-0.5 rounded-md">
+                red text
+              </span> */}
+              <button
+                className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors"
+                aria-label="Show removed text"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+              {' indicates text has been removed, and normal text is shared between versions.'}
+            </span>
+          )
+        },
+        { id: "controls-hint", trigger: "#removed-text-sidebar", side: "left", content:
+          <span>
+          <span className="text-red-900 line-through px-1.5 py-0.5 rounded-md border border-red-200">
+                Removed text
+              </span> 
+              {" will appear here. You can insert it back in by clicking on it." }
+              </span>
+        }
+      ]} initialStep={0} onClose={() => setShowDiffPopover(false)} />}
     </div>
   );
 };
 
 export default PromptPlayground;
+

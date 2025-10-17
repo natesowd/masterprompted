@@ -4,10 +4,15 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 
+// MODIFICATION 1: Updated Step type
 type Step = {
   id: string;
   trigger: string;
   content: React.ReactNode;
+  // Add optional positioning props
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  align?: 'start' | 'center' | 'end';
+  sideOffset?: number;
 };
 
 interface PopoverSeriesProps {
@@ -75,6 +80,7 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
       setBorderRadius('0px');
     }
   }, [currentStep, steps]);
+
   const isOpen = currentStep !== null;
   const currentStepData = isOpen ? steps[currentStep] : null;
 
@@ -133,9 +139,13 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
           <FakeTrigger rect={rect} />
         </PopoverTrigger>
 
+        {/* MODIFICATION 2: Pass positioning props */}
         <PopoverContent
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="space-y-4"
+          side={currentStepData.side}
+          align={currentStepData.align}
+          sideOffset={currentStepData.sideOffset}
         >
           <div className="flex justify-between align-top">
             <div className="mt-2 mr-6">{currentStepData.content}</div>

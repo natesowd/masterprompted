@@ -1,17 +1,11 @@
 // src/components/ChatAnswer.tsx
 
-import { Minus } from "lucide-react";
+import { Minus, CircleQuestionMark } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useLayoutEffect, useRef } from "react";
 import RichText from "@/components/RichText.tsx";
-// Import the new wrapper and type
 import { diffWordsWithNewlineProtection, DiffPart } from "@/lib/diff";
-
-type FormattingState = {
-  bold: boolean;
-  italic: boolean;
-};
 
 type ChatAnswerProps = {
   text: string;
@@ -20,13 +14,12 @@ type ChatAnswerProps = {
   threadIndex: number;
   showDiff: boolean;
   onToggleDiff: (checked: boolean) => void;
-  hoveredCommentId: string | null;
-  // Updated signature to include source for scroll sync logic
-  onHoverComment: (id: string | null, source: 'chat' | 'sidebar') => void;
+  onHoverComment: (id: string | null) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   onUpdateCommentPosition: (id: string, top: number) => void;
   inlineCommentIds: Set<string>;
   onCommentClick: (id: string) => void;
+  toggleDiffHelp: () => void;
 };
 
 const ChatAnswer = ({
@@ -36,31 +29,26 @@ const ChatAnswer = ({
   threadIndex,
   showDiff,
   onToggleDiff,
-  hoveredCommentId,
   onHoverComment,
   scrollContainerRef,
   onUpdateCommentPosition,
   inlineCommentIds,
   onCommentClick,
+  toggleDiffHelp
 }: ChatAnswerProps) => {
   const markerRefs = useRef<Map<string, HTMLElement | null>>(new Map());
-
-  // Convert escaped newline sequences (\\n) into real newline characters.
   const formattedText = text.replace(/\\n/g, '\n');
 
   const canShowDiff = answerArray.length > 1 && currentIndex > 0;
   const originalAnswer = canShowDiff ? answerArray[0].replace(/\\n/g, '\n') : "";
   
-  // UPDATED: Use the new wrapper function for diff calculation
   const diffResult: DiffPart[] = showDiff && canShowDiff 
     ? diffWordsWithNewlineProtection(originalAnswer, formattedText) 
     : [];
   
-  // Measure and report the vertical position of each inline marker.
   useLayoutEffect(() => {
     if (showDiff && scrollContainerRef.current) {
       const scrollContainerTop = scrollContainerRef.current.getBoundingClientRect().top;
-      
       markerRefs.current.forEach((el, id) => {
         if (el) {
           const markerTop = el.getBoundingClientRect().top;
@@ -71,27 +59,14 @@ const ChatAnswer = ({
     }
   }, [diffResult, showDiff, onUpdateCommentPosition, scrollContainerRef, inlineCommentIds]);
 
-
   const renderDiff = () => {
-    // Track formatting state across all parts
-    const formattingState: FormattingState = { bold: false, italic: false };
-
     return (
       <>
         {diffResult.map((part, index) => {
-          // If part.count is defined, it means it's a non-diff part (neutral text or extracted newline)
-          // Since we are using diffWordsWithNewlineProtection, we only need to check added/removed.
           if (part.added) {
             return (
-              <span
-                key={index}
-                className="bg-green-200 text-green-800 px-1 rounded align-middle"
-              >
-                <RichText 
-                  text={part.value} 
-                  inline 
-                  diff={true}
-                />
+              <span key={index} className="bg-green-200 text-green-800 px-1 rounded align-middle">
+                <RichText text={part.value} inline diff={true} />
               </span>
             );
           } else if (part.removed) {
@@ -107,11 +82,7 @@ const ChatAnswer = ({
                   className="bg-red-200/60 text-red-800 px-1 rounded line-through cursor-pointer align-middle"
                   aria-label="Hide removed text"
                 >
-                  <RichText 
-                    text={part.value} 
-                    inline 
-                    diff={true} 
-                  />
+                  <RichText text={part.value} inline diff={true} />
                 </span>
               );
             }
@@ -121,27 +92,18 @@ const ChatAnswer = ({
                 key={index}
                 ref={(el) => markerRefs.current.set(commentId, el as HTMLElement)}
                 onClick={() => onCommentClick(commentId)}
-                onMouseEnter={() => onHoverComment(commentId, 'chat')}
-                onMouseLeave={() => onHoverComment(null, 'chat')}
-                id={commentId} 
-                className={`inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm
-                 border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors
-                 ${hoveredCommentId === commentId ? 'bg-red-600 text-white' : ''}`}
+                onMouseEnter={() => onHoverComment(commentId)}
+                onMouseLeave={() => onHoverComment(null)}
+                id={commentId}
+                // className is now static, highlighting is controlled by a CSS class from the parent
+                className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors"
                 aria-label="Show removed text"
               >
                 <Minus className="h-3.5 w-3.5" />
               </button>
             );
           } else {
-            // This includes original, unchanged text and the newlines separated by the wrapper.
-            return (
-              <RichText 
-                key={index} 
-                text={part.value} 
-                inline 
-                diff={true}
-              />
-            );
+            return <RichText key={index} text={part.value} inline diff={true} />;
           }
         })}
       </>
@@ -150,7 +112,6 @@ const ChatAnswer = ({
 
   return (
     <div className="mb-20 w-full">
-      {/* Show Diff Toggle */}
       {canShowDiff && (
         <div className="flex items-center space-x-2 mb-3 pb-2 border-b border-border">
           <Switch
@@ -161,16 +122,14 @@ const ChatAnswer = ({
           <Label htmlFor={`show-diff-${threadIndex}`} className="text-sm text-muted-foreground">
             Show Changes
           </Label>
+          <button onClick={() => toggleDiffHelp()}>
+          <CircleQuestionMark className="-ml-1 h-4 w-4 text-muted-foreground"  />
+          </button>
         </div>
       )}
       
-      {/* Main message text */}
-      <div className="prose max-w-none text-foreground leading-relaxed">
-        {showDiff && canShowDiff ? (
-          renderDiff()
-        ) : (
-          <RichText text={formattedText}/>
-        )}
+      <div id="chat-body" className="prose max-w-none text-foreground leading-relaxed">
+        {showDiff && canShowDiff ? renderDiff() : <RichText text={formattedText}/>}
       </div>
     </div>
   );

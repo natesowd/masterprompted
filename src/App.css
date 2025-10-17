@@ -59,3 +59,14 @@
     animation: bounce-once 350ms cubic-bezier(.25,.8,.25,1) both;
   }
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* This class will be added by JS to highlight connected comments */
+  .comment-highlight {
+    @apply bg-red-200/60;
+  }
+}
