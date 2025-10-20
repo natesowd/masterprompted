@@ -54,9 +54,12 @@ export default function PromptConstructionSpecificityTakeaways() {
           <div className="mt-16">
             <button 
               onClick={() => navigate("/prompt-playground")}
-              className="bg-green-400 hover:bg-green-500 text-black font-medium px-8 py-3 rounded-full transition-colors"
+              className="bg-green-400 hover:bg-green-500 text-black font-medium px-8 py-3 rounded-full transition-colors inline-flex items-center gap-3"
             >
               Prompt Playground
+              <svg width="10" height="8" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 5H11M11 5L7 1M11 5L7 9" stroke="#1F1F1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
           </div>
         </div>
