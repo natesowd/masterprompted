@@ -154,7 +154,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
       {!waitingforOptimization && ( 
         <Textarea
         placeholder="Type your message here..."
-        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-base leading-6 text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
+        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
         disabled={!canType}
         value={value}
         onChange={handleInputChange}
@@ -170,7 +170,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
       )}
       {waitingforOptimization && (
         <div 
-        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-base leading-6 text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}>
+        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}>
         <Skeleton className="mt-2 h-4 w-[180px]" />
         <Skeleton className="mt-2 h-4 w-[150px]" />
         </div>
