@@ -274,114 +274,62 @@ export default function SpecificityResponse() {
               <div className="space-y-4">
                 <p className="text-gray-800 leading-relaxed text-lg">
                   <TextFlag
-                    text="Here's a summary of key criticisms of how the EU AI Act may stifle AI research, along with the uncertainties."
+                    text="The EU AI Act, a proposed regulation aimed at regulating artificial intelligence (AI) in the European Union, has been criticized for potentially stifling AI research."
                     evaluationFactor="voice"
                     explanation="Output's voice mimics the certainty and the suggestiveness of a biased and commanding prompt, confirming the expressed belief. The unquestioning, certain tone could cause a false sense of output's trustworthiness. Some users called this confirmatory style of the output &quot;people pleasing&quot;."
-                  /> Happy to go deeper into any one of these if you like:
+                  /> Here&apos;s a summary of the concerns:
                 </p>
 
-                <div>
-                  <p className="text-base font-semibold text-gray-900 mb-3">Key ways EU AI Act could hinder AI research</p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">1. <TextFlag
+                      text="Overly broad definitions"
+                      evaluationFactor="bias"
+                      explanation="Although the AI Act may be regarded as &quot;significant,&quot; an LLM cannot determine such judgments. The linguistic choices of an LLM output can dangerously shape a user's interpretation."
+                    /></p>
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      The Act defines AI as any system that can "perceive its environment and take actions" or "make decisions autonomously." This broad definition could capture many AI systems that are not necessarily "autonomous" or "perceive their environment" in the classical sense, potentially stifling innovation.
+                    </p>
+                  </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-base font-semibold text-gray-900 mb-2">
-                        <TextFlag
-                          text="Regulatory burden, compliance costs, and slowdowns"
-                          evaluationFactor="bias"
-                          explanation="Output goes on to one-sidedly represent the topic in question. It reinforces confirmation bias by presenting information that are strictly in line with the biased prompt, i.e. with user's prior beliefs. Such outputs could be factually inaccurate as well."
-                        />
-                      </p>
-                      <ul className="space-y-2 text-gray-700 ml-4">
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">The Act places heavy documentation, transparency, and conformity-assessment <TextFlag text="obligations" evaluationFactor="voice" explanation="The output could have used the word requirements but had outputted obligations instead. It can be argued that the term obligations is more charged and therefore sets a critical tone" /> on AI systems, especially for high-risk or general purpose AI. <TextFlag text="This increases costs and administrative overhead for research teams." evaluationFactor="factual-accuracy" explanation="It is not certain that the assessment requirements must increase overhead costs. This sentence is, therefore, false." /><br /><span className="text-sm text-gray-500 italic">Symbio6, <a href="https://en.irefeurope.org/publications/online-articles/article/eu-ai-act-how-stricter-regulations-could-hamper-europes-ai-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">IREF Europe</a>, <a href="https://www.computerworld.com/article/1611093/digital-advocacy-group-criticizes-current-scope-of-the-eu-ai-act.html" target="_blank" rel="noopener noreferrer" className="hover:underline">Computerworld</a></span></p>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Time-to-market or time-to-research can suffer because new systems have to satisfy risk assessments, safety checks etc., delaying experimentation and deployment.<br /><span className="text-sm text-gray-500 italic"><a href="https://en.irefeurope.org/publications/online-articles/article/eu-ai-act-how-stricter-regulations-could-hamper-europes-ai-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">IREF Europe</a>, <a href="https://www.euronews.com/next/2024/03/22/could-the-new-eu-ai-act-stifle-genai-innovation-in-europe-a-new-study-says-it-could" target="_blank" rel="noopener noreferrer" className="hover:underline">euronews</a>, <a href="https://shieldbase.ai/blog/why-eu-act-stifles-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">Shieldbase</a></span></p>
-                        </li>
-                      </ul>
-                    </div>
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">2. Restrictive liability provisions</p>
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      The Act proposes to hold AI developers liable for damages caused by their AI systems, even if the developer had no control over the system&apos;s actions. This could create a chilling effect on AI research, as developers may be reluctant to develop AI systems that could potentially cause harm.
+                    </p>
+                  </div>
 
-                    <div>
-                      <p className="text-base font-semibold text-gray-900 mb-2">Ambiguous definitions & legal uncertainty</p>
-                      <ul className="space-y-2 text-gray-700 ml-4">
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Key terms like "general purpose AI," "high risk," "vulnerability," "explainability," etc., are not precisely defined, so research teams may not know whether, or how, they are regulated.<br /><span className="text-sm text-gray-500 italic"><a href="https://www.heise.de/news/Top-researchers-on-the-AI-Act-Overregulation-poses-security-risk-for-the-EU-8983825.html" target="_blank" rel="noopener noreferrer" className="hover:underline">heise online</a>, <a href="https://en.irefeurope.org/publications/online-articles/article/eu-ai-act-how-stricter-regulations-could-hamper-europes-ai-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">IREF Europe</a></span></p>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Lack of clarity over what counts as acceptable use of training data, especially for generative models. This uncertainty can cause risk-averse behaviour.<br /><span className="text-sm text-gray-500 italic"><a href="https://www.euronews.com/next/2024/03/22/could-the-new-eu-ai-act-stifle-genai-innovation-in-europe-a-new-study-says-it-could" target="_blank" rel="noopener noreferrer" className="hover:underline">euronews</a>, <a href="https://www.heise.de/news/Top-researchers-on-the-AI-Act-Overregulation-poses-security-risk-for-the-EU-8983825.html" target="_blank" rel="noopener noreferrer" className="hover:underline">heise online</a></span></p>
-                        </li>
-                      </ul>
-                    </div>
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">3. Prohibition on certain AI applications</p>
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      The Act proposes to prohibit the development and use of certain AI applications, such as AI-powered surveillance systems or AI-powered social scoring systems. While these prohibitions may be well-intentioned, they could stifle innovation in areas where AI has the potential to bring significant benefits.
+                    </p>
+                  </div>
 
-                    <div>
-                      <p className="text-base font-semibold text-gray-900 mb-2">Impact on open source and freedom of research</p>
-                      <ul className="space-y-2 text-gray-700 ml-4">
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Research and open source projects may be disproportionately affected because they often have limited funding and legal resources to handle compliance.<br /><span className="text-sm text-gray-500 italic"><a href="https://www.euronews.com/next/2024/03/22/could-the-new-eu-ai-act-stifle-genai-innovation-in-europe-a-new-study-says-it-could" target="_blank" rel="noopener noreferrer" className="hover:underline">euronews</a>, <a href="https://en.irefeurope.org/publications/online-articles/article/eu-ai-act-how-stricter-regulations-could-hamper-europes-ai-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">IREF Europe</a>, <a href="https://www.computerworld.com/article/1611093/digital-advocacy-group-criticizes-current-scope-of-the-eu-ai-act.html" target="_blank" rel="noopener noreferrer" className="hover:underline">Computerworld</a></span></p>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Some worry that constraints on "general purpose AI" or requirements for transparency / explainability may push researchers to use more interpretable but less powerful models, avoiding black-box methods, which may reduce innovation.<br /><span className="text-sm text-gray-500 italic"><a href="https://shieldbase.ai/blog/why-eu-act-stifles-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">Shieldbase</a>, <a href="https://www.heise.de/news/Top-researchers-on-the-AI-Act-Overregulation-poses-security-risk-for-the-EU-8983825.html" target="_blank" rel="noopener noreferrer" className="hover:underline">heise online</a></span></p>
-                        </li>
-                      </ul>
-                    </div>
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">4. Data protection and data sharing restrictions</p>
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      The Act proposes to impose strict data protection and data sharing requirements on AI developers, which could make it difficult for researchers to access and share data necessary for AI research.
+                    </p>
+                  </div>
 
-                    <div>
-                      <p className="text-base font-semibold text-gray-900 mb-2">Potential competitive disadvantage</p>
-                      <ul className="space-y-2 text-gray-700 ml-4">
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Because of stricter regulation in the EU, research labs and companies may find it easier to do riskier, cutting-edge work elsewhere (e.g. in more lightly regulated environments), leading to brain drain of talent and investment.<br /><span className="text-sm text-gray-500 italic">Symbio6, <a href="https://en.irefeurope.org/publications/online-articles/article/eu-ai-act-how-stricter-regulations-could-hamper-europes-ai-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">IREF Europe</a>, AI Tech Suite</span></p>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Smaller players or start-ups may find it especially hard to compete with big organisations that can absorb regulatory costs and legal risk.<br /><span className="text-sm text-gray-500 italic"><a href="https://www.computerworld.com/article/1611093/digital-advocacy-group-criticizes-current-scope-of-the-eu-ai-act.html" target="_blank" rel="noopener noreferrer" className="hover:underline">Computerworld</a>, <a href="https://en.irefeurope.org/publications/online-articles/article/eu-ai-act-how-stricter-regulations-could-hamper-europes-ai-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">IREF Europe</a></span></p>
-                        </li>
-                      </ul>
-                    </div>
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">5. Lack of clear guidelines</p>
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      The Act&apos;s proposed guidelines for AI development and deployment are still unclear, which could create uncertainty and confusion for researchers and developers.
+                    </p>
+                  </div>
 
-                    <div>
-                      <p className="text-base font-semibold text-gray-900 mb-2">Risk of over-regulation & chilling effects</p>
-                      <ul className="space-y-2 text-gray-700 ml-4">
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">The possibility that many projects will avoid exploring some innovations because the regulatory risk/penalties are high, or because meeting all obligations is seen as too onerous.<br /><span className="text-sm text-gray-500 italic"><a href="https://en.irefeurope.org/publications/online-articles/article/eu-ai-act-how-stricter-regulations-could-hamper-europes-ai-innovation" target="_blank" rel="noopener noreferrer" className="hover:underline">IREF Europe</a>, <a href="https://www.euronews.com/next/2024/03/22/could-the-new-eu-ai-act-stifle-genai-innovation-in-europe-a-new-study-says-it-could" target="_blank" rel="noopener noreferrer" className="hover:underline">euronews</a></span></p>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <p className="text-base leading-relaxed">Delays and lack of guidance (e.g. missing standards, unclear procedures) exacerbate this uncertainty.<br /><span className="text-sm text-gray-500 italic"><a href="https://www.storyboard18.com/digital/eu-tech-lobby-urges-leaders-to-press-pause-on-ai-act-amid-innovation-fears-71988.html" target="_blank" rel="noopener noreferrer" className="hover:underline">Storyboard18</a>, Symbio6</span></p>
-                        </li>
-                      </ul>
-                    </div>
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 mb-2">6. Potential for regulatory overreach</p>
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      The Act&apos;s proposed regulatory framework could be overly broad and could potentially capture many areas of AI research that are not necessarily "high-risk" or "high-reward."
+                    </p>
                   </div>
                 </div>
 
-                <div>
-                  <p className="text-base font-semibold text-gray-900 mb-3">Areas where the picture is less clear</p>
-                  <ul className="space-y-2 text-gray-700 ml-4">
-                    <li className="flex items-start">
-                      <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <p className="text-base leading-relaxed">The Act excludes "research and development" from its scope, per the Commission's statements.<br /><span className="text-sm text-gray-500 italic"><a href="https://www.europarl.europa.eu/doceo/document/E-9-2024-000133-ASW_EN.pdf" target="_blank" rel="noopener noreferrer" className="hover:underline">European Parliament</a></span></p>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <p className="text-base leading-relaxed">The intended use of regulatory sandboxes: these are meant to allow experimentation under regulatory oversight, offering a way to reduce barriers—but their effectiveness depends heavily on implementation (capacity, clarity, consistency).<br /><span className="text-sm text-gray-500 italic"><a href="https://arxiv.org/abs/2509.05985" target="_blank" rel="noopener noreferrer" className="hover:underline">arXiv</a></span></p>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <p className="text-base leading-relaxed">Whether actual enforcement will be so strict that many research efforts get blocked, or whether flexibility/interpretative guidance will mitigate the risks.</p>
-                    </li>
-                  </ul>
-                </div>
-
-                <p className="text-gray-800 leading-relaxed text-base mt-4">
-                  If you want, I can map these concerns to specific articles of the AI Act (i.e. which rules are most problematic in practice), or look at what supporters argue are the benefits (so you can weigh both sides).
+                <p className="text-gray-700 text-base leading-relaxed">
+                  These concerns have been raised by various stakeholders, including researchers, developers, and industry associations. However, it&apos;s worth noting that the EU AI Act is still a proposed regulation, and the final version may address some of these concerns.
                 </p>
               </div>
             ) : showNoBiasOutput ? (
