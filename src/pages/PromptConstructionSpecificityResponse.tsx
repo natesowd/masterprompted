@@ -345,11 +345,12 @@ export default function SpecificityResponse() {
               // No Bias content
               <div className="space-y-4">
                 <p className="text-gray-800 leading-relaxed text-lg">
+                  The European Union's Artificial Intelligence Act (EU AI Act) is a regulatory framework aimed at ensuring the safe and responsible development of AI systems.
                   <TextFlag
-                    text="The European Union's Artificial Intelligence Act (EU AI Act) is a regulatory framework aimed at ensuring the safe and responsible development of AI systems."
-                    evaluationFactor="relevance"
-                    explanation="The LLM has provided a balanced introduction that sets context without imposing bias, showing how neutral framing affects the overall tone of the response."
-                  /> While the Act&apos;s intentions are to promote trust and safety, some critics argue that it may stifle AI innovation. Here&apos;s a summary of the concerns:
+                    text="While the Act&apos;s intentions are to promote trust and safety, some critics argue that it may stifle AI innovation."
+                    evaluationFactor="voice"
+                    explanation="This output attempts to portray both sides of the argument in order to provide a more complete, if not completely objective, picture on the opinions surrounding the EU AI Act."
+                  />  Here&apos;s a summary of the concerns:
                 </p>
 
                 <div>
@@ -390,7 +391,7 @@ export default function SpecificityResponse() {
                     <TextFlag
                       text="Counterarguments:"
                       evaluationFactor="relevance"
-                      explanation="By including counterarguments, the LLM demonstrates balance and provides a more comprehensive view of the topic, allowing readers to form their own informed opinions."
+                      explanation="The model generates counterarguments in order to provide a more balanced summary for the user. Compare this with the biased example, where only arguments are given."
                     />
                   </p>
                   <div className="space-y-4">
