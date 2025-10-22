@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
-import ProgressIndicator from "@/components/ProgressIndicator";
+import LearningProgressBar from "@/components/LearningProgressBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -107,13 +107,10 @@ export default function PromptConstruction() {
         </div>
         
         <div className="mt-8">
-          <ProgressIndicator 
-            currentStep="intro" 
-            steps={[
-              { id: 'intro', label: 'Introduction', path: '/module/prompt-construction' },
-              { id: 'main', label: 'Guided Exploration', path: '/module/prompt-construction/specificity/response' },
-              { id: 'takeaway', label: 'Takeaways', path: '/module/prompt-construction/specificity/takeaways' }
-            ]} 
+          <LearningProgressBar 
+            module="prompt-construction"
+            currentStep="intro"
+            baseRoute="/module/prompt-construction"
           />
         </div>
       </main>

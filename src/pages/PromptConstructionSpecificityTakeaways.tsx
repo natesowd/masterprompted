@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
-import ProgressIndicator from "@/components/ProgressIndicator";
+import LearningProgressBar from "@/components/LearningProgressBar";
 
 export default function PromptConstructionSpecificityTakeaways() {
   const navigate = useNavigate();
@@ -64,13 +64,10 @@ export default function PromptConstructionSpecificityTakeaways() {
             </button>
             
             <div className="mt-8">
-              <ProgressIndicator 
-                currentStep="takeaway" 
-                steps={[
-                  { id: 'intro', label: 'Introduction', path: '/module/prompt-construction' },
-                  { id: 'main', label: 'Guided Exploration', path: '/module/prompt-construction/specificity/response' },
-                  { id: 'takeaway', label: 'Takeaways', path: '/module/prompt-construction/specificity/takeaways' }
-                ]} 
+              <LearningProgressBar 
+                module="prompt-construction"
+                currentStep="takeaway"
+                baseRoute="/module/prompt-construction"
               />
             </div>
           </div>

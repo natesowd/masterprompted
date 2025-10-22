@@ -10,7 +10,7 @@ import PromptControlsWithPrompt from "@/components/PromptControlsWithPrompt";
 import TextFlag from "@/components/TextFlag";
 import SectionFlag from "@/components/SectionFlag";
 import ChatPrompt from "@/components/ChatPrompt";
-import ProgressIndicator from "@/components/ProgressIndicator";
+import LearningProgressBar from "@/components/LearningProgressBar";
 import { set } from "zod";
 export default function SpecificityResponse() {
   const navigate = useNavigate();
@@ -699,13 +699,10 @@ export default function SpecificityResponse() {
             </Button>
             
             <div className="mt-8">
-              <ProgressIndicator 
-                currentStep="main" 
-                steps={[
-                  { id: 'intro', label: 'Introduction', path: '/module/prompt-construction' },
-                  { id: 'main', label: 'Guided Exploration', path: '/module/prompt-construction/specificity/response' },
-                  { id: 'takeaway', label: 'Takeaways', path: '/module/prompt-construction/specificity/takeaways' }
-                ]} 
+              <LearningProgressBar 
+                module="prompt-construction"
+                currentStep="main"
+                baseRoute="/module/prompt-construction"
               />
             </div>
           </div>
