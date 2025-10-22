@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 interface ParameterProps {
     parameterTitle: string;
@@ -12,6 +14,7 @@ interface ParameterProps {
     enabled?: boolean;
     currentValue: string;
     onParameterChange?: (param: string) => void;
+    tooltipText?: string;
 }
 
 function Parameter({
@@ -21,7 +24,8 @@ function Parameter({
     showParameter = true,
     enabled = true,
     currentValue,
-    onParameterChange
+    onParameterChange,
+    tooltipText
 }: ParameterProps) {
     if (!showParameter) {
         return null;
@@ -44,8 +48,20 @@ function Parameter({
         className={`my-3 p-0 px-1 border border-border rounded-lg ${!enabled && 'opacity-60 pointer-events-none'}`}
         disabled={!enabled}
     >
-        <legend className="text-xs font-medium text-muted-foreground px-2 mx-auto">
+        <legend className="text-xs font-medium text-muted-foreground px-2 mx-auto flex items-center gap-1">
             {parameterTitle}
+            {tooltipText && (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Info className="h-3 w-3 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p className="max-w-xs">{tooltipText}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            )}
         </legend>
         
         <RadioGroup 
@@ -243,10 +259,46 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
 
             <div>
                 <div className="relative">
-                    <Parameter parameterTitle="Prompt Specificity" leftParameter="General" rightParameter="Specific" showParameter={showSpecificity} enabled={enableSpecificity} currentValue={specificity ?? localSpecificity} onParameterChange={handleSpecificityChange} />
-                    <Parameter parameterTitle="Interaction Style" leftParameter="Conversational" rightParameter="Instructional" showParameter={showStyle} enabled={enableStyle} currentValue={style ?? localStyle} onParameterChange={handleStyleChange} />
-                    <Parameter parameterTitle="Context" leftParameter="No Background" rightParameter="With Background" showParameter={showContext} enabled={enableContext} currentValue={context ?? localContext} onParameterChange={handleContextChange} />
-                    <Parameter parameterTitle="Bias" leftParameter="No Bias" rightParameter="With Bias" showParameter={showBias} enabled={enableBias} currentValue={bias ?? localBias} onParameterChange={handleBiasChange} />
+                    <Parameter 
+                        parameterTitle="Prompt Specificity" 
+                        leftParameter="General" 
+                        rightParameter="Specific" 
+                        showParameter={showSpecificity} 
+                        enabled={enableSpecificity} 
+                        currentValue={specificity ?? localSpecificity} 
+                        onParameterChange={handleSpecificityChange}
+                        tooltipText="Control how detailed your prompt is. General prompts allow more AI interpretation, while specific prompts provide precise instructions."
+                    />
+                    <Parameter 
+                        parameterTitle="Interaction Style" 
+                        leftParameter="Conversational" 
+                        rightParameter="Instructional" 
+                        showParameter={showStyle} 
+                        enabled={enableStyle} 
+                        currentValue={style ?? localStyle} 
+                        onParameterChange={handleStyleChange}
+                        tooltipText="Choose between a conversational tone (informal, friendly) or instructional tone (direct, command-like)."
+                    />
+                    <Parameter 
+                        parameterTitle="Context" 
+                        leftParameter="No Background" 
+                        rightParameter="With Background" 
+                        showParameter={showContext} 
+                        enabled={enableContext} 
+                        currentValue={context ?? localContext} 
+                        onParameterChange={handleContextChange}
+                        tooltipText="Decide whether to provide background information about your role or situation in the prompt."
+                    />
+                    <Parameter 
+                        parameterTitle="Bias" 
+                        leftParameter="No Bias" 
+                        rightParameter="With Bias" 
+                        showParameter={showBias} 
+                        enabled={enableBias} 
+                        currentValue={bias ?? localBias} 
+                        onParameterChange={handleBiasChange}
+                        tooltipText="Choose whether to include a specific perspective or viewpoint in your prompt."
+                    />
                 </div>
 
                 <div className="flex gap-2">
