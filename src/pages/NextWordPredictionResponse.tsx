@@ -23,6 +23,14 @@ export default function HeadlineResponse() {
   const [showCharterTooltip, setShowCharterTooltip] = useState(false);
   const [charterTooltipShown, setCharterTooltipShown] = useState(false);
   const [showMiniTask, setShowMiniTask] = useState(true);
+  const [openTooltips, setOpenTooltips] = useState<{[key: string]: boolean}>({});
+
+  const toggleTooltip = (key: string) => {
+    setOpenTooltips(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
   
 
   const getWordOptions = (position: 'second' | 'third', currentIndex?: number) => {
@@ -250,9 +258,17 @@ export default function HeadlineResponse() {
                                       <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap flex items-center gap-1" style={{ pointerEvents: 'auto' }}>
                                         {rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.67"}
                                         <TooltipProvider>
-                                          <Tooltip>
+                                          <Tooltip open={openTooltips[`second-${word}`]}>
                                             <TooltipTrigger asChild>
-                                              <Info className="h-3 w-3 cursor-help" />
+                                              <Info 
+                                                className="h-3 w-3 cursor-pointer" 
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  toggleTooltip(`second-${word}`);
+                                                }}
+                                                onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`second-${word}`]: true }))}
+                                                onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`second-${word}`]: false }))}
+                                              />
                                             </TooltipTrigger>
                                             <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
                                               <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
@@ -273,9 +289,17 @@ export default function HeadlineResponse() {
                                         <div className="flex items-center gap-1">
                                           <span className="text-xs text-gray-500">{option.probability}</span>
                                           <TooltipProvider>
-                                            <Tooltip>
-                                              <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                <Info className="h-3 w-3 cursor-help text-gray-400 hover:text-gray-600" />
+                                            <Tooltip open={openTooltips[`second-dropdown-${option.word}`]}>
+                                              <TooltipTrigger asChild>
+                                                <Info 
+                                                  className="h-3 w-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleTooltip(`second-dropdown-${option.word}`);
+                                                  }}
+                                                  onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`second-dropdown-${option.word}`]: true }))}
+                                                  onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`second-dropdown-${option.word}`]: false }))}
+                                                />
                                               </TooltipTrigger>
                                               <TooltipContent side="right" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
                                                 <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
@@ -309,9 +333,17 @@ export default function HeadlineResponse() {
                                         <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap flex items-center gap-1" style={{ pointerEvents: 'auto' }}>
                                           {rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.73"}
                                           <TooltipProvider>
-                                            <Tooltip>
+                                            <Tooltip open={openTooltips[`third-${word}`]}>
                                               <TooltipTrigger asChild>
-                                                <Info className="h-3 w-3 cursor-help" />
+                                                <Info 
+                                                  className="h-3 w-3 cursor-pointer" 
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleTooltip(`third-${word}`);
+                                                  }}
+                                                  onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`third-${word}`]: true }))}
+                                                  onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`third-${word}`]: false }))}
+                                                />
                                               </TooltipTrigger>
                                               <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
                                                 <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
@@ -332,9 +364,17 @@ export default function HeadlineResponse() {
                                           <div className="flex items-center gap-1">
                                             <span className="text-xs text-gray-500">{option.probability}</span>
                                             <TooltipProvider>
-                                              <Tooltip>
-                                                <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                  <Info className="h-3 w-3 cursor-help text-gray-400 hover:text-gray-600" />
+                                              <Tooltip open={openTooltips[`third-dropdown-${option.word}`]}>
+                                                <TooltipTrigger asChild>
+                                                  <Info 
+                                                    className="h-3 w-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      toggleTooltip(`third-dropdown-${option.word}`);
+                                                    }}
+                                                    onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`third-dropdown-${option.word}`]: true }))}
+                                                    onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`third-dropdown-${option.word}`]: false }))}
+                                                  />
                                                 </TooltipTrigger>
                                                 <TooltipContent side="right" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
                                                   <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
