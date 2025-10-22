@@ -87,7 +87,7 @@ function Parameter({
                 
                 <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
                     <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
-                    <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">No Change</Label>
+                    <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">Original</Label>
                 </div>
                 
                 <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
