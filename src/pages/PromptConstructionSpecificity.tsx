@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
+import ProgressIndicator from "@/components/ProgressIndicator";
 import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -84,6 +85,17 @@ export default function Specificity() {
             />
           )}
         </div>
+      </div>
+      
+      <div className="mt-8">
+        <ProgressIndicator 
+          currentStep="intro" 
+          steps={[
+            { id: 'intro', label: 'Introduction', path: '/module/prompt-construction' },
+            { id: 'main', label: 'Guided Exploration', path: '/module/prompt-construction/specificity/response' },
+            { id: 'takeaway', label: 'Takeaways', path: '/module/prompt-construction/specificity/takeaways' }
+          ]} 
+        />
       </div>
     </main>
   </div>;
