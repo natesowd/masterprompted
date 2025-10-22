@@ -297,7 +297,7 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
                         enabled={enableBias} 
                         currentValue={bias ?? localBias} 
                         onParameterChange={handleBiasChange}
-                        tooltipText="Choose whether to include a specific perspective or viewpoint in your prompt."
+                        tooltipText="Confirmation bias is when the way you phrase a prompt affects the perspective the LLM produces"
                     />
                 </div>
 
