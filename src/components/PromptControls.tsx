@@ -62,7 +62,12 @@ function Parameter({
                     <TooltipProvider>
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger asChild>
-                                <Info className="w-3 h-3 cursor-help" />
+                                <Info 
+                                    className="w-3 h-3 cursor-pointer" 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                />
                             </TooltipTrigger>
                             <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm">
                                 {infoText}
