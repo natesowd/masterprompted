@@ -9,7 +9,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 export default function HeadlineResponse() {
@@ -23,7 +23,19 @@ export default function HeadlineResponse() {
   const [showCharterTooltip, setShowCharterTooltip] = useState(false);
   const [charterTooltipShown, setCharterTooltipShown] = useState(false);
   const [showMiniTask, setShowMiniTask] = useState(true);
+<<<<<<< HEAD
 
+=======
+  const [openTooltips, setOpenTooltips] = useState<{[key: string]: boolean}>({});
+
+  const toggleTooltip = (key: string) => {
+    setOpenTooltips(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+  
+>>>>>>> 1f22028bcc08d2fd5fdcc0ae5a7fe660ec153f47
 
   const getWordOptions = (position: 'second' | 'third', currentIndex?: number) => {
     let options: { word: string; probability: string }[] = [];
@@ -249,6 +261,7 @@ export default function HeadlineResponse() {
                     wordSpacing: '0.2em',
                     lineHeight: '1.8'
                   }}>
+<<<<<<< HEAD
                     {currentSentence.map((word, index) => {
                       // Handle dropdown for second position (Unites/Reaches/Finalizes/finalizes)
                       if (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes" || word === "finalizes")) {
@@ -301,6 +314,172 @@ export default function HeadlineResponse() {
                         const isValidThirdWord = rawOptions.some(opt => opt.word === word);
 
                         if (isValidThirdWord) {
+=======
+                        {currentSentence.map((word, index) => {
+                          // Handle dropdown for second position (Unites/Reaches/Finalizes/finalizes)
+                          if (index === 2 && (word === "Unites" || word === "Reaches" || word === "Finalizes" || word === "finalizes")) {
+                            const options = getWordOptions('second', index);
+                            const rawOptions = getWordOptions('second');
+                            return (
+                              <span key={index}>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button data-word-union data-word={word.toLowerCase()} className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg inline-flex items-center gap-1">
+                                      {word}
+                                      <ChevronDown className="h-3 w-3" />
+                                      <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap flex items-center gap-1" style={{ pointerEvents: 'auto' }}>
+                                        {rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.67"}
+                                        <TooltipProvider>
+                                          <Tooltip open={openTooltips[`second-${word}`]}>
+                                            <TooltipTrigger asChild>
+                                              <Info 
+                                                className="h-3 w-3 cursor-pointer" 
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  toggleTooltip(`second-${word}`);
+                                                }}
+                                                onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`second-${word}`]: true }))}
+                                                onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`second-${word}`]: false }))}
+                                              />
+                                            </TooltipTrigger>
+                                            <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                              <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </TooltipProvider>
+                                      </span>
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                   <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-[9999] min-w-[120px]">
+                                    {options.map((option) => (
+                                       <DropdownMenuItem 
+                                        key={option.word}
+                                        onClick={() => handleWordSelection(option.word, index)}
+                                        className="cursor-pointer hover:bg-gray-100 flex justify-between items-center gap-2"
+                                      >
+                                        <span>{option.word}</span>
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-xs text-gray-500">{option.probability}</span>
+                                          <TooltipProvider>
+                                            <Tooltip open={openTooltips[`second-dropdown-${option.word}`]}>
+                                              <TooltipTrigger asChild>
+                                                <Info 
+                                                  className="h-3 w-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleTooltip(`second-dropdown-${option.word}`);
+                                                  }}
+                                                  onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`second-dropdown-${option.word}`]: true }))}
+                                                  onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`second-dropdown-${option.word}`]: false }))}
+                                                />
+                                              </TooltipTrigger>
+                                              <TooltipContent side="right" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                                <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
+                                              </TooltipContent>
+                                            </Tooltip>
+                                          </TooltipProvider>
+                                        </div>
+                                      </DropdownMenuItem>
+                                    ))}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                                {index < currentSentence.length - 1 && " "}
+                              </span>
+                            );
+                          }
+                          
+                          // Handle dropdown for third position (On/Around/Behind/landmark/etc.)
+                          if (index === 3) {
+                            const rawOptions = getWordOptions('third');
+                            const options = getWordOptions('third', index);
+                            const isValidThirdWord = rawOptions.some(opt => opt.word === word);
+                            
+                            if (isValidThirdWord) {
+                              return (
+                                <span key={index}>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <button data-word={word.toLowerCase()} className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg inline-flex items-center gap-1">
+                                        {word}
+                                        <ChevronDown className="h-3 w-3" />
+                                        <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap flex items-center gap-1" style={{ pointerEvents: 'auto' }}>
+                                          {rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.73"}
+                                          <TooltipProvider>
+                                            <Tooltip open={openTooltips[`third-${word}`]}>
+                                              <TooltipTrigger asChild>
+                                                <Info 
+                                                  className="h-3 w-3 cursor-pointer" 
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleTooltip(`third-${word}`);
+                                                  }}
+                                                  onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`third-${word}`]: true }))}
+                                                  onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`third-${word}`]: false }))}
+                                                />
+                                              </TooltipTrigger>
+                                              <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                                <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
+                                              </TooltipContent>
+                                            </Tooltip>
+                                          </TooltipProvider>
+                                        </span>
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-[9999] min-w-[120px]">
+                                      {options.map((option) => (
+                                        <DropdownMenuItem 
+                                          key={option.word}
+                                          onClick={() => handleWordSelection(option.word, index)}
+                                          className="cursor-pointer hover:bg-gray-100 flex justify-between items-center gap-2"
+                                        >
+                                          <span>{option.word}</span>
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-xs text-gray-500">{option.probability}</span>
+                                            <TooltipProvider>
+                                              <Tooltip open={openTooltips[`third-dropdown-${option.word}`]}>
+                                                <TooltipTrigger asChild>
+                                                  <Info 
+                                                    className="h-3 w-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      toggleTooltip(`third-dropdown-${option.word}`);
+                                                    }}
+                                                    onMouseEnter={() => setOpenTooltips(prev => ({ ...prev, [`third-dropdown-${option.word}`]: true }))}
+                                                    onMouseLeave={() => setOpenTooltips(prev => ({ ...prev, [`third-dropdown-${option.word}`]: false }))}
+                                                  />
+                                                </TooltipTrigger>
+                                                <TooltipContent side="right" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                                  <p className="text-sm leading-relaxed">These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.</p>
+                                                </TooltipContent>
+                                              </Tooltip>
+                                            </TooltipProvider>
+                                          </div>
+                                        </DropdownMenuItem>
+                                      ))}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                  {index < currentSentence.length - 1 && " "}
+                                </span>
+                              );
+                            }
+                          }
+                          
+                          // Handle TextFlag for "Charter," in new form too
+                          if (word === "Charter,") {
+                            return <span key={index} className="relative">
+                                     <span onMouseLeave={() => {
+                                  if (!charterTooltipShown) {
+                                    setShowCharterTooltip(true);
+                                    setCharterTooltipShown(true);
+                                  }
+                                }}>
+                                       <TextFlag text="Charter" evaluationFactor="factual-accuracy" explanation="The term 'charter' has been used here to describe the EU AI Act. A charter is a different type of document than an act and therefore are not interchangeable terms." />
+                                     </span>
+                                     ,{index < currentSentence.length - 1 && " "}
+                                   </span>;
+                          }
+                          
+>>>>>>> 1f22028bcc08d2fd5fdcc0ae5a7fe660ec153f47
                           return (
                             <span key={index}>
                               <DropdownMenu>
@@ -419,6 +598,7 @@ export default function HeadlineResponse() {
       <div className="bg-emerald-600 text-white rounded-xl shadow-lg max-w-xs pointer-events-auto relative" style={{
         padding: '16px 20px'
       }}>
+<<<<<<< HEAD
         <p className="text-sm leading-relaxed mb-4">
           The numbers on top of each word represent the probability that the word would be selected.
         </p>
@@ -441,4 +621,28 @@ export default function HeadlineResponse() {
       LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
     </div>
   </div>;
+=======
+            <p className="text-sm leading-relaxed mb-4">
+              The numbers on top of each word represent the probability that the word would be selected.
+            </p>
+            <p className="text-sm leading-relaxed mb-4">
+              Use them to understand what would be the most probable selection by the LLM
+            </p>
+            <button onClick={() => setShowTooltip(false)} className="absolute bottom-2 right-2 bg-white text-emerald-500 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>}
+      
+      <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">
+        LLMs have been used in the following places: The creation of prompt output examples in the Guided Exploration<br />
+        LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
+      </div>
+      
+      <ModuleNavigation
+        previousRoute="/module/next-word-prediction/prompt" 
+        nextRoute="/module/next-word-prediction/takeaways"
+      />
+    </div>;
+>>>>>>> 1f22028bcc08d2fd5fdcc0ae5a7fe660ec153f47
 }

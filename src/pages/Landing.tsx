@@ -163,7 +163,7 @@ const Landing = () => {
       <VideoLightbox
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        videoUrl="https://www.youtube.com/watch?v=2PjWP60KUAk"
+        videoUrl="https://youtu.be/6TcjHnuHLGg"
       />
     </div>
   );

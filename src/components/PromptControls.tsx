@@ -191,7 +191,7 @@ export default function PromptControls({
                             enabled={enableSpecificity} 
                             currentValue={parameters.specificity} 
                             onParameterChange={onParameterChange}
-                            infoText="Prompt Specificity is how explicit you are in your prompt for the desired output. The more specific you are, the better the results will be."
+                            infoText="Control how detailed your prompt is. General prompts allow more AI interpretation, while specific prompts provide precise instructions."
                         />
                         <Parameter 
                             parameterTitle="Interaction Style" 
@@ -202,7 +202,7 @@ export default function PromptControls({
                             enabled={enableStyle} 
                             currentValue={parameters.style} 
                             onParameterChange={onParameterChange}
-                            infoText="Conversation Style is the manner in which you prompt your LLM. You can interact like it is human but this is not necessary."
+                            infoText="Choose between a conversational tone (informal, friendly) or instructional tone (direct, command-like)."
                         />
                         <Parameter 
                             parameterTitle="Context" 
@@ -213,7 +213,7 @@ export default function PromptControls({
                             enabled={enableContext} 
                             currentValue={parameters.context} 
                             onParameterChange={onParameterChange}
-                            infoText="Context is the additional information you give to the LLM to help it answers as well as possible. This may include background to your prompt"
+                            infoText="Decide whether to provide background information about your role or situation in the prompt."
                         />
                         <Parameter 
                             parameterTitle="Bias" 
@@ -224,7 +224,7 @@ export default function PromptControls({
                             enabled={enableBias} 
                             currentValue={parameters.bias} 
                             onParameterChange={onParameterChange}
-                            infoText="Confirmation bias is when the way you phrase a prompt affects the perspective the LLM produces"
+                            infoText="Explore how neutral or leading prompts can effect and bias LLM output"
                         />
                     </div>
 

@@ -11,6 +11,12 @@ interface VideoLightboxProps {
 const VideoLightbox = ({ isOpen, onClose, videoUrl }: VideoLightboxProps) => {
   // Extract YouTube video ID from URL
   const getYouTubeEmbedUrl = (url: string) => {
+    // Handle shortened URLs (youtu.be/VIDEO_ID)
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    // Handle standard URLs (youtube.com/watch?v=VIDEO_ID)
     const videoId = url.split('v=')[1]?.split('&')[0];
     return `https://www.youtube.com/embed/${videoId}`;
   };

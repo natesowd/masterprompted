@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 
+
 interface ParameterProps {
     parameterTitle: string;
     leftParameter: string;
@@ -80,6 +81,7 @@ function Parameter({
 
             <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
                 <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
+                <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">Original</Label>
                 <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">Original</Label>
             </div>
 
