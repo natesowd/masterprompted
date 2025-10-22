@@ -188,7 +188,7 @@ export default function PromptControls({
                     <Separator/>
                     <div id='parameters' className="relative">
                         <Parameter 
-                            parameterTitle="Prompt Specificity" 
+                            parameterTitle="Specificity" 
                             parameterKey="specificity" 
                             leftParameter="More General" 
                             rightParameter="More Specific" 
@@ -199,7 +199,7 @@ export default function PromptControls({
                             infoText="Control how detailed your prompt is. General prompts allow more AI interpretation, while specific prompts provide precise instructions."
                         />
                         <Parameter 
-                            parameterTitle="Interaction Style" 
+                            parameterTitle="Conversation Style" 
                             parameterKey="style" 
                             leftParameter="More Conversational" 
                             rightParameter="More Instructional" 
@@ -210,7 +210,7 @@ export default function PromptControls({
                             infoText="Choose between a conversational tone (informal, friendly) or instructional tone (direct, command-like)."
                         />
                         <Parameter 
-                            parameterTitle="Context" 
+                            parameterTitle="Context Provided" 
                             parameterKey="context" 
                             leftParameter="Less Background" 
                             rightParameter="More Background" 
@@ -221,7 +221,7 @@ export default function PromptControls({
                             infoText="Decide whether to provide background information about your role or situation in the prompt."
                         />
                         <Parameter 
-                            parameterTitle="Bias" 
+                            parameterTitle="Confirmation Bias" 
                             parameterKey="bias" 
                             leftParameter="Less Bias" 
                             rightParameter="More Bias" 
