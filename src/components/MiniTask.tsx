@@ -101,11 +101,11 @@ export function MiniTask({
 
       {/* MiniTask component - positioned near spotlight */}
       {(spotlightRects.unite || spotlightRects.on) && (
-        <div className={`fixed z-50 w-full max-w-[33vw] pointer-events-auto ${className}`} style={{
+        <div className={`fixed z-50 w-full max-w-[33vw] ${className}`} style={{
           top: taskTop,
           left: taskLeft
         }}>
-          <div className="bg-card border border-border rounded-lg p-4 shadow-lg animate-in fade-in duration-300">
+          <div className="bg-card border border-border rounded-lg p-4 shadow-lg">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                 <AlignJustify className="w-5 h-5 text-primary" />
@@ -113,7 +113,7 @@ export function MiniTask({
               <div className="flex-1 space-y-3">
                 <h3 className="text-lg font-semibold text-foreground">{title}</h3>
                 <p className="text-sm text-muted-foreground">{description}</p>
-                <Button onClick={onStartTask} variant="default" size="sm" className="animate-pulse">
+                <Button onClick={onStartTask} variant="default" size="sm">
                   Start Task
                 </Button>
               </div>
