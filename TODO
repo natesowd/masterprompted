@@ -6,11 +6,8 @@ TODO:
 - some way to pull old prompts back into chatbox easily (click on chatprompt component?)
 - edit button for chats
 - need to make prompt optimization more reliable, probably add a system prompt or something.
-- make clickable (next word prediction probabilities info, prompt control panel parameters info, journalistic eval highlights)
-- progress bar?
-- change the tooltip component so they overlay over everything not just local components
 - add a legend to the diff component (added/removed text)
-- change bias parameter name to confirmation bias?
+
 - DIFF: 
   - implement connectorlines.tsx?
   - add code block formatting to richtext
@@ -20,6 +17,7 @@ TODO:
 - DONE: 
   - spotlight: disable clicks on dimmed-out screen
   - remove scrolling where possible
-
-
-
+  - change bias parameter name to confirmation bias?
+  -  change the tooltip component so they overlay over everything not just local components
+  - progress bar?
+  -  make clickable (next word prediction probabilities info, prompt control panel parameters info, journalistic eval highlights)
