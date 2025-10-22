@@ -14,9 +14,9 @@ export default function ProgressIndicator({ currentStep, steps }: ProgressIndica
   const stepIndex = steps.findIndex(step => step.id === currentStep);
   
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
+    <div className="flex items-center justify-center gap-4 mb-8">
       {steps.map((step, index) => (
-        <div key={step.id} className="flex flex-col items-center group relative">
+        <div key={step.id} className="flex flex-col items-center group">
           <button
             onClick={() => navigate(step.path)}
             className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer hover:scale-150 ${
@@ -28,21 +28,16 @@ export default function ProgressIndicator({ currentStep, steps }: ProgressIndica
             }`}
             aria-label={step.label}
           />
-          <span
-            className={`absolute top-full mt-1 text-xs transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap ${
+          <button
+            onClick={() => navigate(step.path)}
+            className={`mt-2 text-xs transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap cursor-pointer ${
               index === stepIndex
                 ? 'text-primary font-medium'
                 : 'text-gray-500'
             }`}
-            style={{ 
-              transform: 'rotate(-90deg) translateX(-50%)',
-              transformOrigin: 'left top',
-              left: '50%',
-              marginTop: '12px'
-            }}
           >
             {step.label}
-          </span>
+          </button>
         </div>
       ))}
     </div>
