@@ -18,14 +18,6 @@ export default function PromptConstructionSpecificityTakeaways() {
       <main className="container mx-auto px-6 py-6">
         <Breadcrumb />
         <div className="mb-5"></div>
-        <ProgressIndicator 
-          currentStep="takeaway" 
-          steps={[
-            { id: 'intro', label: 'Introduction' },
-            { id: 'main', label: 'Guided Exploration' },
-            { id: 'takeaway', label: 'Takeaways' }
-          ]} 
-        />
         
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-foreground mb-2">Takeaways:</h1>
@@ -70,6 +62,17 @@ export default function PromptConstructionSpecificityTakeaways() {
                 <path d="M1 5H11M11 5L7 1M11 5L7 9" stroke="#1F1F1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
+            
+            <div className="mt-8">
+              <ProgressIndicator 
+                currentStep="takeaway" 
+                steps={[
+                  { id: 'intro', label: 'Introduction' },
+                  { id: 'main', label: 'Guided Exploration' },
+                  { id: 'takeaway', label: 'Takeaways' }
+                ]} 
+              />
+            </div>
           </div>
         </div>
       </main>
