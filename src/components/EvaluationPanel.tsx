@@ -1,6 +1,6 @@
 import { CheckCircle, Target, Mic, Scale, Copy, ChevronDown, ListChevronsUpDown, ListChevronsDownUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const evaluationCriteria = [
   {
@@ -42,8 +42,13 @@ interface EvaluationPanelProps {
 
 // Update the component signature to accept the props
 export default function EvaluationPanel({ initialIsOpen = true }: EvaluationPanelProps) {
-  // Use state to manage the main panel open state, defaulting to initialIsOpen prop
+  // Use state to manage the main panel open state. Keep it in sync whenever the prop changes
   const [isPanelOpen, setIsPanelOpen] = useState(initialIsOpen);
+
+  // If the parent updates `initialIsOpen` at any time, reflect that change in local state.
+  useEffect(() => {
+    if (!initialIsOpen) setIsPanelOpen(initialIsOpen);
+  }, [initialIsOpen]);
   // State for managing which criteria item is open
   const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -55,7 +60,7 @@ export default function EvaluationPanel({ initialIsOpen = true }: EvaluationPane
     <div className="relative">
       {/* When closed, only render a small floating button. When open, render the full panel. */}
       {isPanelOpen ? (
-        <div className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4 relative absolute top-0 right-0 z-10">
+  <div className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4 absolute top-0 right-0 z-10">
           {/* Expand/Minimize button in top-right */}
           <button
             aria-label={isPanelOpen ? 'Minimize evaluation panel' : 'Expand evaluation panel'}

@@ -399,12 +399,18 @@ const PromptPlayground = () => {
     if (threads.length === 0 || hasManualEdit) {
       await createNewThreadAndFetch(submittedText);
     } else {
+      let temp = false;
+      if (showDiff) {
+        setShowDiff(false);
+        temp = true;
+      }
       await submitAnswerForLatestVersion(submittedText);
+      if (temp) setShowDiff(true);
     }
   };
 
   const handleChatSubmit = (submittedText: string) => { void handleSubmit(submittedText, true); };
-  const handleOptimizeSubmit = async () => { if (editingText.trim()) { void handleSubmit(editingText, false); }};
+  const handleOptimizeSubmit = async () => { if (editingText.trim()) { void handleSubmit(editingText, false); } };
   const handleInputChange = (input: string) => {
     setHasManualEdit(true);
     handleReset();
@@ -444,7 +450,7 @@ const PromptPlayground = () => {
               <button className="p-2 rounded-full hover:bg-muted/50" onClick={() => setShowControlPanelPopover(true)}>
                 <CircleQuestionMark className="h-6 w-6 text-muted-foreground" />
               </button>
-              <EvaluationPanel initialIsOpen={false} />
+              <EvaluationPanel initialIsOpen={!showDiff} />
             </div>
           </div>
         </div>
