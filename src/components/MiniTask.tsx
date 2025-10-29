@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { AlignJustify } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 interface MiniTaskProps {
   title: string;
   description: string;
@@ -15,6 +16,7 @@ export function MiniTask({
   onClose,
   className = ""
 }: MiniTaskProps) {
+  const { t } = useLanguage();
   const [spotlightRects, setSpotlightRects] = useState<{
     unite: DOMRect | null;
     on: DOMRect | null;
@@ -122,7 +124,7 @@ export function MiniTask({
                 <h3 className="text-lg font-semibold text-foreground">{title}</h3>
                 <p className="text-sm text-muted-foreground">{description}</p>
                 <Button onClick={onStartTask} variant="default" size="sm">
-                  Start Task
+                  {t('components.miniTask.startTask')}
                 </Button>
               </div>
             </div>

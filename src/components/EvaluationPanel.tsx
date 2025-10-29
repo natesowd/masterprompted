@@ -1,39 +1,8 @@
 import { CheckCircle, Target, Mic, Scale, Copy, ChevronDown, ListChevronsUpDown, ListChevronsDownUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const evaluationCriteria = [
-  {
-    id: "factual-accuracy",
-    label: "Factual Accuracy",
-    icon: CheckCircle,
-    description: "Factual accuracy in an LLM output ensures that information provided is correct and aligns with real-world knowledge, which is crucial for reliable, trustworthy results. A part of this are hallucinations, when the AI generates information that appears plausible but is factually incorrect or entirely fabricated; often because it extrapolates from incorrect training data, lacks real-world context, or misunderstands the user's query."
-  },
-  {
-    id: "relevance",
-    label: "Relevance",
-    icon: Target,
-    description: "Relevance measures how well the response matches the topic or intent of the prompt. If the prompt is not specific enough, the LLM output may leave out key information that affects a journalist's pool of information to draw from."
-  },
-  {
-    id: "voice",
-    label: "Voice",
-    icon: Mic,
-    description: "Voice refers to the tone, style, or 'personality' conveyed in the response, which can be shaped by specifying so in the prompt. When the voice of a prompt is human-like, LLM outputs are made to seem more plausible and knowledgeable, effectively disguising other aspects discussed."
-  },
-  {
-    id: "bias",
-    label: "Bias",
-    icon: Scale,
-    description: "Bias refers to prejudices and unbalanced narratives outputted by LLMs due to biased training data, model architecture or prompt instructions. LLMs will always have a degree of bias in its representation of different topics and therefore can bias the journalist's piece of work."
-  },
-  {
-    id: "plagiarism",
-    label: "Plagiarism",
-    icon: Copy,
-    description: "LLMs can plagiarise by directly taking content from training data. While some LLMs are able to attribute pieces of information, all LLMs have the ability to lose connection to data sources, making them vulnerable to reproducing substantial portions of text from data. User should be wary of this, even when the output has sources cited."
-  }
-];
 
 // Define props for the component, including the optional initialIsOpen prop
 interface EvaluationPanelProps {
@@ -43,6 +12,41 @@ interface EvaluationPanelProps {
 
 // Update the component signature to accept the props
 export default function EvaluationPanel({ initialIsOpen = true, canClose = false }: EvaluationPanelProps) {
+  const { t } = useLanguage();
+  
+  const evaluationCriteria = [
+    {
+      id: "factual-accuracy",
+      label: t('components.evaluationPanel.criteria.factualAccuracy.label'),
+      icon: CheckCircle,
+      description: t('components.evaluationPanel.criteria.factualAccuracy.description')
+    },
+    {
+      id: "relevance",
+      label: t('components.evaluationPanel.criteria.relevance.label'),
+      icon: Target,
+      description: t('components.evaluationPanel.criteria.relevance.description')
+    },
+    {
+      id: "voice",
+      label: t('components.evaluationPanel.criteria.voice.label'),
+      icon: Mic,
+      description: t('components.evaluationPanel.criteria.voice.description')
+    },
+    {
+      id: "bias",
+      label: t('components.evaluationPanel.criteria.bias.label'),
+      icon: Scale,
+      description: t('components.evaluationPanel.criteria.bias.description')
+    },
+    {
+      id: "plagiarism",
+      label: t('components.evaluationPanel.criteria.plagiarism.label'),
+      icon: Copy,
+      description: t('components.evaluationPanel.criteria.plagiarism.description')
+    }
+  ];
+  
   // Use state to manage the main panel open state. Keep it in sync whenever the prop changes
   const [isPanelOpen, setIsPanelOpen] = useState(initialIsOpen);
 
@@ -64,19 +68,19 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
   <div className="w-[20rem] bg-card border border-border rounded-lg shadow-sm px-4 py-4 absolute top-0 right-0 z-10">
           {/* Expand/Minimize button in top-right */}
           <button
-            aria-label={isPanelOpen ? 'Minimize evaluation panel' : 'Expand evaluation panel'}
+            aria-label={isPanelOpen ? t('components.evaluationPanel.minimize') : t('components.evaluationPanel.expand')}
             className={
               `absolute top-1 right-1 p-1 rounded-full hover:bg-muted/50 ${!canClose ? 'opacity-50 cursor-not-allowed' : ''}`
             }
             onClick={() => { if (canClose) setIsPanelOpen(false); }}
             aria-disabled={!canClose}
-            title={!canClose ? 'Panel cannot be minimized right now' : undefined}
+            title={!canClose ? t('components.evaluationPanel.cannotMinimize') : undefined}
           >
             <ListChevronsDownUp className="h-5 w-5 text-muted-foreground" />
           </button>
 
           <div className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground mb-2">
-            <span>Journalistic Evaluation</span>
+            <span>{t('components.evaluationPanel.title')}</span>
           </div>
 
           <div className="space-y-3 mt-4">
@@ -111,7 +115,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
       ) : (
         <div className="w-10 h-10">
           <button
-            aria-label="Open evaluation panel"
+            aria-label={t('components.evaluationPanel.expand')}
             className="p-2 rounded-full hover:bg-muted/50"
             onClick={() => setIsPanelOpen(true)}
           >

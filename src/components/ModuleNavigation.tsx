@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationBar from "./NavigationBar";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ModuleNavigationProps {
   previousRoute?: string;
@@ -13,10 +14,14 @@ interface ModuleNavigationProps {
 const ModuleNavigation = ({ 
   previousRoute, 
   nextRoute, 
-  previousLabel = "Previous",
-  nextLabel = "Next"
+  previousLabel,
+  nextLabel
 }: ModuleNavigationProps) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  
+  const defaultPreviousLabel = previousLabel || t('components.moduleNavigation.previous');
+  const defaultNextLabel = nextLabel || t('components.moduleNavigation.next');
 
   return (
     <NavigationBar>

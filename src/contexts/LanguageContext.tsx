@@ -207,6 +207,54 @@ const translations = {
         title: 'Conversation Style',
         comingSoon: 'Coming soon...'
       }
+    },
+    components: {
+      miniTask: {
+        startTask: 'Start Task'
+      },
+      breadcrumb: {
+        home: 'Home',
+        guidedSimulation: 'Guided Simulation',
+        modules: 'Modules',
+        takeaways: 'Takeaways'
+      },
+      moduleNavigation: {
+        previous: 'Previous',
+        next: 'Next'
+      },
+      learningProgressBar: {
+        intro: 'Introduction',
+        guidedExploration: 'Guided Exploration',
+        takeaways: 'Takeaways'
+      },
+      evaluationPanel: {
+        title: 'Journalistic Evaluation',
+        minimize: 'Minimize evaluation panel',
+        expand: 'Open evaluation panel',
+        cannotMinimize: 'Panel cannot be minimized right now',
+        criteria: {
+          factualAccuracy: {
+            label: 'Factual Accuracy',
+            description: 'Factual accuracy in an LLM output ensures that information provided is correct and aligns with real-world knowledge, which is crucial for reliable, trustworthy results. A part of this are hallucinations, when the AI generates information that appears plausible but is factually incorrect or entirely fabricated; often because it extrapolates from incorrect training data, lacks real-world context, or misunderstands the user\'s query.'
+          },
+          relevance: {
+            label: 'Relevance',
+            description: 'Relevance measures how well the response matches the topic or intent of the prompt. If the prompt is not specific enough, the LLM output may leave out key information that affects a journalist\'s pool of information to draw from.'
+          },
+          voice: {
+            label: 'Voice',
+            description: 'Voice refers to the tone, style, or \'personality\' conveyed in the response, which can be shaped by specifying so in the prompt. When the voice of a prompt is human-like, LLM outputs are made to seem more plausible and knowledgeable, effectively disguising other aspects discussed.'
+          },
+          bias: {
+            label: 'Bias',
+            description: 'Bias refers to prejudices and unbalanced narratives outputted by LLMs due to biased training data, model architecture or prompt instructions. LLMs will always have a degree of bias in its representation of different topics and therefore can bias the journalist\'s piece of work.'
+          },
+          plagiarism: {
+            label: 'Plagiarism',
+            description: 'LLMs can plagiarise by directly taking content from training data. While some LLMs are able to attribute pieces of information, all LLMs have the ability to lose connection to data sources, making them vulnerable to reproducing substantial portions of text from data. User should be wary of this, even when the output has sources cited.'
+          }
+        }
+      }
     }
   },
   es: {
@@ -371,6 +419,54 @@ const translations = {
       conversationStyle: {
         title: 'Estilo de Conversación',
         comingSoon: 'Próximamente...'
+      }
+    },
+    components: {
+      miniTask: {
+        startTask: 'Iniciar Tarea'
+      },
+      breadcrumb: {
+        home: 'Inicio',
+        guidedSimulation: 'Simulación Guiada',
+        modules: 'Módulos',
+        takeaways: 'Conclusiones'
+      },
+      moduleNavigation: {
+        previous: 'Anterior',
+        next: 'Siguiente'
+      },
+      learningProgressBar: {
+        intro: 'Introducción',
+        guidedExploration: 'Exploración Guiada',
+        takeaways: 'Conclusiones'
+      },
+      evaluationPanel: {
+        title: 'Evaluación Periodística',
+        minimize: 'Minimizar panel de evaluación',
+        expand: 'Abrir panel de evaluación',
+        cannotMinimize: 'El panel no se puede minimizar en este momento',
+        criteria: {
+          factualAccuracy: {
+            label: 'Precisión Factual',
+            description: 'La precisión factual en la salida de un LLM garantiza que la información proporcionada sea correcta y se alinee con el conocimiento del mundo real, lo cual es crucial para obtener resultados confiables y dignos de confianza. Una parte de esto son las alucinaciones, cuando la IA genera información que parece plausible pero es factualmente incorrecta o completamente fabricada; a menudo porque extrapola a partir de datos de entrenamiento incorrectos, carece de contexto del mundo real o malinterpreta la consulta del usuario.'
+          },
+          relevance: {
+            label: 'Relevancia',
+            description: 'La relevancia mide qué tan bien la respuesta coincide con el tema o la intención del mensaje. Si el mensaje no es lo suficientemente específico, la salida del LLM puede omitir información clave que afecta el conjunto de información del que dispone el periodista.'
+          },
+          voice: {
+            label: 'Voz',
+            description: 'La voz se refiere al tono, estilo o \'personalidad\' transmitida en la respuesta, que puede moldearse especificándolo en el mensaje. Cuando la voz de un mensaje es similar a la humana, las salidas de LLM parecen más plausibles y conocedoras, disfrazando efectivamente otros aspectos discutidos.'
+          },
+          bias: {
+            label: 'Sesgo',
+            description: 'El sesgo se refiere a prejuicios y narrativas desequilibradas producidas por LLM debido a datos de entrenamiento sesgados, arquitectura del modelo o instrucciones del mensaje. Los LLM siempre tendrán cierto grado de sesgo en su representación de diferentes temas y, por lo tanto, pueden sesgar el trabajo del periodista.'
+          },
+          plagiarism: {
+            label: 'Plagio',
+            description: 'Los LLM pueden plagiar tomando directamente contenido de los datos de entrenamiento. Si bien algunos LLM pueden atribuir piezas de información, todos los LLM tienen la capacidad de perder la conexión con las fuentes de datos, lo que los hace vulnerables a reproducir porciones sustanciales de texto de los datos. El usuario debe tener cuidado con esto, incluso cuando la salida tiene fuentes citadas.'
+          }
+        }
       }
     }
   }

@@ -1,4 +1,5 @@
 import ProgressIndicator from "./ProgressIndicator";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LearningProgressBarProps {
   module: string;
@@ -30,23 +31,24 @@ export default function LearningProgressBar({
   currentStep,
   baseRoute 
 }: LearningProgressBarProps) {
+  const { t } = useLanguage();
   // Use module config if available, otherwise use baseRoute
   const config = moduleConfigs[module];
   
   const steps = [
     { 
       id: 'intro', 
-      label: 'Introduction', 
+      label: t('components.learningProgressBar.intro'), 
       path: config?.introRoute || `${baseRoute}` 
     },
     { 
       id: 'main', 
-      label: 'Guided Exploration', 
+      label: t('components.learningProgressBar.guidedExploration'), 
       path: config?.mainRoute || `${baseRoute}/main` 
     },
     { 
       id: 'takeaway', 
-      label: 'Takeaways', 
+      label: t('components.learningProgressBar.takeaways'), 
       path: config?.takeawayRoute || `${baseRoute}/takeaways` 
     }
   ];

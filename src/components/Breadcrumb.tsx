@@ -1,5 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const breadcrumbMap: Record<string, string> = {
   "/modules": "Modules",
@@ -25,6 +26,7 @@ const breadcrumbMap: Record<string, string> = {
 
 export default function Breadcrumb() {
   const location = useLocation();
+  const { t } = useLanguage();
   const pathSegments = location.pathname.split('/').filter(Boolean);
   
   // Build breadcrumb items
@@ -33,7 +35,7 @@ export default function Breadcrumb() {
   
   // Add home
   breadcrumbItems.push({
-    label: "Home",
+    label: t('components.breadcrumb.home'),
     path: "/",
     isLast: false
   });
@@ -41,7 +43,7 @@ export default function Breadcrumb() {
   // Special case for takeaways page
   if (location.pathname === '/takeaways') {
     breadcrumbItems.push({
-      label: "Guided Simulation",
+      label: t('components.breadcrumb.guidedSimulation'),
       path: "/module/intro",
       isLast: false
     });
@@ -51,7 +53,7 @@ export default function Breadcrumb() {
       isLast: false
     });
     breadcrumbItems.push({
-      label: "Takeaways",
+      label: t('components.breadcrumb.takeaways'),
       path: "/takeaways",
       isLast: true
     });
@@ -107,7 +109,7 @@ export default function Breadcrumb() {
             <span className="text-foreground font-medium">{item.label}</span>
           ) : (
             <Link 
-              to={item.label === "Guided Simulation" ? "/module/intro" : item.path}
+              to={item.label === t('components.breadcrumb.guidedSimulation') ? "/module/intro" : item.path}
               className="hover:text-foreground transition-colors"
             >
               {item.label}
