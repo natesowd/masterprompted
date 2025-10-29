@@ -26,7 +26,7 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
   }, []);
 
   const navigationItems = [
-    { label: "Prompt Playground", path: "/playground" },
+    { label: t('nav.promptPlayground'), path: "/playground" },
     { label: t('nav.about'), path: "/about" },
     { label: t('nav.contact'), path: "/contact" },
     { label: t('nav.imprint'), path: "/imprint" }
@@ -34,17 +34,17 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
 
   const moduleItems = [
     { 
-      title: "Introduction", 
+      title: t('modules.introduction'), 
       path: "/module/intro/about-simulator",
       completed: false
     },
     { 
-      title: "Next Word Prediction", 
+      title: t('modules.nextWordPrediction'), 
       path: "/module/next-word-prediction",
       completed: false
     },
     { 
-      title: "Prompt Construction", 
+      title: t('modules.promptConstruction'), 
       path: "/module/prompt-construction",
       completed: false
     }
@@ -117,7 +117,7 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
                         : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Guided Simulator
+                  {t('nav.guidedSimulator')}
                   <ChevronDown className="h-4 w-4" />
                   {isModuleActive() && (
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />

@@ -50,7 +50,9 @@ const translations = {
       modules: 'Modules',
       about: 'About',
       contact: 'Contact',
-      imprint: 'Imprint'
+      imprint: 'Imprint',
+      guidedSimulator: 'Guided Simulator',
+      promptPlayground: 'Prompt Playground'
     },
     landing: {
       hero: {
@@ -85,7 +87,10 @@ const translations = {
     },
     modules: {
       title: 'Modules',
-      comingSoon: 'Coming soon...'
+      comingSoon: 'Coming soon...',
+      introduction: 'Introduction',
+      nextWordPrediction: 'Next Word Prediction',
+      promptConstruction: 'Prompt Construction'
     },
     about: {
       title: 'About',
@@ -116,6 +121,7 @@ const translations = {
       comingSoon: 'Coming soon...'
     },
     promptConstruction: {
+      title: 'Prompt Construction',
       bias: {
         title: 'Bias',
         comingSoon: 'Coming soon...'
@@ -136,7 +142,9 @@ const translations = {
       modules: 'Módulos',
       about: 'Acerca de',
       contact: 'Contacto',
-      imprint: 'Aviso Legal'
+      imprint: 'Aviso Legal',
+      guidedSimulator: 'Simulador Guiado',
+      promptPlayground: 'Campo de Práctica de Prompts'
     },
     landing: {
       hero: {
@@ -171,7 +179,10 @@ const translations = {
     },
     modules: {
       title: 'Módulos',
-      comingSoon: 'Próximamente...'
+      comingSoon: 'Próximamente...',
+      introduction: 'Introducción',
+      nextWordPrediction: 'Predicción de Siguiente Palabra',
+      promptConstruction: 'Construcción de Prompts'
     },
     about: {
       title: 'Acerca de',
@@ -202,6 +213,7 @@ const translations = {
       comingSoon: 'Próximamente...'
     },
     promptConstruction: {
+      title: 'Construcción de Prompts',
       bias: {
         title: 'Sesgo',
         comingSoon: 'Próximamente...'

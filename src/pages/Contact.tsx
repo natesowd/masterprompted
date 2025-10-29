@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,6 +27,7 @@ const contactSchema = z.object({
 type ContactFormValues = z.infer<typeof contactSchema>;
 
 const Contact = () => {
+  const { t } = useLanguage();
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
@@ -53,7 +55,7 @@ const Contact = () => {
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-foreground mb-6">
-            Contact
+            {t('contact.title')}
           </h1>
           
           <div className="bg-card rounded-lg border p-8 mb-6">

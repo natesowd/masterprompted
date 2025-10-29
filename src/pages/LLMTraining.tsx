@@ -1,7 +1,9 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function LLMTraining() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -11,8 +13,8 @@ export default function LLMTraining() {
         <div className="mb-5"></div>
         <div className="max-w-4xl mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-4">LLM Training</h1>
-            <p className="text-xl text-muted-foreground">Coming soon...</p>
+            <h1 className="text-4xl font-bold text-foreground mb-4">{t('llmTraining.title')}</h1>
+            <p className="text-xl text-muted-foreground">{t('llmTraining.comingSoon')}</p>
           </div>
         </div>
       </main>

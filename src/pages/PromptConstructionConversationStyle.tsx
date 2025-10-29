@@ -1,8 +1,10 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ConversationStyle() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -12,8 +14,8 @@ export default function ConversationStyle() {
         <div className="mb-5"></div>
         <div className="max-w-4xl mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-4">Conversation Style</h1>
-            <p className="text-xl text-muted-foreground">Coming soon...</p>
+            <h1 className="text-4xl font-bold text-foreground mb-4">{t('promptConstruction.conversationStyle.title')}</h1>
+            <p className="text-xl text-muted-foreground">{t('promptConstruction.conversationStyle.comingSoon')}</p>
           </div>
         </div>
       </main>
