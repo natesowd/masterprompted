@@ -54,9 +54,33 @@ const translations = {
     },
     landing: {
       hero: {
-        title: 'Master AI-Assisted Journalism',
-        subtitle: 'Learn to effectively use AI tools while maintaining journalistic integrity and accuracy',
-        cta: 'Start Learning'
+        title: 'PromptED: Responsible AI use in Journalism',
+        subtitle: 'A hands-on exploration and practice for journalists to observe how large language models function, their limitations, and how to use them for more trustworthy content production.',
+        watchTrailer: 'Watch Trailer'
+      },
+      features: {
+        simulator: {
+          title: 'Guided Simulator',
+          description: 'Interactive guide: explore how LLMs work and how to responsibly interact with them'
+        },
+        playground: {
+          title: 'Prompt Playground',
+          description: 'Apply your knowledge: experiment with your own prompts'
+        },
+        debunker: {
+          title: 'AI Claim Debunker',
+          description: 'Put your skills to work: review claims and gain counter perspectives'
+        }
+      },
+      footer: {
+        llmUsage: 'LLMs have been used in the following ways:',
+        guidedExploration: 'Guided Exploration:',
+        guidedExplorationDesc: 'To create prompt-output examples.',
+        promptPlayground: 'Prompt Playground:',
+        promptPlaygroundDesc: 'To optimize prompts, generate outputs and to identify factual inaccuracies and bias.',
+        modelsUsed: 'Models used:',
+        models: 'Llama 3.1 8B, Mistral, Claude, ChatGPT',
+        euFunding: "Funded by the European Union's Horizon Europe Programme (Grant 101135437)"
       }
     },
     modules: {
@@ -116,9 +140,33 @@ const translations = {
     },
     landing: {
       hero: {
-        title: 'Domina el Periodismo Asistido por IA',
-        subtitle: 'Aprende a usar herramientas de IA de manera efectiva mientras mantienes la integridad y precisión periodística',
-        cta: 'Comenzar a Aprender'
+        title: 'PromptED: Uso Responsable de IA en Periodismo',
+        subtitle: 'Una exploración y práctica para periodistas para observar cómo funcionan los modelos de lenguaje grandes, sus limitaciones y cómo usarlos para una producción de contenido más confiable.',
+        watchTrailer: 'Ver Tráiler'
+      },
+      features: {
+        simulator: {
+          title: 'Simulador Guiado',
+          description: 'Guía interactiva: explora cómo funcionan los LLM y cómo interactuar responsablemente con ellos'
+        },
+        playground: {
+          title: 'Campo de Práctica de Prompts',
+          description: 'Aplica tus conocimientos: experimenta con tus propios prompts'
+        },
+        debunker: {
+          title: 'Verificador de Afirmaciones de IA',
+          description: 'Pon tus habilidades a trabajar: revisa afirmaciones y obtén perspectivas contrarias'
+        }
+      },
+      footer: {
+        llmUsage: 'Los LLM se han utilizado de las siguientes maneras:',
+        guidedExploration: 'Exploración Guiada:',
+        guidedExplorationDesc: 'Para crear ejemplos de prompt-salida.',
+        promptPlayground: 'Campo de Práctica de Prompts:',
+        promptPlaygroundDesc: 'Para optimizar prompts, generar salidas e identificar inexactitudes factuales y sesgos.',
+        modelsUsed: 'Modelos utilizados:',
+        models: 'Llama 3.1 8B, Mistral, Claude, ChatGPT',
+        euFunding: "Financiado por el Programa Horizonte Europa de la Unión Europea (Subvención 101135437)"
       }
     },
     modules: {

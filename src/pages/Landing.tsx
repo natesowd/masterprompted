@@ -62,7 +62,7 @@ const Landing = () => {
                     className="bg-white text-black hover:bg-white/90 px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-3 h-20"
                   >
                     <img src="/play_circle.png" alt="Play" className="w-6 h-6" />
-                    Watch Trailer
+                    {t('landing.hero.watchTrailer')}
                   </Button>
                 </div>
               </div>
@@ -82,9 +82,9 @@ const Landing = () => {
                 onClick={handleStartSimulator}
               >
                 <CardContent className="p-8 space-y-6">
-                  <h3 className="text-xl font-semibold text-white">Guided Simulator</h3>
+                  <h3 className="text-xl font-semibold text-white">{t('landing.features.simulator.title')}</h3>
                   <p className="text-white/80 text-sm">
-                    Interactive guide: explore how LLMs work and how to responsibly interact with them
+                    {t('landing.features.simulator.description')}
                   </p>
                   <div className="flex justify-center">
                     <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300">
@@ -99,9 +99,9 @@ const Landing = () => {
                 onClick={handleStartPlayground}
               >
                 <CardContent className="p-8 space-y-6">
-                  <h3 className="text-xl font-semibold text-white">Prompt Playground</h3>
+                  <h3 className="text-xl font-semibold text-white">{t('landing.features.playground.title')}</h3>
                   <p className="text-white/80 text-sm">
-                    Apply your knowledge: experiment with your own prompts
+                    {t('landing.features.playground.description')}
                   </p>
                   <div className="flex justify-center">
                     <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300">
@@ -113,9 +113,9 @@ const Landing = () => {
 
               <Card className="bg-black/90 backdrop-blur-sm border border-white/10 hover:bg-black/80 hover:scale-105 transition-all duration-500 cursor-pointer group">
                 <CardContent className="p-8 space-y-6">
-                  <h3 className="text-xl font-semibold text-white">AI Claim Debunker</h3>
+                  <h3 className="text-xl font-semibold text-white">{t('landing.features.debunker.title')}</h3>
                   <p className="text-white/80 text-sm">
-                    Put your skills to work: review claims and gain counter perspectives
+                    {t('landing.features.debunker.description')}
                   </p>
                   <div className="flex justify-center">
                     <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300">
@@ -135,7 +135,7 @@ const Landing = () => {
                 alt="European Union Flag"
                 className="w-8 h-6"
               />
-              Funded by the European Union's Horizon Europe Programme (Grant 101135437)
+              {t('landing.footer.euFunding')}
             </div>
           </div>
         </section>
@@ -145,17 +145,17 @@ const Landing = () => {
           <div className="max-w-6xl mx-auto px-6 text-center space-y-8">
             <div className="space-y-4">
               <h3 className="text-2xl font-semibold text-gray-900">
-                LLMs have been used in the following ways:
+                {t('landing.footer.llmUsage')}
               </h3>
               <div className="space-y-2 text-gray-700">
-                <p><strong>Guided Exploration:</strong> To create prompt-output examples.</p>
-                <p><strong>Prompt Playground:</strong> To optimize prompts, generate outputs and to identify factual inaccuracies and bias.</p>
+                <p><strong>{t('landing.footer.guidedExploration')}</strong> {t('landing.footer.guidedExplorationDesc')}</p>
+                <p><strong>{t('landing.footer.promptPlayground')}</strong> {t('landing.footer.promptPlaygroundDesc')}</p>
               </div>
             </div>
 
             <div className="pt-8 border-t border-gray-200">
               <p className="text-gray-600">
-                <strong>Models used:</strong> Llama 3.1 8B, Mistral, Claude, ChatGPT
+                <strong>{t('landing.footer.modelsUsed')}</strong> {t('landing.footer.models')}
               </p>
             </div>
           </div>
