@@ -3,9 +3,11 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import LearningProgressBar from "@/components/LearningProgressBar";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function PromptConstructionSpecificityTakeaways() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleContinue = () => {
     navigate("/playground");
@@ -20,8 +22,8 @@ export default function PromptConstructionSpecificityTakeaways() {
         <div className="mb-5"></div>
         
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Takeaways:</h1>
-          <h2 className="text-4xl font-bold text-foreground mb-12">How does my input affect the quality of the LLM's output?</h2>
+          <h1 className="text-4xl font-bold text-foreground mb-2">{t('promptConstructionModule.takeaways.title')}</h1>
+          <h2 className="text-4xl font-bold text-foreground mb-12">{t('promptConstructionModule.takeaways.subtitle')}</h2>
           
           <div className="space-y-8">
             <div className="flex gap-6 items-start">
@@ -29,7 +31,7 @@ export default function PromptConstructionSpecificityTakeaways() {
                 1
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">How you prompt directly impacts LLM output:</span> An LLM will use your word choice and information provided to try and form an appropriate response.
+                <span className="font-bold">{t('promptConstructionModule.takeaways.point1Title')}</span>{t('promptConstructionModule.takeaways.point1')}
               </p>
             </div>
             
@@ -38,7 +40,7 @@ export default function PromptConstructionSpecificityTakeaways() {
                 2
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">You don't need to interact conversationally:</span> Interacting in a human-like manner may only increase the plausibility of the LLM's response and make it harder to evaluate.
+                <span className="font-bold">{t('promptConstructionModule.takeaways.point2Title')}</span>{t('promptConstructionModule.takeaways.point2')}
               </p>
             </div>
             
@@ -47,7 +49,7 @@ export default function PromptConstructionSpecificityTakeaways() {
                 3
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">Look out for key parameters to get better results:</span> Include context, specificity and phrase your prompts in a neutral, technical manner
+                <span className="font-bold">{t('promptConstructionModule.takeaways.point3Title')}</span>{t('promptConstructionModule.takeaways.point3')}
               </p>
             </div>
           </div>
@@ -57,7 +59,7 @@ export default function PromptConstructionSpecificityTakeaways() {
               onClick={() => navigate("/playground")}
               className="bg-green-400 hover:bg-green-500 text-black font-medium px-8 py-3 rounded-full transition-colors inline-flex items-center gap-3"
             >
-              Prompt Playground
+              {t('promptConstructionModule.takeaways.promptPlayground')}
               <svg width="10" height="8" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 5H11M11 5L7 1M11 5L7 9" stroke="#1F1F1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>

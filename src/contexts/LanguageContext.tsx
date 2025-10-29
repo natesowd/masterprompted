@@ -117,6 +117,24 @@ const translations = {
       prompt: {
         input: 'Write a headline for a long form journalistic article about ai ethics agreement reached across the eu',
         popoverSubmit: "Click here to submit your prompt and see the AI's response!"
+      },
+      response: {
+        miniTaskTitle: 'Mini Task: Find the factual inaccuracy',
+        miniTaskDescription: 'Click on the green highlighted words to try out different combinations – each combination will generate a different outcome.',
+        interactiveTitle: 'Interactive Word Selection',
+        interactiveDesc: 'Click on the highlighted words to select a different option. Try and find the word combination that leads to a factual inaccuracy.',
+        probTooltip: 'These are example probabilities that could be assigned to a word that weights words to be selected by the LLM.'
+      },
+      takeaways: {
+        title: 'Takeaways:',
+        subtitle: 'How do LLMs form responses to user prompts?',
+        point1Title: 'LLMs generate text through next-word prediction',
+        point1: '—a probabilistic process that relies on patterns in data rather than logical reasoning.',
+        point2Title: 'Because of this stochastic nature, errors are inevitable:',
+        point2: ' advanced models will produce mistakes, distortions, or unfounded claims.',
+        point3Title: 'As a journalist, your critical expertise is essential:',
+        point3: ' apply your analytical skills to evaluate AI outputs, filter out misinformation, and prevent LLM falsehoods from entering your reporting.',
+        nextTask: 'Next Task →'
       }
     },
     promptConstructionModule: {
@@ -125,6 +143,26 @@ const translations = {
         title: "How does my input affect the quality of the LLM's output?",
         description: "Your prompt directly shapes an LLM's response. Large language models use the wording, specificity, and context in your wording to help decide how to reply, meaning the quality of the output can depend heavily on how you phrase it. Explore how real LLM generated responses change with different prompt constructions",
         continue: 'Continue'
+      },
+      specificity: {
+        input: 'Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems.',
+        popoverSubmit: "Click here to submit your prompt and see the AI's response!"
+      },
+      summarize: {
+        addDocument: 'Add document',
+        documentAttached: 'Document attached',
+        fileName: 'EU_AI_Act.pdf'
+      },
+      takeaways: {
+        title: 'Takeaways:',
+        subtitle: "How does my input affect the quality of the LLM's output?",
+        point1Title: 'How you prompt directly impacts LLM output:',
+        point1: ' An LLM will use your word choice and information provided to try and form an appropriate response.',
+        point2Title: "You don't need to interact conversationally:",
+        point2: " Interacting in a human-like manner may only increase the plausibility of the LLM's response and make it harder to evaluate.",
+        point3Title: 'Look out for key parameters to get better results:',
+        point3: ' Include context, specificity and phrase your prompts in a neutral, technical manner',
+        promptPlayground: 'Prompt Playground'
       }
     },
     about: {
@@ -244,6 +282,24 @@ const translations = {
       prompt: {
         input: "Escribe un titular para un artículo periodístico de formato largo sobre el acuerdo de ética de IA alcanzado en toda la UE",
         popoverSubmit: "Haz clic aquí para enviar tu prompt y ver la respuesta de la IA"
+      },
+      response: {
+        miniTaskTitle: 'Mini Tarea: Encuentra la inexactitud factual',
+        miniTaskDescription: 'Haz clic en las palabras resaltadas en verde para probar diferentes combinaciones; cada combinación generará un resultado diferente.',
+        interactiveTitle: 'Selección Interactiva de Palabras',
+        interactiveDesc: 'Haz clic en las palabras resaltadas para seleccionar una opción diferente. Intenta encontrar la combinación de palabras que conduce a una inexactitud factual.',
+        probTooltip: 'Estas son probabilidades de ejemplo que podrían asignarse a una palabra que pondera las palabras a ser seleccionadas por el LLM.'
+      },
+      takeaways: {
+        title: 'Conclusiones:',
+        subtitle: '¿Cómo forman los LLM respuestas a las indicaciones del usuario?',
+        point1Title: 'Los LLM generan texto mediante predicción de siguiente palabra',
+        point1: '—un proceso probabilístico que se basa en patrones en los datos en lugar de razonamiento lógico.',
+        point2Title: 'Debido a esta naturaleza estocástica, los errores son inevitables:',
+        point2: ' los modelos avanzados producirán errores, distorsiones o afirmaciones infundadas.',
+        point3Title: 'Como periodista, tu experiencia crítica es esencial:',
+        point3: ' aplica tus habilidades analíticas para evaluar las salidas de IA, filtrar la desinformación y evitar que las falsedades de LLM entren en tus reportajes.',
+        nextTask: 'Siguiente Tarea →'
       }
     },
     promptConstructionModule: {
@@ -252,6 +308,26 @@ const translations = {
         title: '¿Cómo afecta mi entrada a la calidad de la salida del LLM?',
         description: 'Tu prompt da forma directamente a la respuesta de un LLM. Los modelos de lenguaje grandes utilizan la redacción, especificidad y contexto en tu redacción para ayudar a decidir cómo responder, lo que significa que la calidad de la salida puede depender en gran medida de cómo lo formules. Explora cómo cambian las respuestas reales generadas por LLM con diferentes construcciones de prompts',
         continue: 'Continuar'
+      },
+      specificity: {
+        input: 'Resume los puntos principales de la Ley de IA de la UE, incluyendo sus categorías de riesgo y reglas para sistemas de IA de alto riesgo.',
+        popoverSubmit: "Haz clic aquí para enviar tu prompt y ver la respuesta de la IA"
+      },
+      summarize: {
+        addDocument: 'Agregar documento',
+        documentAttached: 'Documento adjunto',
+        fileName: 'Ley_IA_UE.pdf'
+      },
+      takeaways: {
+        title: 'Conclusiones:',
+        subtitle: '¿Cómo afecta mi entrada a la calidad de la salida del LLM?',
+        point1Title: 'Cómo haces tu prompt impacta directamente la salida del LLM:',
+        point1: ' Un LLM utilizará tu elección de palabras e información proporcionada para intentar formar una respuesta apropiada.',
+        point2Title: 'No necesitas interactuar conversacionalmente:',
+        point2: ' Interactuar de manera similar a un humano solo puede aumentar la plausibilidad de la respuesta del LLM y hacerla más difícil de evaluar.',
+        point3Title: 'Busca parámetros clave para obtener mejores resultados:',
+        point3: ' Incluye contexto, especificidad y formula tus prompts de manera neutral y técnica',
+        promptPlayground: 'Campo de Práctica de Prompts'
       }
     },
     about: {

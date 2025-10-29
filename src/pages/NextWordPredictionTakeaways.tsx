@@ -3,9 +3,11 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import LearningProgressBar from "@/components/LearningProgressBar";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Takeaways() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleNextTask = () => {
     navigate("/module/prompt-construction");
@@ -20,8 +22,8 @@ export default function Takeaways() {
         <div className="mb-5"></div>
         
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Takeaways:</h1>
-          <h2 className="text-4xl font-bold text-foreground mb-12">How do LLMs form responses to user prompts?</h2>
+          <h1 className="text-4xl font-bold text-foreground mb-2">{t('nextWord.takeaways.title')}</h1>
+          <h2 className="text-4xl font-bold text-foreground mb-12">{t('nextWord.takeaways.subtitle')}</h2>
           
           <div className="space-y-8">
             <div className="flex gap-6 items-start">
@@ -29,7 +31,7 @@ export default function Takeaways() {
                 1
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">LLMs generate text through next-word prediction</span>—a probabilistic process that relies on patterns in data rather than logical reasoning.
+                <span className="font-bold">{t('nextWord.takeaways.point1Title')}</span>{t('nextWord.takeaways.point1')}
               </p>
             </div>
             
@@ -38,7 +40,7 @@ export default function Takeaways() {
                 2
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">Because of this stochastic nature, errors are inevitable:</span> advanced models will produce mistakes, distortions, or unfounded claims.
+                <span className="font-bold">{t('nextWord.takeaways.point2Title')}</span>{t('nextWord.takeaways.point2')}
               </p>
             </div>
             
@@ -47,7 +49,7 @@ export default function Takeaways() {
                 3
               </div>
               <p className="text-lg text-foreground pt-2">
-                <span className="font-bold">As a journalist, your critical expertise is essential:</span> apply your analytical skills to evaluate AI outputs, filter out misinformation, and prevent LLM falsehoods from entering your reporting.
+                <span className="font-bold">{t('nextWord.takeaways.point3Title')}</span>{t('nextWord.takeaways.point3')}
               </p>
             </div>
           </div>
@@ -57,7 +59,7 @@ export default function Takeaways() {
               onClick={handleNextTask}
               className="bg-green-400 hover:bg-green-500 text-black font-medium px-8 py-3 rounded-full transition-colors"
             >
-              Next Task →
+              {t('nextWord.takeaways.nextTask')}
             </button>
           </div>
           

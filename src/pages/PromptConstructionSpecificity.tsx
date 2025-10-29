@@ -11,11 +11,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal } from "lucide-react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import Chatbox from "@/components/ChatBox";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Specificity() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [showTooltip, setShowTooltip] = useState(true);
-  const [promptText, setPromptText] = useState("Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems");
+  const [promptText, setPromptText] = useState(t('promptConstructionModule.specificity.input'));
   const [clickCount, setClickCount] = useState(0);
   const [showPopover, setShowPopover] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
@@ -62,7 +64,7 @@ export default function Specificity() {
         <div className="w-full relative">
           <Chatbox
             canType={false}
-            value={"Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems."}
+            value={t('promptConstructionModule.specificity.input')}
             onChange={() => { }}
             fileName="EU_AI_Act.pdf"
             submitButtonId="chatbox-submit-button" // Pass the ID here
@@ -74,7 +76,7 @@ export default function Specificity() {
                 {
                   id: "submit-hint",
                   trigger: "#chatbox-submit-button",
-                  content: "Click here to submit your prompt and see the AI's response!"
+                  content: t('promptConstructionModule.specificity.popoverSubmit')
                 }
               ]}
               initialStep={0}

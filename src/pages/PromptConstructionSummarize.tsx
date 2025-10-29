@@ -6,9 +6,11 @@ import ModuleNavigation from "@/components/ModuleNavigation";
 import LearningProgressBar from "@/components/LearningProgressBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Paperclip } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function PromptConstructionSummarize() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [isDocumentAttached, setIsDocumentAttached] = useState(false);
 
   const handleAddDocument = () => {
@@ -51,7 +53,7 @@ export default function PromptConstructionSummarize() {
                   <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                     <Plus className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-lg font-medium">Add document</span>
+                  <span className="text-lg font-medium">{t('promptConstructionModule.summarize.addDocument')}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-4 text-primary">
@@ -59,8 +61,8 @@ export default function PromptConstructionSummarize() {
                     <Paperclip className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-lg font-medium text-gray-900">Document attached</span>
-                    <span className="text-sm text-gray-600">EU_AI_Act.pdf</span>
+                    <span className="text-lg font-medium text-gray-900">{t('promptConstructionModule.summarize.documentAttached')}</span>
+                    <span className="text-sm text-gray-600">{t('promptConstructionModule.summarize.fileName')}</span>
                   </div>
                 </div>
               )}
