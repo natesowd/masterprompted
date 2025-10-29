@@ -254,6 +254,42 @@ const translations = {
             description: 'LLMs can plagiarise by directly taking content from training data. While some LLMs are able to attribute pieces of information, all LLMs have the ability to lose connection to data sources, making them vulnerable to reproducing substantial portions of text from data. User should be wary of this, even when the output has sources cited.'
           }
         }
+      },
+      promptControls: {
+        title: 'Prompt Controls',
+        original: 'Original',
+        specificity: {
+          title: 'Specificity',
+          left: 'More General',
+          right: 'More Specific',
+          info: 'Control how detailed your prompt is. General prompts allow more AI interpretation, while specific prompts provide precise instructions.'
+        },
+        conversationStyle: {
+          title: 'Conversation Style',
+          left: 'More Conversational',
+          right: 'More Instructional',
+          info: 'Choose between a conversational tone (informal, friendly) or instructional tone (direct, command-like).'
+        },
+        context: {
+          title: 'Context Provided',
+          left: 'Less Background',
+          right: 'More Background',
+          info: 'Decide whether to provide background information about your role or situation in the prompt.'
+        },
+        bias: {
+          title: 'Confirmation Bias',
+          left: 'Less Bias',
+          right: 'More Bias',
+          info: 'Explore how neutral or leading prompts can effect and bias LLM output'
+        },
+        sendOptimizedPrompt: 'Send Optimized Prompt',
+        sendPrompt: 'Send Prompt',
+        promptSpecificity: 'Prompt Specificity',
+        interactionStyle: 'Interaction Style',
+        promptSpecificityInfo: 'Prompt Specificity is how explicit you are in your prompt for the desired output. The more specific you are, the better the results will be.',
+        interactionStyleInfo: 'Conversation Style is the manner in which you prompt your LLM. You can interact like it is human but this is not necessary.',
+        contextInfo: 'Context is the additional information you give to the LLM to help it answers as well as possible. This may include background to your prompt',
+        biasInfo: 'Confirmation bias is when the way you phrase a prompt affects the perspective the LLM produces'
       }
     }
   },
@@ -467,6 +503,42 @@ const translations = {
             description: 'Los LLM pueden plagiar tomando directamente contenido de los datos de entrenamiento. Si bien algunos LLM pueden atribuir piezas de información, todos los LLM tienen la capacidad de perder la conexión con las fuentes de datos, lo que los hace vulnerables a reproducir porciones sustanciales de texto de los datos. El usuario debe tener cuidado con esto, incluso cuando la salida tiene fuentes citadas.'
           }
         }
+      },
+      promptControls: {
+        title: 'Controles de Prompt',
+        original: 'Original',
+        specificity: {
+          title: 'Especificidad',
+          left: 'Más General',
+          right: 'Más Específico',
+          info: 'Controla qué tan detallado es tu prompt. Los prompts generales permiten más interpretación de la IA, mientras que los prompts específicos proporcionan instrucciones precisas.'
+        },
+        conversationStyle: {
+          title: 'Estilo de Conversación',
+          left: 'Más Conversacional',
+          right: 'Más Instructivo',
+          info: 'Elige entre un tono conversacional (informal, amigable) o un tono instructivo (directo, tipo comando).'
+        },
+        context: {
+          title: 'Contexto Proporcionado',
+          left: 'Menos Antecedentes',
+          right: 'Más Antecedentes',
+          info: 'Decide si proporcionar información de antecedentes sobre tu papel o situación en el prompt.'
+        },
+        bias: {
+          title: 'Sesgo de Confirmación',
+          left: 'Menos Sesgo',
+          right: 'Más Sesgo',
+          info: 'Explora cómo los prompts neutrales o dirigidos pueden afectar y sesgar la salida del LLM'
+        },
+        sendOptimizedPrompt: 'Enviar Prompt Optimizado',
+        sendPrompt: 'Enviar Prompt',
+        promptSpecificity: 'Especificidad del Prompt',
+        interactionStyle: 'Estilo de Interacción',
+        promptSpecificityInfo: 'La especificidad del prompt es qué tan explícito eres en tu prompt para la salida deseada. Cuanto más específico seas, mejores serán los resultados.',
+        interactionStyleInfo: 'El estilo de conversación es la manera en que le das prompts a tu LLM. Puedes interactuar como si fuera humano, pero esto no es necesario.',
+        contextInfo: 'El contexto es la información adicional que le das al LLM para ayudarlo a responder lo mejor posible. Esto puede incluir antecedentes de tu prompt',
+        biasInfo: 'El sesgo de confirmación es cuando la forma en que formulas un prompt afecta la perspectiva que produce el LLM'
       }
     }
   }

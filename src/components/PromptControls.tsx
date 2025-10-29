@@ -8,6 +8,7 @@ import { Info } from "lucide-react";
 import Chatbox from "./ChatBox";
 import { Parameters } from "@/pages/PromptPlayground";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const NO_CHANGE_VALUE = "no-change";
 
@@ -96,7 +97,7 @@ function Parameter({
                 
                 <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
                     <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
-                    <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">Original</Label>
+                    <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">{useLanguage().t('components.promptControls.original')}</Label>
                 </div>
                 
                 <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
@@ -157,6 +158,7 @@ export default function PromptControls({
     chatAnimationKey,
     waitingforOptimization = false
 }: PromptControlsProps) {
+    const { t } = useLanguage();
     const handleResetClick = () => {
         if (onReset) onReset();
     };
@@ -188,52 +190,52 @@ export default function PromptControls({
                 </div>
 
                 <div className="flex flex-col overflow-y-auto">
-                    <h3 className="font-semibold text-card-foreground text-center whitespace-nowrap">Prompt Controls</h3>
+                    <h3 className="font-semibold text-card-foreground text-center whitespace-nowrap">{t('components.promptControls.title')}</h3>
                     <Separator/>
                     <div id='parameters' className="relative">
                         <Parameter 
-                            parameterTitle="Specificity" 
+                            parameterTitle={t('components.promptControls.specificity.title')}
                             parameterKey="specificity" 
-                            leftParameter="More General" 
-                            rightParameter="More Specific" 
+                            leftParameter={t('components.promptControls.specificity.left')}
+                            rightParameter={t('components.promptControls.specificity.right')}
                             showParameter={showSpecificity} 
                             enabled={enableSpecificity} 
                             currentValue={parameters.specificity} 
                             onParameterChange={onParameterChange}
-                            infoText="Control how detailed your prompt is. General prompts allow more AI interpretation, while specific prompts provide precise instructions."
+                            infoText={t('components.promptControls.specificity.info')}
                         />
                         <Parameter 
-                            parameterTitle="Conversation Style" 
+                            parameterTitle={t('components.promptControls.conversationStyle.title')}
                             parameterKey="style" 
-                            leftParameter="More Conversational" 
-                            rightParameter="More Instructional" 
+                            leftParameter={t('components.promptControls.conversationStyle.left')}
+                            rightParameter={t('components.promptControls.conversationStyle.right')}
                             showParameter={showStyle} 
                             enabled={enableStyle} 
                             currentValue={parameters.style} 
                             onParameterChange={onParameterChange}
-                            infoText="Choose between a conversational tone (informal, friendly) or instructional tone (direct, command-like)."
+                            infoText={t('components.promptControls.conversationStyle.info')}
                         />
                         <Parameter 
-                            parameterTitle="Context Provided" 
+                            parameterTitle={t('components.promptControls.context.title')}
                             parameterKey="context" 
-                            leftParameter="Less Background" 
-                            rightParameter="More Background" 
+                            leftParameter={t('components.promptControls.context.left')}
+                            rightParameter={t('components.promptControls.context.right')}
                             showParameter={showContext} 
                             enabled={enableContext} 
                             currentValue={parameters.context} 
                             onParameterChange={onParameterChange}
-                            infoText="Decide whether to provide background information about your role or situation in the prompt."
+                            infoText={t('components.promptControls.context.info')}
                         />
                         <Parameter 
-                            parameterTitle="Confirmation Bias" 
+                            parameterTitle={t('components.promptControls.bias.title')}
                             parameterKey="bias" 
-                            leftParameter="Less Bias" 
-                            rightParameter="More Bias" 
+                            leftParameter={t('components.promptControls.bias.left')}
+                            rightParameter={t('components.promptControls.bias.right')}
                             showParameter={showBias} 
                             enabled={enableBias} 
                             currentValue={parameters.bias} 
                             onParameterChange={onParameterChange}
-                            infoText="Explore how neutral or leading prompts can effect and bias LLM output"
+                            infoText={t('components.promptControls.bias.info')}
                         />
                     </div>
 
@@ -245,7 +247,7 @@ export default function PromptControls({
                             className="flex-1 min-h-[48px] leading-tight rounded-full whitespace-normal text-center"
                             disabled={disableOptimize}
                         > 
-                            Send Optimized Prompt
+                            {t('components.promptControls.sendOptimizedPrompt')}
                         </Button>
                     </div>
                 </div>

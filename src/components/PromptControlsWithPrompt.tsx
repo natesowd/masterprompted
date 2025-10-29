@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 
 interface ParameterProps {
@@ -86,7 +87,7 @@ function Parameter({
 
             <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
                 <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
-                <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">Original</Label>
+                <Label htmlFor={`${parameterTitle}-r2`} className="text-[10px] font-normal whitespace-nowrap px-1">{useLanguage().t('components.promptControls.original')}</Label>
             </div>
 
             <div className="flex flex-1 flex-col items-center gap-1 w-1/4">
@@ -146,6 +147,7 @@ export default function PromptControlsWithPrompt({
     onPromptChange,
     onOutputChange
 }: PromptControlsWithPromptProps) {
+    const { t } = useLanguage();
     const [localSpecificity, setLocalSpecificity] = useState<string>(specificity ?? "");
     const [localStyle, setLocalStyle] = useState<string>(style ?? "");
     const [localContext, setLocalContext] = useState<string>(context ?? "");
@@ -235,7 +237,7 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
     return <Card className="bg-card border border-border rounded-lg shadow-sm max-w-sm">
         <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-lg font-semibold text-card-foreground">Prompt Controls</h3>
+                <h3 className="text-lg font-semibold text-card-foreground">{t('components.promptControls.title')}</h3>
             </div>
 
             {/* Sent Prompt Display */}
@@ -268,13 +270,45 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
 
             <div>
                 <div className="relative">
-                    <Parameter parameterTitle="Prompt Specificity" leftParameter="More General" rightParameter="More Specific" showParameter={showSpecificity} enabled={enableSpecificity} currentValue={specificity ?? localSpecificity} onParameterChange={handleSpecificityChange} infoText="Prompt Specificity is how explicit you are in your prompt for the desired output. The more specific you are, the better the results will be."
+                    <Parameter 
+                        parameterTitle={t('components.promptControls.promptSpecificity')}
+                        leftParameter={t('components.promptControls.specificity.left')}
+                        rightParameter={t('components.promptControls.specificity.right')}
+                        showParameter={showSpecificity} 
+                        enabled={enableSpecificity} 
+                        currentValue={specificity ?? localSpecificity} 
+                        onParameterChange={handleSpecificityChange} 
+                        infoText={t('components.promptControls.promptSpecificityInfo')}
                     />
-                    <Parameter parameterTitle="Interaction Style" leftParameter="More Conversational" rightParameter="More Instructional" showParameter={showStyle} enabled={enableStyle} currentValue={style ?? localStyle} onParameterChange={handleStyleChange} infoText="Conversation Style is the manner in which you prompt your LLM. You can interact like it is human but this is not necessary."
+                    <Parameter 
+                        parameterTitle={t('components.promptControls.interactionStyle')}
+                        leftParameter={t('components.promptControls.conversationStyle.left')}
+                        rightParameter={t('components.promptControls.conversationStyle.right')}
+                        showParameter={showStyle} 
+                        enabled={enableStyle} 
+                        currentValue={style ?? localStyle} 
+                        onParameterChange={handleStyleChange} 
+                        infoText={t('components.promptControls.interactionStyleInfo')}
                     />
-                    <Parameter parameterTitle="Context" leftParameter="Less Background" rightParameter="More Background" showParameter={showContext} enabled={enableContext} currentValue={context ?? localContext} onParameterChange={handleContextChange} infoText="Context is the additional information you give to the LLM to help it answers as well as possible. This may include background to your prompt"
+                    <Parameter 
+                        parameterTitle={t('components.promptControls.context.title')}
+                        leftParameter={t('components.promptControls.context.left')}
+                        rightParameter={t('components.promptControls.context.right')}
+                        showParameter={showContext} 
+                        enabled={enableContext} 
+                        currentValue={context ?? localContext} 
+                        onParameterChange={handleContextChange} 
+                        infoText={t('components.promptControls.contextInfo')}
                     />
-                    <Parameter parameterTitle="Bias" leftParameter="Less Bias" rightParameter="More Bias" showParameter={showBias} enabled={enableBias} currentValue={bias ?? localBias} onParameterChange={handleBiasChange} infoText="Confirmation bias is when the way you phrase a prompt affects the perspective the LLM produces"
+                    <Parameter 
+                        parameterTitle={t('components.promptControls.bias.title')}
+                        leftParameter={t('components.promptControls.bias.left')}
+                        rightParameter={t('components.promptControls.bias.right')}
+                        showParameter={showBias} 
+                        enabled={enableBias} 
+                        currentValue={bias ?? localBias} 
+                        onParameterChange={handleBiasChange} 
+                        infoText={t('components.promptControls.biasInfo')}
                     />
                 </div>
 
@@ -286,7 +320,7 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
                         className="flex-1"
                         disabled={hasUnappliedChanges !== undefined ? !hasUnappliedChanges : !((specificity ?? localSpecificity) || (style ?? localStyle) || (context ?? localContext) || (bias ?? localBias))}
                     >
-                        Send Prompt
+                        {t('components.promptControls.sendPrompt')}
                     </Button>
                 </div>
             </div>
