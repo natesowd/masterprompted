@@ -20,6 +20,11 @@ const Landing = () => {
     navigate("/playground");
   };
 
+  const handleStartDebunker = () => {
+    // Use a full page navigation for an external URL instead of react-router's navigate
+    window.location.assign("https://dh-hetzner.fbk.eu/aicode-v2/");
+  };
+
   const handleWatchTrailer = () => {
     setIsVideoOpen(true);
   };
@@ -111,7 +116,8 @@ const Landing = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-black/90 backdrop-blur-sm border border-white/10 hover:bg-black/80 hover:scale-105 transition-all duration-500 cursor-pointer group">
+              <Card className="bg-black/90 backdrop-blur-sm border border-white/10 hover:bg-black/80 hover:scale-105 transition-all duration-500 cursor-pointer group"
+              onClick={handleStartDebunker}>
                 <CardContent className="p-8 space-y-6">
                   <h3 className="text-xl font-semibold text-white">{t('landing.features.debunker.title')}</h3>
                   <p className="text-white/80 text-sm">
