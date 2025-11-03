@@ -53,11 +53,13 @@ type ChatboxProps = {
   animationKey?: number;
   // When true, the chatbox will expand to fill its parent's height
   fullHeight?: boolean;
+  // When true, the whole chatbox container can be resized by dragging its corner
+  resizeable?: boolean;
   id?: string;
   waitingforOptimization?: boolean;
 };
 
-const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId, id='chatbox', fullHeight = false, disableSend = false, animationKey, waitingforOptimization }: ChatboxProps) => {
+const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId, id='chatbox', fullHeight = false, disableSend = false, animationKey, waitingforOptimization, resizeable = false }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -144,7 +146,14 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
   }, [animationKey]);
 
   return (
-  <div ref={containerRef} id={id} className={`relative bg-card border border-border rounded-2xl shadow-lg min-h-24 ${fullHeight ? 'h-full flex flex-col' : 'max-w-3xl'} ${isBouncing ? 'bounce-once' : ''}`}>
+  <div
+    ref={containerRef}
+    id={id}
+    className={`relative bg-card border border-border rounded-2xl shadow-lg min-h-24 ${fullHeight ? 'h-full flex flex-col' : 'max-w-3xl'} ${isBouncing ? 'bounce-once' : ''}`}
+    // Allow the user to resize the whole chatbox by dragging the corner when enabled
+    style={resizeable ? { resize: 'both', overflow: 'auto', minWidth: 250, maxWidth:350, maxHeight: 385, minHeight: 175} : undefined}
+    aria-roledescription={resizeable ? 'Resizable chatbox' : undefined}
+  >
       {/* Submit button - positioned in top right */}
       <div className="absolute top-4 right-4 z-10">
         <SubmitButton onClick={handleSubmit} id={submitButtonId} disableSend={disableSend} />
@@ -154,7 +163,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
       {!waitingforOptimization && ( 
         <Textarea
         placeholder="Type your message here..."
-        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
+        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] ${resizeable ? 'text-md' : 'text-lg'} ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
         disabled={!canType}
         value={value}
         onChange={handleInputChange}
@@ -171,7 +180,7 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
       {waitingforOptimization && (
         <div 
         className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}>
-        <Skeleton className="mt-2 h-4 w-[200px]" />
+        <Skeleton className="mt-2 h-4 w-[180px]" />
         <Skeleton className="mt-2 h-4 w-[150px]" />
         </div>
       )}

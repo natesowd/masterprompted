@@ -290,6 +290,17 @@ const translations = {
         interactionStyleInfo: 'Conversation Style is the manner in which you prompt your LLM. You can interact like it is human but this is not necessary.',
         contextInfo: 'Context is the additional information you give to the LLM to help it answers as well as possible. This may include background to your prompt',
         biasInfo: 'Confirmation bias is when the way you phrase a prompt affects the perspective the LLM produces'
+      }, 
+      popoverSeries: {
+        previous: 'Previous',
+        next: 'Next',
+        done: 'Done',
+        gotIt: 'Got it!',
+      }, 
+      chatAnswer: {
+        showChanges: 'Show Changes',
+        added: 'Added Text',
+        removed: 'Removed Text',
       }
     }
   },

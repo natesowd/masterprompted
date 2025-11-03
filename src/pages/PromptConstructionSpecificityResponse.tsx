@@ -34,6 +34,8 @@ export default function SpecificityResponse() {
       ? "Summarize whether the EU AI Act stifles AI research."
       : context === "More Background"
         ? "I'm researching recent regulations on artificial intelligence. Please give me a summary of the main points in the AI Act, focusing on its key rules and how it aims to regulate AI systems."
+        : context === "Less Background"
+        ? "Summarize the main points in the AI Act."
         : style === "More Instructional"
           ? "TDLR; EU AI Act"
           : style === "More Conversational"

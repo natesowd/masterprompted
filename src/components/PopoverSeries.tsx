@@ -171,23 +171,23 @@ export function PopoverSeries({ steps, initialStep = 0, onClose }: PopoverSeries
                   disabled={currentStep === 0}
                   variant="secondary"
                 >
-                  {t('popoverSeries.previous')}
+                  {t('components.popoverSeries.previous')}
                 </Button>
                 {currentStep === steps.length - 1 ? (
-                  <Button onClick={close}>{t('popoverSeries.done')}</Button>
+                  <Button onClick={close}>{t('components.popoverSeries.done')}</Button>
                 ) : (
                   <Button
                     onClick={() => goToStep(currentStep + 1)}
                     disabled={currentStep === steps.length - 1}
                   >
-                    {t('popoverSeries.next')}
+                    {t('components.popoverSeries.next')}
                   </Button>
                 )}
               </div>
             </div>
           ) : (
             <div className="flex justify-end">
-              <Button onClick={close}>{t('popoverSeries.gotIt')}</Button>
+              <Button onClick={close}>{t('components.popoverSeries.gotIt')}</Button>
             </div>
           )}
         </PopoverContent>

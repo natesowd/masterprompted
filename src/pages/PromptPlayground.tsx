@@ -434,7 +434,26 @@ const PromptPlayground = () => {
         <div className="flex gap-8 h-[calc(100vh-8rem)]">
           <div className="flex-none h-full">
             <div className="sticky top-4 h-[calc(100vh-8rem)]">
-              <PromptControls {...{ parameters, onParameterChange: handleParameterChange, onReset: handleReset, onOptimize: handleOptimizeSubmit, onUndo: handleUndo, chatValue: editingText, onChatChange: handleInputChange, onChatSubmit: handleChatSubmit, chatSubmitButtonId: "prompt-playground-submit", disableSend, disableOptimize, enableBias, enableSpecificity, enableContext, enableStyle, chatAnimationKey: optimizePulse, waitingforOptimization }} />
+              <PromptControls {...{ 
+                parameters, 
+                onParameterChange: handleParameterChange, 
+                onReset: handleReset, 
+                onOptimize: handleOptimizeSubmit, 
+                onUndo: handleUndo, 
+                chatValue: editingText, 
+                onChatChange: handleInputChange, 
+                onChatSubmit: handleChatSubmit, 
+                chatSubmitButtonId: "prompt-playground-submit", 
+                disableSend, 
+                disableOptimize, 
+                enableBias, 
+                enableSpecificity, 
+                enableContext, 
+                enableStyle, 
+                chatAnimationKey: optimizePulse, 
+                waitingforOptimization,
+                isChatResizeable: true
+              }} />
             </div>
           </div>
           <div className="flex-1 min-w-0 flex flex-col h-[calc(100vh-8rem)] relative">

@@ -132,6 +132,7 @@ interface PromptControlsProps {
     onChatSubmit?: (value: string) => void;
     chatSubmitButtonId?: string;
     chatAnimationKey?: number;
+    isChatResizeable?: boolean;
 }
 
 export default function PromptControls({
@@ -156,7 +157,8 @@ export default function PromptControls({
     disableSend,
     disableOptimize,
     chatAnimationKey,
-    waitingforOptimization = false
+    waitingforOptimization = false,
+    isChatResizeable = false
 }: PromptControlsProps) {
     const { t } = useLanguage();
     const handleResetClick = () => {
@@ -176,23 +178,26 @@ export default function PromptControls({
     return (
         <Card className="bg-card border border-border rounded-lg max-w-sm h-full">
             <CardContent className="p-4 h-full flex flex-col gap-2">
-                <div className="flex-1 min-h-0 z-50">
+                {/* Chatbox: allow it to size naturally when resizeable, otherwise keep full height */}
+                <div className="z-50">
                     <Chatbox
                         value={chatValue}
                         onChange={onChatChange ?? (() => {})}
                         onSubmit={onChatSubmit}
                         submitButtonId={chatSubmitButtonId}
                         disableSend={disableSend}
-                        fullHeight
+                        fullHeight={!isChatResizeable}
                         animationKey={chatAnimationKey}
                         waitingforOptimization={waitingforOptimization}
+                        resizeable={isChatResizeable}
                     />
                 </div>
 
-                <div className="flex flex-col overflow-y-auto">
+                {/* Parameters area: make this the flexible scrollable region so it shrinks/scrolls when the chatbox grows */}
+                <div className="flex-1 flex flex-col min-h-0">
                     <h3 className="font-semibold text-card-foreground text-center whitespace-nowrap">{t('components.promptControls.title')}</h3>
                     <Separator/>
-                    <div id='parameters' className="relative">
+                    <div id='parameters' className="relative overflow-auto">
                         <Parameter 
                             parameterTitle={t('components.promptControls.specificity.title')}
                             parameterKey="specificity" 
