@@ -7,6 +7,7 @@ import ChatPrompt from "@/components/ChatPrompt";
 import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import ChatAnswer from "@/components/ChatAnswer";
 import { PopoverSeries } from "@/components/PopoverSeries";
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from "@/components/ui/skeleton"
 import { CircleQuestionMark, Minus } from "lucide-react";
 import RemovedTextSidebar from "@/components/RemovedTextSidebar";
@@ -129,9 +130,12 @@ const PromptPlayground = () => {
   const LOCALSTORAGE_POPKEY = "promptPlayground.popoverSeen";
   const [showControlPanelPopover, setShowControlPanelPopover] = useState<boolean>(false);
   const [showDiffPopover, setShowDiffPopover] = useState<boolean>(false);
+  const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
 
   const [showDiff, setShowDiff] = useState(false);
+  // Track current page language (forwarded from Header -> LanguageSwitcher)
+  const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
   const [commentPositions, setCommentPositions] = useState<Record<string, number>>({});
   const [inlineCommentIds, setInlineCommentIds] = useState(() => new Set<string>());
 
@@ -323,7 +327,7 @@ const PromptPlayground = () => {
       const response = await fetch("https://llm1.hochschule-stralsund.de:8000/optimize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, language: "en", temperature: 0.7, specificity, communication_mode: style, depth: context, bias, length: "short" }),
+        body: JSON.stringify({ prompt, language: pageLanguage, temperature: 0.7, specificity, communication_mode: style, depth: context, bias, length: "short" }),
       });
       const data = await response.json();
       if (data && typeof data.optimized_prompt === "string") {
@@ -335,7 +339,7 @@ const PromptPlayground = () => {
       }
     } catch (err) { console.error("handlePromptOptimize failed:", err); }
     setWaitingForOptimization(false);
-  }, []);
+  }, [pageLanguage]);
 
   useEffect(() => {
     if (!currentPrompt.trim() && !editingText.trim()) return;
@@ -429,7 +433,7 @@ const PromptPlayground = () => {
 
   return (
     <div className="min-h-screen max-h-screen bg-background">
-      <Header />
+      <Header onLanguageChange={setPageLanguage} />
       <main className="container mx-auto px-6 py-4">
         <div className="flex gap-8 h-[calc(100vh-8rem)]">
           <div className="flex-none h-full">
@@ -474,44 +478,60 @@ const PromptPlayground = () => {
           </div>
         </div>
       </main>
-      {showControlPanelPopover && <PopoverSeries steps={[
-        { id: "submit-hint", trigger: "#chatbox", content: "Click here to submit your prompt and see the AI's response!" },
-        { id: "controls-hint", trigger: "#parameters", content: "You can use the prompt controls to optimize your prompt." }
-      ]} initialStep={0} onClose={() => { try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ } setShowControlPanelPopover(false); }} />}
-      {showDiffPopover && <PopoverSeries steps={[
-        { id: "diff-hint", trigger: "#chat-body", content: 'You can use "Show Changes" to show how the current output version is different from the original ouput.' },
-        {
-          id: "diff-hint",
-          trigger: "#chat-body",
-          content: (
-            <span>
-              <span className="bg-green-200 text-green-900 px-1.5 py-0.5 rounded-md">
-                Green text
-              </span>
-              {' has been added, '}
-              {/* <span className="bg-red-200 text-red-900 line-through px-1.5 py-0.5 rounded-md">
-                red text
-              </span> */}
-              <button
-                className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors"
-                aria-label="Show removed text"
-              >
-                <Minus className="h-3.5 w-3.5" />
-              </button>
-              {' indicates text has been removed, and normal text is shared between versions.'}
-            </span>
-          )
-        },
-        {
-          id: "controls-hint", trigger: "#removed-text-sidebar", side: "left", content:
-            <span>
-              <span className="text-red-900 line-through px-1.5 py-0.5 rounded-md border border-red-200">
-                Removed text
-              </span>
-              {" will appear here. You can insert it back in by clicking on it."}
-            </span>
-        }
-      ]} initialStep={0} onClose={() => setShowDiffPopover(false)} />}
+      {showControlPanelPopover && (
+        <PopoverSeries
+          steps={[
+            { id: "submit-hint", trigger: "#chatbox", content: t('components.popoverSeries.promptPlayground.submitHint') },
+            { id: "controls-hint", trigger: "#parameters", content: t('components.popoverSeries.promptPlayground.controlsHint') }
+          ]}
+          initialStep={0}
+          onClose={() => {
+            try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ }
+            setShowControlPanelPopover(false);
+          }}
+        />
+      )}
+      {showDiffPopover && (
+        <PopoverSeries
+          steps={[
+            { id: "diff-hint", trigger: "#chat-body", content: t('components.popoverSeries.diff.step1') },
+            {
+              id: "diff-hint-2",
+              trigger: "#chat-body",
+              content: (
+                <span>
+                  <span className="bg-green-200 text-green-900 px-1.5 py-0.5 rounded-md">
+                    {t('components.popoverSeries.diff.greenText')}
+                  </span>
+                  {` ${t('components.popoverSeries.diff.addedNote')} `}
+                  <button
+                    className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors"
+                    aria-label={t('components.popoverSeries.diff.showRemovedAria')}
+                  >
+                    <Minus className="h-3.5 w-3.5" />
+                  </button>
+                  {` ${t('components.popoverSeries.diff.removedNote')}`}
+                </span>
+              )
+            },
+            {
+              id: "controls-hint",
+              trigger: "#removed-text-sidebar",
+              side: "left",
+              content: (
+                <span>
+                  <span className="text-red-900 line-through px-1.5 py-0.5 rounded-md border border-red-200">
+                    {t('components.popoverSeries.diff.removedTextLabel')}
+                  </span>
+                  {` ${t('components.popoverSeries.diff.removedTextNote')}`}
+                </span>
+              )
+            }
+          ]}
+          initialStep={0}
+          onClose={() => setShowDiffPopover(false)}
+        />
+      )}
       <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">
         LLMs have been used in the following places:<br />
         The creation of prompt optimizations and generated outputs in the Prompt Playground<br />

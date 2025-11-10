@@ -16,7 +16,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
   
   const evaluationCriteria = [
     {
-      id: "factual-accuracy",
+      id: "factual_accuracy",
       label: t('components.evaluationPanel.criteria.factualAccuracy.label'),
       icon: CheckCircle,
       description: t('components.evaluationPanel.criteria.factualAccuracy.description')

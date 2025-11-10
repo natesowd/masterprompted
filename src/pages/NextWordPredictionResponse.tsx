@@ -387,7 +387,7 @@ export default function HeadlineResponse() {
                               setCharterTooltipShown(true);
                             }
                           }}>
-                            <TextFlag text="Charter" evaluationFactor="factual-accuracy" explanation="The term 'charter' has been used here to describe the EU AI Act. A charter is a different type of document than an act and therefore are not interchangeable terms." />
+                            <TextFlag text="Charter" evaluationFactor='factual_accuracy' explanation={t('components.textFlag.content.factual1')} />
                           </span>
                           ,{index < currentSentence.length - 1 && " "}
                         </span>;
@@ -435,7 +435,7 @@ export default function HeadlineResponse() {
               {/* Takeaways Button */}
               <div className="mt-8">
                 <Button variant="secondary" onClick={() => navigate("/module/next-word-prediction/takeaways")} className="rounded-full px-6 py-3">
-                  Takeaways
+                  {t('components.breadcrumb.takeaways')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>

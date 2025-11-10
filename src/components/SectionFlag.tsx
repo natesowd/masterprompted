@@ -1,40 +1,44 @@
 import { useEffect, ReactNode } from "react";
 import { CheckCircle, Target, Mic, Scale, Copy } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SectionFlagProps {
   children: ReactNode;
-  evaluationFactor: "factual-accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
+  evaluationFactor: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
   explanation: string;
   className?: string;
 }
 
 const iconMap = {
-  "factual-accuracy": CheckCircle,
+  "factual_accuracy": CheckCircle,
   "relevance": Target,
   "voice": Mic,
   "bias": Scale,
   "plagiarism": Copy,
 };
 
-const labelMap = {
-  "factual-accuracy": "Factual Accuracy",
-  "relevance": "Relevance", 
-  "voice": "Voice",
-  "bias": "Bias",
-  "plagiarism": "Plagiarism",
-};
 
 export default function SectionFlag({ children, evaluationFactor, explanation, className = "" }: SectionFlagProps) {
+  const labelMap = {
+    "factual_accuracy": "Factual Accuracy",
+    "relevance": "Relevance",
+    "voice": "Voice",
+    "bias": "Bias",
+    "plagiarism": "Plagiarism",
+  };
+  
   const Icon = iconMap[evaluationFactor];
   const label = labelMap[evaluationFactor];
+  const { t } = useLanguage();
+
 
   // Highlight the corresponding evaluation criterion when component is mounted
   useEffect(() => {
     const criterionElement = document.querySelector(`[data-criterion-id="${evaluationFactor}"]`);
     if (criterionElement) {
-      const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') || 
-                            criterionElement.querySelector('.flex.items-center.justify-between');
+      const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') ||
+        criterionElement.querySelector('.flex.items-center.justify-between');
       if (triggerElement) {
         triggerElement.classList.add('ring-2', 'ring-red-500', 'bg-red-50');
         triggerElement.classList.remove('bg-gray-50', 'hover:bg-gray-100');
@@ -44,8 +48,8 @@ export default function SectionFlag({ children, evaluationFactor, explanation, c
     // Cleanup: remove highlighting when component unmounts
     return () => {
       if (criterionElement) {
-        const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') || 
-                              criterionElement.querySelector('.flex.items-center.justify-between');
+        const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') ||
+          criterionElement.querySelector('.flex.items-center.justify-between');
         if (triggerElement) {
           triggerElement.classList.remove('ring-2', 'ring-red-500', 'bg-red-50');
           triggerElement.classList.add('bg-gray-50', 'hover:bg-gray-100');
@@ -64,14 +68,14 @@ export default function SectionFlag({ children, evaluationFactor, explanation, c
           {children}
         </div>
       </HoverCardTrigger>
-      <HoverCardContent 
+      <HoverCardContent
         className="w-80 bg-white border border-red-200 shadow-lg rounded-lg p-4"
         sideOffset={5}
       >
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Icon className="h-4 w-4 text-red-500" />
-            <h4 className="font-semibold text-red-700 text-sm">{label}</h4>
+            <h4 className="font-semibold text-red-700 text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
           </div>
           <p className="text-sm text-gray-700 leading-relaxed">
             {explanation}

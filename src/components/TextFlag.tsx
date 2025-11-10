@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { CheckCircle, Target, Mic, Scale, Copy } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useLanguage } from "@/contexts/LanguageContext";
+
 
 interface TextFlagProps {
   text: string;
-  evaluationFactor: "factual-accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
+  evaluationFactor: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
   explanation: React.ReactNode;
   
   className?: string;
@@ -12,7 +14,7 @@ interface TextFlagProps {
 }
 
 const iconMap = {
-  "factual-accuracy": CheckCircle,
+  "factual_accuracy": CheckCircle,
   "relevance": Target,
   "voice": Mic,
   "bias": Scale,
@@ -20,7 +22,7 @@ const iconMap = {
 };
 
 const labelMap = {
-  "factual-accuracy": "Factual Accuracy",
+  "factual_accuracy": "Factual Accuracy",
   "relevance": "Relevance", 
   "voice": "Voice",
   "bias": "Bias",
@@ -31,6 +33,8 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
   const Icon = iconMap[evaluationFactor];
   const label = labelMap[evaluationFactor];
   const [hoverCardOpen, setHoverCardOpen] = useState(false);
+  const { t } = useLanguage();
+  
 
   // Highlight the corresponding evaluation criterion when component is mounted
   useEffect(() => {
@@ -96,7 +100,7 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Icon className="h-4 w-4 text-destructive" />
-            <h4 className="font-semibold text-destructive text-sm">{label}</h4>
+            <h4 className="font-semibold text-destructive text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
           </div>
           <p className="text-sm text-foreground font-normal leading-relaxed">
             {explanation}

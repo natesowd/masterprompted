@@ -129,7 +129,7 @@ const ChatAnswer = ({
               <CircleQuestionMark className="-ml-1 h-4 w-4 text-muted-foreground"  />
             </button>
           </div>
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-3 text-xs px-2 ">
             <div className="flex items-center gap-1">
               <span className="bg-green-200 text-green-800 px-1 rounded">{t('components.chatAnswer.added')}</span>
             </div>

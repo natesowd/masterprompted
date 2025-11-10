@@ -10,7 +10,14 @@ import {
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const Header = ({ transparent = false }: { transparent?: boolean }) => {
+type Language = 'en' | 'es';
+
+interface HeaderProps {
+  transparent?: boolean;
+  onLanguageChange?: (lang: Language) => void;
+}
+
+const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
@@ -184,7 +191,7 @@ const Header = ({ transparent = false }: { transparent?: boolean }) => {
 
         {/* Language Switcher and Right side logo */}
         <div className={`flex items-center gap-4 ${transparent ? 'text-white' : 'text-foreground'}`}>
-          <LanguageSwitcher />
+          <LanguageSwitcher onLanguageChange={onLanguageChange} />
           {transparent ? (
             <svg width="101" height="25" viewBox="0 0 101 25" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-auto">
               <path d="M13.085 24.5H9.24219L8.75879 22.0098H4.3252L3.8418 24.5H0L4.65137 0.552734H8.43262L13.085 24.5ZM19.3184 24.4473H15.1299V0.5H19.3184V24.4473ZM44.6602 4.73828C40.5179 4.73847 37.1201 8.17688 37.1201 12.4736C37.1202 16.7703 40.5179 20.2088 44.6602 20.209V24.4473C38.1633 24.4471 32.9317 19.0693 32.9316 12.4736C32.9317 5.87795 38.1633 0.500193 44.6602 0.5V4.73828ZM58.5879 0.5C65.1232 0.5 70.4209 5.86092 70.4209 12.4736C70.4208 19.0863 65.1232 24.4473 58.5879 24.4473C52.0528 24.4471 46.755 19.0862 46.7549 12.4736C46.7549 5.86104 52.0527 0.500195 58.5879 0.5ZM75.0293 0.5C81.4677 0.500178 86.9668 5.81896 86.9668 12.4736C86.9667 19.1282 81.4676 24.4471 75.0293 24.4473H72.9346V0.5H75.0293ZM101 4.73828C97.4736 4.73841 94.5294 7.06923 93.5762 10.248H101V14.4863H93.5166C94.4001 17.7732 97.3955 20.2089 101 20.209V24.4473C94.4185 24.4471 89.0616 19.1108 89.0615 12.4736C89.0615 5.83637 94.4185 0.500159 101 0.5V4.73828ZM58.5879 4.73828C54.3662 4.73848 50.9434 8.20185 50.9434 12.4736C50.9435 16.7454 54.3662 20.2088 58.5879 20.209C62.8098 20.209 66.2323 16.7455 66.2324 12.4736C66.2324 8.20173 62.8098 4.73828 58.5879 4.73828ZM77.123 19.9121C80.3449 18.9838 82.7782 15.9828 82.7783 12.4736C82.7783 8.96441 80.345 5.96254 77.123 5.03418V19.9121ZM5.06641 18.1953H8.01758L6.54199 10.6006L5.06641 18.1953ZM58.5879 9.40039C60.2651 9.40039 61.625 10.7766 61.625 12.4736C61.6249 14.1706 60.265 15.5459 58.5879 15.5459C56.9109 15.5457 55.5509 14.1705 55.5508 12.4736C55.5508 10.7767 56.9109 9.40059 58.5879 9.40039ZM29.8945 14.2744H22.6689V10.46H29.8945V14.2744Z" fill="white"/>

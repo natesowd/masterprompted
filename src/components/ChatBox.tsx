@@ -27,7 +27,7 @@ function UploadFile({ onClick, fileName }: { onClick?: () => void; fileName?: st
   return (
     <div className="flex items-center gap-2">
       {/* **temporarily disabled** */}
-      <Button variant="ghost" size="icon" className="rounded-full h-6 w-6" onClick={onClick} disabled={true}> 
+      <Button variant="ghost" size="icon" className="rounded-full h-6 w-6" onClick={onClick} disabled={true}>
         <Paperclip className="h-4 w-4 text-muted-foreground" />
       </Button>
       {fileName && (
@@ -59,10 +59,48 @@ type ChatboxProps = {
   waitingforOptimization?: boolean;
 };
 
-const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId, id='chatbox', fullHeight = false, disableSend = false, animationKey, waitingforOptimization, resizeable = false }: ChatboxProps) => {
+const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName, submitButtonId, id = 'chatbox', fullHeight = false, disableSend = false, animationKey, waitingforOptimization, resizeable = false }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [stretchVertical, setStretchVertical] = useState(false);
+  // Detect if parent container is taller than this component so we can stretch vertically
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const parent = el.parentElement;
+    if (!parent) return;
+
+    const check = () => {
+      try {
+        const parentRect = parent.getBoundingClientRect();
+        const selfRect = el.getBoundingClientRect();
+        // If parent is noticeably taller than the chatbox, enable stretch
+        setStretchVertical(parentRect.height > selfRect.height + 2);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    // Initial check
+    check();
+
+    // Observe parent size changes
+    let ro: ResizeObserver | null = null;
+    try {
+      ro = new ResizeObserver(check);
+      ro.observe(parent);
+    } catch (e) {
+      // If ResizeObserver not available, fallback to window resize
+      window.addEventListener('resize', check);
+    }
+
+    return () => {
+      if (ro) ro.disconnect();
+      else window.removeEventListener('resize', check);
+    };
+  }, [containerRef, resizeable]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
@@ -70,7 +108,6 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
 
   // Local state to trigger a one-shot bounce animation when an external "animationKey" changes
   const [isBouncing, setIsBouncing] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleSubmit = (e?: React.MouseEvent) => {
     e?.preventDefault();
@@ -146,42 +183,45 @@ const Chatbox = ({ canType = true, value, onChange, onSubmit, onUpload, fileName
   }, [animationKey]);
 
   return (
-  <div
-    ref={containerRef}
-    id={id}
-    className={`relative bg-card border border-border rounded-2xl shadow-lg min-h-24 ${fullHeight ? 'h-full flex flex-col' : 'max-w-3xl'} ${isBouncing ? 'bounce-once' : ''}`}
-    // Allow the user to resize the whole chatbox by dragging the corner when enabled
-    style={resizeable ? { resize: 'both', overflow: 'auto', minWidth: 250, maxWidth:350, maxHeight: 385, minHeight: 175} : undefined}
-    aria-roledescription={resizeable ? 'Resizable chatbox' : undefined}
-  >
+    <div
+      ref={containerRef}
+      id={id}
+      className={`relative bg-card border border-border rounded-2xl shadow-lg min-h-24 ${(fullHeight || stretchVertical || resizeable) ? 'h-full flex flex-col' : 'max-w-3xl'} ${isBouncing ? 'bounce-once' : ''}`}
+      // Allow the user to resize the whole chatbox by dragging the corner when enabled
+      style={resizeable ? { resize: 'both', overflow: 'auto', minWidth: 250, maxWidth: 350, maxHeight: 385, minHeight: 175 } : undefined}
+      aria-roledescription={resizeable ? 'Resizable chatbox' : undefined}
+    >
       {/* Submit button - positioned in top right */}
       <div className="absolute top-4 right-4 z-10">
         <SubmitButton onClick={handleSubmit} id={submitButtonId} disableSend={disableSend} />
       </div>
 
       {/* Text area - takes up most of the space */}
-      {!waitingforOptimization && ( 
+      {!waitingforOptimization && (
         <Textarea
-        placeholder="Type your message here..."
-        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] ${resizeable ? 'text-md' : 'text-lg'} ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
-        disabled={!canType}
-        value={value}
-        onChange={handleInputChange}
-        ref={textareaRef}
-        onKeyDown={e => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            if (!e.shiftKey && !disableSend)
-            handleSubmit();
-          }
-        }}
-      />
+          placeholder="Type your message here..."
+          className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 mb-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] ${resizeable ? 'text-md' : 'text-lg'} ${(fullHeight || stretchVertical || resizeable) ? 'flex-1 h-full min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}
+          disabled={!canType}
+          value={value}
+          onChange={handleInputChange}
+          ref={textareaRef}
+          onKeyDown={e => {
+            if (e.key === "Enter") {
+              if (!e.shiftKey) {
+                e.preventDefault();
+                if (!disableSend) {
+                  handleSubmit();
+                }
+              }
+            }
+          }}
+        />
       )}
       {waitingforOptimization && (
-        <div 
-        className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] ${fullHeight ? 'flex-1 min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}>
-        <Skeleton className="mt-2 h-4 w-[180px]" />
-        <Skeleton className="mt-2 h-4 w-[150px]" />
+        <div
+          className={`border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] ${(fullHeight || stretchVertical || resizeable) ? 'flex-1 h-full min-h-0 resize-none overflow-y-auto' : 'min-h-[100px] resize-none'}`}>
+          <Skeleton className="mt-2 h-4 w-[180px]" />
+          <Skeleton className="mt-2 h-4 w-[150px]" />
         </div>
       )}
     </div>

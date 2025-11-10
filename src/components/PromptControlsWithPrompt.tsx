@@ -57,8 +57,8 @@ function Parameter({
                 <TooltipProvider>
                     <Tooltip delayDuration={300}>
                         <TooltipTrigger asChild>
-                            <Info 
-                                className="w-3 h-3 cursor-pointer" 
+                            <Info
+                                className="w-3 h-3 cursor-pointer"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                 }}
@@ -206,31 +206,6 @@ export default function PromptControlsWithPrompt({
         }
     };
     const handleSubmitClick = () => {
-        // Update output based on current context value
-        const currentContext = context ?? localContext;
-        if (currentContext === "No Background" && onOutputChange) {
-            onOutputChange(`The AI Act is the EU's regulation for artificial intelligence, adopted in 2024. Here are the main points:
-Risk-based approach: AI systems are categorized by risk level:
-
-Unacceptable risk systems are banned (e.g., government social scoring, manipulative AI)
-High-risk systems face strict requirements (e.g., AI in employment, law enforcement, credit scoring, critical infrastructure)
-Limited risk systems need transparency (e.g., chatbots must disclose they're AI)
-Minimal risk systems have few requirements
-
-Requirements for high-risk AI:
-
-Risk management throughout the system's lifecycle
-High-quality training data to minimize bias
-Technical documentation and record-keeping
-Transparency about capabilities and limitations
-Human oversight mechanisms
-Robustness, accuracy, and cybersecurity
-Conformity assessments before deployment
-
-Scope: Applies to AI providers and deployers in the EU market, regardless of location.
-Goals: Protect fundamental rights and safety while promoting innovation and creating harmonized rules across EU member states.`);
-        }
-
         if (onSubmit) onSubmit();
     };
 
@@ -270,44 +245,44 @@ Goals: Protect fundamental rights and safety while promoting innovation and crea
 
             <div>
                 <div className="relative">
-                    <Parameter 
+                    <Parameter
                         parameterTitle={t('components.promptControls.promptSpecificity')}
                         leftParameter={t('components.promptControls.specificity.left')}
                         rightParameter={t('components.promptControls.specificity.right')}
-                        showParameter={showSpecificity} 
-                        enabled={enableSpecificity} 
-                        currentValue={specificity ?? localSpecificity} 
-                        onParameterChange={handleSpecificityChange} 
+                        showParameter={showSpecificity}
+                        enabled={enableSpecificity}
+                        currentValue={specificity ?? localSpecificity}
+                        onParameterChange={handleSpecificityChange}
                         infoText={t('components.promptControls.promptSpecificityInfo')}
                     />
-                    <Parameter 
+                    <Parameter
                         parameterTitle={t('components.promptControls.interactionStyle')}
                         leftParameter={t('components.promptControls.conversationStyle.left')}
                         rightParameter={t('components.promptControls.conversationStyle.right')}
-                        showParameter={showStyle} 
-                        enabled={enableStyle} 
-                        currentValue={style ?? localStyle} 
-                        onParameterChange={handleStyleChange} 
+                        showParameter={showStyle}
+                        enabled={enableStyle}
+                        currentValue={style ?? localStyle}
+                        onParameterChange={handleStyleChange}
                         infoText={t('components.promptControls.interactionStyleInfo')}
                     />
-                    <Parameter 
+                    <Parameter
                         parameterTitle={t('components.promptControls.context.title')}
                         leftParameter={t('components.promptControls.context.left')}
                         rightParameter={t('components.promptControls.context.right')}
-                        showParameter={showContext} 
-                        enabled={enableContext} 
-                        currentValue={context ?? localContext} 
-                        onParameterChange={handleContextChange} 
+                        showParameter={showContext}
+                        enabled={enableContext}
+                        currentValue={context ?? localContext}
+                        onParameterChange={handleContextChange}
                         infoText={t('components.promptControls.contextInfo')}
                     />
-                    <Parameter 
+                    <Parameter
                         parameterTitle={t('components.promptControls.bias.title')}
                         leftParameter={t('components.promptControls.bias.left')}
                         rightParameter={t('components.promptControls.bias.right')}
-                        showParameter={showBias} 
-                        enabled={enableBias} 
-                        currentValue={bias ?? localBias} 
-                        onParameterChange={handleBiasChange} 
+                        showParameter={showBias}
+                        enabled={enableBias}
+                        currentValue={bias ?? localBias}
+                        onParameterChange={handleBiasChange}
                         infoText={t('components.promptControls.biasInfo')}
                     />
                 </div>

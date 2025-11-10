@@ -21,7 +21,7 @@ const ChatPrompt = ({ text, fileName, parameters, versionIndex = 0, versionCount
 
   return (
     <div
-      className="mb-6 max-w-fit ml-auto bg-secondary relative"
+      className="mb-6 mx-2 max-w-fit ml-auto bg-secondary relative"
       style={{
         borderRadius: '20px',
         padding: '20px 24px',

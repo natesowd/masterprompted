@@ -375,7 +375,7 @@ const ComponentLibrary = () => {
                 <CardContent>
                   <TextFlag
                     text="This text has been flagged"
-                    evaluationFactor="factual-accuracy"
+                    evaluationFactor="factual_accuracy"
                     explanation="This is an example explanation of why this text was flagged"
                   />
                 </CardContent>
