@@ -10,7 +10,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info, InfoIcon, CheckCircle } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -313,7 +313,7 @@ export default function HeadlineResponse() {
                                  {options.map(option => <DropdownMenuItem key={option.word} onClick={() => handleWordSelection(option.word, index)} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center gap-2">
                                       <span className="inline-flex items-center gap-2">
                                         {option.word}
-                                        {option.word === "Unites" && <CheckCircle className="h-3 w-3 text-red-600" />}
+                                        {option.word === "Unites"}
                                       </span>
                                       <span className="flex items-center gap-1 text-xs text-gray-500">
                                         {option.probability}
