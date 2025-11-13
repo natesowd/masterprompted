@@ -423,7 +423,7 @@ const PromptPlayground = () => {
     const isEmpty = !input.trim();
     setDisableSend(isEmpty);
     setDisableOptimize(true);
-    setEnableSpecificity(!isEmpty); setEnableBias(!isEmpty); setEnableContext(!isEmpty); setEnableStyle(!isEmpty);
+    setEnableSpecificity(false); setEnableBias(false); setEnableContext(false); setEnableStyle(false);
   };
 
   useEffect(() => { if (chatEndRef.current) chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight; }, [threads.length]);
@@ -473,7 +473,7 @@ const PromptPlayground = () => {
               <button className="p-2 rounded-full hover:bg-muted/50" onClick={() => setShowControlPanelPopover(true)}>
                 <CircleQuestionMark className="h-6 w-6 text-muted-foreground" />
               </button>
-              <EvaluationPanel initialIsOpen={!showDiff} canClose={true} />
+              <EvaluationPanel initialIsOpen={false} canClose={true} />
             </div>
           </div>
         </div>
