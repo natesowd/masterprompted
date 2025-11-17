@@ -1,23 +1,23 @@
 TODO:
 - align theming with greater AI-Code design philosophy
 - look into scraping data from google sheets
-- NWP: add info to minitask
-- PROMPT PLAYGROUND:
-  - close journalistic eval by default
-  - remove optimize-before-send
-  - add upload
-    - implement upload_rag endpoint
-    - implement answer_rag endpoint
-  - BACKEND:
-    - change optimize to use system prompt
-    - make answer_rag use HF external inference
-    - refactor langchain pipeline, maybe 
-    - user needs to be able to upload any PDFs, regardless of metadata
-  - DIFF: 
-    - add shove button to insert/remove all sidebar text at once
-    - some way to show the user which prompts are being compared in diff
-    - allow user to choose which prompt/outputs they are comparing
-    - richtext beyond newline doesn't work with diff because it's too hard to create a custom less-stringent diff using jsdiff. probably need to switch diff tools?
-      - do that and then add richtext support during diff
-      - still some minor newline gore issues, need to remove trailing/leading newlines from the span
-    - itemize down to one-diff-per-thread
+- add info to parameters
+- minor: add bounce to only manual revert neutral parameters, make sure to exclude send prompt.
+- some way to pull old prompts back into chatbox easily (click on chatprompt component?)
+- edit button for chats
+- need to make prompt optimization more reliable, probably add a system prompt or something.
+- add a legend to the diff component (added/removed text)
+
+- DIFF: 
+  - implement connectorlines.tsx?
+  - add code block formatting to richtext
+  - richtext beyond newline doesn't work with diff because it's too hard to create a custom less-stringent diff using jsdiff. probably need to switch diff tools?
+    - do that and then add richtext support during diff
+    - still some minor newline gore issues, need to remove trailing/leading newlines from the span
+- DONE: 
+  - spotlight: disable clicks on dimmed-out screen
+  - remove scrolling where possible
+  - change bias parameter name to confirmation bias?
+  -  change the tooltip component so they overlay over everything not just local components
+  - progress bar?
+  -  make clickable (next word prediction probabilities info, prompt control panel parameters info, journalistic eval highlights)
