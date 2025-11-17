@@ -10,7 +10,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info, InfoIcon } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -246,6 +246,19 @@ export default function HeadlineResponse() {
   return <div className="min-h-screen bg-background">
     {showMiniTask && <MiniTask title={t('nextWord.response.miniTaskTitle')} description={t('nextWord.response.miniTaskDescription')} onStartTask={() => setShowMiniTask(false)} />}
     <Header />
+    
+    {/* Question mark button to reopen MiniTask */}
+    <div className="fixed top-20 right-6 z-30">
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => setShowMiniTask(true)}
+        className="rounded-full bg-background shadow-md hover:shadow-lg transition-shadow"
+        aria-label="Show task hint"
+      >
+        <HelpCircle className="h-5 w-5" />
+      </Button>
+    </div>
 
     {/* MiniTask - render at top for immediate visibility */}
 
