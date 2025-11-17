@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle, Target, Mic, Scale, Copy } from "lucide-react";
+import { ListChecks, Target, Mic, Scale, Copy } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -14,7 +14,7 @@ interface TextFlagProps {
 }
 
 const iconMap = {
-  "factual_accuracy": CheckCircle,
+  "factual_accuracy": ListChecks,
   "relevance": Target,
   "voice": Mic,
   "bias": Scale,
