@@ -8,7 +8,7 @@ import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import ChatAnswer from "@/components/ChatAnswer";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 import { CircleQuestionMark, Minus } from "lucide-react";
 import RemovedTextSidebar from "@/components/RemovedTextSidebar";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
@@ -23,6 +23,11 @@ export type Parameters = {
 type ThreadVersion = { prompt: string; answer?: string; parameters?: Parameters };
 type Thread = { versions: ThreadVersion[]; currentIndex: number };
 type RemovedComment = { id: string; value: string };
+
+type AttachedFile = {
+  name: string;
+  // id?: string; // reserved for future backend IDs
+};
 
 // Memoizing ChatBody to prevent unnecessary re-renders
 const ChatBody = memo(function ChatBody({
@@ -115,6 +120,13 @@ const PromptPlayground = () => {
 
   const [threads, setThreads] = useState<Thread[]>([]);
   const [parameters, setParameters] = useState<Parameters>({ specificity: "", style: "", context: "", bias: "" });
+  const [sessionId] = useState<string>(() => {
+    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+      return crypto.randomUUID();
+    }
+    return Math.random().toString(36).slice(2);
+  });
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [disableSend, setDisableSend] = useState(true);
   const [disableOptimize, setDisableOptimize] = useState(true);
   const [optimizePulse, setOptimizePulse] = useState(0);
@@ -303,20 +315,77 @@ const PromptPlayground = () => {
     setParameters({ specificity: "", style: "", context:   "", bias: "" });
   };
 
-  const submitAnswerForThreadVersion = useCallback(async (threadIndex: number, versionIndex: number, promptText: string) => {
-    const response = await fetch("https://llm1.hochschule-stralsund.de:8000/answer", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: promptText, temperature: 0.7, fileIds: [] }),
-    });
-    const data: { answer: string } = await response.json();
-    setThreads(prev => {
-      const copy = [...prev];
-      if (!copy[threadIndex]?.versions[versionIndex]) return prev;
-      copy[threadIndex].versions[versionIndex].answer = data.answer;
-      return copy;
-    });
-  }, []);
+  const uploadRagFiles = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (!fileArray.length) return;
+
+    const formData = new FormData();
+    for (const file of fileArray) {
+      formData.append("files", file);
+    }
+    formData.append("session_id", sessionId);
+
+    try {
+      const response = await fetch("https://llm1.hochschule-stralsund.de:8000/upload_rag/", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`upload_rag failed: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log("upload_rag response:", data);
+
+      setAttachedFiles(prev => [
+        ...prev,
+        ...fileArray.map(file => ({ name: file.name }))
+      ]);
+    } catch (error) {
+      console.error("uploadRagFiles error:", error);
+    }
+  };
+
+  const handleUploadFiles = async (files: FileList | File[]) => {
+    await uploadRagFiles(files);
+  };
+
+  const submitAnswerForThreadVersion = useCallback(
+    async (threadIndex: number, versionIndex: number, promptText: string) => {
+      const hasRagFiles = attachedFiles.length > 0;
+
+      const url = hasRagFiles
+        ? "https://llm1.hochschule-stralsund.de:8000/answer_rag"
+        : "https://llm1.hochschule-stralsund.de:8000/answer";
+
+      const body = hasRagFiles
+        ? { prompt: promptText, temperature: 0.7, session_id: sessionId }
+        : { prompt: promptText, temperature: 0.7, fileIds: [] };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`answer request failed: ${response.status} - ${errorText}`);
+      }
+
+      const data: { answer: string } = await response.json();
+
+      setThreads(prev => {
+        const copy = [...prev];
+        if (!copy[threadIndex]?.versions[versionIndex]) return prev;
+        copy[threadIndex].versions[versionIndex].answer = data.answer;
+        return copy;
+      });
+    },
+    [attachedFiles.length, sessionId]
+  );
 
   const handlePromptOptimize = useCallback(async (prompt: string, ...args: string[]) => {
     if (!prompt.trim()) return;
@@ -455,7 +524,9 @@ const PromptPlayground = () => {
                 enableContext, 
                 enableStyle, 
                 chatAnimationKey: optimizePulse, 
-                waitingforOptimization
+                waitingforOptimization,
+                files: attachedFiles,
+                onUploadFiles: handleUploadFiles
               }} />
             </div>
           </div>

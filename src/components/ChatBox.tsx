@@ -33,15 +33,29 @@ type ChatboxProps = {
   animationKey?: number;
   id?: string;
   waitingforOptimization?: boolean;
-  onUpload?: () => void;
-  fileName?: string;
+  onUploadFiles?: (files: FileList | File[]) => void;
+  files?: { name: string }[];
+  onRemoveFile?: (index: number) => void;
 };
 
-const Chatbox = ({ value, onChange, onSubmit, submitButtonId, id = 'chatbox', disableSend = false, animationKey, waitingforOptimization, onUpload, fileName }: ChatboxProps) => {
+const Chatbox = ({
+  value,
+  onChange,
+  onSubmit,
+  submitButtonId,
+  id = 'chatbox',
+  disableSend = false,
+  animationKey,
+  waitingforOptimization,
+  onUploadFiles,
+  files = [],
+  onRemoveFile,
+}: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
@@ -123,16 +137,47 @@ const Chatbox = ({ value, onChange, onSubmit, submitButtonId, id = 'chatbox', di
     };
   }, [animationKey]);
 
-  const UploadFile = ({ onClick, fileName }: { onClick?: () => void; fileName?: string }) => (
-    <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" className="rounded-full h-8 w-8" onClick={onClick} disabled={!onClick}>
+  const UploadFile = () => (
+    <div className="flex items-center gap-2 w-full">
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={e => {
+          if (e.target.files && onUploadFiles) {
+            onUploadFiles(e.target.files);
+          }
+          e.target.value = "";
+        }}
+      />
+      <Button
+        variant="ghost"
+        size="icon"
+        className="rounded-full h-4 w-4 flex-shrink-0"
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+      >
         <Paperclip className="h-4 w-4 text-muted-foreground" />
       </Button>
-      {fileName && (
-        <span className="text-sm text-muted-foreground overflow-hidden text-ellipsis max-w-[150px]">
-          {fileName}
-        </span>
-      )}
+      <div className="flex-1 flex flex-wrap items-center gap-1 max-w-[250px] max-h-[1.75rem] overflow-y-auto">
+        {files.map((file, index) => (
+          <div
+            key={`${file.name}-${index}`}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-xs text-muted-foreground max-w-[100%] overflow-hidden"
+          >
+            <span className="truncate">{file.name}</span>
+            <button
+              type="button"
+              className="ml-0.5 text-[10px] leading-none text-muted-foreground/80 hover:text-foreground"
+              // Boilerplate for future remove endpoint; currently no-op
+              // onClick={() => onRemoveFile?.(index)}
+            >
+              x
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 
@@ -142,7 +187,14 @@ const Chatbox = ({ value, onChange, onSubmit, submitButtonId, id = 'chatbox', di
       id={id}
       className={`relative bg-card border border-border rounded-2xl shadow-sm w-full h-full min-w-[250px] min-h-[220px] flex flex-col ${isBouncing ? 'bounce-once' : ''}`}
       // Allow the user to resize while still honoring parent-provided dimensions.
-      style={{ resize: 'both', overflow: 'auto' }}
+      style={{
+        resize: 'both',
+        overflow: 'auto',
+        minWidth: '280px',
+        minHeight: '190px',
+        maxWidth: '100%',
+        maxHeight: '400px',
+      }}
       aria-roledescription="Resizable chatbox"
     >
       {/* Submit button - positioned in top right */}
@@ -153,7 +205,7 @@ const Chatbox = ({ value, onChange, onSubmit, submitButtonId, id = 'chatbox', di
       {!waitingforOptimization && (
         <Textarea
           placeholder="Type your message here..."
-          className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-2 mt-2 mb-6 pr-12 leading-relaxed text-card-foreground font-['Manrope'] text-md flex-1 h-full min-h-[140px] resize-none overflow-y-auto"
+          className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-2 mt-2 mb-2 pr-12 leading-relaxed text-card-foreground font-['Manrope'] text-md flex-1 h-full min-h-[140px] resize-none overflow-y-auto"
           value={value}
           onChange={handleInputChange}
           ref={textareaRef}
@@ -176,8 +228,8 @@ const Chatbox = ({ value, onChange, onSubmit, submitButtonId, id = 'chatbox', di
           <Skeleton className="mt-2 h-4 w-[150px]" />
         </div>
       )}
-      <div className="absolute bottom-1 left-1 flex items-center gap-2">
-        <UploadFile onClick={onUpload} fileName={fileName} />
+      <div className="px-2 pb-2">
+        <UploadFile />
       </div>
     </div>
   );

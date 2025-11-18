@@ -130,8 +130,12 @@ interface PromptControlsProps {
     chatValue?: string;
     onChatChange?: (value: string) => void;
     onChatSubmit?: (value: string) => void;
+    onFileUpload?: () => void;
     chatSubmitButtonId?: string;
     chatAnimationKey?: number;
+    files?: { name: string }[];
+    onUploadFiles?: (files: FileList | File[]) => void;
+    onRemoveFile?: (index: number) => void;
 }
 
 export default function PromptControls({
@@ -152,10 +156,14 @@ export default function PromptControls({
     chatValue = "",
     onChatChange,
     onChatSubmit,
+    onFileUpload,
     chatSubmitButtonId,
     disableSend,
     disableOptimize,
     chatAnimationKey,
+    files,
+    onUploadFiles,
+    onRemoveFile,
     waitingforOptimization = false
 }: PromptControlsProps) {
     const { t } = useLanguage();
@@ -186,6 +194,9 @@ export default function PromptControls({
                         disableSend={disableSend}
                         animationKey={chatAnimationKey}
                         waitingforOptimization={waitingforOptimization}
+                        onUploadFiles={onUploadFiles}
+                        files={files}
+                        onRemoveFile={onRemoveFile}
                     />
                 </div>
 
