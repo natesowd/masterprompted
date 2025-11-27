@@ -1,12 +1,53 @@
-// src/components/ChatBox.tsx
+/**
+ * ChatBox Component
+ * 
+ * A controlled, resizable chatbox with file upload support and animated feedback.
+ * Features include keyboard shortcuts, submit button, and loading states.
+ * 
+ * @example
+ * ```tsx
+ * <ChatBox
+ *   value={message}
+ *   onChange={setMessage}
+ *   onSubmit={handleSubmit}
+ *   files={attachments}
+ * />
+ * ```
+ */
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, Paperclip, SendHorizontal } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-// SubmitButton component
+const chatboxVariants = cva(
+  "relative bg-card border border-border rounded-2xl shadow-sm w-full flex flex-col",
+  {
+    variants: {
+      size: {
+        default: "min-w-[280px] min-h-[150px] max-h-[400px]",
+        compact: "min-w-[240px] min-h-[120px] max-h-[300px]",
+        expanded: "min-w-[320px] min-h-[200px] max-h-[500px]"
+      },
+      state: {
+        default: "",
+        bouncing: "bounce-once",
+        disabled: "opacity-60 cursor-not-allowed"
+      }
+    },
+    defaultVariants: {
+      size: "default",
+      state: "default"
+    }
+  }
+);
+
+/**
+ * Submit button for the chatbox
+ */
 function SubmitButton({ onClick, id, disableSend }: { onClick?: (e?: React.MouseEvent) => void; id?: string; disableSend?: boolean }) {
   return (
     <Button
@@ -20,23 +61,34 @@ function SubmitButton({ onClick, id, disableSend }: { onClick?: (e?: React.Mouse
       <SendHorizontal className="h-5 w-5" />
     </Button>
   );
-};
+}
 
-type ChatboxProps = {
-  // Controlled-only API
+type ChatboxProps = VariantProps<typeof chatboxVariants> & {
+  /** Controlled value for the textarea */
   value: string;
+  /** Callback when textarea content changes */
   onChange: (value: string) => void;
-  onSubmit?: (value: string) => void; // Function to lift state up
+  /** Callback when form is submitted */
+  onSubmit?: (value: string) => void;
+  /** ID for the submit button element */
   submitButtonId?: string;
+  /** Disables the submit button */
   disableSend?: boolean;
-  // A numeric key that increments when an external event wants the chatbox to animate
+  /** Numeric key that triggers bounce animation when changed */
   animationKey?: number;
+  /** ID for the chatbox container */
   id?: string;
+  /** Shows loading skeleton instead of textarea */
   waitingforOptimization?: boolean;
+  /** Callback when files are uploaded */
   onUploadFiles?: (files: FileList | File[]) => void;
+  /** Array of attached files */
   files?: { name: string; isUploading?: boolean }[];
+  /** Callback to remove a file by index */
   onRemoveFile?: (index: number) => void;
+  /** Makes the textarea read-only */
   readOnly?: boolean;
+  /** Additional CSS classes */
   className?: string;
 };
 
@@ -54,6 +106,8 @@ const Chatbox = ({
   onRemoveFile,
   readOnly = false,
   className = "",
+  size,
+  state
 }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
@@ -193,15 +247,17 @@ const Chatbox = ({
     <div
       ref={containerRef}
       id={id}
-      className={`relative bg-card border border-border rounded-2xl shadow-sm w-full flex flex-col ${isBouncing ? 'bounce-once' : ''} ${className}`}
-      // Allow the user to resize while still honoring parent-provided dimensions.
+      className={cn(
+        chatboxVariants({ 
+          size, 
+          state: isBouncing ? "bouncing" : state 
+        }),
+        className
+      )}
       style={{
         resize: 'both',
         overflow: 'auto',
-        minWidth: '280px',
-        minHeight: '150px',
         maxWidth: '100%',
-        maxHeight: '400px',
       }}
       aria-roledescription="Resizable chatbox"
     >

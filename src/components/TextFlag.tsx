@@ -1,17 +1,42 @@
+/**
+ * TextFlag Component
+ * 
+ * Inline text annotation with evaluation criteria icons and hover explanations.
+ * Automatically syncs highlighting with evaluation panel criteria.
+ * 
+ * @example
+ * ```tsx
+ * <TextFlag
+ *   text="disputed claim"
+ *   evaluationFactor="factual_accuracy"
+ *   explanation="This claim lacks verification"
+ *   href="https://source.com"
+ * />
+ * ```
+ */
+
 import { useEffect, useState } from "react";
 import { ListChecks, Target, Mic, Scale, Copy } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-
-interface TextFlagProps {
-  text: string;
-  evaluationFactor: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
-  explanation: React.ReactNode;
-  
-  className?: string;
-  href?: string;
-}
+const textFlagVariants = cva(
+  "inline cursor-pointer",
+  {
+    variants: {
+      severity: {
+        error: "[&>a]:decoration-destructive [&>span]:decoration-destructive",
+        warning: "[&>a]:decoration-yellow-600 [&>span]:decoration-yellow-600",
+        info: "[&>a]:decoration-blue-500 [&>span]:decoration-blue-500"
+      }
+    },
+    defaultVariants: {
+      severity: "error"
+    }
+  }
+);
 
 const iconMap = {
   "factual_accuracy": ListChecks,
@@ -29,13 +54,32 @@ const labelMap = {
   "plagiarism": "Plagiarism",
 };
 
-export default function TextFlag({ text, evaluationFactor, explanation, className = "", href }: TextFlagProps) {
+interface TextFlagProps extends VariantProps<typeof textFlagVariants> {
+  /** The text to display with the flag */
+  text: string;
+  /** The evaluation criterion this flag represents */
+  evaluationFactor: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
+  /** Explanation shown in hover card */
+  explanation: React.ReactNode;
+  /** Additional CSS classes */
+  className?: string;
+  /** Optional external link URL */
+  href?: string;
+}
+
+export default function TextFlag({ 
+  text, 
+  evaluationFactor, 
+  explanation, 
+  className = "", 
+  href,
+  severity 
+}: TextFlagProps) {
   const Icon = iconMap[evaluationFactor];
   const label = labelMap[evaluationFactor];
   const [hoverCardOpen, setHoverCardOpen] = useState(false);
   const { t } = useLanguage();
   
-
   // Highlight the corresponding evaluation criterion when component is mounted
   useEffect(() => {
     const criterionElement = document.querySelector(`[data-criterion-id="${evaluationFactor}"]`);
@@ -69,7 +113,7 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
     <HoverCard open={hoverCardOpen} onOpenChange={setHoverCardOpen}>
       <HoverCardTrigger asChild>
         <span 
-          className={`inline cursor-pointer ${className}`}
+          className={cn(textFlagVariants({ severity }), className)}
           onClick={(e) => {
             e.stopPropagation();
             setHoverCardOpen(!hoverCardOpen);
@@ -81,13 +125,13 @@ export default function TextFlag({ text, evaluationFactor, explanation, classNam
               href={href} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="underline decoration-destructive decoration-2 underline-offset-2 text-current hover:opacity-80"
+              className="underline decoration-2 underline-offset-2 text-current hover:opacity-80"
               onClick={(e) => e.stopPropagation()}
             >
               {text}
             </a>
           ) : (
-            <span className="underline decoration-destructive decoration-2 underline-offset-2 text-current">
+            <span className="underline decoration-2 underline-offset-2 text-current">
               {text}
             </span>
           )}
