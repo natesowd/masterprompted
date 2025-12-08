@@ -7,7 +7,7 @@ import { PopoverSeries } from "@/components/PopoverSeries";
 import TextFlag from "@/components/TextFlag";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import GuidanceTooltip from "@/components/GuidanceTooltip";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown, Info, InfoIcon, Play } from "lucide-react";
@@ -451,11 +451,11 @@ export default function HeadlineResponse() {
                           {3 < currentSentence.length - 1 && " "}
                         </span> : null;
 
-                        return <>
-                          <div data-mini-task-target className="h-[66px] w-[220px] tran absolute inline-block" />
+                        return <React.Fragment key="dropdown-group">
+                          <div data-mini-task-target className="h-[66px] w-[220px] absolute inline-block pointer-events-none" />
                           {dropdown1}
                           {dropdown2}
-                        </>
+                        </React.Fragment>
                       }
 
                       // Handle TextFlag for "Charter," in new form too
