@@ -10,7 +10,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info, InfoIcon } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon, Play } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -33,11 +33,46 @@ export default function HeadlineResponse() {
   const [dropdownProbTooltips, setDropdownProbTooltips] = useState<{
     [key: string]: boolean;
   }>({});
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animatedWord, setAnimatedWord] = useState<string | null>(null);
+  const [showHighlightPulse, setShowHighlightPulse] = useState(false);
+  
   const toggleDropdownTooltip = (key: string, value: boolean) => {
     setDropdownProbTooltips(prev => ({
       ...prev,
       [key]: value
     }));
+  };
+
+  // Animation to show LLM selecting highest probability word
+  const playSelectionAnimation = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    
+    const options = ["Finalizes", "Reaches", "Unites"];
+    let currentIndex = 0;
+    const cycleCount = 8; // Number of cycles before landing
+    let cycles = 0;
+    
+    const interval = setInterval(() => {
+      setAnimatedWord(options[currentIndex % options.length]);
+      currentIndex++;
+      cycles++;
+      
+      if (cycles >= cycleCount) {
+        clearInterval(interval);
+        // Land on "Unites" (highest probability 0.67)
+        setAnimatedWord("Unites");
+        setShowHighlightPulse(true);
+        
+        // Reset after animation completes
+        setTimeout(() => {
+          setShowHighlightPulse(false);
+          setAnimatedWord(null);
+          setIsAnimating(false);
+        }, 2000);
+      }
+    }, 200);
   };
   const getWordOptions = (position: 'second' | 'third', currentIndex?: number) => {
     let options: {
@@ -290,17 +325,39 @@ export default function HeadlineResponse() {
                         const optionsThird = getWordOptions('third', 3);
                         const isValidThirdWord = rawOptionsThird.some(opt => opt.word === thirdWord);
 
-                        const dropdown1 = <span key={2}>
+                        const displayWord = animatedWord || word;
+                        const isHighlighted = showHighlightPulse && animatedWord === "Unites";
+                        
+                        const dropdown1 = <span key={2} className="inline-flex items-center gap-1">
+                          {/* Play button for animation */}
+                          <button
+                            onClick={playSelectionAnimation}
+                            disabled={isAnimating}
+                            className="p-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors disabled:opacity-50"
+                            title="Watch LLM select word"
+                          >
+                            <Play className="h-4 w-4" />
+                          </button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button data-word-union data-word={word.toLowerCase()} className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg inline-flex items-center gap-1">
-                                {word}
+                              <button data-word-union data-word={word.toLowerCase()} className={`relative group cursor-pointer transition-all duration-200 px-1 rounded-lg inline-flex items-center gap-1 ${
+                                isHighlighted 
+                                  ? "bg-primary text-primary-foreground animate-pulse ring-4 ring-primary/50" 
+                                  : isAnimating && animatedWord 
+                                    ? "bg-yellow-200" 
+                                    : "bg-green-200 hover:bg-green-300"
+                              }`}>
+                                {displayWord}
                                 <ChevronDown className="h-3 w-3" />
-                                <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap flex items-center gap-1" style={{
+                                <span className={`absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded transition-all duration-200 whitespace-nowrap flex items-center gap-1 ${
+                                  isHighlighted 
+                                    ? "bg-primary text-primary-foreground opacity-100 scale-110" 
+                                    : "bg-green-200 text-green-800 opacity-0 group-hover:opacity-100"
+                                }`} style={{
                                   pointerEvents: 'auto'
                                 }}>
-                                  {rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.67"}
-                                  <TooltipProvider>
+                                  {isHighlighted ? "0.67 ✓ Highest!" : (rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.67")}
+                                  {!isHighlighted && <TooltipProvider>
                                     <Tooltip open={secondProbTooltipOpen} onOpenChange={setSecondProbTooltipOpen}>
                                       <TooltipTrigger asChild>
                                         <Info className="h-3 w-3 cursor-pointer" onClick={e => {
@@ -312,7 +369,7 @@ export default function HeadlineResponse() {
                                         <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
                                       </TooltipContent>
                                     </Tooltip>
-                                  </TooltipProvider>
+                                  </TooltipProvider>}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
