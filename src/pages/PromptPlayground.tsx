@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBody";
+import { checkDisinformation, DisinformationSpan } from "@/services/disinformationApi";
 
 export type Parameters = {
   specificity: string;
@@ -13,8 +14,21 @@ export type Parameters = {
   context: string;
   bias: string;
 };
+
+export type VersionEvaluation = {
+  loading: boolean;
+  error: boolean;
+  data: DisinformationSpan[] | null;
+};
+
 export type ThreadVersion = { prompt: string; answer?: string; parameters?: Parameters };
-export type Thread = { versions: ThreadVersion[]; currentIndex: number; showDiff?: boolean };
+export type Thread = { 
+  versions: ThreadVersion[]; 
+  currentIndex: number; 
+  showDiff?: boolean;
+  showEvaluation?: boolean;
+  evaluations?: VersionEvaluation[];
+};
 
 type AttachedFile = {
   name: string;
@@ -58,6 +72,17 @@ const PromptPlayground = () => {
         return prev;
       }
       next[threadIndex] = { ...next[threadIndex], showDiff: checked };
+      return next;
+    });
+  }, []);
+
+  const handleThreadEvaluationToggle = useCallback((threadIndex: number, checked: boolean) => {
+    setThreads(prev => {
+      const next = [...prev];
+      if (!next[threadIndex]) {
+        return prev;
+      }
+      next[threadIndex] = { ...next[threadIndex], showEvaluation: checked };
       return next;
     });
   }, []);
@@ -155,6 +180,7 @@ const PromptPlayground = () => {
 
       const data: { answer: string } = await response.json();
 
+      // Update answer in state
       setThreads(prev => {
         const copy = [...prev];
         const thread = copy[threadIndex];
@@ -162,7 +188,37 @@ const PromptPlayground = () => {
         const versions = thread.versions.map((version, idx) =>
           idx === versionIndex ? { ...version, answer: data.answer } : version
         );
-        copy[threadIndex] = { ...thread, versions };
+        
+        // Initialize evaluation entry as loading and disable showEvaluation
+        const evaluations = [...(thread.evaluations || [])];
+        evaluations[versionIndex] = { loading: true, error: false, data: null };
+        
+        copy[threadIndex] = { 
+          ...thread, 
+          versions,
+          evaluations,
+          showEvaluation: false, // Auto-disable while loading
+        };
+        return copy;
+      });
+
+      // Trigger disinformation check
+      const evaluationResult = await checkDisinformation(data.answer);
+      
+      // Update evaluation state
+      setThreads(prev => {
+        const copy = [...prev];
+        const thread = copy[threadIndex];
+        if (!thread?.evaluations) return prev;
+        
+        const evaluations = [...thread.evaluations];
+        evaluations[versionIndex] = {
+          loading: false,
+          error: evaluationResult === null,
+          data: evaluationResult,
+        };
+        
+        copy[threadIndex] = { ...thread, evaluations };
         return copy;
       });
     },
@@ -338,6 +394,7 @@ const PromptPlayground = () => {
             onPrevVersion={handlePrevVersion}
             onNextVersion={handleNextVersion}
             onToggleThreadDiff={handleThreadDiffToggle}
+            onToggleThreadEvaluation={handleThreadEvaluationToggle}
             onRequestControlPanelHelp={() => setShowControlPanelPopover(true)}
           />
         </div>

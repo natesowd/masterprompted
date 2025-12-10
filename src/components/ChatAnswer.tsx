@@ -16,7 +16,7 @@
  * ```
  */
 
-import { Minus, CircleQuestionMark } from "lucide-react";
+import { Minus, CircleQuestionMark, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useLayoutEffect, useRef } from "react";
@@ -25,6 +25,8 @@ import { diffWordsWithNewlineProtection, DiffPart } from "@/lib/diff";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { VersionEvaluation } from "@/pages/PromptPlayground";
+import { renderTextWithFlags } from "@/lib/evaluationRenderer";
 
 const answerVariants = cva(
   "mb-20 w-full",
@@ -67,6 +69,12 @@ type ChatAnswerProps = VariantProps<typeof answerVariants> & {
   showDiff: boolean;
   /** Callback when diff toggle is changed */
   onToggleDiff: (checked: boolean) => void;
+  /** Whether to show evaluation flags */
+  showEvaluation: boolean;
+  /** Callback when evaluation toggle is changed */
+  onToggleEvaluation: (checked: boolean) => void;
+  /** Current evaluation state for this version */
+  currentEvaluation?: VersionEvaluation;
   /** Callback when hovering over a comment marker */
   onHoverComment: (id: string | null) => void;
   /** Reference to scroll container */
@@ -88,6 +96,9 @@ const ChatAnswer = ({
   threadIndex,
   showDiff,
   onToggleDiff,
+  showEvaluation,
+  onToggleEvaluation,
+  currentEvaluation,
   onHoverComment,
   scrollContainerRef,
   onUpdateCommentPosition,
@@ -170,25 +181,53 @@ const ChatAnswer = ({
     );
   };
 
+  // Determine if evaluation toggle should be disabled
+  const evaluationDisabled = !currentEvaluation || currentEvaluation.loading || currentEvaluation.error || !currentEvaluation.data;
+  const evaluationLoading = currentEvaluation?.loading ?? false;
+
+  // Render text with evaluation flags
+  const renderEvaluation = () => {
+    if (!currentEvaluation?.data) return <RichText text={formattedText} />;
+    return renderTextWithFlags(formattedText, currentEvaluation.data);
+  };
+
   return (
     <div className={cn(answerVariants({ variant }))}>
-      {canShowDiff && (
-        <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
-          <div className="flex items-center space-x-2" id='show-diff-switch'>
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+        <div className="flex items-center gap-4">
+          {canShowDiff && (
+            <div className="flex items-center space-x-2" id='show-diff-switch'>
+              <Switch
+                id={`show-diff-${threadIndex}`}
+                checked={showDiff}
+                onCheckedChange={onToggleDiff}
+                disabled={showEvaluation}
+              />
+              <Label htmlFor={`show-diff-${threadIndex}`} className="text-sm text-muted-foreground">
+                {t('components.chatAnswer.showChanges')}
+              </Label>
+              <button onClick={() => toggleDiffHelp()}>
+                <CircleQuestionMark className="-ml-1 h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
+          )}
+          
+          <div className="flex items-center space-x-2">
             <Switch
-              id={`show-diff-${threadIndex}`}
-              checked={showDiff}
-              onCheckedChange={onToggleDiff}
+              id={`show-evaluation-${threadIndex}`}
+              checked={showEvaluation}
+              onCheckedChange={onToggleEvaluation}
+              disabled={evaluationDisabled || showDiff}
             />
-            <Label htmlFor={`show-diff-${threadIndex}`} className="text-sm text-muted-foreground">
-              {t('components.chatAnswer.showChanges')}
+            <Label htmlFor={`show-evaluation-${threadIndex}`} className="text-sm text-muted-foreground flex items-center gap-1">
+              {t('components.chatAnswer.showEvaluation')}
+              {evaluationLoading && <Loader2 className="h-3 w-3 animate-spin" />}
             </Label>
-            <button onClick={() => toggleDiffHelp()}>
-              <CircleQuestionMark className="-ml-1 h-4 w-4 text-muted-foreground"  />
-            </button>
           </div>
-          {showDiff && (
-          <div className="flex items-center gap-3 text-xs px-2 ">
+        </div>
+        
+        {showDiff && canShowDiff && (
+          <div className="flex items-center gap-3 text-xs px-2">
             <div className="flex items-center gap-1">
               <span className={cn(diffPartVariants({ type: "added" }))}>{t('components.chatAnswer.added')}</span>
             </div>
@@ -196,12 +235,17 @@ const ChatAnswer = ({
               <span className={cn(diffPartVariants({ type: "removed" }))}>{t('components.chatAnswer.removed')}</span>
             </div>
           </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
       
       <div id="chat-body" className="prose max-w-none text-foreground leading-relaxed">
-        {showDiff && canShowDiff ? renderDiff() : <RichText text={formattedText}/>}
+        {showEvaluation ? (
+          renderEvaluation()
+        ) : showDiff && canShowDiff ? (
+          renderDiff()
+        ) : (
+          <RichText text={formattedText} />
+        )}
       </div>
     </div>
   );

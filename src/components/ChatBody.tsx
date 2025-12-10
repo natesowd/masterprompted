@@ -26,12 +26,14 @@ const ChatBody = memo(function ChatBody({
   onPrevVersion,
   onNextVersion,
   onToggleThreadDiff,
+  onToggleThreadEvaluation,
   onRequestControlPanelHelp,
 }: {
   threads: Thread[];
   onPrevVersion: (threadIndex: number) => void;
   onNextVersion: (threadIndex: number) => void;
   onToggleThreadDiff: (threadIndex: number, checked: boolean) => void;
+  onToggleThreadEvaluation: (threadIndex: number, checked: boolean) => void;
   onRequestControlPanelHelp: () => void;
 }) {
   const { t } = useLanguage();
@@ -278,6 +280,9 @@ const ChatBody = memo(function ChatBody({
                         threadIndex={threadIndex}
                         showDiff={Boolean(thread.showDiff)}
                         onToggleDiff={checked => onToggleThreadDiff(threadIndex, checked)}
+                        showEvaluation={Boolean(thread.showEvaluation)}
+                        onToggleEvaluation={checked => onToggleThreadEvaluation(threadIndex, checked)}
+                        currentEvaluation={thread.evaluations?.[thread.currentIndex]}
                         onHoverComment={handleHoverComment}
                         scrollContainerRef={chatContainerRef}
                         onUpdateCommentPosition={handleUpdateCommentPosition}

@@ -314,6 +314,7 @@ const translations = {
         showChanges: 'Show Changes',
         added: 'Added Text',
         removed: 'Removed Text',
+        showEvaluation: 'Show Evaluation',
       },
       textFlag: {
         type: {
@@ -605,6 +606,7 @@ const translations = {
         showChanges: 'Mostrar cambios',
         added: 'añadido',
         removed: 'eliminado',
+        showEvaluation: 'Mostrar evaluación',
       },
       popoverSeries: {
         previous: 'Anterior',
