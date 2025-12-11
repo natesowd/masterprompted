@@ -9,7 +9,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info, InfoIcon, Play } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon, Cpu } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -328,15 +328,6 @@ export default function HeadlineResponse() {
                         const isHighlighted = showHighlightPulse && animatedWord === "Unites";
                         
                         const dropdown1 = <span key={2} className="inline-flex items-center gap-1">
-                          {/* Play button for animation */}
-                          <button
-                            onClick={playSelectionAnimation}
-                            disabled={isAnimating}
-                            className="p-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors disabled:opacity-50"
-                            title="Watch LLM select word"
-                          >
-                            <Play className="h-4 w-4" />
-                          </button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button data-word-union data-word={word.toLowerCase()} className={`relative group cursor-pointer transition-all duration-200 px-1 rounded-lg inline-flex items-center gap-1 ${
@@ -350,8 +341,8 @@ export default function HeadlineResponse() {
                                 <ChevronDown className="h-3 w-3" />
                                 <span className={`absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded transition-all duration-200 whitespace-nowrap flex items-center gap-1 ${
                                   isHighlighted 
-                                    ? "bg-primary text-primary-foreground opacity-100 scale-110" 
-                                    : "bg-green-200 text-green-800 opacity-0 group-hover:opacity-100"
+                                    ? "bg-primary text-primary-foreground scale-110" 
+                                    : "bg-green-200 text-green-800"
                                 }`} style={{
                                   pointerEvents: 'auto'
                                 }}>
@@ -369,6 +360,20 @@ export default function HeadlineResponse() {
                                       </TooltipContent>
                                     </Tooltip>
                                   </TooltipProvider>}
+                                  {/* Computer choice button */}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      playSelectionAnimation();
+                                    }}
+                                    disabled={isAnimating}
+                                    className={`p-0.5 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all disabled:opacity-50 ${
+                                      isAnimating ? 'animate-spin' : ''
+                                    }`}
+                                    title="Watch LLM select word"
+                                  >
+                                    <Cpu className="h-3 w-3" />
+                                  </button>
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
@@ -404,7 +409,7 @@ export default function HeadlineResponse() {
                               <button data-word={thirdWord.toLowerCase()} className="relative group cursor-pointer transition-colors duration-200 bg-green-200 hover:bg-green-300 px-1 rounded-lg inline-flex items-center gap-1">
                                 {thirdWord}
                                 <ChevronDown className="h-3 w-3" />
-                                <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap flex items-center gap-1" style={{
+                                <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-green-200 text-green-800 text-xs px-2 py-1 rounded transition-opacity duration-200 whitespace-nowrap flex items-center gap-1" style={{
                                   pointerEvents: 'auto'
                                 }}>
                                   {rawOptionsThird.find(opt => opt.word === thirdWord)?.probability || rawOptionsThird[0]?.probability || "0.73"}
