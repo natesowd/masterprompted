@@ -209,8 +209,6 @@ export function BranchTreeDiagram({
           <div className="min-w-[600px] p-4">
             {/* SVG branch lines */}
             <svg className="w-full h-[400px]" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
-              {/* Root node */}
-              <text x="10" y="200" className="text-xs fill-foreground font-medium">EU</text>
               
               {/* Draw all paths as branches */}
               {treePaths.map((path, pathIndex) => {
@@ -255,19 +253,6 @@ export function BranchTreeDiagram({
                   </g>
                 );
               })}
-              
-              {/* Level labels */}
-              {["Verb", "Prep", "Adj", "Topic", "Aspect", "Type"].map((label, i) => (
-                <text
-                  key={label}
-                  x={100 + i * 70}
-                  y={390}
-                  className="text-[10px] fill-muted-foreground"
-                  textAnchor="middle"
-                >
-                  {label}
-                </text>
-              ))}
             </svg>
             
             {/* Matching paths count */}
