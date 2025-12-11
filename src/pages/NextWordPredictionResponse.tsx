@@ -389,22 +389,7 @@ export default function HeadlineResponse() {
                                 }`} style={{
                                   pointerEvents: 'auto'
                                 }}>
-                                  {isHighlighted ? "0.67 ✓ Highest!" : (rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.67")}
-                                  {!isHighlighted && <>
-                                    <TooltipProvider>
-                                      <Tooltip open={secondProbTooltipOpen} onOpenChange={setSecondProbTooltipOpen}>
-                                        <TooltipTrigger asChild>
-                                          <Info className="h-3 w-3 cursor-pointer" onClick={e => {
-                                            e.stopPropagation();
-                                            setSecondProbTooltipOpen(!secondProbTooltipOpen);
-                                          }} onMouseEnter={() => setSecondProbTooltipOpen(true)} onMouseLeave={() => setSecondProbTooltipOpen(false)} />
-                                        </TooltipTrigger>
-                                        <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
-                                          <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                    {/* Computer choice button */}
+                                  {!isHighlighted && (
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -418,7 +403,23 @@ export default function HeadlineResponse() {
                                     >
                                       <Monitor className="h-3 w-3" />
                                     </button>
-                                  </>}
+                                  )}
+                                  {isHighlighted ? "0.67 ✓ Highest!" : (rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.67")}
+                                  {!isHighlighted && (
+                                    <TooltipProvider>
+                                      <Tooltip open={secondProbTooltipOpen} onOpenChange={setSecondProbTooltipOpen}>
+                                        <TooltipTrigger asChild>
+                                          <Info className="h-3 w-3 cursor-pointer" onClick={e => {
+                                            e.stopPropagation();
+                                            setSecondProbTooltipOpen(!secondProbTooltipOpen);
+                                          }} onMouseEnter={() => setSecondProbTooltipOpen(true)} onMouseLeave={() => setSecondProbTooltipOpen(false)} />
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                          <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  )}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
@@ -470,22 +471,7 @@ export default function HeadlineResponse() {
                                 }`} style={{
                                   pointerEvents: 'auto'
                                 }}>
-                                  {isThirdHighlighted ? `${rawOptionsThird.find(opt => opt.word === animatedThirdWord)?.probability || "0.73"} ✓ Highest!` : (rawOptionsThird.find(opt => opt.word === thirdWord)?.probability || rawOptionsThird[0]?.probability || "0.73")}
-                                  {!isThirdHighlighted && <>
-                                    <TooltipProvider>
-                                      <Tooltip open={thirdProbTooltipOpen} onOpenChange={setThirdProbTooltipOpen}>
-                                        <TooltipTrigger asChild>
-                                          <Info className="h-3 w-3 cursor-pointer" onClick={e => {
-                                            e.stopPropagation();
-                                            setThirdProbTooltipOpen(!thirdProbTooltipOpen);
-                                          }} onMouseEnter={() => setThirdProbTooltipOpen(true)} onMouseLeave={() => setThirdProbTooltipOpen(false)} />
-                                        </TooltipTrigger>
-                                        <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
-                                          <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                    {/* Computer choice button */}
+                                  {!isThirdHighlighted && (
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -499,7 +485,23 @@ export default function HeadlineResponse() {
                                     >
                                       <Monitor className="h-3 w-3" />
                                     </button>
-                                  </>}
+                                  )}
+                                  {isThirdHighlighted ? `${rawOptionsThird.find(opt => opt.word === animatedThirdWord)?.probability || "0.73"} ✓ Highest!` : (rawOptionsThird.find(opt => opt.word === thirdWord)?.probability || rawOptionsThird[0]?.probability || "0.73")}
+                                  {!isThirdHighlighted && (
+                                    <TooltipProvider>
+                                      <Tooltip open={thirdProbTooltipOpen} onOpenChange={setThirdProbTooltipOpen}>
+                                        <TooltipTrigger asChild>
+                                          <Info className="h-3 w-3 cursor-pointer" onClick={e => {
+                                            e.stopPropagation();
+                                            setThirdProbTooltipOpen(!thirdProbTooltipOpen);
+                                          }} onMouseEnter={() => setThirdProbTooltipOpen(true)} onMouseLeave={() => setThirdProbTooltipOpen(false)} />
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                          <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  )}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
