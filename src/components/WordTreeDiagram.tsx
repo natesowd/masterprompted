@@ -191,9 +191,27 @@ export function WordTreeDiagram({
     return startOffset + idx * (nodeHeight + levelGap) + nodeHeight / 2;
   };
 
-  // Render a level column
+  // Get all possible options at a level (not filtered by current path)
+  const getAllOptionsAtLevel = (level: number): { word: string; probability: number }[] => {
+    if (level === 0) return [{ word: "European Union", probability: 1 }];
+    
+    const uniqueOptions = new Map<string, number>();
+    treePaths.forEach(p => {
+      const word = p.words[level];
+      const prob = p.probabilities[level];
+      if (!uniqueOptions.has(word)) {
+        uniqueOptions.set(word, prob);
+      }
+    });
+    
+    return Array.from(uniqueOptions.entries())
+      .map(([word, probability]) => ({ word, probability }));
+  };
+
+  // Render a level column - show ALL options at this level
   const renderLevel = (level: number) => {
-    const options = getOptionsAtLevel(level);
+    const options = getAllOptionsAtLevel(level);
+    const activeOptions = getOptionsAtLevel(level);
     if (options.length === 0) return null;
 
     return (
@@ -229,20 +247,27 @@ export function WordTreeDiagram({
         <div className="flex flex-col justify-center gap-8 flex-1">
           {options.map((option) => {
             const isActive = currentPath[level] === option.word;
+            const isReachable = activeOptions.some(o => o.word === option.word);
             const isAnimated = animatingLevel === level && animatedWord === option.word;
             const isPulsing = showPulse && animatingLevel === level && animatedWord === option.word;
+            
+            // Get the probability from the active options if reachable
+            const displayProb = activeOptions.find(o => o.word === option.word)?.probability || option.probability;
             
             return (
               <button
                 key={option.word}
-                onClick={() => handleWordClick(level, option.word)}
+                onClick={() => isReachable && handleWordClick(level, option.word)}
+                disabled={!isReachable && level > 0}
                 className={cn(
                   "relative px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border-2 min-w-[80px] h-9",
                   level === 0 
                     ? "bg-primary text-primary-foreground border-primary cursor-default"
                     : isActive 
                       ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" 
-                      : "bg-card border-border hover:border-primary/50 hover:bg-muted",
+                      : isReachable
+                        ? "bg-card border-border hover:border-primary/50 hover:bg-muted"
+                        : "bg-muted/30 border-muted text-muted-foreground/40 cursor-not-allowed",
                   isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10",
                   isPulsing && "ring-4 ring-green-400 ring-offset-1 bg-green-200 border-green-400 text-green-900 animate-pulse scale-110"
                 )}
@@ -251,9 +276,9 @@ export function WordTreeDiagram({
                 {level > 0 && (
                   <span className={cn(
                     "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded",
-                    isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground"
+                    isActive ? "bg-green-200 text-green-800" : isReachable ? "bg-muted text-muted-foreground" : "bg-muted/20 text-muted-foreground/40"
                   )}>
-                    {option.probability.toFixed(2)}
+                    {displayProb.toFixed(2)}
                   </span>
                 )}
               </button>
@@ -264,32 +289,44 @@ export function WordTreeDiagram({
     );
   };
 
-  // Render connector lines between levels
+
+
+  // Render connector lines between levels - showing ALL branches
   const renderConnector = (fromLevel: number, toLevel: number) => {
-    const fromOptions = getOptionsAtLevel(fromLevel);
-    const toOptions = getOptionsAtLevel(toLevel);
+    const fromOptions = getAllOptionsAtLevel(fromLevel);
+    const toOptions = getAllOptionsAtLevel(toLevel);
     
     if (fromOptions.length === 0 || toOptions.length === 0) return null;
 
-    const fromIdx = fromOptions.findIndex(o => o.word === currentPath[fromLevel]);
-    const fromY = getNodeY(fromIdx >= 0 ? fromIdx : 0, fromOptions.length);
+    // Get currently selected indices
+    const activeFromWord = currentPath[fromLevel];
+    const activeToWord = currentPath[toLevel];
 
     return (
-      <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-10" style={{ height: containerHeight }}>
-        <svg className="w-full h-full" viewBox={`0 0 40 ${containerHeight}`} preserveAspectRatio="none">
-          {toOptions.map((option, idx) => {
-            const toY = getNodeY(idx, toOptions.length);
-            const isActive = currentPath[toLevel] === option.word;
-            return (
-              <path
-                key={option.word}
-                d={`M 0 ${fromY} C 20 ${fromY}, 20 ${toY}, 40 ${toY}`}
-                fill="none"
-                stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                strokeWidth={isActive ? 2.5 : 1}
-                strokeOpacity={isActive ? 1 : 0.3}
-              />
-            );
+      <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-12" style={{ height: containerHeight }}>
+        <svg className="w-full h-full" viewBox={`0 0 48 ${containerHeight}`} preserveAspectRatio="none">
+          {/* Draw ALL possible connections from every node to every node */}
+          {fromOptions.map((fromOpt, fromIdx) => {
+            const fromY = getNodeY(fromIdx, fromOptions.length);
+            
+            return toOptions.map((toOpt, toIdx) => {
+              const toY = getNodeY(toIdx, toOptions.length);
+              const isActivePath = fromOpt.word === activeFromWord && toOpt.word === activeToWord;
+              
+              // Add slight curve variations for visual chaos
+              const curveOffset = (fromIdx + toIdx) % 3 * 4 - 4;
+              
+              return (
+                <path
+                  key={`${fromOpt.word}-${toOpt.word}`}
+                  d={`M 0 ${fromY} C ${18 + curveOffset} ${fromY}, ${30 + curveOffset} ${toY}, 48 ${toY}`}
+                  fill="none"
+                  stroke={isActivePath ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                  strokeWidth={isActivePath ? 2.5 : 0.75}
+                  strokeOpacity={isActivePath ? 1 : 0.15}
+                />
+              );
+            });
           })}
         </svg>
       </div>
