@@ -291,7 +291,7 @@ export function WordTreeDiagram({
 
 
 
-  // Render connector lines between levels - showing ALL branches with visual chaos
+  // Render connector lines between levels - showing ALL branches
   const renderConnector = (fromLevel: number, toLevel: number) => {
     const fromOptions = getAllOptionsAtLevel(fromLevel);
     const toOptions = getAllOptionsAtLevel(toLevel);
@@ -302,36 +302,9 @@ export function WordTreeDiagram({
     const activeFromWord = currentPath[fromLevel];
     const activeToWord = currentPath[toLevel];
 
-    // Create extra "ghost" lines to show branching complexity
-    const ghostLines: { fromY: number; toY: number; offset: number }[] = [];
-    fromOptions.forEach((_, fromIdx) => {
-      const fromY = getNodeY(fromIdx, fromOptions.length);
-      // Add extra spread lines to suggest more branches
-      [-25, -12, 12, 25].forEach((spread, i) => {
-        ghostLines.push({
-          fromY,
-          toY: containerHeight / 2 + spread * 3 + (Math.random() - 0.5) * 20,
-          offset: (i % 3) * 6 - 6
-        });
-      });
-    });
-
     return (
-      <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-14" style={{ height: containerHeight }}>
-        <svg className="w-full h-full" viewBox={`0 0 56 ${containerHeight}`} preserveAspectRatio="none">
-          {/* Ghost lines to show branching potential */}
-          {ghostLines.map((ghost, i) => (
-            <path
-              key={`ghost-${i}`}
-              d={`M 0 ${ghost.fromY} C ${20 + ghost.offset} ${ghost.fromY}, ${36 + ghost.offset} ${ghost.toY}, 56 ${ghost.toY}`}
-              fill="none"
-              stroke="hsl(var(--muted-foreground))"
-              strokeWidth={0.5}
-              strokeOpacity={0.08}
-              strokeDasharray="2,3"
-            />
-          ))}
-          
+      <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-12" style={{ height: containerHeight }}>
+        <svg className="w-full h-full" viewBox={`0 0 48 ${containerHeight}`} preserveAspectRatio="none">
           {/* Draw ALL possible connections from every node to every node */}
           {fromOptions.map((fromOpt, fromIdx) => {
             const fromY = getNodeY(fromIdx, fromOptions.length);
@@ -340,18 +313,17 @@ export function WordTreeDiagram({
               const toY = getNodeY(toIdx, toOptions.length);
               const isActivePath = fromOpt.word === activeFromWord && toOpt.word === activeToWord;
               
-              // Add varied curve offsets for visual chaos
-              const curveVariation = ((fromIdx * 3 + toIdx * 7) % 5) * 4 - 8;
-              const midOffset = (fromIdx !== toIdx) ? (toIdx > fromIdx ? 15 : -15) : 0;
+              // Add slight curve variations for visual chaos
+              const curveOffset = (fromIdx + toIdx) % 3 * 4 - 4;
               
               return (
                 <path
                   key={`${fromOpt.word}-${toOpt.word}`}
-                  d={`M 0 ${fromY} C ${16 + curveVariation} ${fromY + midOffset}, ${40 + curveVariation} ${toY - midOffset}, 56 ${toY}`}
+                  d={`M 0 ${fromY} C ${18 + curveOffset} ${fromY}, ${30 + curveOffset} ${toY}, 48 ${toY}`}
                   fill="none"
                   stroke={isActivePath ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                  strokeWidth={isActivePath ? 2.5 : 1}
-                  strokeOpacity={isActivePath ? 1 : 0.25}
+                  strokeWidth={isActivePath ? 2.5 : 0.75}
+                  strokeOpacity={isActivePath ? 1 : 0.15}
                 />
               );
             });
