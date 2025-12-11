@@ -6,12 +6,15 @@ import { PopoverSeries } from "@/components/PopoverSeries";
 import TextFlag from "@/components/TextFlag";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import GuidanceTooltip from "@/components/GuidanceTooltip";
+import { WordTreeDiagram } from "@/components/WordTreeDiagram";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info, InfoIcon, Monitor } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon, Monitor, GitBranch } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
 export default function HeadlineResponse() {
   const navigate = useNavigate();
@@ -38,6 +41,7 @@ export default function HeadlineResponse() {
   const [isAnimatingThird, setIsAnimatingThird] = useState(false);
   const [animatedThirdWord, setAnimatedThirdWord] = useState<string | null>(null);
   const [showHighlightPulseThird, setShowHighlightPulseThird] = useState(false);
+  const [showTreeView, setShowTreeView] = useState(false);
   
   const toggleDropdownTooltip = (key: string, value: boolean) => {
     setDropdownProbTooltips(prev => ({
@@ -343,11 +347,52 @@ export default function HeadlineResponse() {
 
             {/* AI Response */}
             <div className="space-y-6">
-              <p className="text-gray-700 text-lg">
-                Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-gray-700 text-lg">
+                  Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
+                </p>
+                
+                {/* Tree View Toggle */}
+                <div className="flex items-center gap-2 ml-4 shrink-0">
+                  <GitBranch className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="tree-view" className="text-sm text-muted-foreground cursor-pointer">
+                    Tree View
+                  </Label>
+                  <Switch
+                    id="tree-view"
+                    checked={showTreeView}
+                    onCheckedChange={setShowTreeView}
+                  />
+                </div>
+              </div>
 
-              {/* Interactive Word Selection Form */}
+              {showTreeView ? (
+                <WordTreeDiagram
+                  selectedPath={currentSentence}
+                  onPathChange={(path) => {
+                    // Update current sentence based on tree selection
+                    const secondWord = path[2];
+                    const thirdWord = path[3];
+                    
+                    if (secondWord === "Reaches") {
+                      setCurrentSentence(["European", "Union", "Reaches", thirdWord, "on", "Historic", "AI", "Ethics", "Framework,", "Paving", "the", "Way", "for", "Responsible", "Tech", "Innovation"]);
+                    } else if (secondWord === "Finalizes") {
+                      setCurrentSentence(["European", "Union", "Finalizes", thirdWord, "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"]);
+                    } else {
+                      // Unites path
+                      const completions: { [key: string]: string[] } = {
+                        "On": ["Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"],
+                        "Around": ["Sweeping", "AI", "Ethics", "Charter,", "Pioneering", "International", "Tech", "Policy", "Standards"],
+                        "Behind": ["Historic", "AI", "Ethics", "Framework,", "Setting", "Standards", "for", "Responsible", "Innovation"]
+                      };
+                      const completion = completions[thirdWord] || completions["On"];
+                      setCurrentSentence(["European", "Union", secondWord, thirdWord, ...completion]);
+                    }
+                  }}
+                  className="border border-border rounded-lg bg-card"
+                />
+              ) : (
+              /* Interactive Word Selection Form */
               <div className="space-y-6">
                 <div className="relative">
                   <h1 className="text-2xl text-gray-900 leading-loose font-normal md:text-4xl" style={{
@@ -578,6 +623,7 @@ export default function HeadlineResponse() {
                 <GuidanceTooltip text="Journalistic Evaluation Checklist: For more information on the flagged content, expand the relevant term according to the icon. This checklist is designed to help you apply your journalistic expertise effectively to LLM outputs. With LLM-specific criteria, it guides you to keep your reporting reliable." isVisible={showCharterTooltip} onClose={() => setShowCharterTooltip(false)} className="fixed right-80 top-1/2 transform -translate-y-1/2 z-50" />
 
               </div>
+              )}
 
               {/* Takeaways Button */}
               <div className="mt-8">
