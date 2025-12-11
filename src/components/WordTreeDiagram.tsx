@@ -174,24 +174,11 @@ export function WordTreeDiagram({
       setUnlockedLevel(level + 1);
     }
     
-    // Build the path from selections
+    // Notify parent
     const newPath = [treePaths[0].words[0]];
     for (let i = 1; i <= level; i++) {
       if (newSelections[i]) newPath.push(newSelections[i]!);
     }
-    
-    // If complete path (level 6), find and append the headline ending
-    if (level === 6) {
-      const match = treePaths.find(p => 
-        p.words.every((w, i) => w === newPath[i])
-      );
-      if (match?.headline) {
-        // Append headline ending words to the path
-        const headlineWords = match.headline.split(" ");
-        newPath.push(...headlineWords);
-      }
-    }
-    
     onPathChange(newPath);
   };
 
