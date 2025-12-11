@@ -468,13 +468,14 @@ export function WordTreeDiagram({
             </React.Fragment>
           ))}
 
-          {/* Final connector to headline - only when complete */}
-          {headline && (
+          {/* Headline display - shows selected words dynamically */}
+          {currentPath.length > 1 && (
             <>
               <div className="flex items-center w-6" style={{ height: containerHeight }}>
                 <svg className="w-full h-full" viewBox={`0 0 24 ${containerHeight}`} preserveAspectRatio="none">
                   {(() => {
-                    const y = getSelectedYAtLevel(6);
+                    const lastSelectedLevel = currentPath.length - 1;
+                    const y = getSelectedYAtLevel(lastSelectedLevel);
                     return (
                       <path
                         d={`M 0 ${y} L 24 ${y}`}
@@ -487,19 +488,28 @@ export function WordTreeDiagram({
                 </svg>
               </div>
 
-              {/* Headline completion */}
+              {/* Dynamic headline based on selections */}
               <div className="relative" style={{ height: containerHeight }}>
                 <div 
-                  className="absolute bg-muted/50 border border-border rounded-lg p-3 animate-fade-in max-w-[220px]"
+                  className="absolute bg-muted/50 border border-border rounded-lg p-3 animate-fade-in max-w-[280px]"
                   style={{ 
-                    top: getSelectedYAtLevel(6) - 40,
+                    top: getSelectedYAtLevel(currentPath.length - 1) - 50,
                     left: 0 
                   }}
                 >
-                  <p className="text-[10px] text-muted-foreground mb-1">Headline ending:</p>
-                  <p className="text-xs text-foreground leading-relaxed">
-                    {headline}
+                  <p className="text-[10px] text-muted-foreground mb-1">Current headline:</p>
+                  <p className="text-sm font-medium text-foreground leading-relaxed">
+                    {currentPath.join(" ")}
+                    {!headline && <span className="text-muted-foreground">...</span>}
                   </p>
+                  {headline && (
+                    <>
+                      <p className="text-[10px] text-muted-foreground mt-2 mb-1">Ending:</p>
+                      <p className="text-xs text-muted-foreground italic">
+                        {headline}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </>
