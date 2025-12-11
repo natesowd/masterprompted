@@ -9,7 +9,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info, InfoIcon, Cpu } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon, Monitor } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -390,33 +390,35 @@ export default function HeadlineResponse() {
                                   pointerEvents: 'auto'
                                 }}>
                                   {isHighlighted ? "0.67 ✓ Highest!" : (rawOptions.find(opt => opt.word === word)?.probability || rawOptions[0]?.probability || "0.67")}
-                                  {!isHighlighted && <TooltipProvider>
-                                    <Tooltip open={secondProbTooltipOpen} onOpenChange={setSecondProbTooltipOpen}>
-                                      <TooltipTrigger asChild>
-                                        <Info className="h-3 w-3 cursor-pointer" onClick={e => {
-                                          e.stopPropagation();
-                                          setSecondProbTooltipOpen(!secondProbTooltipOpen);
-                                        }} onMouseEnter={() => setSecondProbTooltipOpen(true)} onMouseLeave={() => setSecondProbTooltipOpen(false)} />
-                                      </TooltipTrigger>
-                                      <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
-                                        <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>}
-                                  {/* Computer choice button */}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      playSelectionAnimation();
-                                    }}
-                                    disabled={isAnimating}
-                                    className={`p-0.5 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all disabled:opacity-50 ${
-                                      isAnimating ? 'animate-spin' : ''
-                                    }`}
-                                    title="Watch LLM select word"
-                                  >
-                                    <Cpu className="h-3 w-3" />
-                                  </button>
+                                  {!isHighlighted && <>
+                                    <TooltipProvider>
+                                      <Tooltip open={secondProbTooltipOpen} onOpenChange={setSecondProbTooltipOpen}>
+                                        <TooltipTrigger asChild>
+                                          <Info className="h-3 w-3 cursor-pointer" onClick={e => {
+                                            e.stopPropagation();
+                                            setSecondProbTooltipOpen(!secondProbTooltipOpen);
+                                          }} onMouseEnter={() => setSecondProbTooltipOpen(true)} onMouseLeave={() => setSecondProbTooltipOpen(false)} />
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                          <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    {/* Computer choice button */}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        playSelectionAnimation();
+                                      }}
+                                      disabled={isAnimating}
+                                      className={`p-0.5 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all disabled:opacity-50 ${
+                                        isAnimating ? 'animate-spin' : ''
+                                      }`}
+                                      title="Watch LLM select word"
+                                    >
+                                      <Monitor className="h-3 w-3" />
+                                    </button>
+                                  </>}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
@@ -469,33 +471,35 @@ export default function HeadlineResponse() {
                                   pointerEvents: 'auto'
                                 }}>
                                   {isThirdHighlighted ? `${rawOptionsThird.find(opt => opt.word === animatedThirdWord)?.probability || "0.73"} ✓ Highest!` : (rawOptionsThird.find(opt => opt.word === thirdWord)?.probability || rawOptionsThird[0]?.probability || "0.73")}
-                                  {!isThirdHighlighted && <TooltipProvider>
-                                    <Tooltip open={thirdProbTooltipOpen} onOpenChange={setThirdProbTooltipOpen}>
-                                      <TooltipTrigger asChild>
-                                        <Info className="h-3 w-3 cursor-pointer" onClick={e => {
-                                          e.stopPropagation();
-                                          setThirdProbTooltipOpen(!thirdProbTooltipOpen);
-                                        }} onMouseEnter={() => setThirdProbTooltipOpen(true)} onMouseLeave={() => setThirdProbTooltipOpen(false)} />
-                                      </TooltipTrigger>
-                                      <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
-                                        <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>}
-                                  {/* Computer choice button */}
-                                  {!isThirdHighlighted && <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      playThirdWordAnimation();
-                                    }}
-                                    disabled={isAnimatingThird}
-                                    className={`p-0.5 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all disabled:opacity-50 ${
-                                      isAnimatingThird ? 'animate-spin' : ''
-                                    }`}
-                                    title="Watch LLM select word"
-                                  >
-                                    <Cpu className="h-3 w-3" />
-                                  </button>}
+                                  {!isThirdHighlighted && <>
+                                    <TooltipProvider>
+                                      <Tooltip open={thirdProbTooltipOpen} onOpenChange={setThirdProbTooltipOpen}>
+                                        <TooltipTrigger asChild>
+                                          <Info className="h-3 w-3 cursor-pointer" onClick={e => {
+                                            e.stopPropagation();
+                                            setThirdProbTooltipOpen(!thirdProbTooltipOpen);
+                                          }} onMouseEnter={() => setThirdProbTooltipOpen(true)} onMouseLeave={() => setThirdProbTooltipOpen(false)} />
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" align="center" sideOffset={6} className="max-w-sm overflow-visible whitespace-normal text-white text-left">
+                                          <p className="text-sm leading-relaxed">{t('nextWord.response.probTooltip')}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    {/* Computer choice button */}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        playThirdWordAnimation();
+                                      }}
+                                      disabled={isAnimatingThird}
+                                      className={`p-0.5 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all disabled:opacity-50 ${
+                                        isAnimatingThird ? 'animate-spin' : ''
+                                      }`}
+                                      title="Watch LLM select word"
+                                    >
+                                      <Monitor className="h-3 w-3" />
+                                    </button>
+                                  </>}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
