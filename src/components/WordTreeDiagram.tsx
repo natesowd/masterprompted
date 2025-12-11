@@ -499,7 +499,7 @@ export function WordTreeDiagram({
                 >
                   <p className="text-[10px] text-muted-foreground mb-1">Current headline:</p>
                   <p className="text-sm font-medium text-foreground leading-relaxed">
-                    {currentPath.join(" ")}
+                    European Union {currentPath.join(" ")}
                     {!headline && <span className="text-muted-foreground">...</span>}
                   </p>
                   {headline && (
