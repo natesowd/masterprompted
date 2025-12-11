@@ -450,9 +450,18 @@ export function WordTreeDiagram({
   return (
     <div className={cn("relative overflow-x-auto", className)}>
       <div className="min-w-[1200px] p-6">
-        {/* Reset button */}
-        {unlockedLevel > 1 && (
-          <div className="flex justify-end mb-2">
+        {/* Current headline display - above tree */}
+        <div className="mb-6 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
+            <p className="text-xl font-medium text-foreground">
+              {displayHeadline || "European Union"}
+              {headline && <span className="text-muted-foreground"> {headline}</span>}
+              {!headline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
+            </p>
+          </div>
+          {/* Reset button */}
+          {unlockedLevel > 1 && (
             <Button
               variant="outline"
               size="sm"
@@ -462,8 +471,8 @@ export function WordTreeDiagram({
               <RotateCcw className="h-3 w-3" />
               Reset
             </Button>
-          </div>
-        )}
+          )}
+        </div>
         {/* Tree container */}
         <div className="flex items-start gap-1">
           {/* Level 0: Root */}
@@ -515,17 +524,6 @@ export function WordTreeDiagram({
           )}
         </div>
 
-        {/* Current headline display */}
-        {displayHeadline && (
-          <div className="mt-6 p-4 bg-muted/30 rounded-lg">
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
-            <p className="text-base font-medium text-foreground">
-              {displayHeadline}
-              {headline && <span className="text-muted-foreground"> {headline}</span>}
-              {!headline && <span className="text-muted-foreground/50">...</span>}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

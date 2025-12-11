@@ -367,39 +367,29 @@ export default function HeadlineResponse() {
               </div>
 
               {showTreeView ? (
-                <div className="space-y-6">
-                  {/* Full headline display */}
-                  <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                    <p className="text-xl md:text-2xl font-medium text-foreground leading-relaxed">
-                      {currentSentence.join(" ")}
-                    </p>
-                  </div>
-                  
-                  <WordTreeDiagram
-                    selectedPath={currentSentence}
-                    onPathChange={(path) => {
-                      // Update current sentence based on tree selection
-                      const secondWord = path[2];
-                      const thirdWord = path[3];
-                      
-                      if (secondWord === "Reaches") {
-                        setCurrentSentence(["European", "Union", "Reaches", thirdWord, "on", "Historic", "AI", "Ethics", "Framework,", "Paving", "the", "Way", "for", "Responsible", "Tech", "Innovation"]);
-                      } else if (secondWord === "Finalizes") {
-                        setCurrentSentence(["European", "Union", "Finalizes", thirdWord, "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"]);
-                      } else {
-                        // Unites path
-                        const completions: { [key: string]: string[] } = {
-                          "On": ["Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"],
-                          "Around": ["Sweeping", "AI", "Ethics", "Charter,", "Pioneering", "International", "Tech", "Policy", "Standards"],
-                          "Behind": ["Historic", "AI", "Ethics", "Framework,", "Setting", "Standards", "for", "Responsible", "Innovation"]
-                        };
-                        const completion = completions[thirdWord] || completions["On"];
-                        setCurrentSentence(["European", "Union", secondWord, thirdWord, ...completion]);
-                      }
-                    }}
-                    className="border border-border rounded-lg bg-card"
-                  />
-                </div>
+                <WordTreeDiagram
+                  selectedPath={currentSentence}
+                  onPathChange={(path) => {
+                    // Update current sentence based on tree selection
+                    const secondWord = path[2];
+                    const thirdWord = path[3];
+                    
+                    if (secondWord === "Reaches") {
+                      setCurrentSentence(["European", "Union", "Reaches", thirdWord, "on", "Historic", "AI", "Ethics", "Framework,", "Paving", "the", "Way", "for", "Responsible", "Tech", "Innovation"]);
+                    } else if (secondWord === "Finalizes") {
+                      setCurrentSentence(["European", "Union", "Finalizes", thirdWord, "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"]);
+                    } else {
+                      // Unites path
+                      const completions: { [key: string]: string[] } = {
+                        "On": ["Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"],
+                        "Around": ["Sweeping", "AI", "Ethics", "Charter,", "Pioneering", "International", "Tech", "Policy", "Standards"],
+                        "Behind": ["Historic", "AI", "Ethics", "Framework,", "Setting", "Standards", "for", "Responsible", "Innovation"]
+                      };
+                      const completion = completions[thirdWord] || completions["On"];
+                      setCurrentSentence(["European", "Union", secondWord, thirdWord, ...completion]);
+                    }
+                  }}
+                />
               ) : (
               /* Interactive Word Selection Form */
               <div className="space-y-6">
