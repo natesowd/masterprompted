@@ -100,79 +100,105 @@ export function WordTreeDiagram({
   const getSelectedThirdWord = () => selectedPath[3] || "On";
   const selectedSecondNode = treeData.children?.find(c => c.word.toLowerCase() === getSelectedSecondWord().toLowerCase());
   const selectedThirdNode = selectedSecondNode?.children?.find(c => c.word.toLowerCase() === getSelectedThirdWord().toLowerCase());
+  // Calculate node positions for accurate line drawing
+  const nodeHeight = 40;
+  const level1Gap = 48; // gap-12 = 48px
+  const level2Gap = 40; // gap-10 = 40px
+  const level1Count = treeData.children?.length || 3;
+  const level2Count = selectedSecondNode?.children?.length || 3;
+  
+  const level1TotalHeight = level1Count * nodeHeight + (level1Count - 1) * level1Gap;
+  const level2TotalHeight = level2Count * nodeHeight + (level2Count - 1) * level2Gap;
+  
+  const containerHeight = Math.max(level1TotalHeight, level2TotalHeight) + 80;
+  
+  const getLevel1Y = (idx: number) => {
+    const startOffset = (containerHeight - level1TotalHeight) / 2;
+    return startOffset + idx * (nodeHeight + level1Gap) + nodeHeight / 2;
+  };
+  
+  const getLevel2Y = (idx: number) => {
+    const startOffset = (containerHeight - level2TotalHeight) / 2;
+    return startOffset + idx * (nodeHeight + level2Gap) + nodeHeight / 2;
+  };
+  
+  const rootY = containerHeight / 2;
+
   return <div className={cn("relative overflow-x-auto", className)}>
       <div className="min-w-[900px] p-6">
         {/* Tree container */}
         <div className="flex items-start gap-2">
           {/* Level 0: Root */}
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center justify-center" style={{ height: containerHeight }}>
             <div className="bg-primary text-primary-foreground px-4 py-3 rounded-lg font-semibold text-sm shadow-md">
               European Union
             </div>
           </div>
 
           {/* Connector lines to Level 1 */}
-          <div className="flex flex-col items-center justify-center min-h-[400px] w-12">
-            <svg className="w-full h-[300px]" viewBox="0 0 48 300" preserveAspectRatio="none">
+          <div className="flex flex-col items-center justify-center w-16" style={{ height: containerHeight }}>
+            <svg className="w-full h-full" viewBox={`0 0 64 ${containerHeight}`} preserveAspectRatio="none">
               {treeData.children?.map((_, idx) => {
-              const startY = 150;
-              const endY = 50 + idx * 125;
-              const isActive = isInPath(1, treeData.children![idx].word);
-              return <path key={idx} d={`M 0 ${startY} C 24 ${startY}, 24 ${endY}, 48 ${endY}`} fill="none" stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isActive ? 3 : 1.5} strokeOpacity={isActive ? 1 : 0.4} />;
-            })}
+                const startY = rootY;
+                const endY = getLevel1Y(idx);
+                const isActive = isInPath(1, treeData.children![idx].word);
+                return <path key={idx} d={`M 0 ${startY} C 32 ${startY}, 32 ${endY}, 64 ${endY}`} fill="none" stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isActive ? 3 : 1.5} strokeOpacity={isActive ? 1 : 0.4} />;
+              })}
             </svg>
           </div>
 
           {/* Level 1: Second words */}
-          <div className="flex flex-col justify-center gap-8 min-h-[400px]">
+          <div className="flex flex-col justify-center gap-12" style={{ height: containerHeight }}>
             {treeData.children?.map(node => {
-            const isActive = isInPath(1, node.word);
-            return <button key={node.word} onClick={() => handleNodeClick(1, node)} onMouseEnter={() => setHoveredNode(`l1-${node.word}`)} onMouseLeave={() => setHoveredNode(null)} className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px]", isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted")}>
-                  {node.word}
-                  <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
-                    {node.probability}
-                  </span>
-                </button>;
-          })}
+              const isActive = isInPath(1, node.word);
+              return <button key={node.word} onClick={() => handleNodeClick(1, node)} onMouseEnter={() => setHoveredNode(`l1-${node.word}`)} onMouseLeave={() => setHoveredNode(null)} className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-10", isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted")}>
+                    {node.word}
+                    <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
+                      {node.probability}
+                    </span>
+                  </button>;
+            })}
           </div>
 
           {/* Connector lines to Level 2 */}
-          <div className="flex flex-col items-center justify-center min-h-[400px] w-16">
-            <svg className="w-full h-[300px]" viewBox="0 0 64 300" preserveAspectRatio="none">
+          <div className="flex flex-col items-center justify-center w-20" style={{ height: containerHeight }}>
+            <svg className="w-full h-full" viewBox={`0 0 80 ${containerHeight}`} preserveAspectRatio="none">
               {selectedSecondNode?.children?.map((child, idx) => {
-              const parentIdx = treeData.children?.findIndex(c => c.word.toLowerCase() === getSelectedSecondWord().toLowerCase()) ?? 0;
-              const startY = 50 + parentIdx * 125;
-              const baseY = 50;
-              const spacing = 100;
-              const endY = baseY + idx * spacing;
-              const isActive = isInPath(2, child.word);
-              return <path key={idx} d={`M 0 ${startY} C 32 ${startY}, 32 ${endY}, 64 ${endY}`} fill="none" stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isActive ? 3 : 1.5} strokeOpacity={isActive ? 1 : 0.4} />;
-            })}
+                const parentIdx = treeData.children?.findIndex(c => c.word.toLowerCase() === getSelectedSecondWord().toLowerCase()) ?? 0;
+                const startY = getLevel1Y(parentIdx);
+                const endY = getLevel2Y(idx);
+                const isActive = isInPath(2, child.word);
+                return <path key={idx} d={`M 0 ${startY} C 40 ${startY}, 40 ${endY}, 80 ${endY}`} fill="none" stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isActive ? 3 : 1.5} strokeOpacity={isActive ? 1 : 0.4} />;
+              })}
             </svg>
           </div>
 
           {/* Level 2: Third words */}
-          <div className="flex flex-col justify-center gap-6 min-h-[400px]">
+          <div className="flex flex-col justify-center gap-10" style={{ height: containerHeight }}>
             {selectedSecondNode?.children?.map(node => {
-            const isActive = isInPath(2, node.word);
-            return <button key={node.word} onClick={() => handleNodeClick(2, node, selectedSecondNode.word)} onMouseEnter={() => setHoveredNode(`l2-${node.word}`)} onMouseLeave={() => setHoveredNode(null)} className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px]", isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted")}>
-                  {node.word}
-                  <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
-                    {node.probability}
-                  </span>
-                </button>;
-          })}
+              const isActive = isInPath(2, node.word);
+              return <button key={node.word} onClick={() => handleNodeClick(2, node, selectedSecondNode.word)} onMouseEnter={() => setHoveredNode(`l2-${node.word}`)} onMouseLeave={() => setHoveredNode(null)} className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-10", isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted")}>
+                    {node.word}
+                    <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
+                      {node.probability}
+                    </span>
+                  </button>;
+            })}
           </div>
 
           {/* Connector to completion */}
-          <div className="flex flex-col items-center justify-center min-h-[400px] w-8">
-            <svg className="w-full h-[300px]" viewBox="0 0 32 300" preserveAspectRatio="none">
-              {selectedThirdNode && <path d={`M 0 150 L 32 150`} fill="none" stroke="hsl(var(--primary))" strokeWidth={3} />}
+          <div className="flex flex-col items-center justify-center w-8" style={{ height: containerHeight }}>
+            <svg className="w-full h-full" viewBox={`0 0 32 ${containerHeight}`} preserveAspectRatio="none">
+              {selectedThirdNode && (() => {
+                const thirdIdx = selectedSecondNode?.children?.findIndex(c => c.word.toLowerCase() === getSelectedThirdWord().toLowerCase()) ?? 0;
+                const lineY = getLevel2Y(thirdIdx);
+                return <path d={`M 0 ${lineY} L 32 ${lineY}`} fill="none" stroke="hsl(var(--primary))" strokeWidth={3} />;
+              })()}
             </svg>
           </div>
 
           {/* Completion text */}
-          <div className="flex flex-col justify-center min-h-[400px] max-w-[300px]">
+          <div className="flex flex-col justify-center max-w-[300px]" style={{ height: containerHeight }}>
             {selectedThirdNode && <div className="bg-muted/50 border border-border rounded-lg p-4 animate-fade-in">
                 <p className="text-xs text-muted-foreground mb-1">Completion:</p>
                 <p className="text-sm text-foreground leading-relaxed">
@@ -181,9 +207,6 @@ export function WordTreeDiagram({
               </div>}
           </div>
         </div>
-
-        {/* Full headline preview */}
-        
       </div>
     </div>;
 }
