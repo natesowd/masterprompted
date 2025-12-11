@@ -159,6 +159,13 @@ export function WordTreeDiagram({
     return match?.headline || null;
   };
 
+  // Build display headline from selected words
+  const buildDisplayHeadline = (): string => {
+    const words = currentPath.filter(Boolean);
+    if (words.length === 0) return "";
+    return words.join(" ");
+  };
+
   // Handle word selection - unlock next level
   const handleWordClick = (level: number, word: string) => {
     const newSelections = [...selections];
@@ -336,11 +343,12 @@ export function WordTreeDiagram({
                 style={{
                   position: 'absolute',
                   top: nodeY - nodeHeight / 2,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
+                  left: 0,
                 }}
                 className={cn(
-                  "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-11",
+                  "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
+                  level === 0 ? "min-w-[140px]" : "min-w-[100px]",
+                  "h-11",
                   level === 0 
                     ? "bg-primary text-primary-foreground border-primary cursor-default"
                     : isSelected 
@@ -436,11 +444,12 @@ export function WordTreeDiagram({
     );
   };
 
+  const displayHeadline = buildDisplayHeadline();
   const headline = getCurrentHeadline();
 
   return (
     <div className={cn("relative overflow-x-auto", className)}>
-      <div className="min-w-[1200px] p-4">
+      <div className="min-w-[1200px] p-6">
         {/* Reset button */}
         {unlockedLevel > 1 && (
           <div className="flex justify-end mb-2">
@@ -490,21 +499,33 @@ export function WordTreeDiagram({
               {/* Headline completion */}
               <div className="relative" style={{ height: containerHeight }}>
                 <div 
-                  className="absolute bg-muted/50 border border-border rounded-lg p-3 animate-fade-in max-w-[220px]"
+                  className="absolute bg-muted/30 rounded-lg p-4 animate-fade-in max-w-[280px]"
                   style={{ 
-                    top: getSelectedYAtLevel(6) - 40,
+                    top: getSelectedYAtLevel(6) - 50,
                     left: 0 
                   }}
                 >
-                  <p className="text-[10px] text-muted-foreground mb-1">Headline ending:</p>
-                  <p className="text-xs text-foreground leading-relaxed">
-                    {headline}
+                  <p className="text-[10px] text-muted-foreground mb-2 uppercase tracking-wide">Completion:</p>
+                  <p className="text-sm text-foreground leading-relaxed">
+                    ...{headline}
                   </p>
                 </div>
               </div>
             </>
           )}
         </div>
+
+        {/* Current headline display */}
+        {displayHeadline && (
+          <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
+            <p className="text-base font-medium text-foreground">
+              {displayHeadline}
+              {headline && <span className="text-muted-foreground"> {headline}</span>}
+              {!headline && <span className="text-muted-foreground/50">...</span>}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
