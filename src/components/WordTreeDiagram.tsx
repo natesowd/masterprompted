@@ -214,8 +214,8 @@ export function WordTreeDiagram({
   };
 
   const nodeHeight = 36;
-  const levelGap = 28;
-  const containerHeight = 320;
+  const levelGap = 44;
+  const containerHeight = 400;
 
   // Get Y position for a node, optionally centered around a reference Y
   const getNodeY = (idx: number, count: number, centerY?: number) => {
