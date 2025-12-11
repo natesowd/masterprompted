@@ -214,28 +214,83 @@ export function WordTreeDiagram({
   };
 
   const nodeHeight = 36;
-  const levelGap = 32;
+  const levelGap = 28;
   const containerHeight = 320;
 
-  const getNodeY = (idx: number, count: number) => {
+  // Get Y position for a node, optionally centered around a reference Y
+  const getNodeY = (idx: number, count: number, centerY?: number) => {
     const totalHeight = count * nodeHeight + (count - 1) * levelGap;
+    if (centerY !== undefined) {
+      // Center the group around centerY
+      const startOffset = centerY - totalHeight / 2;
+      return startOffset + idx * (nodeHeight + levelGap) + nodeHeight / 2;
+    }
+    // Default: center in container
     const startOffset = (containerHeight - totalHeight) / 2;
     return startOffset + idx * (nodeHeight + levelGap) + nodeHeight / 2;
+  };
+
+  // Get the Y position of the selected word at a given level
+  const getSelectedYAtLevel = (level: number): number => {
+    if (level === 0) return containerHeight / 2;
+    
+    const prevY = getSelectedYAtLevel(level - 1);
+    const options = getOptionsAtLevelWithPrevPath(level);
+    const selectedWord = selections[level];
+    const idx = options.findIndex(o => o.word === selectedWord);
+    
+    if (idx >= 0) {
+      return getNodeY(idx, options.length, prevY);
+    }
+    return prevY; // Fallback to previous position
+  };
+
+  // Get options based on the path up to this level
+  const getOptionsAtLevelWithPrevPath = (level: number): { word: string; probability: number }[] => {
+    if (level === 0) return [{ word: "European Union", probability: 1 }];
+    
+    const pathPrefix: string[] = [treePaths[0].words[0]];
+    for (let i = 1; i < level; i++) {
+      if (selections[i]) pathPrefix.push(selections[i]!);
+      else break;
+    }
+    
+    const matchingPaths = treePaths.filter(p => 
+      pathPrefix.every((word, i) => p.words[i] === word)
+    );
+    
+    const uniqueOptions = new Map<string, number>();
+    matchingPaths.forEach(p => {
+      const word = p.words[level];
+      const prob = p.probabilities[level];
+      if (!uniqueOptions.has(word) || uniqueOptions.get(word)! < prob) {
+        uniqueOptions.set(word, prob);
+      }
+    });
+    
+    return Array.from(uniqueOptions.entries())
+      .map(([word, probability]) => ({ word, probability }))
+      .sort((a, b) => b.probability - a.probability);
   };
 
   // Render a level column - only show if unlocked
   const renderLevel = (level: number) => {
     if (level > unlockedLevel) return null;
     
-    const options = getOptionsAtLevel(level);
+    const options = getOptionsAtLevelWithPrevPath(level);
     if (options.length === 0) return null;
 
-    const isSelectable = level === unlockedLevel && !selections[level];
+    // Allow selection if: level is unlocked AND (no selection yet OR can change existing selection)
+    const canSelect = level > 0 && level <= unlockedLevel;
+    const isCurrentFrontier = level === unlockedLevel && !selections[level];
+
+    // Get center Y from previous level's selection
+    const prevSelectedY = level > 0 ? getSelectedYAtLevel(level - 1) : containerHeight / 2;
 
     return (
-      <div key={level} className="flex flex-col" style={{ height: containerHeight }}>
-        {/* Monitor button - only for unlocked selectable levels */}
-        {level > 0 && isSelectable && (
+      <div key={level} className="flex flex-col relative" style={{ height: containerHeight }}>
+        {/* Monitor button - only for current frontier */}
+        {level > 0 && isCurrentFrontier && (
           <div className="flex justify-center mb-1">
             <TooltipProvider>
               <Tooltip>
@@ -261,27 +316,36 @@ export function WordTreeDiagram({
           </div>
         )}
         {/* Spacer if no button */}
-        {(level === 0 || !isSelectable) && level > 0 && <div className="h-6 mb-1" />}
+        {(level === 0 || !isCurrentFrontier) && <div className="h-6 mb-1" />}
         
-        {/* Word buttons */}
-        <div className="flex flex-col justify-center gap-8 flex-1">
-          {options.map((option) => {
+        {/* Word buttons - positioned relative to previous selection */}
+        <div className="relative flex-1">
+          {options.map((option, idx) => {
             const isSelected = selections[level] === option.word;
             const isAnimated = animatingLevel === level && animatedWord === option.word;
             const isPulsing = showPulse && animatingLevel === level && animatedWord === option.word;
             
+            // Calculate Y position centered around previous selection
+            const nodeY = getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined);
+            
             return (
               <button
                 key={option.word}
-                onClick={() => isSelectable && handleWordClick(level, option.word)}
-                disabled={!isSelectable && level > 0}
+                onClick={() => canSelect && handleWordClick(level, option.word)}
+                disabled={!canSelect}
+                style={{
+                  position: 'absolute',
+                  top: nodeY - nodeHeight / 2,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                }}
                 className={cn(
                   "relative px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border-2 min-w-[80px] h-9",
                   level === 0 
                     ? "bg-primary text-primary-foreground border-primary cursor-default"
                     : isSelected 
-                      ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" 
-                      : isSelectable
+                      ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
+                      : canSelect
                         ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
                         : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                   isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10",
@@ -291,7 +355,7 @@ export function WordTreeDiagram({
                 {option.word}
                 {level > 0 && (
                   <span className={cn(
-                    "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded",
+                    "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
                     isSelected ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground"
                   )}>
                     {option.probability.toFixed(2)}
@@ -312,26 +376,24 @@ export function WordTreeDiagram({
     if (toLevel > unlockedLevel) return null;
     if (fromLevel > 0 && !selections[fromLevel]) return null;
     
-    const fromOptions = getOptionsAtLevel(fromLevel);
-    const toOptions = getOptionsAtLevel(toLevel);
+    const toOptions = getOptionsAtLevelWithPrevPath(toLevel);
+    if (toOptions.length === 0) return null;
+
+    // Get the Y position of the selected word at fromLevel
+    const fromY = getSelectedYAtLevel(fromLevel);
     
-    if (fromOptions.length === 0 || toOptions.length === 0) return null;
-
-    const selectedFromWord = selections[fromLevel] || fromOptions[0]?.word;
-    const selectedFromIdx = fromOptions.findIndex(o => o.word === selectedFromWord);
-    const fromY = getNodeY(selectedFromIdx >= 0 ? selectedFromIdx : 0, fromOptions.length);
-
     // Draw many varied curves from selected "from" node to ALL "to" options
     // Add extra ghost lines to show branching complexity
-    const ghostLineCount = Math.min(8, toOptions.length * 3); // Many ghost branches
+    const ghostLineCount = Math.min(8, toOptions.length * 3);
 
     return (
       <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-16" style={{ height: containerHeight }}>
         <svg className="w-full h-full" viewBox={`0 0 64 ${containerHeight}`} preserveAspectRatio="none">
           {/* Ghost lines to show complexity - fan out wildly */}
           {Array.from({ length: ghostLineCount }).map((_, ghostIdx) => {
-            // Distribute ghost lines across vertical space with variance
-            const targetY = (containerHeight / (ghostLineCount + 1)) * (ghostIdx + 1);
+            // Distribute ghost lines around the fromY with variance
+            const spreadRange = 100;
+            const targetY = fromY + (ghostIdx - ghostLineCount / 2) * (spreadRange / ghostLineCount);
             const curveVariance = (ghostIdx % 3 - 1) * 15;
             const midX1 = 20 + curveVariance;
             const midX2 = 44 - curveVariance;
@@ -350,7 +412,8 @@ export function WordTreeDiagram({
           
           {/* Real option lines - varied curves */}
           {toOptions.map((toOpt, toIdx) => {
-            const toY = getNodeY(toIdx, toOptions.length);
+            // Calculate toY centered around fromY
+            const toY = getNodeY(toIdx, toOptions.length, fromY);
             const isSelected = selections[toLevel] === toOpt.word;
             
             // Varied curve control points for organic look
@@ -411,9 +474,7 @@ export function WordTreeDiagram({
               <div className="flex items-center w-6" style={{ height: containerHeight }}>
                 <svg className="w-full h-full" viewBox={`0 0 24 ${containerHeight}`} preserveAspectRatio="none">
                   {(() => {
-                    const options = getOptionsAtLevel(6);
-                    const idx = options.findIndex(o => o.word === selections[6]);
-                    const y = getNodeY(idx >= 0 ? idx : 0, options.length);
+                    const y = getSelectedYAtLevel(6);
                     return (
                       <path
                         d={`M 0 ${y} L 24 ${y}`}
@@ -427,8 +488,14 @@ export function WordTreeDiagram({
               </div>
 
               {/* Headline completion */}
-              <div className="flex flex-col justify-center max-w-[220px]" style={{ height: containerHeight }}>
-                <div className="bg-muted/50 border border-border rounded-lg p-3 animate-fade-in">
+              <div className="relative" style={{ height: containerHeight }}>
+                <div 
+                  className="absolute bg-muted/50 border border-border rounded-lg p-3 animate-fade-in max-w-[220px]"
+                  style={{ 
+                    top: getSelectedYAtLevel(6) - 40,
+                    left: 0 
+                  }}
+                >
                   <p className="text-[10px] text-muted-foreground mb-1">Headline ending:</p>
                   <p className="text-xs text-foreground leading-relaxed">
                     {headline}
