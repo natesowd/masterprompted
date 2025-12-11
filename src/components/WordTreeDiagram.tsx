@@ -101,6 +101,8 @@ export function WordTreeDiagram({
   const [unlockedLevel, setUnlockedLevel] = useState(1);
   // Track selected words at each level
   const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
+  // Track previously selected words (words that were once selected but are no longer)
+  const [previousSelections, setPreviousSelections] = useState<Map<number, string>>(new Map());
   
   // Animation states per level
   const [animatingLevel, setAnimatingLevel] = useState<number | null>(null);
@@ -115,6 +117,7 @@ export function WordTreeDiagram({
   const handleReset = () => {
     setUnlockedLevel(1);
     setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
+    setPreviousSelections(new Map());
     onPathChange([treePaths[0].words[0]]);
   };
 
@@ -173,12 +176,18 @@ export function WordTreeDiagram({
   // Handle word selection - unlock next level
   const handleWordClick = (level: number, word: string) => {
     const newSelections = [...selections];
-    // Clear all selections from this level onwards
+    const newPreviousSelections = new Map(previousSelections);
+    
+    // Track words being cleared as previous selections
     for (let i = level; i <= 6; i++) {
+      if (selections[i] && selections[i] !== word) {
+        newPreviousSelections.set(i, selections[i]!);
+      }
       newSelections[i] = null;
     }
     newSelections[level] = word;
     setSelections(newSelections);
+    setPreviousSelections(newPreviousSelections);
     
     // Unlock next level
     const nextLevel = level + 1;
@@ -194,16 +203,17 @@ export function WordTreeDiagram({
     onPathChange(newPath);
   };
   
-  // Auto-scroll when unlocked level changes
+  // Auto-scroll when unlocked level changes - only after 3rd word selection, show 2 levels at a time
   useEffect(() => {
-    if (unlockedLevel > 1 && containerRef.current) {
+    if (unlockedLevel > 2 && containerRef.current) {
       // Wait for the new level to render
       requestAnimationFrame(() => {
-        const levelEl = levelRefs.current[unlockedLevel];
-        if (levelEl && containerRef.current) {
+        // Scroll to show the previous level and current level (2 levels visible)
+        const prevLevelEl = levelRefs.current[unlockedLevel - 1];
+        if (prevLevelEl && containerRef.current) {
           const containerRect = containerRef.current.getBoundingClientRect();
-          const levelRect = levelEl.getBoundingClientRect();
-          const scrollLeft = containerRef.current.scrollLeft + levelRect.left - containerRect.left - 100;
+          const levelRect = prevLevelEl.getBoundingClientRect();
+          const scrollLeft = containerRef.current.scrollLeft + levelRect.left - containerRect.left - 50;
           containerRef.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
         }
       });
@@ -327,8 +337,8 @@ export function WordTreeDiagram({
           const isSelected = selections[level] === option.word;
           const isAnimated = animatingLevel === level && animatedWord === option.word;
           const isPulsing = showPulse && animatingLevel === level && animatedWord === option.word;
-          // Check if this is a past selection (already chosen and moved past)
-          const isPastSelection = isSelected && level > 0 && level < unlockedLevel;
+          // Check if this word was previously selected but is no longer (user changed their path)
+          const wasPreviouslySelected = previousSelections.get(level) === option.word && !isSelected;
           
           // Calculate Y position centered around previous selection
           const nodeY = getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined);
@@ -370,8 +380,8 @@ export function WordTreeDiagram({
                 </div>
               )}
               
-              {/* Ghost outline for past selections */}
-              {isPastSelection && (
+              {/* Ghost outline for words that were previously selected but no longer are */}
+              {wasPreviouslySelected && (
                 <div 
                   className="absolute inset-0 rounded-lg border-2 border-dashed border-green-300/40 pointer-events-none"
                   style={{ 
@@ -391,12 +401,12 @@ export function WordTreeDiagram({
                   level === 0 
                     ? "bg-primary text-primary-foreground border-primary cursor-default"
                     : isSelected 
-                      ? isPastSelection
-                        ? "bg-green-100/60 border-green-300/60 text-green-800/80 shadow-sm cursor-pointer"
-                        : "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
-                      : canSelect
-                        ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
-                        : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
+                      ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
+                      : wasPreviouslySelected
+                        ? "bg-green-50/60 border-green-200/60 text-green-700/70 cursor-pointer"
+                        : canSelect
+                          ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
+                          : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                   isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10",
                   isPulsing && "ring-4 ring-green-400 ring-offset-1 bg-green-200 border-green-400 text-green-900 animate-pulse scale-110"
                 )}
@@ -406,9 +416,7 @@ export function WordTreeDiagram({
                   <span className={cn(
                     "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
                     isSelected 
-                      ? isPastSelection 
-                        ? "bg-green-100/60 text-green-700/80"
-                        : "bg-green-200 text-green-800" 
+                      ? "bg-green-200 text-green-800" 
                       : "bg-muted text-muted-foreground"
                   )}>
                     {option.probability.toFixed(2)}
