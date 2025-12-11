@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { Monitor } from "lucide-react";
+import { Monitor, RotateCcw } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 /**
  * WordTreeDiagram - Visualizes word prediction paths as a horizontal tree diagram
@@ -105,6 +106,13 @@ export function WordTreeDiagram({
   const [animatingLevel, setAnimatingLevel] = useState<number | null>(null);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showPulse, setShowPulse] = useState(false);
+
+  // Reset to initial state
+  const handleReset = () => {
+    setUnlockedLevel(1);
+    setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
+    onPathChange([treePaths[0].words[0]]);
+  };
 
   // Get the current partial path based on selections
   const currentPath = useMemo(() => {
@@ -370,6 +378,20 @@ export function WordTreeDiagram({
   return (
     <div className={cn("relative overflow-x-auto", className)}>
       <div className="min-w-[900px] p-4">
+        {/* Reset button */}
+        {unlockedLevel > 1 && (
+          <div className="flex justify-end mb-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="h-7 text-xs gap-1.5"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset
+            </Button>
+          </div>
+        )}
         {/* Tree container */}
         <div className="flex items-start gap-1">
           {/* Level 0: Root */}
