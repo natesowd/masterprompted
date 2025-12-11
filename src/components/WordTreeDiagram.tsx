@@ -478,32 +478,34 @@ export function WordTreeDiagram({
   const headline = getCurrentHeadline();
 
   return (
-    <div ref={containerRef} className={cn("relative overflow-x-auto scroll-smooth", className)}>
-      <div className="min-w-[1600px] p-6 pr-[320px]">
-        {/* Current headline display - above tree */}
-        <div className="mb-6 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
-            <p className="text-xl font-medium text-foreground">
-              {displayHeadline || "European Union"}
-              {headline && <span className="text-muted-foreground"> {headline}</span>}
-              {!headline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
-            </p>
-          </div>
-          {/* Reset button */}
-          {unlockedLevel > 1 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReset}
-              className="h-7 text-xs gap-1.5"
-            >
-              <RotateCcw className="h-3 w-3" />
-              Reset
-            </Button>
-          )}
+    <div className={cn("relative", className)}>
+      {/* Current headline display - fixed above scrollable tree */}
+      <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
+          <p className="text-xl font-medium text-foreground truncate">
+            {displayHeadline || "European Union"}
+            {headline && <span className="text-muted-foreground"> {headline}</span>}
+            {!headline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
+          </p>
         </div>
-        {/* Tree container */}
+        {/* Reset button */}
+        {unlockedLevel > 1 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleReset}
+            className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Reset
+          </Button>
+        )}
+      </div>
+      
+      {/* Scrollable tree container */}
+      <div ref={containerRef} className="overflow-x-auto scroll-smooth">
+        <div className="min-w-[1600px] p-6 pr-[320px]">
         <div className="flex items-start gap-1">
           {/* Level 0: Root */}
           {renderLevel(0)}
@@ -553,7 +555,7 @@ export function WordTreeDiagram({
             </>
           )}
         </div>
-
+      </div>
       </div>
     </div>
   );
