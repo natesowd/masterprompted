@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Monitor, RotateCcw } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -106,6 +106,10 @@ export function WordTreeDiagram({
   const [animatingLevel, setAnimatingLevel] = useState<number | null>(null);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showPulse, setShowPulse] = useState(false);
+  
+  // Ref for auto-scroll
+  const containerRef = useRef<HTMLDivElement>(null);
+  const levelRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Reset to initial state
   const handleReset = () => {
@@ -179,6 +183,17 @@ export function WordTreeDiagram({
     // Unlock next level
     if (level < 6) {
       setUnlockedLevel(level + 1);
+      
+      // Auto-scroll to the next level after a short delay
+      setTimeout(() => {
+        const nextLevelEl = levelRefs.current[level + 1];
+        if (nextLevelEl && containerRef.current) {
+          const containerRect = containerRef.current.getBoundingClientRect();
+          const levelRect = nextLevelEl.getBoundingClientRect();
+          const scrollLeft = containerRef.current.scrollLeft + levelRect.left - containerRect.left - 100;
+          containerRef.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+        }
+      }, 100);
     }
     
     // Notify parent
@@ -295,12 +310,19 @@ export function WordTreeDiagram({
     const prevSelectedY = level > 0 ? getSelectedYAtLevel(level - 1) : containerHeight / 2;
 
     return (
-      <div key={level} className="relative" style={{ height: containerHeight, minWidth: level === 0 ? 140 : 110 }}>
+      <div 
+        key={level} 
+        ref={(el) => { levelRefs.current[level] = el; }}
+        className="relative" 
+        style={{ height: containerHeight, minWidth: level === 0 ? 140 : 110 }}
+      >
         {/* Word buttons - positioned absolutely */}
         {options.map((option, idx) => {
           const isSelected = selections[level] === option.word;
           const isAnimated = animatingLevel === level && animatedWord === option.word;
           const isPulsing = showPulse && animatingLevel === level && animatedWord === option.word;
+          // Check if this is a past selection (already chosen and moved past)
+          const isPastSelection = isSelected && level < unlockedLevel - 1;
           
           // Calculate Y position centered around previous selection
           const nodeY = getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined);
@@ -342,6 +364,17 @@ export function WordTreeDiagram({
                 </div>
               )}
               
+              {/* Ghost outline for past selections */}
+              {isPastSelection && (
+                <div 
+                  className="absolute inset-0 rounded-lg border-2 border-dashed border-green-300/40 pointer-events-none"
+                  style={{ 
+                    width: level === 0 ? 140 : 100,
+                    height: 44,
+                  }}
+                />
+              )}
+              
               <button
                 onClick={() => canSelect && handleWordClick(level, option.word)}
                 disabled={!canSelect}
@@ -352,7 +385,9 @@ export function WordTreeDiagram({
                   level === 0 
                     ? "bg-primary text-primary-foreground border-primary cursor-default"
                     : isSelected 
-                      ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
+                      ? isPastSelection
+                        ? "bg-green-100/60 border-green-300/60 text-green-800/80 shadow-sm cursor-pointer"
+                        : "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
                       : canSelect
                         ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
                         : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
@@ -364,7 +399,11 @@ export function WordTreeDiagram({
                 {level > 0 && (
                   <span className={cn(
                     "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
-                    isSelected ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground"
+                    isSelected 
+                      ? isPastSelection 
+                        ? "bg-green-100/60 text-green-700/80"
+                        : "bg-green-200 text-green-800" 
+                      : "bg-muted text-muted-foreground"
                   )}>
                     {option.probability.toFixed(2)}
                   </span>
@@ -448,7 +487,7 @@ export function WordTreeDiagram({
   const headline = getCurrentHeadline();
 
   return (
-    <div className={cn("relative overflow-x-auto scroll-smooth", className)}>
+    <div ref={containerRef} className={cn("relative overflow-x-auto scroll-smooth", className)}>
       <div className="min-w-[1600px] p-6 pr-[320px]">
         {/* Current headline display - above tree */}
         <div className="mb-6 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
