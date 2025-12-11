@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
-import LearningProgressBar from "@/components/LearningProgressBar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -85,13 +84,6 @@ const NextWordPredictionIntro = () => {
           </Card>
         </div>
         
-        <div className="mt-8">
-          <LearningProgressBar 
-            module="next-word-prediction"
-            currentStep="intro"
-            baseRoute="/module/next-word-prediction"
-          />
-        </div>
       </main>
     </div>;
 };

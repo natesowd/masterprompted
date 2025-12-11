@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import ChatPrompt from "@/components/ChatPrompt";
-import LearningProgressBar from "@/components/LearningProgressBar";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import TextFlag from "@/components/TextFlag";
 import ModuleNavigation from "@/components/ModuleNavigation";
@@ -533,10 +532,6 @@ export default function HeadlineResponse() {
         </button>
       </div>
     </div>}
-
-    <div className="mt-8">
-      <LearningProgressBar module="next-word-prediction" currentStep="main" baseRoute="/module/next-word-prediction" />
-    </div>
 
     <ModuleNavigation previousRoute="/module/next-word-prediction/prompt" nextRoute="/module/next-word-prediction/takeaways" />
     <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">

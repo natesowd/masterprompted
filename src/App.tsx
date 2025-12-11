@@ -43,9 +43,10 @@ const App = () => (
           <Route path="/" element={<Landing />} />
           <Route path="/modules" element={<Modules />} />
           <Route path="/playground" element={<PromptPlayground />} />
-          <Route path="/about" element={<About />} />
+          {/* Hidden pages - uncomment to restore: */}
+          {/* <Route path="/about" element={<About />} /> */}
           <Route path="/contact" element={<Contact />} />
-          <Route path="/imprint" element={<Imprint />} />
+          {/* <Route path="/imprint" element={<Imprint />} /> */}
 
           {/* INTRO MODULE */}
           <Route path="/module/intro" element={<Introduction />} />
