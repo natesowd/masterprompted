@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Monitor } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 /**
  * WordTreeDiagram - Visualizes word prediction paths as a horizontal tree diagram
@@ -72,12 +74,85 @@ const treeData: TreeNode = {
     }]
   }]
 };
+
 export function WordTreeDiagram({
   selectedPath,
   onPathChange,
   className
 }: WordTreeDiagramProps) {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  
+  // Animation states for Level 1
+  const [isAnimatingL1, setIsAnimatingL1] = useState(false);
+  const [animatedWordL1, setAnimatedWordL1] = useState<string | null>(null);
+  const [showPulseL1, setShowPulseL1] = useState(false);
+  
+  // Animation states for Level 2
+  const [isAnimatingL2, setIsAnimatingL2] = useState(false);
+  const [animatedWordL2, setAnimatedWordL2] = useState<string | null>(null);
+  const [showPulseL2, setShowPulseL2] = useState(false);
+
+  const playLevel1Animation = () => {
+    if (isAnimatingL1) return;
+    setIsAnimatingL1(true);
+    
+    const options = treeData.children?.map(c => c.word) || [];
+    let currentIndex = 0;
+    const cycleCount = 8;
+    let cycles = 0;
+    
+    const interval = setInterval(() => {
+      setAnimatedWordL1(options[currentIndex % options.length]);
+      currentIndex++;
+      cycles++;
+      
+      if (cycles >= cycleCount) {
+        clearInterval(interval);
+        // Land on highest probability (Unites = 0.67)
+        setAnimatedWordL1("Unites");
+        setShowPulseL1(true);
+        
+        setTimeout(() => {
+          setShowPulseL1(false);
+          setAnimatedWordL1(null);
+          setIsAnimatingL1(false);
+        }, 2000);
+      }
+    }, 200);
+  };
+
+  const playLevel2Animation = () => {
+    if (isAnimatingL2) return;
+    setIsAnimatingL2(true);
+    
+    const selectedSecond = treeData.children?.find(c => c.word.toLowerCase() === (selectedPath[2] || "Unites").toLowerCase());
+    const options = selectedSecond?.children?.map(c => c.word) || [];
+    const highestProb = selectedSecond?.children?.reduce((a, b) => 
+      parseFloat(a.probability || "0") > parseFloat(b.probability || "0") ? a : b
+    );
+    
+    let currentIndex = 0;
+    const cycleCount = 8;
+    let cycles = 0;
+    
+    const interval = setInterval(() => {
+      setAnimatedWordL2(options[currentIndex % options.length]);
+      currentIndex++;
+      cycles++;
+      
+      if (cycles >= cycleCount) {
+        clearInterval(interval);
+        setAnimatedWordL2(highestProb?.word || options[0]);
+        setShowPulseL2(true);
+        
+        setTimeout(() => {
+          setShowPulseL2(false);
+          setAnimatedWordL2(null);
+          setIsAnimatingL2(false);
+        }, 2000);
+      }
+    }, 200);
+  };
   const isInPath = (level: number, word: string) => {
     if (level === 0) return true; // Root always selected
     if (level === 1) return selectedPath[2]?.toLowerCase() === word.toLowerCase();
@@ -148,16 +223,55 @@ export function WordTreeDiagram({
           </div>
 
           {/* Level 1: Second words */}
-          <div className="flex flex-col justify-center gap-12" style={{ height: containerHeight }}>
-            {treeData.children?.map(node => {
-              const isActive = isInPath(1, node.word);
-              return <button key={node.word} onClick={() => handleNodeClick(1, node)} onMouseEnter={() => setHoveredNode(`l1-${node.word}`)} onMouseLeave={() => setHoveredNode(null)} className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-10", isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted")}>
-                    {node.word}
-                    <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
-                      {node.probability}
-                    </span>
-                  </button>;
-            })}
+          <div className="flex flex-col" style={{ height: containerHeight }}>
+            {/* Monitor button above */}
+            <div className="flex justify-center mb-2 pt-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={playLevel1Animation}
+                      disabled={isAnimatingL1}
+                      className={cn(
+                        "p-1.5 rounded-md transition-all duration-200",
+                        isAnimatingL1 
+                          ? "bg-primary/20 text-primary animate-pulse" 
+                          : "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary"
+                      )}
+                    >
+                      <Monitor className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Watch LLM select word</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            {/* Word buttons */}
+            <div className="flex flex-col justify-center gap-12 flex-1">
+              {treeData.children?.map(node => {
+                const isActive = isInPath(1, node.word);
+                const isAnimated = animatedWordL1 === node.word;
+                const isPulsing = showPulseL1 && animatedWordL1 === node.word;
+                return <button 
+                  key={node.word} 
+                  onClick={() => handleNodeClick(1, node)} 
+                  onMouseEnter={() => setHoveredNode(`l1-${node.word}`)} 
+                  onMouseLeave={() => setHoveredNode(null)} 
+                  className={cn(
+                    "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-10",
+                    isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted",
+                    isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-2 bg-primary/10",
+                    isPulsing && "ring-4 ring-green-400 ring-offset-2 bg-green-200 border-green-400 text-green-900 animate-pulse scale-110"
+                  )}>
+                  {node.word}
+                  <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
+                    {node.probability}
+                  </span>
+                </button>;
+              })}
+            </div>
           </div>
 
           {/* Connector lines to Level 2 */}
@@ -174,16 +288,55 @@ export function WordTreeDiagram({
           </div>
 
           {/* Level 2: Third words */}
-          <div className="flex flex-col justify-center gap-10" style={{ height: containerHeight }}>
-            {selectedSecondNode?.children?.map(node => {
-              const isActive = isInPath(2, node.word);
-              return <button key={node.word} onClick={() => handleNodeClick(2, node, selectedSecondNode.word)} onMouseEnter={() => setHoveredNode(`l2-${node.word}`)} onMouseLeave={() => setHoveredNode(null)} className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-10", isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted")}>
-                    {node.word}
-                    <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
-                      {node.probability}
-                    </span>
-                  </button>;
-            })}
+          <div className="flex flex-col" style={{ height: containerHeight }}>
+            {/* Monitor button above */}
+            <div className="flex justify-center mb-2 pt-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={playLevel2Animation}
+                      disabled={isAnimatingL2}
+                      className={cn(
+                        "p-1.5 rounded-md transition-all duration-200",
+                        isAnimatingL2 
+                          ? "bg-primary/20 text-primary animate-pulse" 
+                          : "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary"
+                      )}
+                    >
+                      <Monitor className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Watch LLM select word</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            {/* Word buttons */}
+            <div className="flex flex-col justify-center gap-10 flex-1">
+              {selectedSecondNode?.children?.map(node => {
+                const isActive = isInPath(2, node.word);
+                const isAnimated = animatedWordL2 === node.word;
+                const isPulsing = showPulseL2 && animatedWordL2 === node.word;
+                return <button 
+                  key={node.word} 
+                  onClick={() => handleNodeClick(2, node, selectedSecondNode.word)} 
+                  onMouseEnter={() => setHoveredNode(`l2-${node.word}`)} 
+                  onMouseLeave={() => setHoveredNode(null)} 
+                  className={cn(
+                    "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-10",
+                    isActive ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105" : "bg-card border-border hover:border-primary/50 hover:bg-muted",
+                    isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-2 bg-primary/10",
+                    isPulsing && "ring-4 ring-green-400 ring-offset-2 bg-green-200 border-green-400 text-green-900 animate-pulse scale-110"
+                  )}>
+                  {node.word}
+                  <span className={cn("absolute -top-5 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded", isActive ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
+                    {node.probability}
+                  </span>
+                </button>;
+              })}
+            </div>
           </div>
 
           {/* Connector to completion */}
