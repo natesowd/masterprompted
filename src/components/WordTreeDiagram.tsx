@@ -213,9 +213,9 @@ export function WordTreeDiagram({
     }, 180);
   };
 
-  const nodeHeight = 36;
-  const levelGap = 44;
-  const containerHeight = 400;
+  const nodeHeight = 44;
+  const levelGap = 59;
+  const containerHeight = 480;
 
   // Get Y position for a node, optionally centered around a reference Y
   const getNodeY = (idx: number, count: number, centerY?: number) => {
@@ -340,7 +340,7 @@ export function WordTreeDiagram({
                   transform: 'translateX(-50%)',
                 }}
                 className={cn(
-                  "relative px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border-2 min-w-[80px] h-9",
+                  "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 min-w-[100px] h-11",
                   level === 0 
                     ? "bg-primary text-primary-foreground border-primary cursor-default"
                     : isSelected 
