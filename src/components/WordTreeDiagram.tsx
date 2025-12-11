@@ -387,21 +387,21 @@ export function WordTreeDiagram({
     const ghostLineCount = Math.min(8, toOptions.length * 3);
 
     return (
-      <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-16" style={{ height: containerHeight }}>
-        <svg className="w-full h-full" viewBox={`0 0 64 ${containerHeight}`} preserveAspectRatio="none">
+      <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-24" style={{ height: containerHeight }}>
+        <svg className="w-full h-full" viewBox={`0 0 96 ${containerHeight}`} preserveAspectRatio="none">
           {/* Ghost lines to show complexity - fan out wildly */}
           {Array.from({ length: ghostLineCount }).map((_, ghostIdx) => {
             // Distribute ghost lines around the fromY with variance
             const spreadRange = 100;
             const targetY = fromY + (ghostIdx - ghostLineCount / 2) * (spreadRange / ghostLineCount);
             const curveVariance = (ghostIdx % 3 - 1) * 15;
-            const midX1 = 20 + curveVariance;
-            const midX2 = 44 - curveVariance;
+            const midX1 = 30 + curveVariance;
+            const midX2 = 66 - curveVariance;
             
             return (
               <path
                 key={`ghost-${ghostIdx}`}
-                d={`M 0 ${fromY} C ${midX1} ${fromY + (ghostIdx % 2 ? 10 : -10)}, ${midX2} ${targetY}, 64 ${targetY}`}
+                d={`M 0 ${fromY} C ${midX1} ${fromY + (ghostIdx % 2 ? 10 : -10)}, ${midX2} ${targetY}, 96 ${targetY}`}
                 fill="none"
                 stroke="hsl(var(--muted-foreground))"
                 strokeWidth={0.5}
@@ -423,7 +423,7 @@ export function WordTreeDiagram({
             return (
               <path
                 key={`real-${toOpt.word}`}
-                d={`M 0 ${fromY} C ${22 + curveOffset} ${fromY + vertOffset}, ${42 - curveOffset} ${toY - vertOffset}, 64 ${toY}`}
+                d={`M 0 ${fromY} C ${34 + curveOffset} ${fromY + vertOffset}, ${62 - curveOffset} ${toY - vertOffset}, 96 ${toY}`}
                 fill="none"
                 stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
                 strokeWidth={isSelected ? 2.5 : 1}
@@ -440,7 +440,7 @@ export function WordTreeDiagram({
 
   return (
     <div className={cn("relative overflow-x-auto", className)}>
-      <div className="min-w-[900px] p-4">
+      <div className="min-w-[1200px] p-4">
         {/* Reset button */}
         {unlockedLevel > 1 && (
           <div className="flex justify-end mb-2">
