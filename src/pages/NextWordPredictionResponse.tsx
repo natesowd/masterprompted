@@ -368,6 +368,10 @@ export default function HeadlineResponse() {
                     <GitBranch className="h-3.5 w-3.5" />
                     Tree
                   </ToggleGroupItem>
+                  <ToggleGroupItem value="branch" aria-label="Branch View" className="gap-1.5 text-xs">
+                    <GitBranch className="h-3.5 w-3.5 rotate-90" />
+                    Paths
+                  </ToggleGroupItem>
                   <ToggleGroupItem value="full" aria-label="Full Branch View" className="gap-1.5 text-xs">
                     <Network className="h-3.5 w-3.5" />
                     Branch
