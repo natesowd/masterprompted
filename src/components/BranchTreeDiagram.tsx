@@ -207,29 +207,56 @@ export function BranchTreeDiagram({
         {/* Branch visualization */}
         <div className="flex-1 overflow-x-auto">
           <div className="min-w-[600px] p-4">
-            {/* SVG branch lines */}
+            {/* SVG branch lines - proper tree structure */}
             <svg className="w-full h-[400px]" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
-              
-              {/* Draw all paths as branches */}
+              {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
                 const isMatching = pathMatchesSelections(path);
-                const yOffset = 20 + (pathIndex * 5.5);
                 
-                // Calculate branch points
+                // Calculate proper tree branching positions
+                // Level 1: Split by "Unites" (32 paths) vs "Reaches" (32 paths)
+                const level1Group = path.words[1] === "Unites" ? 0 : 1;
+                // Level 2: Split by "On" vs "Around" within each group
+                const level2Group = path.words[2] === "On" ? 0 : 1;
+                // Level 3: Split by "Historic" vs "Sweeping"
+                const level3Group = path.words[3] === "Historic" ? 0 : 1;
+                // Level 4: Split by "AI" vs "Technology"
+                const level4Group = path.words[4] === "AI" ? 0 : 1;
+                // Level 5: Split by "Ethics" vs "Governance"
+                const level5Group = path.words[5] === "Ethics" ? 0 : 1;
+                // Level 6: Split by "Framework" vs "Charter"
+                const level6Group = path.words[6] === "Framework" ? 0 : 1;
+                
+                // Calculate Y positions based on binary splits
+                const baseY = 200;
+                const spread = 180;
+                
+                // Progressive Y calculation
+                const y1 = baseY + (level1Group - 0.5) * spread;
+                const y2 = y1 + (level2Group - 0.5) * (spread / 2);
+                const y3 = y2 + (level3Group - 0.5) * (spread / 4);
+                const y4 = y3 + (level4Group - 0.5) * (spread / 8);
+                const y5 = y4 + (level5Group - 0.5) * (spread / 16);
+                const y6 = y5 + (level6Group - 0.5) * (spread / 32);
+                
                 const points = [
-                  { x: 30, y: 200 }, // Start from root
-                  { x: 100, y: yOffset + (path.words[1] === "Unites" ? 0 : 180) },
-                  { x: 170, y: yOffset },
-                  { x: 240, y: yOffset },
-                  { x: 310, y: yOffset },
-                  { x: 380, y: yOffset },
-                  { x: 450, y: yOffset },
-                  { x: 550, y: yOffset },
+                  { x: 20, y: baseY },
+                  { x: 100, y: y1 },
+                  { x: 180, y: y2 },
+                  { x: 260, y: y3 },
+                  { x: 340, y: y4 },
+                  { x: 420, y: y5 },
+                  { x: 500, y: y6 },
+                  { x: 570, y: y6 },
                 ];
                 
-                // Create path string
+                // Create curved path for smoother look
                 const pathD = `M ${points[0].x} ${points[0].y} ` +
-                  points.slice(1).map(p => `L ${p.x} ${p.y}`).join(" ");
+                  points.slice(1).map((p, i) => {
+                    const prev = points[i];
+                    const cpX = (prev.x + p.x) / 2;
+                    return `C ${cpX} ${prev.y} ${cpX} ${p.y} ${p.x} ${p.y}`;
+                  }).join(" ");
                 
                 return (
                   <g key={pathIndex}>
@@ -237,28 +264,23 @@ export function BranchTreeDiagram({
                       d={pathD}
                       fill="none"
                       stroke={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                      strokeWidth={isMatching ? 2 : 0.5}
-                      opacity={isMatching ? 1 : 0.2}
+                      strokeWidth={isMatching ? 2.5 : 0.5}
+                      opacity={isMatching ? 1 : 0.15}
                       className="transition-all duration-300"
                     />
                     {/* End node */}
                     <circle
-                      cx={550}
-                      cy={yOffset}
-                      r={isMatching ? 4 : 2}
+                      cx={570}
+                      cy={y6}
+                      r={isMatching ? 4 : 1.5}
                       fill={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                      opacity={isMatching ? 1 : 0.3}
+                      opacity={isMatching ? 1 : 0.25}
                       className="transition-all duration-300"
                     />
                   </g>
                 );
               })}
             </svg>
-            
-            {/* Matching paths count */}
-            <div className="text-center text-sm text-muted-foreground mt-2">
-              {getMatchingPaths.length} possible path{getMatchingPaths.length !== 1 ? 's' : ''} remaining
-            </div>
           </div>
         </div>
 
