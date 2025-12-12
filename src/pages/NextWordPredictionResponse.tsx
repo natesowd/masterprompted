@@ -49,7 +49,7 @@ export default function HeadlineResponse() {
   // Watch for "Charter" in the sentence to expand evaluation panel
   useEffect(() => {
     const hasCharter = currentSentence.some(word => 
-      word.toLowerCase().includes("charter")
+      word && word.toLowerCase().includes("charter")
     );
     if (hasCharter && !evaluationPanelOpen) {
       setEvaluationPanelOpen(true);
