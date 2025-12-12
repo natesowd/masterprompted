@@ -315,20 +315,8 @@ export default function HeadlineResponse() {
     </div>
   }];
 
-  // Define intro popover steps replacing MiniTask
-  const introPopoverSteps = [{
-    id: "mini-task-intro",
-    trigger: "[data-mini-task-target]",
-    content: <div className="space-y-2">
-      <h3 className="font-semibold text-lg">{t('nextWord.response.miniTaskTitle')}</h3>
-      <p className="text-sm leading-relaxed">{t('nextWord.response.miniTaskDescription')}</p>
-    </div>
-  }];
   return <div className="min-h-screen bg-background">
-    {showIntroPopover && <PopoverSeries steps={introPopoverSteps} onClose={() => setShowIntroPopover(false)} />}
     <Header />
-
-    {/* MiniTask - render at top for immediate visibility */}
 
 
     <main className="container mx-auto px-6 py-6 max-w-7xl">
