@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Monitor } from "lucide-react";
@@ -195,10 +195,24 @@ export function FullBranchDiagram({
     return selections.every((word, i) => path.words[i] === word);
   };
 
-  // Get X position for a level
+  // Get X position for a level (extended for completion)
   const getLevelX = (level: number): number => {
     return 50 + level * 110;
   };
+
+  // Scroll container ref for auto-scroll
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll when selections advance
+  useEffect(() => {
+    if (scrollContainerRef.current && selections.length > 3) {
+      const scrollX = Math.max(0, (selections.length - 2) * 110);
+      scrollContainerRef.current.scrollTo({ left: scrollX, behavior: 'smooth' });
+    }
+  }, [selections.length]);
+
+  // SVG width needs to accommodate completion text
+  const svgWidth = 1050;
 
   return (
     <div className={cn("relative", className)}>
@@ -224,21 +238,25 @@ export function FullBranchDiagram({
       </div>
 
       {/* Branch visualization */}
-      <div className="overflow-x-auto mb-6">
-        <div className="min-w-[850px] p-4">
-          <svg className="w-full h-[300px]" viewBox="0 0 850 300" preserveAspectRatio="xMidYMid meet">
-            {/* Draw all 64 branch paths */}
+      <div ref={scrollContainerRef} className="overflow-x-auto mb-6">
+        <div className="min-w-[1050px] p-4">
+          <svg className="w-full h-[300px]" viewBox={`0 0 ${svgWidth} 300`} preserveAspectRatio="xMidYMid meet">
+            {/* Draw all 64 branch paths - extended to completion */}
             {treePaths.map((path, pathIndex) => {
               const isSelected = pathMatchesSelections(path);
               const isFirstMatch = isSelected && pathIndex === treePaths.findIndex(p => pathMatchesSelections(p));
               
-              // Build the path
+              // Build the path - now extends to level 7 for completion
               let d = `M 50 150`;
               for (let level = 1; level <= 6; level++) {
                 const x = getLevelX(level);
                 const y = getPathY(path, level);
                 d += ` L ${x} ${y}`;
               }
+              // Extend to completion position
+              const completionX = getLevelX(7);
+              const completionY = getPathY(path, 6);
+              d += ` L ${completionX} ${completionY}`;
               
               return (
                 <path
@@ -302,6 +320,20 @@ export function FullBranchDiagram({
                 </g>
               );
             })}
+
+            {/* Completion text at the end of the selected branch */}
+            {selections.length === 7 && selectedFullPath && (
+              <g>
+                <text
+                  x={getLevelX(7) + 10}
+                  y={getPathY(selectedFullPath, 6) + 4}
+                  textAnchor="start"
+                  className="text-[10px] font-medium fill-primary pointer-events-none select-none"
+                >
+                  {selectedFullPath.headline}
+                </text>
+              </g>
+            )}
           </svg>
         </div>
       </div>
