@@ -432,10 +432,11 @@ export function BranchTreeDiagram({
                       width={wordWidth}
                       height={rectHeight}
                       rx={closeUpView ? 6 : 4}
-                      fill="hsl(var(--primary))"
+                      fill={displayWord === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"}
                       className={cn(
                         "drop-shadow-sm transition-all duration-200",
-                        isClickable && "hover:fill-[hsl(var(--primary)/0.8)]"
+                        isClickable && displayWord !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]",
+                        isClickable && displayWord === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]"
                       )}
                     />
                     <text
@@ -488,12 +489,14 @@ export function BranchTreeDiagram({
                       disabled={isAnimating}
                       className={cn(
                         "w-full text-left px-4 py-3 rounded-lg border transition-all",
-                        "hover:border-primary hover:bg-primary/5",
                         "focus:outline-none focus:ring-2 focus:ring-primary/50",
+                        word === "Charter" 
+                          ? "border-destructive bg-destructive/10 hover:bg-destructive/20" 
+                          : "hover:border-primary hover:bg-primary/5",
                         isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10"
                       )}
                     >
-                      <div className="font-medium text-foreground">
+                      <div className={cn("font-medium", word === "Charter" ? "text-destructive" : "text-foreground")}>
                         {word === "Charter" ? (
                           <TextFlag
                             text="Charter"

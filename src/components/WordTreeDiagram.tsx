@@ -380,11 +380,17 @@ export function WordTreeDiagram({
                   "h-11",
                   level === 0 
                     ? "bg-primary text-primary-foreground border-primary cursor-default"
-                    : isSelected 
-                      ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
-                      : canSelect
-                        ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
-                        : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
+                    : option.word === "Charter"
+                      ? isSelected
+                        ? "bg-destructive/30 border-destructive text-destructive shadow-md scale-105 cursor-pointer"
+                        : canSelect
+                          ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer"
+                          : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed"
+                      : isSelected 
+                        ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
+                        : canSelect
+                          ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
+                          : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                   isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10",
                   isPulsing && "ring-4 ring-green-400 ring-offset-1 bg-green-200 border-green-400 text-green-900 animate-pulse scale-110"
                 )}

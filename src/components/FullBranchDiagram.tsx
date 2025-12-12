@@ -455,10 +455,11 @@ export function FullBranchDiagram({
                         width={wordWidth}
                         height={24}
                         rx={4}
-                        fill="hsl(var(--primary))"
+                        fill={word === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"}
                         className={cn(
                           "drop-shadow-sm transition-all duration-200",
-                          isClickable && "hover:fill-[hsl(var(--primary)/0.8)]"
+                          isClickable && word !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]",
+                          isClickable && word === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]"
                         )}
                       />
                       <text
@@ -527,10 +528,11 @@ export function FullBranchDiagram({
                   disabled={isAnimating}
                   className={cn(
                     "h-12 min-w-[140px] flex flex-col gap-0.5 px-6",
+                    option.word === "Charter" && "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
                     isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10"
                   )}
                 >
-                  <span className="text-sm font-medium">
+                  <span className={cn("text-sm font-medium", option.word === "Charter" && "text-destructive")}>
                     {option.word === "Charter" ? (
                       <TextFlag
                         text="Charter"
