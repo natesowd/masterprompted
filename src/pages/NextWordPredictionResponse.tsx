@@ -43,6 +43,17 @@ export default function HeadlineResponse() {
   const [animatedThirdWord, setAnimatedThirdWord] = useState<string | null>(null);
   const [showHighlightPulseThird, setShowHighlightPulseThird] = useState(false);
   const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full">("dropdown");
+  const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
+
+  // Watch for "Charter" in the sentence to expand evaluation panel
+  useEffect(() => {
+    const hasCharter = currentSentence.some(word => 
+      word.toLowerCase().includes("charter")
+    );
+    if (hasCharter && !evaluationPanelOpen) {
+      setEvaluationPanelOpen(true);
+    }
+  }, [currentSentence]);
   
   const toggleDropdownTooltip = (key: string, value: boolean) => {
     setDropdownProbTooltips(prev => ({
@@ -652,7 +663,7 @@ export default function HeadlineResponse() {
 
           {/* Right column - Evaluation panel */}
           <div className="w-full lg:w-auto lg:flex-shrink-0" data-evaluation-panel>
-            <EvaluationPanel />
+            <EvaluationPanel initialIsOpen={evaluationPanelOpen} canClose={true} />
           </div>
         </div>
       </div>
