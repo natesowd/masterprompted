@@ -253,21 +253,43 @@ export function FullBranchDiagram({
               );
             })}
             
-            {/* Words along the selected path */}
+            {/* Words along the selected path - clickable to navigate */}
             {selectedFullPath && selections.map((word, level) => {
               const x = getLevelX(level);
               const y = getPathY(selectedFullPath, level);
+              const isClickable = level > 0; // Can't go back before "European Union"
+              
+              // Handle clicking a word to go back to that level
+              const handleWordClick = () => {
+                if (!isClickable) return;
+                // Keep selections up to and including this level, then remove rest
+                const newSelections = selections.slice(0, level);
+                setSelections(newSelections);
+                setCurrentLevel(level);
+                onPathChange(newSelections);
+              };
+              
+              // Calculate dynamic width based on word length
+              const wordWidth = Math.max(80, word.length * 8 + 16);
               
               return (
-                <g key={`word-${level}`}>
+                <g 
+                  key={`word-${level}`} 
+                  onClick={handleWordClick}
+                  className={cn(isClickable && "cursor-pointer")}
+                  style={{ pointerEvents: isClickable ? 'all' : 'none' }}
+                >
                   <rect
-                    x={x - 40}
+                    x={x - wordWidth / 2}
                     y={y - 12}
-                    width={80}
+                    width={wordWidth}
                     height={24}
                     rx={4}
                     fill="hsl(var(--primary))"
-                    className="drop-shadow-sm"
+                    className={cn(
+                      "drop-shadow-sm transition-all duration-200",
+                      isClickable && "hover:fill-[hsl(var(--primary)/0.8)]"
+                    )}
                   />
                   <text
                     x={x}
@@ -275,7 +297,7 @@ export function FullBranchDiagram({
                     textAnchor="middle"
                     className="text-[10px] font-medium fill-primary-foreground pointer-events-none select-none"
                   >
-                    {word.length > 12 ? word.slice(0, 10) + "..." : word}
+                    {word}
                   </text>
                 </g>
               );
