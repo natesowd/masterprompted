@@ -144,15 +144,15 @@ export default function TextFlag({
         </span>
       </HoverCardTrigger>
       <HoverCardContent 
-        className="w-80 bg-card border-destructive/20 shadow-lg rounded-lg p-4"
+        className="w-80 max-w-[90vw] bg-card border-destructive/20 shadow-lg rounded-lg p-4"
         sideOffset={5}
       >
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Icon className="h-4 w-4 text-destructive" />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Icon className="h-4 w-4 text-destructive flex-shrink-0" />
             <h4 className="font-semibold text-destructive text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
           </div>
-          <p className="text-sm text-foreground font-normal leading-relaxed">
+          <p className="text-sm text-foreground font-normal leading-relaxed break-words">
             {explanation}
           </p>
         </div>
