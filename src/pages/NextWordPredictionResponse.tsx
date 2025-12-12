@@ -8,14 +8,14 @@ import ModuleNavigation from "@/components/ModuleNavigation";
 import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { WordTreeDiagram } from "@/components/WordTreeDiagram";
 import { BranchTreeDiagram } from "@/components/BranchTreeDiagram";
+import { FullBranchDiagram } from "@/components/FullBranchDiagram";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown, Info, InfoIcon, Monitor, GitBranch, Network } from "lucide-react";
+import { ArrowRight, ChevronDown, Info, InfoIcon, Monitor, GitBranch, Network, List } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useLanguage } from "@/contexts/LanguageContext";
 export default function HeadlineResponse() {
   const navigate = useNavigate();
@@ -42,8 +42,7 @@ export default function HeadlineResponse() {
   const [isAnimatingThird, setIsAnimatingThird] = useState(false);
   const [animatedThirdWord, setAnimatedThirdWord] = useState<string | null>(null);
   const [showHighlightPulseThird, setShowHighlightPulseThird] = useState(false);
-  const [showTreeView, setShowTreeView] = useState(false);
-  const [showBranchView, setShowBranchView] = useState(false);
+  const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full">("dropdown");
   
   const toggleDropdownTooltip = (key: string, value: boolean) => {
     setDropdownProbTooltips(prev => ({
@@ -354,44 +353,32 @@ export default function HeadlineResponse() {
                   Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
                 </p>
                 
-                {/* View Toggles */}
-                <div className="flex items-center gap-4 ml-4 shrink-0">
-                  <div className="flex items-center gap-2">
-                    <GitBranch className="h-4 w-4 text-muted-foreground" />
-                    <Label htmlFor="tree-view" className="text-sm text-muted-foreground cursor-pointer">
-                      Tree View
-                    </Label>
-                    <Switch
-                      id="tree-view"
-                      checked={showTreeView}
-                      onCheckedChange={(checked) => {
-                        setShowTreeView(checked);
-                        if (checked) setShowBranchView(false);
-                      }}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Network className="h-4 w-4 text-muted-foreground" />
-                    <Label htmlFor="branch-view" className="text-sm text-muted-foreground cursor-pointer">
-                      Branch View
-                    </Label>
-                    <Switch
-                      id="branch-view"
-                      checked={showBranchView}
-                      onCheckedChange={(checked) => {
-                        setShowBranchView(checked);
-                        if (checked) setShowTreeView(false);
-                      }}
-                    />
-                  </div>
-                </div>
+                {/* View Toggle Group */}
+                <ToggleGroup 
+                  type="single" 
+                  value={viewMode} 
+                  onValueChange={(value) => value && setViewMode(value as typeof viewMode)}
+                  className="ml-4 shrink-0"
+                >
+                  <ToggleGroupItem value="dropdown" aria-label="Dropdown View" className="gap-1.5 text-xs">
+                    <List className="h-3.5 w-3.5" />
+                    Dropdown
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="tree" aria-label="Tree View" className="gap-1.5 text-xs">
+                    <GitBranch className="h-3.5 w-3.5" />
+                    Tree
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="full" aria-label="Full Branch View" className="gap-1.5 text-xs">
+                    <Network className="h-3.5 w-3.5" />
+                    Branch
+                  </ToggleGroupItem>
+                </ToggleGroup>
               </div>
 
-              {showTreeView ? (
+              {viewMode === "tree" ? (
                 <WordTreeDiagram
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
-                    // Update current sentence based on tree selection
                     const secondWord = path[2];
                     const thirdWord = path[3];
                     
@@ -400,7 +387,6 @@ export default function HeadlineResponse() {
                     } else if (secondWord === "Finalizes") {
                       setCurrentSentence(["European", "Union", "Finalizes", thirdWord, "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"]);
                     } else {
-                      // Unites path
                       const completions: { [key: string]: string[] } = {
                         "On": ["Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"],
                         "Around": ["Sweeping", "AI", "Ethics", "Charter,", "Pioneering", "International", "Tech", "Policy", "Standards"],
@@ -411,18 +397,25 @@ export default function HeadlineResponse() {
                     }
                   }}
                 />
-              ) : showBranchView ? (
+              ) : viewMode === "full" ? (
+                <FullBranchDiagram
+                  selectedPath={currentSentence}
+                  onPathChange={(path) => {
+                    if (path.length >= 7) {
+                      setCurrentSentence(path);
+                    }
+                  }}
+                />
+              ) : viewMode === "branch" ? (
                 <BranchTreeDiagram
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
-                    // Update current sentence based on branch selection
                     if (path.length >= 7) {
                       setCurrentSentence(path);
                     }
                   }}
                 />
               ) : (
-              /* Interactive Word Selection Form */
               <div className="space-y-6">
                 <div className="relative">
                   <h1 className="text-2xl text-gray-900 leading-loose font-normal md:text-4xl" style={{
