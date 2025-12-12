@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Monitor, ZoomIn, ZoomOut } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import TextFlag from "@/components/TextFlag";
 
 /**
  * FullBranchDiagram - Shows all branches with words flowing along the selected path.
@@ -529,7 +530,17 @@ export function FullBranchDiagram({
                     isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10"
                   )}
                 >
-                  <span className="text-sm font-medium">{option.word}</span>
+                  <span className="text-sm font-medium">
+                    {option.word === "Charter" ? (
+                      <TextFlag
+                        text="Charter"
+                        evaluationFactor="factual_accuracy"
+                        explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate."
+                        severity="error"
+                        className="no-underline"
+                      />
+                    ) : option.word}
+                  </span>
                   <span className="text-xs text-muted-foreground">
                     {(option.prob * 100).toFixed(0)}%
                   </span>

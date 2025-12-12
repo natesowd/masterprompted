@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Monitor } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import TextFlag from "@/components/TextFlag";
 
 /**
  * BranchTreeDiagram - Shows all possible sentence branches greyed out,
@@ -492,7 +493,17 @@ export function BranchTreeDiagram({
                         isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10"
                       )}
                     >
-                      <div className="font-medium text-foreground">{word}</div>
+                      <div className="font-medium text-foreground">
+                        {word === "Charter" ? (
+                          <TextFlag
+                            text="Charter"
+                            evaluationFactor="factual_accuracy"
+                            explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate."
+                            severity="error"
+                            className="no-underline"
+                          />
+                        ) : word}
+                      </div>
                       <div className="text-xs text-muted-foreground mt-1">
                         Probability: {(probability * 100).toFixed(0)}%
                       </div>

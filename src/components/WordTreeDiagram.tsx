@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Monitor, RotateCcw } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import TextFlag from "@/components/TextFlag";
 
 /**
  * WordTreeDiagram - Visualizes word prediction paths as a horizontal tree diagram
@@ -388,7 +389,15 @@ export function WordTreeDiagram({
                   isPulsing && "ring-4 ring-green-400 ring-offset-1 bg-green-200 border-green-400 text-green-900 animate-pulse scale-110"
                 )}
               >
-                {option.word}
+                {option.word === "Charter" ? (
+                  <TextFlag
+                    text="Charter"
+                    evaluationFactor="factual_accuracy"
+                    explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate."
+                    severity="error"
+                    className="no-underline"
+                  />
+                ) : option.word}
                 {level > 0 && (
                   <span className={cn(
                     "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
