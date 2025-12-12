@@ -294,21 +294,43 @@ export function FullBranchDiagram({
           >
             {closeUpView ? (
               <>
-                {/* Close-up view: Show only 3 words at a time on a single line */}
-                {/* Draw simplified branch line */}
-                <line
-                  x1={50}
-                  y1={100}
-                  x2={650}
-                  y2={100}
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={3}
-                  strokeOpacity={0.3}
-                />
+                {/* Close-up view: Show all branches but zoomed in on 3 words */}
+                {/* Draw all branch paths */}
+                {treePaths.map((path, pathIndex) => {
+                  const isSelected = pathMatchesSelections(path);
+                  
+                  let d = `M ${getCloseUpX(0)} 100`;
+                  for (let level = 1; level <= 6; level++) {
+                    if (level < visibleLevels.start || level > visibleLevels.end + 1) continue;
+                    const x = getCloseUpX(level);
+                    const baseY = 100;
+                    let offset = 0;
+                    let spread = 60;
+                    
+                    for (let l = 1; l <= Math.min(level, 6); l++) {
+                      const wordIndex = levelOptions[l].findIndex(o => o.word === path.words[l]);
+                      offset += wordIndex === 0 ? -spread : spread;
+                      spread /= 2;
+                    }
+                    const y = baseY + offset / 4;
+                    d += ` L ${x} ${y}`;
+                  }
+                  
+                  return (
+                    <path
+                      key={pathIndex}
+                      d={d}
+                      fill="none"
+                      stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                      strokeWidth={isSelected ? 2.5 : 0.5}
+                      strokeOpacity={isSelected ? 1 : 0.15}
+                      className="transition-all duration-300"
+                    />
+                  );
+                })}
                 
                 {/* Words along the visible portion */}
                 {selections.map((word, level) => {
-                  // Only show 3 levels at a time centered around current selection
                   if (level < visibleLevels.start || level > visibleLevels.end) return null;
                   
                   const x = getCloseUpX(level);
@@ -364,10 +386,10 @@ export function FullBranchDiagram({
                   <text x={670} y={105} className="text-lg fill-muted-foreground">→</text>
                 )}
 
-                {/* Completion text in close-up */}
+                {/* Completion text in close-up - positioned after the last word */}
                 {selections.length === 7 && selectedFullPath && visibleLevels.end >= 6 && (
                   <text
-                    x={getCloseUpX(6) + 80}
+                    x={getCloseUpX(6) + 100}
                     y={105}
                     textAnchor="start"
                     className="text-xs font-medium fill-primary pointer-events-none select-none"
@@ -378,7 +400,7 @@ export function FullBranchDiagram({
               </>
             ) : (
               <>
-                {/* Normal view: Full tree with all branches */}
+                {/* Normal view: Full tree with all branches - paths end at last word, not through completion */}
                 {treePaths.map((path, pathIndex) => {
                   const isSelected = pathMatchesSelections(path);
                   
@@ -388,9 +410,7 @@ export function FullBranchDiagram({
                     const y = getPathY(path, level);
                     d += ` L ${x} ${y}`;
                   }
-                  const completionX = getLevelX(7);
-                  const completionY = getPathY(path, 6);
-                  d += ` L ${completionX} ${completionY}`;
+                  // Don't extend line to completion text area
                   
                   return (
                     <path
