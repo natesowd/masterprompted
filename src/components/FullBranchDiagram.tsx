@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Monitor } from "lucide-react";
 
 /**
- * FullBranchDiagram - Shows all words on the tree with one selected branch highlighted.
- * Word selection moved to bottom with computer animation button.
+ * FullBranchDiagram - Shows all branches with words flowing along the selected path.
+ * Progressive word selection at bottom with probabilities for both options.
  */
 
 interface TreePath {
@@ -82,15 +82,15 @@ const treePaths: TreePath[] = [
   { words: ["European Union", "Reaches", "Around", "Sweeping", "Technology", "Governance", "Charter"], probabilities: [1, 0.42, 0.23, 0.37, 0.32, 0.29, 0.34], headline: "Positioning Europe as Democratic Alternative" },
 ];
 
-// Word options at each level
-const levelOptions = [
-  ["European Union"],
-  ["Unites", "Reaches"],
-  ["On", "Around"],
-  ["Historic", "Sweeping"],
-  ["AI", "Technology"],
-  ["Ethics", "Governance"],
-  ["Framework", "Charter"],
+// Word options at each level with probabilities
+const levelOptions: { word: string; prob: number }[][] = [
+  [{ word: "European Union", prob: 1.0 }],
+  [{ word: "Unites", prob: 0.34 }, { word: "Reaches", prob: 0.42 }],
+  [{ word: "On", prob: 0.40 }, { word: "Around", prob: 0.30 }],
+  [{ word: "Historic", prob: 0.44 }, { word: "Sweeping", prob: 0.38 }],
+  [{ word: "AI", prob: 0.52 }, { word: "Technology", prob: 0.30 }],
+  [{ word: "Ethics", prob: 0.64 }, { word: "Governance", prob: 0.22 }],
+  [{ word: "Framework", prob: 0.50 }, { word: "Charter", prob: 0.40 }],
 ];
 
 interface FullBranchDiagramProps {
@@ -104,109 +104,100 @@ export function FullBranchDiagram({
   onPathChange,
   className
 }: FullBranchDiagramProps) {
-  const [selections, setSelections] = useState<string[]>([
-    "European Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework"
-  ]);
+  const [selections, setSelections] = useState<string[]>(["European Union"]);
+  const [currentLevel, setCurrentLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [animatingLevel, setAnimatingLevel] = useState<number | null>(null);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
 
-  // Get matching path for current selections
-  const matchingPath = useMemo(() => {
-    return treePaths.find(p => 
-      p.words.every((word, i) => word === selections[i])
+  // Get matching paths for current selections
+  const matchingPaths = useMemo(() => {
+    return treePaths.filter(p => 
+      selections.every((word, i) => p.words[i] === word)
     );
   }, [selections]);
 
+  // Get the first matching complete path (for display)
+  const selectedFullPath = useMemo(() => {
+    if (selections.length === 7) {
+      return treePaths.find(p => p.words.every((w, i) => w === selections[i]));
+    }
+    return matchingPaths[0];
+  }, [selections, matchingPaths]);
+
   // Build headline string
   const buildHeadline = (): string => {
-    if (matchingPath) {
-      return `${selections.join(" ")}, ${matchingPath.headline}`;
+    if (selections.length === 7 && selectedFullPath) {
+      return `${selections.join(" ")}, ${selectedFullPath.headline}`;
     }
-    return selections.join(" ");
+    return selections.join(" ") + "...";
   };
 
-  // Handle word selection
-  const handleWordSelect = (level: number, word: string) => {
-    const newSelections = [...selections];
-    newSelections[level] = word;
+  // Handle word selection - progressive reveal
+  const handleWordSelect = (word: string) => {
+    const newSelections = [...selections, word];
     setSelections(newSelections);
+    setCurrentLevel(currentLevel + 1);
     onPathChange(newSelections);
   };
 
-  // Reset to default
+  // Reset to start
   const handleReset = () => {
-    const defaultPath = ["European Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework"];
-    setSelections(defaultPath);
-    onPathChange(defaultPath);
+    setSelections(["European Union"]);
+    setCurrentLevel(1);
+    onPathChange(["European Union"]);
   };
 
-  // Play computer selection animation for a level
-  const playAnimation = (level: number) => {
-    if (isAnimating || level === 0) return;
+  // Play computer selection animation
+  const playAnimation = () => {
+    if (isAnimating || currentLevel > 6) return;
     setIsAnimating(true);
-    setAnimatingLevel(level);
 
-    const options = levelOptions[level];
-    let currentIndex = 0;
+    const options = levelOptions[currentLevel];
+    let cycleIndex = 0;
     const cycleCount = 8;
-    let cycles = 0;
 
     const interval = setInterval(() => {
-      setAnimatedWord(options[currentIndex % options.length]);
-      currentIndex++;
-      cycles++;
+      setAnimatedWord(options[cycleIndex % options.length].word);
+      cycleIndex++;
 
-      if (cycles >= cycleCount) {
+      if (cycleIndex >= cycleCount) {
         clearInterval(interval);
         // Select highest probability option
-        const highestProb = options[0]; // First option typically has higher prob in our data
-        setAnimatedWord(highestProb);
+        const highestProb = options.reduce((a, b) => a.prob > b.prob ? a : b);
+        setAnimatedWord(highestProb.word);
         
         setTimeout(() => {
-          handleWordSelect(level, highestProb);
+          handleWordSelect(highestProb.word);
           setAnimatedWord(null);
-          setAnimatingLevel(null);
           setIsAnimating(false);
-        }, 800);
+        }, 600);
       }
     }, 150);
   };
 
-  // Calculate branch path for SVG
-  const getBranchPath = (pathIndex: number) => {
-    const path = treePaths[pathIndex];
-    const totalPaths = 64;
-    const startX = 30;
-    const endX = 750;
-    const height = 300;
-    const ySpacing = height / totalPaths;
-    const yStart = height / 2;
-    
-    // Calculate y position based on binary splits
-    let y = yStart;
+  // Calculate Y position for a path based on its word choices
+  const getPathY = (path: TreePath, level: number): number => {
+    const height = 280;
+    const centerY = height / 2;
+    let y = centerY;
     let spread = height / 4;
-    
-    for (let level = 1; level < 7; level++) {
-      const optionIndex = levelOptions[level].indexOf(path.words[level]);
-      y += optionIndex === 0 ? -spread : spread;
+
+    for (let l = 1; l <= Math.min(level, 6); l++) {
+      const wordIndex = levelOptions[l].findIndex(o => o.word === path.words[l]);
+      y += wordIndex === 0 ? -spread : spread;
       spread /= 2;
     }
-    
-    const yEnd = 10 + pathIndex * ySpacing;
-    
-    return `M ${startX} ${yStart} Q ${startX + 100} ${yStart} ${startX + 150} ${y * 0.3 + yEnd * 0.7} L ${endX} ${yEnd}`;
+    return y;
   };
 
-  // Check if path matches current selections
+  // Check if a path matches current selections up to current level
   const pathMatchesSelections = (path: TreePath): boolean => {
-    return path.words.every((word, i) => word === selections[i]);
+    return selections.every((word, i) => path.words[i] === word);
   };
 
-  // Get probability for selected word at level
-  const getProbability = (level: number): number => {
-    if (!matchingPath) return 0;
-    return matchingPath.probabilities[level];
+  // Get X position for a level
+  const getLevelX = (level: number): number => {
+    return 50 + level * 110;
   };
 
   return (
@@ -219,143 +210,139 @@ export function FullBranchDiagram({
             {buildHeadline()}
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleReset}
-          className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
-        >
-          <RotateCcw className="h-3 w-3" />
-          Reset
-        </Button>
+        {currentLevel > 1 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleReset}
+            className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Reset
+          </Button>
+        )}
       </div>
 
-      {/* Branch visualization with word labels */}
+      {/* Branch visualization */}
       <div className="overflow-x-auto mb-6">
-        <div className="min-w-[800px] p-4">
-          <svg className="w-full h-[320px]" viewBox="0 0 800 320" preserveAspectRatio="xMidYMid meet">
-            {/* Draw all 64 branches */}
+        <div className="min-w-[850px] p-4">
+          <svg className="w-full h-[300px]" viewBox="0 0 850 300" preserveAspectRatio="xMidYMid meet">
+            {/* Draw all 64 branch paths */}
             {treePaths.map((path, pathIndex) => {
               const isSelected = pathMatchesSelections(path);
+              const isFirstMatch = isSelected && pathIndex === treePaths.findIndex(p => pathMatchesSelections(p));
+              
+              // Build the path
+              let d = `M 50 150`;
+              for (let level = 1; level <= 6; level++) {
+                const x = getLevelX(level);
+                const y = getPathY(path, level);
+                d += ` L ${x} ${y}`;
+              }
+              
               return (
                 <path
                   key={pathIndex}
-                  d={getBranchPath(pathIndex)}
+                  d={d}
                   fill="none"
                   stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
                   strokeWidth={isSelected ? 2.5 : 0.5}
-                  strokeOpacity={isSelected ? 1 : 0.2}
-                  className={cn(
-                    "transition-all duration-300",
-                    isSelected && "drop-shadow-sm"
-                  )}
+                  strokeOpacity={isSelected ? 1 : 0.15}
+                  className="transition-all duration-300"
                 />
               );
             })}
             
-            {/* Word labels on the tree */}
-            {levelOptions.map((options, level) => {
-              const xPos = 30 + (level * 120);
-              return options.map((word, optionIndex) => {
-                const isSelected = selections[level] === word;
-                const isAnimated = animatingLevel === level && animatedWord === word;
-                
-                // Calculate y position
-                let baseY = 160;
-                if (level > 0 && options.length === 2) {
-                  baseY = optionIndex === 0 ? 120 : 200;
-                }
-                
-                return (
-                  <g key={`${level}-${word}`}>
-                    <rect
-                      x={xPos - 35}
-                      y={baseY - 10}
-                      width={70}
-                      height={20}
-                      rx={4}
-                      fill={isSelected ? "hsl(var(--primary))" : isAnimated ? "hsl(var(--accent))" : "hsl(var(--background))"}
-                      stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--border))"}
-                      strokeWidth={1}
-                      className={cn(
-                        "transition-all duration-200",
-                        isAnimated && "animate-pulse"
-                      )}
-                    />
-                    <text
-                      x={xPos}
-                      y={baseY + 4}
-                      textAnchor="middle"
-                      className={cn(
-                        "text-[10px] font-medium pointer-events-none select-none",
-                        isSelected ? "fill-primary-foreground" : "fill-foreground"
-                      )}
-                    >
-                      {word.length > 10 ? word.slice(0, 8) + "..." : word}
-                    </text>
-                  </g>
-                );
-              });
+            {/* Words along the selected path */}
+            {selectedFullPath && selections.map((word, level) => {
+              const x = getLevelX(level);
+              const y = getPathY(selectedFullPath, level);
+              
+              return (
+                <g key={`word-${level}`}>
+                  <rect
+                    x={x - 40}
+                    y={y - 12}
+                    width={80}
+                    height={24}
+                    rx={4}
+                    fill="hsl(var(--primary))"
+                    className="drop-shadow-sm"
+                  />
+                  <text
+                    x={x}
+                    y={y + 4}
+                    textAnchor="middle"
+                    className="text-[10px] font-medium fill-primary-foreground pointer-events-none select-none"
+                  >
+                    {word.length > 12 ? word.slice(0, 10) + "..." : word}
+                  </text>
+                </g>
+              );
             })}
           </svg>
         </div>
       </div>
 
-      {/* Word selection controls at bottom */}
-      <div className="border-t border-border pt-4">
-        <p className="text-sm text-muted-foreground mb-3">Select words to change the sentence path:</p>
-        <div className="flex flex-wrap gap-4 items-end">
-          {levelOptions.slice(1).map((options, levelIndex) => {
-            const level = levelIndex + 1;
-            const probability = getProbability(level);
-            
-            return (
-              <div key={level} className="flex flex-col gap-2">
-                <div className="flex items-center gap-1">
+      {/* Single word selection at bottom */}
+      {currentLevel <= 6 && (
+        <div className="border-t border-border pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm text-muted-foreground">
+              Select the next word:
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={playAnimation}
+              disabled={isAnimating}
+              className="h-7 gap-1.5 text-xs"
+              title="Watch computer select"
+            >
+              <Monitor className={cn(
+                "h-3.5 w-3.5",
+                isAnimating ? "text-primary animate-pulse" : "text-muted-foreground"
+              )} />
+              Auto-select
+            </Button>
+          </div>
+          
+          <div className="flex gap-4 justify-center">
+            {levelOptions[currentLevel].map((option) => {
+              const isAnimated = animatedWord === option.word;
+              
+              return (
+                <Button
+                  key={option.word}
+                  variant="outline"
+                  onClick={() => handleWordSelect(option.word)}
+                  disabled={isAnimating}
+                  className={cn(
+                    "h-12 min-w-[140px] flex flex-col gap-0.5 px-6",
+                    isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10"
+                  )}
+                >
+                  <span className="text-sm font-medium">{option.word}</span>
                   <span className="text-xs text-muted-foreground">
-                    {(probability * 100).toFixed(0)}%
+                    {(option.prob * 100).toFixed(0)}%
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => playAnimation(level)}
-                    disabled={isAnimating}
-                    className="h-5 w-5 p-0"
-                    title="Watch computer select"
-                  >
-                    <Monitor className={cn(
-                      "h-3 w-3",
-                      animatingLevel === level ? "text-primary animate-pulse" : "text-muted-foreground"
-                    )} />
-                  </Button>
-                </div>
-                <div className="flex gap-1">
-                  {options.map((word) => {
-                    const isSelected = selections[level] === word;
-                    const isAnimated = animatingLevel === level && animatedWord === word;
-                    
-                    return (
-                      <Button
-                        key={word}
-                        variant={isSelected ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleWordSelect(level, word)}
-                        disabled={isAnimating}
-                        className={cn(
-                          "h-8 text-xs min-w-[80px]",
-                          isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse"
-                        )}
-                      >
-                        {word}
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+                </Button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Completion message */}
+      {currentLevel > 6 && (
+        <div className="border-t border-border pt-4 text-center">
+          <p className="text-sm text-muted-foreground mb-2">Headline complete!</p>
+          <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5">
+            <RotateCcw className="h-3.5 w-3.5" />
+            Start Over
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
