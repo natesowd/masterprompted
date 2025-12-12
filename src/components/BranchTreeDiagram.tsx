@@ -242,7 +242,7 @@ export function BranchTreeDiagram({
 
   const levelXPositions = closeUpView ? [80, 240, 400, 560, 720, 880, 1040] : [20, 100, 180, 260, 340, 420, 500];
   const svgWidth = closeUpView ? 1200 : 600;
-  const svgHeight = closeUpView ? 200 : 400;
+  const svgHeight = closeUpView ? 320 : 400;
 
   // Build current headline
   const buildHeadline = (): string => {
@@ -269,7 +269,7 @@ export function BranchTreeDiagram({
             {selections.filter(Boolean).join(" ")}
             {currentLevel <= 6 ? "..." : (
               selectedFullPath && (
-                <span className="text-primary font-semibold">, {selectedFullPath.headline}</span>
+                <span className="text-primary font-bold bg-primary/15 px-2 py-0.5 rounded ml-1">, {selectedFullPath.headline}</span>
               )
             )}
           </p>
@@ -308,7 +308,7 @@ export function BranchTreeDiagram({
           <div className={cn("p-4", closeUpView ? "min-w-[1200px]" : "min-w-[600px]")}>
             {/* SVG branch lines - proper tree structure */}
             <svg 
-              className={cn("w-full", closeUpView ? "h-[200px]" : "h-[400px]")} 
+              className={cn("w-full", closeUpView ? "h-[320px]" : "h-[400px]")} 
               viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
               preserveAspectRatio="xMidYMid meet"
             >
@@ -326,7 +326,7 @@ export function BranchTreeDiagram({
                 
                 // Calculate Y positions based on view mode
                 const baseY = svgHeight / 2;
-                const spread = closeUpView ? 80 : 180;
+                const spread = closeUpView ? 140 : 180;
                 
                 // Progressive Y calculation
                 const y1 = baseY + (level1Group - 0.5) * spread;
@@ -384,7 +384,7 @@ export function BranchTreeDiagram({
                 const x = levelXPositions[level];
                 // Recalculate Y based on view mode
                 const baseY = svgHeight / 2;
-                const spread = closeUpView ? 80 : 180;
+                const spread = closeUpView ? 140 : 180;
                 
                 const level1Group = selectedFullPath.words[1] === "Unites" ? 0 : 1;
                 const level2Group = selectedFullPath.words[2] === "On" ? 0 : 1;
