@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Monitor } from "lucide-react";
+import { RotateCcw, Monitor, ZoomIn, ZoomOut } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 /**
  * FullBranchDiagram - Shows all branches with words flowing along the selected path.
@@ -108,6 +110,7 @@ export function FullBranchDiagram({
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
+  const [closeUpView, setCloseUpView] = useState(false);
 
   // Get matching paths for current selections
   const matchingPaths = useMemo(() => {
@@ -195,24 +198,54 @@ export function FullBranchDiagram({
     return selections.every((word, i) => path.words[i] === word);
   };
 
-  // Get X position for a level (extended for completion)
+  // Get X position for a level - different spacing for close-up view
   const getLevelX = (level: number): number => {
+    if (closeUpView) {
+      return 80 + level * 160; // More spacing in close-up
+    }
     return 50 + level * 110;
   };
 
   // Scroll container ref for auto-scroll
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll when selections advance
+  // Auto-scroll when selections advance - always in close-up, after 3rd in normal
   useEffect(() => {
-    if (scrollContainerRef.current && selections.length > 3) {
-      const scrollX = Math.max(0, (selections.length - 2) * 110);
-      scrollContainerRef.current.scrollTo({ left: scrollX, behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      if (closeUpView && selections.length > 1) {
+        // In close-up, keep current word centered with 3 words visible
+        const scrollX = Math.max(0, (selections.length - 2) * 160);
+        scrollContainerRef.current.scrollTo({ left: scrollX, behavior: 'smooth' });
+      } else if (selections.length > 3) {
+        const scrollX = Math.max(0, (selections.length - 2) * 110);
+        scrollContainerRef.current.scrollTo({ left: scrollX, behavior: 'smooth' });
+      }
     }
-  }, [selections.length]);
+  }, [selections.length, closeUpView]);
 
-  // SVG width needs to accommodate completion text
-  const svgWidth = 1050;
+  // SVG dimensions based on view mode
+  const svgWidth = closeUpView ? 1500 : 1050;
+  const svgHeight = closeUpView ? 200 : 300;
+
+  // Calculate which levels to show in close-up view (3 words visible)
+  const getVisibleLevels = (): { start: number; end: number } => {
+    if (!closeUpView) return { start: 0, end: 7 };
+    const currentSelectionLevel = selections.length - 1;
+    const start = Math.max(0, currentSelectionLevel - 1);
+    const end = Math.min(7, start + 3);
+    return { start, end };
+  };
+
+  const visibleLevels = getVisibleLevels();
+
+  // Get X position adjusted for close-up viewport
+  const getCloseUpX = (level: number): number => {
+    if (closeUpView) {
+      const offset = visibleLevels.start;
+      return 120 + (level - offset) * 200;
+    }
+    return getLevelX(level);
+  };
 
   return (
     <div className={cn("relative", className)}>
@@ -224,115 +257,215 @@ export function FullBranchDiagram({
             {buildHeadline()}
           </p>
         </div>
-        {currentLevel > 1 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
-          >
-            <RotateCcw className="h-3 w-3" />
-            Reset
-          </Button>
-        )}
+        <div className="flex items-center gap-4 ml-4 flex-shrink-0">
+          {/* Close-up view toggle */}
+          <div className="flex items-center gap-2">
+            <Switch
+              id="closeup-view"
+              checked={closeUpView}
+              onCheckedChange={setCloseUpView}
+            />
+            <Label htmlFor="closeup-view" className="text-xs text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+              {closeUpView ? <ZoomIn className="h-3 w-3" /> : <ZoomOut className="h-3 w-3" />}
+              Close-up
+            </Label>
+          </div>
+          {currentLevel > 1 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="h-7 text-xs gap-1.5"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Branch visualization */}
       <div ref={scrollContainerRef} className="overflow-x-auto mb-6">
-        <div className="min-w-[1050px] p-4">
-          <svg className="w-full h-[300px]" viewBox={`0 0 ${svgWidth} 300`} preserveAspectRatio="xMidYMid meet">
-            {/* Draw all 64 branch paths - extended to completion */}
-            {treePaths.map((path, pathIndex) => {
-              const isSelected = pathMatchesSelections(path);
-              const isFirstMatch = isSelected && pathIndex === treePaths.findIndex(p => pathMatchesSelections(p));
-              
-              // Build the path - now extends to level 7 for completion
-              let d = `M 50 150`;
-              for (let level = 1; level <= 6; level++) {
-                const x = getLevelX(level);
-                const y = getPathY(path, level);
-                d += ` L ${x} ${y}`;
-              }
-              // Extend to completion position
-              const completionX = getLevelX(7);
-              const completionY = getPathY(path, 6);
-              d += ` L ${completionX} ${completionY}`;
-              
-              return (
-                <path
-                  key={pathIndex}
-                  d={d}
-                  fill="none"
-                  stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                  strokeWidth={isSelected ? 2.5 : 0.5}
-                  strokeOpacity={isSelected ? 1 : 0.15}
-                  className="transition-all duration-300"
+        <div className={cn("p-4", closeUpView ? "min-w-[700px]" : "min-w-[1050px]")}>
+          <svg 
+            className={cn("w-full", closeUpView ? "h-[200px]" : "h-[300px]")} 
+            viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 300`} 
+            preserveAspectRatio="xMidYMid meet"
+          >
+            {closeUpView ? (
+              <>
+                {/* Close-up view: Show only 3 words at a time on a single line */}
+                {/* Draw simplified branch line */}
+                <line
+                  x1={50}
+                  y1={100}
+                  x2={650}
+                  y2={100}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={3}
+                  strokeOpacity={0.3}
                 />
-              );
-            })}
-            
-            {/* Words along the selected path - clickable to navigate */}
-            {selectedFullPath && selections.map((word, level) => {
-              const x = getLevelX(level);
-              const y = getPathY(selectedFullPath, level);
-              const isClickable = level > 0; // Can't go back before "European Union"
-              
-              // Handle clicking a word to go back to that level
-              const handleWordClick = () => {
-                if (!isClickable) return;
-                // Keep selections up to and including this level, then remove rest
-                const newSelections = selections.slice(0, level);
-                setSelections(newSelections);
-                setCurrentLevel(level);
-                onPathChange(newSelections);
-              };
-              
-              // Calculate dynamic width based on word length
-              const wordWidth = Math.max(80, word.length * 8 + 16);
-              
-              return (
-                <g 
-                  key={`word-${level}`} 
-                  onClick={handleWordClick}
-                  className={cn(isClickable && "cursor-pointer")}
-                  style={{ pointerEvents: isClickable ? 'all' : 'none' }}
-                >
-                  <rect
-                    x={x - wordWidth / 2}
-                    y={y - 12}
-                    width={wordWidth}
-                    height={24}
-                    rx={4}
-                    fill="hsl(var(--primary))"
-                    className={cn(
-                      "drop-shadow-sm transition-all duration-200",
-                      isClickable && "hover:fill-[hsl(var(--primary)/0.8)]"
-                    )}
-                  />
-                  <text
-                    x={x}
-                    y={y + 4}
-                    textAnchor="middle"
-                    className="text-[10px] font-medium fill-primary-foreground pointer-events-none select-none"
-                  >
-                    {word}
-                  </text>
-                </g>
-              );
-            })}
+                
+                {/* Words along the visible portion */}
+                {selections.map((word, level) => {
+                  // Only show 3 levels at a time centered around current selection
+                  if (level < visibleLevels.start || level > visibleLevels.end) return null;
+                  
+                  const x = getCloseUpX(level);
+                  const y = 100;
+                  const isClickable = level > 0;
+                  
+                  const handleWordClick = () => {
+                    if (!isClickable) return;
+                    const newSelections = selections.slice(0, level);
+                    setSelections(newSelections);
+                    setCurrentLevel(level);
+                    onPathChange(newSelections);
+                  };
+                  
+                  const wordWidth = Math.max(100, word.length * 10 + 24);
+                  
+                  return (
+                    <g 
+                      key={`word-${level}`} 
+                      onClick={handleWordClick}
+                      className={cn(isClickable && "cursor-pointer")}
+                      style={{ pointerEvents: isClickable ? 'all' : 'none' }}
+                    >
+                      <rect
+                        x={x - wordWidth / 2}
+                        y={y - 18}
+                        width={wordWidth}
+                        height={36}
+                        rx={6}
+                        fill="hsl(var(--primary))"
+                        className={cn(
+                          "drop-shadow-md transition-all duration-200",
+                          isClickable && "hover:fill-[hsl(var(--primary)/0.8)]"
+                        )}
+                      />
+                      <text
+                        x={x}
+                        y={y + 5}
+                        textAnchor="middle"
+                        className="text-sm font-medium fill-primary-foreground pointer-events-none select-none"
+                      >
+                        {word}
+                      </text>
+                    </g>
+                  );
+                })}
 
-            {/* Completion text at the end of the selected branch */}
-            {selections.length === 7 && selectedFullPath && (
-              <g>
-                <text
-                  x={getLevelX(7) + 10}
-                  y={getPathY(selectedFullPath, 6) + 4}
-                  textAnchor="start"
-                  className="text-[10px] font-medium fill-primary pointer-events-none select-none"
-                >
-                  {selectedFullPath.headline}
-                </text>
-              </g>
+                {/* Arrows indicating more content */}
+                {visibleLevels.start > 0 && (
+                  <text x={20} y={105} className="text-lg fill-muted-foreground">←</text>
+                )}
+                {(visibleLevels.end < selections.length - 1 || currentLevel <= 6) && (
+                  <text x={670} y={105} className="text-lg fill-muted-foreground">→</text>
+                )}
+
+                {/* Completion text in close-up */}
+                {selections.length === 7 && selectedFullPath && visibleLevels.end >= 6 && (
+                  <text
+                    x={getCloseUpX(6) + 80}
+                    y={105}
+                    textAnchor="start"
+                    className="text-xs font-medium fill-primary pointer-events-none select-none"
+                  >
+                    {selectedFullPath.headline}
+                  </text>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Normal view: Full tree with all branches */}
+                {treePaths.map((path, pathIndex) => {
+                  const isSelected = pathMatchesSelections(path);
+                  
+                  let d = `M 50 150`;
+                  for (let level = 1; level <= 6; level++) {
+                    const x = getLevelX(level);
+                    const y = getPathY(path, level);
+                    d += ` L ${x} ${y}`;
+                  }
+                  const completionX = getLevelX(7);
+                  const completionY = getPathY(path, 6);
+                  d += ` L ${completionX} ${completionY}`;
+                  
+                  return (
+                    <path
+                      key={pathIndex}
+                      d={d}
+                      fill="none"
+                      stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                      strokeWidth={isSelected ? 2.5 : 0.5}
+                      strokeOpacity={isSelected ? 1 : 0.15}
+                      className="transition-all duration-300"
+                    />
+                  );
+                })}
+                
+                {/* Words along the selected path */}
+                {selectedFullPath && selections.map((word, level) => {
+                  const x = getLevelX(level);
+                  const y = getPathY(selectedFullPath, level);
+                  const isClickable = level > 0;
+                  
+                  const handleWordClick = () => {
+                    if (!isClickable) return;
+                    const newSelections = selections.slice(0, level);
+                    setSelections(newSelections);
+                    setCurrentLevel(level);
+                    onPathChange(newSelections);
+                  };
+                  
+                  const wordWidth = Math.max(80, word.length * 8 + 16);
+                  
+                  return (
+                    <g 
+                      key={`word-${level}`} 
+                      onClick={handleWordClick}
+                      className={cn(isClickable && "cursor-pointer")}
+                      style={{ pointerEvents: isClickable ? 'all' : 'none' }}
+                    >
+                      <rect
+                        x={x - wordWidth / 2}
+                        y={y - 12}
+                        width={wordWidth}
+                        height={24}
+                        rx={4}
+                        fill="hsl(var(--primary))"
+                        className={cn(
+                          "drop-shadow-sm transition-all duration-200",
+                          isClickable && "hover:fill-[hsl(var(--primary)/0.8)]"
+                        )}
+                      />
+                      <text
+                        x={x}
+                        y={y + 4}
+                        textAnchor="middle"
+                        className="text-[10px] font-medium fill-primary-foreground pointer-events-none select-none"
+                      >
+                        {word}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* Completion text */}
+                {selections.length === 7 && selectedFullPath && (
+                  <g>
+                    <text
+                      x={getLevelX(7) + 10}
+                      y={getPathY(selectedFullPath, 6) + 4}
+                      textAnchor="start"
+                      className="text-[10px] font-medium fill-primary pointer-events-none select-none"
+                    >
+                      {selectedFullPath.headline}
+                    </text>
+                  </g>
+                )}
+              </>
             )}
           </svg>
         </div>
