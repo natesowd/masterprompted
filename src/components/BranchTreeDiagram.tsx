@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Monitor } from "lucide-react";
+import { RotateCcw, Monitor, ZoomIn, ZoomOut } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 /**
  * BranchTreeDiagram - Shows all possible sentence branches greyed out,
@@ -98,6 +100,16 @@ export function BranchTreeDiagram({
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
+  const [closeUpView, setCloseUpView] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll in close-up view
+  useEffect(() => {
+    if (scrollContainerRef.current && closeUpView && currentLevel > 2) {
+      const scrollX = Math.max(0, (currentLevel - 2) * 160);
+      scrollContainerRef.current.scrollTo({ left: scrollX, behavior: 'smooth' });
+    }
+  }, [currentLevel, closeUpView]);
 
   // Get options at each level based on current selections
   const getOptionsAtLevel = (level: number): { word: string; probability: number }[] => {
@@ -228,7 +240,9 @@ export function BranchTreeDiagram({
     return yPositions[level] || baseY;
   };
 
-  const levelXPositions = [20, 100, 180, 260, 340, 420, 500];
+  const levelXPositions = closeUpView ? [80, 240, 400, 560, 720, 880, 1040] : [20, 100, 180, 260, 340, 420, 500];
+  const svgWidth = closeUpView ? 1200 : 600;
+  const svgHeight = closeUpView ? 200 : 400;
 
   // Build current headline
   const buildHeadline = (): string => {
@@ -252,50 +266,67 @@ export function BranchTreeDiagram({
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
           <p className="text-lg font-medium text-foreground">
-            {buildHeadline()}
+            {selections.filter(Boolean).join(" ")}
+            {currentLevel <= 6 ? "..." : (
+              selectedFullPath && (
+                <span className="text-primary font-semibold">, {selectedFullPath.headline}</span>
+              )
+            )}
           </p>
         </div>
-        {currentLevel > 1 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
-          >
-            <RotateCcw className="h-3 w-3" />
-            Reset
-          </Button>
-        )}
+        <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+          {/* Close-up view toggle */}
+          <div className="flex items-center gap-2">
+            <Switch
+              id="closeup-branch"
+              checked={closeUpView}
+              onCheckedChange={setCloseUpView}
+            />
+            <Label htmlFor="closeup-branch" className="text-xs text-muted-foreground flex items-center gap-1">
+              {closeUpView ? <ZoomOut className="h-3 w-3" /> : <ZoomIn className="h-3 w-3" />}
+              Close-up
+            </Label>
+          </div>
+          {currentLevel > 1 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="h-7 text-xs gap-1.5"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Main layout: branches on left, selection on right */}
       <div className="flex gap-6">
         {/* Branch visualization */}
-        <div className="flex-1 overflow-x-auto">
-          <div className="min-w-[600px] p-4">
+        <div className="flex-1 overflow-x-auto" ref={scrollContainerRef}>
+          <div className={cn("p-4", closeUpView ? "min-w-[1200px]" : "min-w-[600px]")}>
             {/* SVG branch lines - proper tree structure */}
-            <svg className="w-full h-[400px]" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
+            <svg 
+              className={cn("w-full", closeUpView ? "h-[200px]" : "h-[400px]")} 
+              viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
+              preserveAspectRatio="xMidYMid meet"
+            >
               {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
                 const isMatching = pathMatchesSelections(path);
                 
                 // Calculate proper tree branching positions
-                // Level 1: Split by "Unites" (32 paths) vs "Reaches" (32 paths)
                 const level1Group = path.words[1] === "Unites" ? 0 : 1;
-                // Level 2: Split by "On" vs "Around" within each group
                 const level2Group = path.words[2] === "On" ? 0 : 1;
-                // Level 3: Split by "Historic" vs "Sweeping"
                 const level3Group = path.words[3] === "Historic" ? 0 : 1;
-                // Level 4: Split by "AI" vs "Technology"
                 const level4Group = path.words[4] === "AI" ? 0 : 1;
-                // Level 5: Split by "Ethics" vs "Governance"
                 const level5Group = path.words[5] === "Ethics" ? 0 : 1;
-                // Level 6: Split by "Framework" vs "Charter"
                 const level6Group = path.words[6] === "Framework" ? 0 : 1;
                 
-                // Calculate Y positions based on binary splits
-                const baseY = 200;
-                const spread = 180;
+                // Calculate Y positions based on view mode
+                const baseY = svgHeight / 2;
+                const spread = closeUpView ? 80 : 180;
                 
                 // Progressive Y calculation
                 const y1 = baseY + (level1Group - 0.5) * spread;
@@ -306,17 +337,16 @@ export function BranchTreeDiagram({
                 const y6 = y5 + (level6Group - 0.5) * (spread / 32);
                 
                 const points = [
-                  { x: 20, y: baseY },
-                  { x: 100, y: y1 },
-                  { x: 180, y: y2 },
-                  { x: 260, y: y3 },
-                  { x: 340, y: y4 },
-                  { x: 420, y: y5 },
-                  { x: 500, y: y6 },
-                  { x: 570, y: y6 },
+                  { x: levelXPositions[0], y: baseY },
+                  { x: levelXPositions[1], y: y1 },
+                  { x: levelXPositions[2], y: y2 },
+                  { x: levelXPositions[3], y: y3 },
+                  { x: levelXPositions[4], y: y4 },
+                  { x: levelXPositions[5], y: y5 },
+                  { x: levelXPositions[6], y: y6 },
                 ];
                 
-                // Create curved path for smoother look
+                // Create curved path for smoother look (stop at last word, no extension)
                 const pathD = `M ${points[0].x} ${points[0].y} ` +
                   points.slice(1).map((p, i) => {
                     const prev = points[i];
@@ -330,15 +360,15 @@ export function BranchTreeDiagram({
                       d={pathD}
                       fill="none"
                       stroke={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                      strokeWidth={isMatching ? 2.5 : 0.5}
+                      strokeWidth={isMatching ? (closeUpView ? 3 : 2.5) : 0.5}
                       opacity={isMatching ? 1 : 0.15}
                       className="transition-all duration-300"
                     />
                     {/* End node */}
                     <circle
-                      cx={570}
+                      cx={levelXPositions[6]}
                       cy={y6}
-                      r={isMatching ? 4 : 1.5}
+                      r={isMatching ? (closeUpView ? 5 : 4) : 1.5}
                       fill={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
                       opacity={isMatching ? 1 : 0.25}
                       className="transition-all duration-300"
@@ -352,7 +382,25 @@ export function BranchTreeDiagram({
                 if (!word || level > 6) return null;
                 
                 const x = levelXPositions[level];
-                const y = getSelectedPathY(level);
+                // Recalculate Y based on view mode
+                const baseY = svgHeight / 2;
+                const spread = closeUpView ? 80 : 180;
+                
+                const level1Group = selectedFullPath.words[1] === "Unites" ? 0 : 1;
+                const level2Group = selectedFullPath.words[2] === "On" ? 0 : 1;
+                const level3Group = selectedFullPath.words[3] === "Historic" ? 0 : 1;
+                const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
+                const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
+                
+                const y1 = baseY + (level1Group - 0.5) * spread;
+                const y2 = y1 + (level2Group - 0.5) * (spread / 2);
+                const y3 = y2 + (level3Group - 0.5) * (spread / 4);
+                const y4 = y3 + (level4Group - 0.5) * (spread / 8);
+                const y5 = y4 + (level5Group - 0.5) * (spread / 16);
+                
+                const yPositions = [baseY, y1, y2, y3, y4, y5, y5];
+                const y = yPositions[level] || baseY;
+                
                 const isClickable = level > 0;
                 
                 const handleWordClickOnTree = () => {
@@ -367,7 +415,9 @@ export function BranchTreeDiagram({
                 };
                 
                 const displayWord = word === "European Union" ? "EU" : word;
-                const wordWidth = Math.max(50, displayWord.length * 7 + 12);
+                const wordWidth = closeUpView ? Math.max(80, displayWord.length * 10 + 20) : Math.max(50, displayWord.length * 7 + 12);
+                const rectHeight = closeUpView ? 28 : 20;
+                const fontSize = closeUpView ? "text-xs" : "text-[9px]";
                 
                 return (
                   <g 
@@ -378,10 +428,10 @@ export function BranchTreeDiagram({
                   >
                     <rect
                       x={x - wordWidth / 2}
-                      y={y - 10}
+                      y={y - rectHeight / 2}
                       width={wordWidth}
-                      height={20}
-                      rx={4}
+                      height={rectHeight}
+                      rx={closeUpView ? 6 : 4}
                       fill="hsl(var(--primary))"
                       className={cn(
                         "drop-shadow-sm transition-all duration-200",
@@ -390,9 +440,9 @@ export function BranchTreeDiagram({
                     />
                     <text
                       x={x}
-                      y={y + 4}
+                      y={y + (closeUpView ? 5 : 4)}
                       textAnchor="middle"
-                      className="text-[9px] font-medium fill-primary-foreground pointer-events-none select-none"
+                      className={cn(fontSize, "font-medium fill-primary-foreground pointer-events-none select-none")}
                     >
                       {displayWord}
                     </text>
