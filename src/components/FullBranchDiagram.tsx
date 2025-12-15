@@ -111,6 +111,8 @@ export function FullBranchDiagram({
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
+  const [showSelectionMessage, setShowSelectionMessage] = useState(false);
+  const [selectedProbability, setSelectedProbability] = useState<number | null>(null);
   const [closeUpView, setCloseUpView] = useState(false);
 
   // Get matching paths for current selections
@@ -155,6 +157,7 @@ export function FullBranchDiagram({
   const playAnimation = () => {
     if (isAnimating || currentLevel > 6) return;
     setIsAnimating(true);
+    setShowSelectionMessage(false);
 
     const options = levelOptions[currentLevel];
     let cycleIndex = 0;
@@ -169,12 +172,16 @@ export function FullBranchDiagram({
         // Select highest probability option
         const highestProb = options.reduce((a, b) => a.prob > b.prob ? a : b);
         setAnimatedWord(highestProb.word);
+        setSelectedProbability(highestProb.prob);
+        setShowSelectionMessage(true);
         
         setTimeout(() => {
           handleWordSelect(highestProb.word);
           setAnimatedWord(null);
+          setShowSelectionMessage(false);
+          setSelectedProbability(null);
           setIsAnimating(false);
-        }, 600);
+        }, 1500);
       }
     }, 150);
   };
@@ -517,9 +524,21 @@ export function FullBranchDiagram({
             </Button>
           </div>
           
+          {/* LLM Selection Message */}
+          {showSelectionMessage && animatedWord && selectedProbability !== null && (
+            <div className="flex items-center gap-2 px-4 py-2.5 mb-3 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-sm font-medium text-primary">
+                LLM selected "{animatedWord}" — highest probability at {(selectedProbability * 100).toFixed(0)}%
+              </span>
+            </div>
+          )}
+          
           <div className="flex gap-4 justify-center">
             {levelOptions[currentLevel].map((option) => {
               const isAnimated = animatedWord === option.word;
+              const isHighestProb = showSelectionMessage && isAnimated;
+              const isCharter = option.word === "Charter";
               
               return (
                 <Button
@@ -528,13 +547,18 @@ export function FullBranchDiagram({
                   onClick={() => handleWordSelect(option.word)}
                   disabled={isAnimating}
                   className={cn(
-                    "h-12 min-w-[140px] flex flex-col gap-0.5 px-6",
-                    option.word === "Charter" && "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
-                    isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10"
+                    "h-12 min-w-[140px] flex flex-col gap-0.5 px-6 transition-all duration-200",
+                    isCharter && !isHighestProb && "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
+                    isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10",
+                    isHighestProb && "ring-4 ring-primary ring-offset-2 scale-110 bg-primary text-primary-foreground border-primary shadow-lg"
                   )}
                 >
-                  <span className={cn("text-sm font-medium", option.word === "Charter" && "text-destructive")}>
-                    {option.word === "Charter" ? (
+                  <span className={cn(
+                    "text-sm font-medium", 
+                    isCharter && !isHighestProb && "text-destructive",
+                    isHighestProb && "text-primary-foreground"
+                  )}>
+                    {isCharter && !isHighestProb ? (
                       <TextFlag
                         text="Charter"
                         evaluationFactor="factual_accuracy"
@@ -544,7 +568,10 @@ export function FullBranchDiagram({
                       />
                     ) : option.word}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className={cn(
+                    "text-xs",
+                    isHighestProb ? "text-primary-foreground/80" : "text-muted-foreground"
+                  )}>
                     {(option.prob * 100).toFixed(0)}%
                   </span>
                 </Button>

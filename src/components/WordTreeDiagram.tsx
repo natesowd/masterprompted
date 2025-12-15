@@ -107,6 +107,8 @@ export function WordTreeDiagram({
   const [animatingLevel, setAnimatingLevel] = useState<number | null>(null);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showPulse, setShowPulse] = useState(false);
+  const [showSelectionMessage, setShowSelectionMessage] = useState(false);
+  const [selectedProbability, setSelectedProbability] = useState<number | null>(null);
   
   // Ref for auto-scroll
   const containerRef = useRef<HTMLDivElement>(null);
@@ -217,6 +219,7 @@ export function WordTreeDiagram({
   const playAnimation = (level: number) => {
     if (animatingLevel !== null) return;
     setAnimatingLevel(level);
+    setShowSelectionMessage(false);
     
     const options = getOptionsAtLevel(level);
     let currentIndex = 0;
@@ -230,15 +233,19 @@ export function WordTreeDiagram({
       
       if (cycles >= cycleCount) {
         clearInterval(interval);
-        const highest = options[0].word;
-        setAnimatedWord(highest);
+        const highest = options[0];
+        setAnimatedWord(highest.word);
+        setSelectedProbability(highest.probability);
         setShowPulse(true);
+        setShowSelectionMessage(true);
         
         setTimeout(() => {
           setShowPulse(false);
           setAnimatedWord(null);
           setAnimatingLevel(null);
-          handleWordClick(level, highest);
+          setShowSelectionMessage(false);
+          setSelectedProbability(null);
+          handleWordClick(level, highest.word);
         }, 1500);
       }
     }, 180);
@@ -371,6 +378,16 @@ export function WordTreeDiagram({
                 </div>
               )}
               
+              {/* LLM Selection Message - show above selected word */}
+              {showSelectionMessage && isPulsing && (
+                <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
+                    Highest: {selectedProbability !== null ? (selectedProbability * 100).toFixed(0) : 0}%
+                  </div>
+                </div>
+              )}
+              
               <button
                 onClick={() => canSelect && handleWordClick(level, option.word)}
                 disabled={!canSelect}
@@ -392,10 +409,10 @@ export function WordTreeDiagram({
                           ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
                           : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                   isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10",
-                  isPulsing && "ring-4 ring-green-400 ring-offset-1 bg-green-200 border-green-400 text-green-900 animate-pulse scale-110"
+                  isPulsing && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                 )}
               >
-                {option.word === "Charter" ? (
+                {option.word === "Charter" && !isPulsing ? (
                   <TextFlag
                     text="Charter"
                     evaluationFactor="factual_accuracy"
@@ -407,9 +424,11 @@ export function WordTreeDiagram({
                 {level > 0 && (
                   <span className={cn(
                     "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
-                    isSelected 
-                      ? "bg-green-200 text-green-800" 
-                      : "bg-muted text-muted-foreground"
+                    isPulsing
+                      ? "bg-primary text-primary-foreground"
+                      : isSelected 
+                        ? "bg-green-200 text-green-800" 
+                        : "bg-muted text-muted-foreground"
                   )}>
                     {option.probability.toFixed(2)}
                   </span>

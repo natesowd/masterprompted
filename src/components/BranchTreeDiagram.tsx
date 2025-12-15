@@ -101,6 +101,8 @@ export function BranchTreeDiagram({
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
+  const [showSelectionMessage, setShowSelectionMessage] = useState(false);
+  const [selectedProbability, setSelectedProbability] = useState<number | null>(null);
   const [closeUpView, setCloseUpView] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -183,6 +185,7 @@ export function BranchTreeDiagram({
   const playAnimation = () => {
     if (isAnimating || currentLevel > 6) return;
     setIsAnimating(true);
+    setShowSelectionMessage(false);
 
     const options = currentOptions;
     let cycleIndex = 0;
@@ -197,12 +200,16 @@ export function BranchTreeDiagram({
         // Select highest probability option
         const highestProb = options.reduce((a, b) => a.probability > b.probability ? a : b);
         setAnimatedWord(highestProb.word);
+        setSelectedProbability(highestProb.probability);
+        setShowSelectionMessage(true);
         
         setTimeout(() => {
           handleWordClick(currentLevel, highestProb.word);
           setAnimatedWord(null);
+          setShowSelectionMessage(false);
+          setSelectedProbability(null);
           setIsAnimating(false);
-        }, 600);
+        }, 1500);
       }
     }, 150);
   };
@@ -505,11 +512,22 @@ export function BranchTreeDiagram({
           )}
         </div>
         
+        {/* LLM Selection Message */}
+        {showSelectionMessage && animatedWord && selectedProbability !== null && (
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-sm font-medium text-primary">
+              LLM selected "{animatedWord}" — highest probability at {(selectedProbability * 100).toFixed(0)}%
+            </span>
+          </div>
+        )}
+        
         {currentLevel <= 6 ? (
           <div className="flex flex-wrap gap-3">
             {currentOptions.map(({ word, probability }) => {
               const isAnimated = animatedWord === word;
               const isCharter = word === "Charter";
+              const isHighestProb = showSelectionMessage && isAnimated;
               
               return (
                 <button
@@ -522,14 +540,16 @@ export function BranchTreeDiagram({
                     isCharter 
                       ? "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50" 
                       : "border-border bg-card hover:border-primary hover:bg-primary/5 focus:ring-primary/50",
-                    isAnimated && "ring-2 ring-primary ring-offset-2 scale-105 bg-primary/10 border-primary"
+                    isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 scale-105 bg-primary/10 border-primary",
+                    isHighestProb && "ring-4 ring-primary ring-offset-2 scale-110 bg-primary text-primary-foreground border-primary shadow-lg"
                   )}
                 >
                   <div className={cn(
                     "font-semibold text-base",
-                    isCharter ? "text-destructive" : "text-foreground"
+                    isCharter && !isHighestProb ? "text-destructive" : "",
+                    isHighestProb ? "text-primary-foreground" : "text-foreground"
                   )}>
-                    {isCharter ? (
+                    {isCharter && !isHighestProb ? (
                       <TextFlag
                         text="Charter"
                         evaluationFactor="factual_accuracy"
@@ -539,7 +559,10 @@ export function BranchTreeDiagram({
                       />
                     ) : word}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">
+                  <div className={cn(
+                    "text-xs mt-1",
+                    isHighestProb ? "text-primary-foreground/80" : "text-muted-foreground"
+                  )}>
                     {(probability * 100).toFixed(0)}% probability
                   </div>
                 </button>
