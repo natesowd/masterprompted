@@ -337,6 +337,19 @@ export function FullBranchDiagram({
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);
   const [selectedProbability, setSelectedProbability] = useState<number | null>(null);
   const [closeUpView, setCloseUpView] = useState(false);
+  const hasAutoSelected = useRef(false);
+
+  // Auto-select first word on mount to demonstrate the feature
+  useEffect(() => {
+    if (!hasAutoSelected.current && currentLevel === 1) {
+      hasAutoSelected.current = true;
+      // Small delay to let users see the initial state first
+      const timer = setTimeout(() => {
+        playAnimation();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Get matching paths for current selections
   const matchingPaths = useMemo(() => {
