@@ -526,7 +526,7 @@ export function FullBranchDiagram({
           
           {/* LLM Selection Message */}
           {showSelectionMessage && animatedWord && selectedProbability !== null && (
-            <div className="flex items-center gap-2 px-4 py-2.5 mb-3 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
+            <div className="flex items-center justify-center gap-2 px-4 py-2.5 mb-3 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in" style={{ width: 'calc(280px + 1rem)' }}>
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-sm font-medium text-primary">
                 LLM selected "{animatedWord}" — highest probability at {(selectedProbability * 100).toFixed(0)}%
