@@ -46,12 +46,14 @@ export default function HeadlineResponse() {
   const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full">("dropdown");
   const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
 
-  // Watch for "Charter" in the sentence to expand evaluation panel
+  // Watch for "Charter" word specifically in the sentence to expand evaluation panel
   useEffect(() => {
-    const hasCharter = currentSentence.some(word => 
-      word && word.toLowerCase().includes("charter")
-    );
-    if (hasCharter && !evaluationPanelOpen) {
+    const hasCharter = currentSentence.some(word => {
+      if (!word) return false;
+      const cleanWord = word.toLowerCase().replace(/[,.]$/g, '');
+      return cleanWord === "charter";
+    });
+    if (hasCharter) {
       setEvaluationPanelOpen(true);
     }
   }, [currentSentence]);
