@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
-import LearningProgressBar from "@/components/LearningProgressBar";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Paperclip } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -70,13 +70,6 @@ export default function PromptConstructionSummarize() {
           </Card>
         </div>
         
-        <div className="mt-8">
-          <LearningProgressBar 
-            module="prompt-construction"
-            currentStep="intro"
-            baseRoute="/module/prompt-construction"
-          />
-        </div>
       </main>
     </div>
   );
