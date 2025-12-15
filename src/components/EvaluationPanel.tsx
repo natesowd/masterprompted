@@ -21,7 +21,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const panelVariants = cva(
-  "bg-card border border-border rounded-lg shadow-sm px-4 py-4 sticky top-6 z-10",
+  "bg-card border border-border rounded-lg shadow-sm px-4 py-4",
   {
     variants: {
       size: {
@@ -115,7 +115,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
   };
 
   return (
-    <div className="relative">
+    <div className="sticky top-0 h-screen flex items-center z-10">
       {isPanelOpen ? (
         <div className={cn(panelVariants({ size, state: "open" }))}>
           {/* Expand/Minimize button in top-right */}
