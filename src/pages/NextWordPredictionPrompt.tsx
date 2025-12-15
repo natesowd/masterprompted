@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ChatboxDummy from "@/components/ChatBoxDummy";
 import Breadcrumb from "@/components/Breadcrumb";
-import LearningProgressBar from "@/components/LearningProgressBar";
+
 import { PopoverSeries } from "@/components/PopoverSeries";
 import AnimatedTransition from "@/components/AnimatedTransition";
 import ModuleNavigation from "@/components/ModuleNavigation";
@@ -84,13 +84,6 @@ export default function NextWordPrediction() {
           </div>
         </div>
         
-        <div className="mt-8">
-          <LearningProgressBar 
-            module="next-word-prediction"
-            currentStep="intro"
-            baseRoute="/module/next-word-prediction"
-          />
-        </div>
       </main>
       
       <ModuleNavigation 

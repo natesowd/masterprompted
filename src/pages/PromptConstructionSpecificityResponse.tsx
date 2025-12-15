@@ -11,7 +11,7 @@ import { Parameters } from "@/pages/PromptPlayground";
 import TextFlag from "@/components/TextFlag";
 import SectionFlag from "@/components/SectionFlag";
 import ChatPrompt from "@/components/ChatPrompt";
-import LearningProgressBar from "@/components/LearningProgressBar";
+
 import { set } from "zod";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -720,13 +720,6 @@ export default function SpecificityResponse() {
               {t('components.breadcrumb.takeaways')} →
             </Button>
 
-            <div className="mt-8">
-              <LearningProgressBar
-                module="prompt-construction"
-                currentStep="main"
-                baseRoute="/module/prompt-construction"
-              />
-            </div>
           </div>
         </div>
 

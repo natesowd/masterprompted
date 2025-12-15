@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
-import LearningProgressBar from "@/components/LearningProgressBar";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -108,13 +108,6 @@ export default function PromptConstruction() {
           </Card>
         </div>
         
-        <div className="mt-8">
-          <LearningProgressBar 
-            module="prompt-construction"
-            currentStep="intro"
-            baseRoute="/module/prompt-construction"
-          />
-        </div>
       </main>
     </div>
   );
