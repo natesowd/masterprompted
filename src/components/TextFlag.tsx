@@ -152,7 +152,7 @@ export default function TextFlag({
             <Icon className="h-4 w-4 text-destructive flex-shrink-0" />
             <h4 className="font-semibold text-destructive text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
           </div>
-          <p className="text-sm text-foreground font-normal leading-relaxed break-words whitespace-normal overflow-wrap-anywhere">
+          <p className="text-sm text-foreground font-normal leading-relaxed break-words whitespace-normal overflow-wrap-anywhere text-left">
             {explanation}
           </p>
         </div>
