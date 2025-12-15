@@ -261,54 +261,56 @@ export function BranchTreeDiagram({
   const currentOptions = currentLevel <= 6 ? getOptionsAtLevel(currentLevel) : [];
 
   return (
-    <div className={cn("relative", className)}>
-      {/* Current headline display */}
-      <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
-          <p className="text-lg font-medium text-foreground">
-            {selections.filter(Boolean).join(" ")}
-            {currentLevel <= 6 ? "..." : (
-              selectedFullPath && (
-                <span className="text-primary font-bold bg-primary/15 px-2 py-0.5 rounded ml-1">, {selectedFullPath.headline}</span>
-              )
-            )}
-          </p>
-        </div>
-        <div className="flex items-center gap-3 ml-4 flex-shrink-0">
-          {/* Close-up view toggle */}
-          <div className="flex items-center gap-2">
-            <Switch
-              id="closeup-branch"
-              checked={closeUpView}
-              onCheckedChange={setCloseUpView}
-            />
-            <Label htmlFor="closeup-branch" className="text-xs text-muted-foreground">
-              Close-up
-            </Label>
+    <div className={cn("relative space-y-6", className)}>
+      {/* Current headline display - card style */}
+      <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-muted-foreground mb-3">Generated Headline</p>
+            <p className="text-xl font-semibold text-foreground leading-relaxed">
+              {selections.filter(Boolean).join(" ")}
+              {currentLevel <= 6 ? (
+                <span className="text-muted-foreground/50">...</span>
+              ) : (
+                selectedFullPath && (
+                  <span className="text-primary">, {selectedFullPath.headline}</span>
+                )
+              )}
+            </p>
           </div>
-          {currentLevel > 1 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReset}
-              className="h-7 text-xs gap-1.5"
-            >
-              <RotateCcw className="h-3 w-3" />
-              Reset
-            </Button>
-          )}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+              <Switch
+                id="closeup-branch"
+                checked={closeUpView}
+                onCheckedChange={setCloseUpView}
+                className="scale-90"
+              />
+              <Label htmlFor="closeup-branch" className="text-xs font-medium text-muted-foreground cursor-pointer">
+                Close-up
+              </Label>
+            </div>
+            {currentLevel > 1 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                className="h-8 text-xs gap-1.5"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Main layout: branches on left, selection on right */}
-      <div className="flex gap-6">
-        {/* Branch visualization */}
-        <div className="flex-1 overflow-x-auto" ref={scrollContainerRef}>
-          <div className={cn("p-4", closeUpView ? "min-w-[1200px]" : "min-w-[600px]")}>
-            {/* SVG branch lines - proper tree structure */}
+      {/* Branch visualization - card style */}
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto" ref={scrollContainerRef}>
+          <div className={cn("p-6", closeUpView ? "min-w-[1200px]" : "min-w-[600px]")}>
             <svg 
-              className={cn("w-full", closeUpView ? "h-[640px]" : "h-[400px]")} 
+              className={cn("w-full", closeUpView ? "h-[500px]" : "h-[320px]")} 
               viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
               preserveAspectRatio="xMidYMid meet"
             >
@@ -453,91 +455,131 @@ export function BranchTreeDiagram({
             </svg>
           </div>
         </div>
+      </div>
 
-        {/* Word selection panel on the right */}
-        <div className="w-64 border-l border-border pl-6">
-          <div className="sticky top-4">
-            <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-sm font-medium text-foreground">
-                {currentLevel <= 6 ? `Select Word ${currentLevel}:` : "Complete!"}
-              </h3>
-              {currentLevel <= 6 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={playAnimation}
-                  disabled={isAnimating}
-                  className="h-6 w-6 p-0"
-                  title="Watch computer select"
-                >
-                  <Monitor className={cn(
-                    "h-3.5 w-3.5",
-                    isAnimating ? "text-primary animate-pulse" : "text-muted-foreground"
-                  )} />
-                </Button>
-              )}
-            </div>
-            
-            {currentLevel <= 6 ? (
-              <div className="space-y-2">
-                {currentOptions.map(({ word, probability }) => {
-                  const isAnimated = animatedWord === word;
-                  return (
-                    <button
-                      key={word}
-                      onClick={() => handleWordClick(currentLevel, word)}
-                      disabled={isAnimating}
-                      className={cn(
-                        "w-full text-left px-4 py-3 rounded-lg border transition-all",
-                        "focus:outline-none focus:ring-2 focus:ring-primary/50",
-                        word === "Charter" 
-                          ? "border-destructive bg-destructive/10 hover:bg-destructive/20" 
-                          : "hover:border-primary hover:bg-primary/5",
-                        isAnimated && "ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10"
-                      )}
-                    >
-                      <div className={cn("font-medium", word === "Charter" ? "text-destructive" : "text-foreground")}>
-                        {word === "Charter" ? (
-                          <TextFlag
-                            text="Charter"
-                            evaluationFactor="factual_accuracy"
-                            explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate."
-                            severity="error"
-                            noUnderline={true}
-                          />
-                        ) : word}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Probability: {(probability * 100).toFixed(0)}%
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                Headline complete! Click reset to try another path.
-              </div>
-            )}
-
-            {/* Selected words summary */}
-            {currentLevel > 1 && (
-              <div className="mt-6 pt-4 border-t border-border">
-                <h4 className="text-xs font-medium text-muted-foreground mb-2">Selected:</h4>
-                <div className="space-y-1">
-                  {selections.slice(1, currentLevel).filter(Boolean).map((word, i) => (
-                    <div key={i} className="text-sm text-foreground flex items-center gap-2">
-                      <span className="w-4 h-4 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center">
-                        {i + 1}
-                      </span>
-                      {word}
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* Word selection panel - below diagram, card style */}
+      <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-semibold text-foreground">
+              {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Headline Complete"}
+            </h3>
+            {currentLevel <= 6 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={playAnimation}
+                disabled={isAnimating}
+                className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                title="Watch LLM select highest probability"
+              >
+                <Monitor className={cn(
+                  "h-3.5 w-3.5",
+                  isAnimating && "text-primary animate-pulse"
+                )} />
+                Auto-select
+              </Button>
             )}
           </div>
+          
+          {/* Progress indicator */}
+          {currentLevel > 1 && currentLevel <= 6 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Progress:</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5, 6].map((level) => (
+                  <div
+                    key={level}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-colors",
+                      level < currentLevel ? "bg-primary" : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+        
+        {currentLevel <= 6 ? (
+          <div className="flex flex-wrap gap-3">
+            {currentOptions.map(({ word, probability }) => {
+              const isAnimated = animatedWord === word;
+              const isCharter = word === "Charter";
+              
+              return (
+                <button
+                  key={word}
+                  onClick={() => handleWordClick(currentLevel, word)}
+                  disabled={isAnimating}
+                  className={cn(
+                    "px-5 py-3 rounded-xl border-2 transition-all duration-200",
+                    "focus:outline-none focus:ring-2 focus:ring-offset-2",
+                    isCharter 
+                      ? "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50" 
+                      : "border-border bg-card hover:border-primary hover:bg-primary/5 focus:ring-primary/50",
+                    isAnimated && "ring-2 ring-primary ring-offset-2 scale-105 bg-primary/10 border-primary"
+                  )}
+                >
+                  <div className={cn(
+                    "font-semibold text-base",
+                    isCharter ? "text-destructive" : "text-foreground"
+                  )}>
+                    {isCharter ? (
+                      <TextFlag
+                        text="Charter"
+                        evaluationFactor="factual_accuracy"
+                        explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate."
+                        severity="error"
+                        noUnderline={true}
+                      />
+                    ) : word}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {(probability * 100).toFixed(0)}% probability
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              All words selected. Your headline is ready!
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Try another path
+            </Button>
+          </div>
+        )}
+
+        {/* Selected words trail */}
+        {currentLevel > 1 && currentLevel <= 6 && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-medium text-muted-foreground">Selected:</span>
+              {selections.slice(0, currentLevel).filter(Boolean).map((word, i) => (
+                <span 
+                  key={i} 
+                  className={cn(
+                    "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium",
+                    word === "Charter" 
+                      ? "bg-destructive/10 text-destructive" 
+                      : "bg-primary/10 text-primary"
+                  )}
+                >
+                  {word === "European Union" ? "EU" : word}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
