@@ -33,8 +33,8 @@ export interface DisinformationResponse {
   };
 }
 
-const DISINFORMATION_ENDPOINT = "https://fd-vc.ilabhub.atc.gr/api/v1/disinformation_signals";
-
+// const DISINFORMATION_ENDPOINT = "https://fd-vc.ilabhub.atc.gr/api/v1/disinformation_signals";
+const DISINFORMATION_ENDPOINT = "https://claim-detection-aicode.ilabhub.atc.gr/extract_claims";
 /**
  * Check text for disinformation signals (fallacies)
  * @param text - The text to analyze
@@ -61,7 +61,7 @@ export async function checkDisinformation(text: string): Promise<DisinformationS
     }
 
     const data: DisinformationResponse = await response.json();
-    
+
     // Extract spans from the FALLACY signals
     const fallacySignal = data.signals?.find(s => s.name === "FALLACY");
     return fallacySignal?.spans ?? [];
