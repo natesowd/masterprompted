@@ -309,13 +309,15 @@ export function BranchTreeDiagram({
 
       {/* Branch visualization - card style */}
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto" ref={scrollContainerRef}>
-          <div className={cn("p-6", closeUpView ? "min-w-[1200px]" : "min-w-[600px]")}>
+        <div className={cn("overflow-x-auto", closeUpView && "overflow-y-auto")} ref={scrollContainerRef}>
+          <div className={cn("p-6", closeUpView ? "min-w-[2400px]" : "min-w-[600px]")}
+            style={closeUpView ? { minHeight: 800 } : undefined}
+          >
             <svg 
-              className={cn("w-full", closeUpView ? "h-[640px]" : "h-[320px]")} 
+              className={cn("w-full", closeUpView ? "h-[800px]" : "h-[320px]")} 
               viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
               preserveAspectRatio="xMidYMid meet"
-              style={closeUpView ? { transform: 'scale(2)', transformOrigin: 'left center' } : undefined}
+              style={closeUpView ? { transform: 'scale(2)', transformOrigin: '0 0' } : undefined}
             >
               {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
