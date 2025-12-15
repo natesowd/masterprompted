@@ -48,9 +48,9 @@ export async function checkDisinformation(text: string): Promise<DisinformationS
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text,
-        use_groq: true,
-        double_stage: false,
+        message: text,
+        // use_groq: true,
+        // double_stage: false,
       }),
     });
 
