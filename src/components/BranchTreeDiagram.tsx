@@ -241,9 +241,11 @@ export function BranchTreeDiagram({
     return yPositions[level] || baseY;
   };
 
-  const levelXPositions = closeUpView ? [80, 240, 400, 560, 720, 880, 1040] : [20, 100, 180, 260, 340, 420, 500];
-  const svgWidth = closeUpView ? 1200 : 600;
-  const svgHeight = closeUpView ? 640 : 400;
+  // Use same positions for both views - close-up just scales/zooms
+  const levelXPositions = [20, 100, 180, 260, 340, 420, 500];
+  const baseSpread = 180; // Keep constant for consistent branch shape
+  const svgWidth = 600;
+  const svgHeight = 400;
 
   // Build current headline
   const buildHeadline = (): string => {
@@ -310,9 +312,10 @@ export function BranchTreeDiagram({
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1200px]" : "min-w-[600px]")}>
             <svg 
-              className={cn("w-full", closeUpView ? "h-[500px]" : "h-[320px]")} 
+              className={cn("w-full", closeUpView ? "h-[640px]" : "h-[320px]")} 
               viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
               preserveAspectRatio="xMidYMid meet"
+              style={closeUpView ? { transform: 'scale(2)', transformOrigin: 'left center' } : undefined}
             >
               {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
@@ -326,9 +329,9 @@ export function BranchTreeDiagram({
                 const level5Group = path.words[5] === "Ethics" ? 0 : 1;
                 const level6Group = path.words[6] === "Framework" ? 0 : 1;
                 
-                // Calculate Y positions based on view mode
+                // Calculate Y positions - use constant spread for consistent shape
                 const baseY = svgHeight / 2;
-                const spread = closeUpView ? 300 : 180;
+                const spread = baseSpread;
                 
                 // Progressive Y calculation
                 const y1 = baseY + (level1Group - 0.5) * spread;
@@ -362,7 +365,7 @@ export function BranchTreeDiagram({
                       d={pathD}
                       fill="none"
                       stroke={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                      strokeWidth={isMatching ? (closeUpView ? 3 : 2.5) : 0.5}
+                      strokeWidth={isMatching ? 2.5 : 0.5}
                       opacity={isMatching ? 1 : 0.15}
                       className="transition-all duration-300"
                     />
@@ -370,7 +373,7 @@ export function BranchTreeDiagram({
                     <circle
                       cx={levelXPositions[6]}
                       cy={y6}
-                      r={isMatching ? (closeUpView ? 5 : 4) : 1.5}
+                      r={isMatching ? 4 : 1.5}
                       fill={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
                       opacity={isMatching ? 1 : 0.25}
                       className="transition-all duration-300"
@@ -384,9 +387,9 @@ export function BranchTreeDiagram({
                 if (!word || level > 6) return null;
                 
                 const x = levelXPositions[level];
-                // Recalculate Y based on view mode
+                // Recalculate Y - use constant spread
                 const baseY = svgHeight / 2;
-                const spread = closeUpView ? 300 : 180;
+                const spread = baseSpread;
                 
                 const level1Group = selectedFullPath.words[1] === "Unites" ? 0 : 1;
                 const level2Group = selectedFullPath.words[2] === "On" ? 0 : 1;
@@ -417,9 +420,8 @@ export function BranchTreeDiagram({
                 };
                 
                 const displayWord = word === "European Union" ? "EU" : word;
-                const wordWidth = closeUpView ? Math.max(80, displayWord.length * 10 + 20) : Math.max(50, displayWord.length * 7 + 12);
-                const rectHeight = closeUpView ? 28 : 20;
-                const fontSize = closeUpView ? "text-xs" : "text-[9px]";
+                const wordWidth = Math.max(50, displayWord.length * 7 + 12);
+                const rectHeight = 20;
                 
                 return (
                   <g 
@@ -433,7 +435,7 @@ export function BranchTreeDiagram({
                       y={y - rectHeight / 2}
                       width={wordWidth}
                       height={rectHeight}
-                      rx={closeUpView ? 6 : 4}
+                      rx={4}
                       fill={displayWord === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"}
                       className={cn(
                         "drop-shadow-sm transition-all duration-200",
@@ -443,9 +445,9 @@ export function BranchTreeDiagram({
                     />
                     <text
                       x={x}
-                      y={y + (closeUpView ? 5 : 4)}
+                      y={y + 4}
                       textAnchor="middle"
-                      className={cn(fontSize, "font-medium fill-primary-foreground pointer-events-none select-none")}
+                      className="text-[9px] font-medium fill-primary-foreground pointer-events-none select-none"
                     >
                       {displayWord}
                     </text>
