@@ -314,299 +314,302 @@ export function BranchTreeDiagram({
         </div>
       </div>
 
-      {/* Branch visualization - card style */}
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-        <div className={cn("overflow-x-auto", closeUpView && "overflow-y-auto")} ref={scrollContainerRef}>
-          <div className={cn("p-6", closeUpView ? "min-w-[2400px]" : "min-w-[600px]")}
-            style={closeUpView ? { minHeight: 800 } : undefined}
-          >
-            <svg 
-              className={cn("w-full", closeUpView ? "h-[800px]" : "h-[320px]")} 
-              viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
-              preserveAspectRatio="xMidYMid meet"
-              style={closeUpView ? { transform: 'scale(2)', transformOrigin: '0 0' } : undefined}
+      {/* Main layout: tree on left, selection panel on right */}
+      <div className="flex gap-6">
+        {/* Branch visualization - card style */}
+        <div className="flex-1 bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className={cn("overflow-x-auto", closeUpView && "overflow-y-auto")} ref={scrollContainerRef}>
+            <div className={cn("p-6", closeUpView ? "min-w-[2400px]" : "min-w-[600px]")}
+              style={closeUpView ? { minHeight: 800 } : undefined}
             >
-              {/* Draw all paths as branches from a proper tree */}
-              {treePaths.map((path, pathIndex) => {
-                const isMatching = pathMatchesSelections(path);
+              <svg 
+                className={cn("w-full", closeUpView ? "h-[800px]" : "h-[320px]")} 
+                viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
+                preserveAspectRatio="xMidYMid meet"
+                style={closeUpView ? { transform: 'scale(2)', transformOrigin: '0 0' } : undefined}
+              >
+                {/* Draw all paths as branches from a proper tree */}
+                {treePaths.map((path, pathIndex) => {
+                  const isMatching = pathMatchesSelections(path);
+                  
+                  // Calculate proper tree branching positions
+                  const level1Group = path.words[1] === "Unites" ? 0 : 1;
+                  const level2Group = path.words[2] === "On" ? 0 : 1;
+                  const level3Group = path.words[3] === "Historic" ? 0 : 1;
+                  const level4Group = path.words[4] === "AI" ? 0 : 1;
+                  const level5Group = path.words[5] === "Ethics" ? 0 : 1;
+                  const level6Group = path.words[6] === "Framework" ? 0 : 1;
+                  
+                  // Calculate Y positions - use constant spread for consistent shape
+                  const baseY = svgHeight / 2;
+                  const spread = baseSpread;
+                  
+                  // Progressive Y calculation
+                  const y1 = baseY + (level1Group - 0.5) * spread;
+                  const y2 = y1 + (level2Group - 0.5) * (spread / 2);
+                  const y3 = y2 + (level3Group - 0.5) * (spread / 4);
+                  const y4 = y3 + (level4Group - 0.5) * (spread / 8);
+                  const y5 = y4 + (level5Group - 0.5) * (spread / 16);
+                  const y6 = y5 + (level6Group - 0.5) * (spread / 32);
+                  
+                  const points = [
+                    { x: levelXPositions[0], y: baseY },
+                    { x: levelXPositions[1], y: y1 },
+                    { x: levelXPositions[2], y: y2 },
+                    { x: levelXPositions[3], y: y3 },
+                    { x: levelXPositions[4], y: y4 },
+                    { x: levelXPositions[5], y: y5 },
+                    { x: levelXPositions[6], y: y6 },
+                  ];
+                  
+                  // Create curved path for smoother look (stop at last word, no extension)
+                  const pathD = `M ${points[0].x} ${points[0].y} ` +
+                    points.slice(1).map((p, i) => {
+                      const prev = points[i];
+                      const cpX = (prev.x + p.x) / 2;
+                      return `C ${cpX} ${prev.y} ${cpX} ${p.y} ${p.x} ${p.y}`;
+                    }).join(" ");
+                  
+                  return (
+                    <g key={pathIndex}>
+                      <path
+                        d={pathD}
+                        fill="none"
+                        stroke={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                        strokeWidth={isMatching ? 2.5 : 0.5}
+                        opacity={isMatching ? 1 : 0.15}
+                        className="transition-all duration-300"
+                      />
+                      {/* End node */}
+                      <circle
+                        cx={levelXPositions[6]}
+                        cy={y6}
+                        r={isMatching ? 4 : 1.5}
+                        fill={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                        opacity={isMatching ? 1 : 0.25}
+                        className="transition-all duration-300"
+                      />
+                    </g>
+                  );
+                })}
                 
-                // Calculate proper tree branching positions
-                const level1Group = path.words[1] === "Unites" ? 0 : 1;
-                const level2Group = path.words[2] === "On" ? 0 : 1;
-                const level3Group = path.words[3] === "Historic" ? 0 : 1;
-                const level4Group = path.words[4] === "AI" ? 0 : 1;
-                const level5Group = path.words[5] === "Ethics" ? 0 : 1;
-                const level6Group = path.words[6] === "Framework" ? 0 : 1;
-                
-                // Calculate Y positions - use constant spread for consistent shape
-                const baseY = svgHeight / 2;
-                const spread = baseSpread;
-                
-                // Progressive Y calculation
-                const y1 = baseY + (level1Group - 0.5) * spread;
-                const y2 = y1 + (level2Group - 0.5) * (spread / 2);
-                const y3 = y2 + (level3Group - 0.5) * (spread / 4);
-                const y4 = y3 + (level4Group - 0.5) * (spread / 8);
-                const y5 = y4 + (level5Group - 0.5) * (spread / 16);
-                const y6 = y5 + (level6Group - 0.5) * (spread / 32);
-                
-                const points = [
-                  { x: levelXPositions[0], y: baseY },
-                  { x: levelXPositions[1], y: y1 },
-                  { x: levelXPositions[2], y: y2 },
-                  { x: levelXPositions[3], y: y3 },
-                  { x: levelXPositions[4], y: y4 },
-                  { x: levelXPositions[5], y: y5 },
-                  { x: levelXPositions[6], y: y6 },
-                ];
-                
-                // Create curved path for smoother look (stop at last word, no extension)
-                const pathD = `M ${points[0].x} ${points[0].y} ` +
-                  points.slice(1).map((p, i) => {
-                    const prev = points[i];
-                    const cpX = (prev.x + p.x) / 2;
-                    return `C ${cpX} ${prev.y} ${cpX} ${p.y} ${p.x} ${p.y}`;
-                  }).join(" ");
-                
-                return (
-                  <g key={pathIndex}>
-                    <path
-                      d={pathD}
-                      fill="none"
-                      stroke={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                      strokeWidth={isMatching ? 2.5 : 0.5}
-                      opacity={isMatching ? 1 : 0.15}
-                      className="transition-all duration-300"
-                    />
-                    {/* End node */}
-                    <circle
-                      cx={levelXPositions[6]}
-                      cy={y6}
-                      r={isMatching ? 4 : 1.5}
-                      fill={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                      opacity={isMatching ? 1 : 0.25}
-                      className="transition-all duration-300"
-                    />
-                  </g>
-                );
-              })}
-              
-              {/* Words along the selected path */}
-              {selectedFullPath && selections.map((word, level) => {
-                if (!word || level > 6) return null;
-                
-                const x = levelXPositions[level];
-                // Recalculate Y - use constant spread
-                const baseY = svgHeight / 2;
-                const spread = baseSpread;
-                
-                const level1Group = selectedFullPath.words[1] === "Unites" ? 0 : 1;
-                const level2Group = selectedFullPath.words[2] === "On" ? 0 : 1;
-                const level3Group = selectedFullPath.words[3] === "Historic" ? 0 : 1;
-                const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
-                const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
-                
-                const y1 = baseY + (level1Group - 0.5) * spread;
-                const y2 = y1 + (level2Group - 0.5) * (spread / 2);
-                const y3 = y2 + (level3Group - 0.5) * (spread / 4);
-                const y4 = y3 + (level4Group - 0.5) * (spread / 8);
-                const y5 = y4 + (level5Group - 0.5) * (spread / 16);
-                
-                const yPositions = [baseY, y1, y2, y3, y4, y5, y5];
-                const y = yPositions[level] || baseY;
-                
-                const isClickable = level > 0;
-                
-                const handleWordClickOnTree = () => {
-                  if (!isClickable) return;
-                  const newSelections = [...selections];
-                  for (let i = level; i <= 6; i++) {
-                    newSelections[i] = null;
-                  }
-                  setSelections(newSelections);
-                  setCurrentLevel(level);
-                  onPathChange(newSelections.filter(Boolean) as string[]);
-                };
-                
-                const displayWord = word === "European Union" ? "EU" : word;
-                const wordWidth = Math.max(50, displayWord.length * 7 + 12);
-                const rectHeight = 20;
-                
-                return (
-                  <g 
-                    key={`word-${level}`}
-                    onClick={handleWordClickOnTree}
-                    className={cn(isClickable && "cursor-pointer")}
-                    style={{ pointerEvents: isClickable ? 'all' : 'none' }}
-                  >
-                    <rect
-                      x={x - wordWidth / 2}
-                      y={y - rectHeight / 2}
-                      width={wordWidth}
-                      height={rectHeight}
-                      rx={4}
-                      fill={displayWord === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"}
+                {/* Words along the selected path */}
+                {selectedFullPath && selections.map((word, level) => {
+                  if (!word || level > 6) return null;
+                  
+                  const x = levelXPositions[level];
+                  // Recalculate Y - use constant spread
+                  const baseY = svgHeight / 2;
+                  const spread = baseSpread;
+                  
+                  const level1Group = selectedFullPath.words[1] === "Unites" ? 0 : 1;
+                  const level2Group = selectedFullPath.words[2] === "On" ? 0 : 1;
+                  const level3Group = selectedFullPath.words[3] === "Historic" ? 0 : 1;
+                  const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
+                  const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
+                  
+                  const y1 = baseY + (level1Group - 0.5) * spread;
+                  const y2 = y1 + (level2Group - 0.5) * (spread / 2);
+                  const y3 = y2 + (level3Group - 0.5) * (spread / 4);
+                  const y4 = y3 + (level4Group - 0.5) * (spread / 8);
+                  const y5 = y4 + (level5Group - 0.5) * (spread / 16);
+                  
+                  const yPositions = [baseY, y1, y2, y3, y4, y5, y5];
+                  const y = yPositions[level] || baseY;
+                  
+                  const isClickable = level > 0;
+                  
+                  const handleWordClickOnTree = () => {
+                    if (!isClickable) return;
+                    const newSelections = [...selections];
+                    for (let i = level; i <= 6; i++) {
+                      newSelections[i] = null;
+                    }
+                    setSelections(newSelections);
+                    setCurrentLevel(level);
+                    onPathChange(newSelections.filter(Boolean) as string[]);
+                  };
+                  
+                  const displayWord = word === "European Union" ? "EU" : word;
+                  const wordWidth = Math.max(50, displayWord.length * 7 + 12);
+                  const rectHeight = 20;
+                  
+                  return (
+                    <g 
+                      key={`word-${level}`}
+                      onClick={handleWordClickOnTree}
+                      className={cn(isClickable && "cursor-pointer")}
+                      style={{ pointerEvents: isClickable ? 'all' : 'none' }}
+                    >
+                      <rect
+                        x={x - wordWidth / 2}
+                        y={y - rectHeight / 2}
+                        width={wordWidth}
+                        height={rectHeight}
+                        rx={4}
+                        fill={displayWord === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"}
+                        className={cn(
+                          "drop-shadow-sm transition-all duration-200",
+                          isClickable && displayWord !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]",
+                          isClickable && displayWord === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]"
+                        )}
+                      />
+                      <text
+                        x={x}
+                        y={y + 4}
+                        textAnchor="middle"
+                        className="text-[9px] font-medium fill-primary-foreground pointer-events-none select-none"
+                      >
+                        {displayWord}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Word selection panel - right side */}
+        <div className="w-72 shrink-0">
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm sticky top-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-foreground">
+                {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Complete!"}
+              </h3>
+              {currentLevel <= 6 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={playAnimation}
+                  disabled={isAnimating}
+                  className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                  title="Watch LLM select highest probability"
+                >
+                  <Monitor className={cn(
+                    "h-3.5 w-3.5",
+                    isAnimating && "text-primary animate-pulse"
+                  )} />
+                  Auto-select
+                </Button>
+              )}
+            </div>
+            
+            {/* Progress indicator */}
+            {currentLevel > 1 && currentLevel <= 6 && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xs text-muted-foreground">Progress:</span>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5, 6].map((level) => (
+                    <div
+                      key={level}
                       className={cn(
-                        "drop-shadow-sm transition-all duration-200",
-                        isClickable && displayWord !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]",
-                        isClickable && displayWord === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]"
+                        "w-2 h-2 rounded-full transition-colors",
+                        level < currentLevel ? "bg-primary" : "bg-muted"
                       )}
                     />
-                    <text
-                      x={x}
-                      y={y + 4}
-                      textAnchor="middle"
-                      className="text-[9px] font-medium fill-primary-foreground pointer-events-none select-none"
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* LLM Selection Message */}
+            {showSelectionMessage && animatedWord && selectedProbability !== null && (
+              <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-xs font-medium text-primary">
+                  LLM selected "{animatedWord}" — {(selectedProbability * 100).toFixed(0)}%
+                </span>
+              </div>
+            )}
+            
+            {currentLevel <= 6 ? (
+              <div className="space-y-2">
+                {currentOptions.map(({ word, probability }) => {
+                  const isAnimated = animatedWord === word;
+                  const isCharter = word === "Charter";
+                  const isHighestProb = showSelectionMessage && isAnimated;
+                  
+                  return (
+                    <button
+                      key={word}
+                      onClick={() => handleWordClick(currentLevel, word)}
+                      disabled={isAnimating}
+                      className={cn(
+                        "w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-200",
+                        "focus:outline-none focus:ring-2 focus:ring-offset-2",
+                        isCharter 
+                          ? "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50" 
+                          : "border-border bg-card hover:border-primary hover:bg-primary/5 focus:ring-primary/50",
+                        isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 bg-primary/10 border-primary",
+                        isHighestProb && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg"
+                      )}
                     >
-                      {displayWord}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
-        </div>
-      </div>
+                      <div className={cn(
+                        "font-semibold text-sm",
+                        isCharter && !isHighestProb ? "text-destructive" : "",
+                        isHighestProb ? "text-primary-foreground" : "text-foreground"
+                      )}>
+                        {isCharter && !isHighestProb ? (
+                          <TextFlag
+                            text="Charter"
+                            evaluationFactor="factual_accuracy"
+                            explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate."
+                            severity="error"
+                            noUnderline={true}
+                          />
+                        ) : word}
+                      </div>
+                      <div className={cn(
+                        "text-xs mt-0.5",
+                        isHighestProb ? "text-primary-foreground/80" : "text-muted-foreground"
+                      )}>
+                        {(probability * 100).toFixed(0)}% probability
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  All words selected. Your headline is ready!
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  className="w-full gap-1.5"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Try another path
+                </Button>
+              </div>
+            )}
 
-      {/* Word selection panel - below diagram, card style */}
-      <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h3 className="text-sm font-semibold text-foreground">
-              {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Headline Complete"}
-            </h3>
-            {currentLevel <= 6 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={playAnimation}
-                disabled={isAnimating}
-                className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-                title="Watch LLM select highest probability"
-              >
-                <Monitor className={cn(
-                  "h-3.5 w-3.5",
-                  isAnimating && "text-primary animate-pulse"
-                )} />
-                Auto-select
-              </Button>
+            {/* Selected words trail */}
+            {currentLevel > 1 && currentLevel <= 6 && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Selected:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {selections.slice(0, currentLevel).filter(Boolean).map((word, i) => (
+                    <span 
+                      key={i} 
+                      className={cn(
+                        "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+                        word === "Charter" 
+                          ? "bg-destructive/10 text-destructive" 
+                          : "bg-primary/10 text-primary"
+                      )}
+                    >
+                      {word === "European Union" ? "EU" : word}
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
-          
-          {/* Progress indicator */}
-          {currentLevel > 1 && currentLevel <= 6 && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Progress:</span>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5, 6].map((level) => (
-                  <div
-                    key={level}
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-colors",
-                      level < currentLevel ? "bg-primary" : "bg-muted"
-                    )}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
-        
-        {/* LLM Selection Message */}
-        {showSelectionMessage && animatedWord && selectedProbability !== null && (
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm font-medium text-primary">
-              LLM selected "{animatedWord}" — highest probability at {(selectedProbability * 100).toFixed(0)}%
-            </span>
-          </div>
-        )}
-        
-        {currentLevel <= 6 ? (
-          <div className="flex flex-wrap gap-3">
-            {currentOptions.map(({ word, probability }) => {
-              const isAnimated = animatedWord === word;
-              const isCharter = word === "Charter";
-              const isHighestProb = showSelectionMessage && isAnimated;
-              
-              return (
-                <button
-                  key={word}
-                  onClick={() => handleWordClick(currentLevel, word)}
-                  disabled={isAnimating}
-                  className={cn(
-                    "px-5 py-3 rounded-xl border-2 transition-all duration-200",
-                    "focus:outline-none focus:ring-2 focus:ring-offset-2",
-                    isCharter 
-                      ? "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50" 
-                      : "border-border bg-card hover:border-primary hover:bg-primary/5 focus:ring-primary/50",
-                    isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 scale-105 bg-primary/10 border-primary",
-                    isHighestProb && "ring-4 ring-primary ring-offset-2 scale-110 bg-primary text-primary-foreground border-primary shadow-lg"
-                  )}
-                >
-                  <div className={cn(
-                    "font-semibold text-base",
-                    isCharter && !isHighestProb ? "text-destructive" : "",
-                    isHighestProb ? "text-primary-foreground" : "text-foreground"
-                  )}>
-                    {isCharter && !isHighestProb ? (
-                      <TextFlag
-                        text="Charter"
-                        evaluationFactor="factual_accuracy"
-                        explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate."
-                        severity="error"
-                        noUnderline={true}
-                      />
-                    ) : word}
-                  </div>
-                  <div className={cn(
-                    "text-xs mt-1",
-                    isHighestProb ? "text-primary-foreground/80" : "text-muted-foreground"
-                  )}>
-                    {(probability * 100).toFixed(0)}% probability
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              All words selected. Your headline is ready!
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReset}
-              className="gap-1.5"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              Try another path
-            </Button>
-          </div>
-        )}
-
-        {/* Selected words trail */}
-        {currentLevel > 1 && currentLevel <= 6 && (
-          <div className="mt-4 pt-4 border-t border-border">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-medium text-muted-foreground">Selected:</span>
-              {selections.slice(0, currentLevel).filter(Boolean).map((word, i) => (
-                <span 
-                  key={i} 
-                  className={cn(
-                    "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium",
-                    word === "Charter" 
-                      ? "bg-destructive/10 text-destructive" 
-                      : "bg-primary/10 text-primary"
-                  )}
-                >
-                  {word === "European Union" ? "EU" : word}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
