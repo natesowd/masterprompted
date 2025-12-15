@@ -606,10 +606,18 @@ export function FullBranchDiagram({
                     </g>;
             })}
 
-                {/* Completion text */}
+                {/* Connecting line to completion and completion text */}
                 {selections.length === 7 && selectedFullPath && <g>
+                    {/* Connecting line from last word to completion */}
+                    <path 
+                      d={`M ${getLevelX(6) + 40} ${getPathY(selectedFullPath, 6)} L ${getLevelX(6) + 60} ${getPathY(selectedFullPath, 6)}`}
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2.5}
+                      className="transition-all duration-300"
+                    />
                     <rect 
-                      x={getLevelX(7) + 8} 
+                      x={getLevelX(6) + 65} 
                       y={getPathY(selectedFullPath, 6) - 14} 
                       width={Math.min(selectedFullPath.headline.length * 7, 280)} 
                       height={28} 
@@ -617,7 +625,7 @@ export function FullBranchDiagram({
                       fill="hsl(var(--primary))" 
                       className="drop-shadow-md"
                     />
-                    <text x={getLevelX(7) + 16} y={getPathY(selectedFullPath, 6) + 5} textAnchor="start" className="text-[13px] font-semibold fill-primary-foreground pointer-events-none select-none">
+                    <text x={getLevelX(6) + 73} y={getPathY(selectedFullPath, 6) + 5} textAnchor="start" className="text-[13px] font-semibold fill-primary-foreground pointer-events-none select-none">
                       {selectedFullPath.headline}
                     </text>
                   </g>}
