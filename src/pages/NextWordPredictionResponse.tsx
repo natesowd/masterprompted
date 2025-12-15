@@ -342,6 +342,7 @@ export default function HeadlineResponse() {
           "flex flex-col lg:flex-row gap-8 items-start",
           evaluationPanelOpen ? "justify-between" : "justify-center"
         )}>
+          {/* Right column - Evaluation Panel (using initialIsOpen prop) */}
           {/* Left column - Main content */}
           <div className={cn("flex-1 min-w-0 max-w-4xl", !evaluationPanelOpen && "mx-auto")}>
             {/* Original Prompt */}
@@ -386,40 +387,22 @@ export default function HeadlineResponse() {
                 <WordTreeDiagram
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
-                    const secondWord = path[2];
-                    const thirdWord = path[3];
-                    
-                    if (secondWord === "Reaches") {
-                      setCurrentSentence(["European", "Union", "Reaches", thirdWord, "on", "Historic", "AI", "Ethics", "Framework,", "Paving", "the", "Way", "for", "Responsible", "Tech", "Innovation"]);
-                    } else if (secondWord === "Finalizes") {
-                      setCurrentSentence(["European", "Union", "Finalizes", thirdWord, "AI", "Ethics", "Agreement,", "Setting", "Global", "Benchmark", "For", "Safe", "Technology", "Development"]);
-                    } else {
-                      const completions: { [key: string]: string[] } = {
-                        "On": ["Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"],
-                        "Around": ["Sweeping", "AI", "Ethics", "Charter,", "Pioneering", "International", "Tech", "Policy", "Standards"],
-                        "Behind": ["Historic", "AI", "Ethics", "Framework,", "Setting", "Standards", "for", "Responsible", "Innovation"]
-                      };
-                      const completion = completions[thirdWord] || completions["On"];
-                      setCurrentSentence(["European", "Union", secondWord, thirdWord, ...completion]);
-                    }
+                    // Update sentence with the path - this triggers Charter detection
+                    setCurrentSentence(path);
                   }}
                 />
               ) : viewMode === "full" ? (
                 <FullBranchDiagram
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
-                    if (path.length >= 7) {
-                      setCurrentSentence(path);
-                    }
+                    setCurrentSentence(path);
                   }}
                 />
               ) : viewMode === "branch" ? (
                 <BranchTreeDiagram
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
-                    if (path.length >= 7) {
-                      setCurrentSentence(path);
-                    }
+                    setCurrentSentence(path);
                   }}
                 />
               ) : (
