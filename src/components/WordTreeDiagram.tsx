@@ -333,16 +333,42 @@ export function WordTreeDiagram({
       .sort((a, b) => b.probability - a.probability);
   };
 
-  // Get history items at a specific level
-  const getHistoryAtLevel = (level: number) => {
-    return selectionHistory.filter(h => h.level === level);
+  // Get history items at a specific level, filtering out overlaps
+  const getFilteredHistoryAtLevel = (level: number, activeYPositions: number[]) => {
+    const historyItems = selectionHistory.filter(h => h.level === level);
+    
+    // Sort by index in array (later = more recent) - reverse to process most recent first
+    const sortedHistory = [...historyItems].reverse();
+    
+    const occupiedPositions: number[] = [...activeYPositions];
+    const filteredHistory: typeof historyItems = [];
+    
+    for (const item of sortedHistory) {
+      // Check if this position overlaps with any occupied position
+      const overlaps = occupiedPositions.some(y => Math.abs(y - item.yPosition) < nodeHeight);
+      
+      if (!overlaps) {
+        filteredHistory.push(item);
+        occupiedPositions.push(item.yPosition);
+      }
+    }
+    
+    return filteredHistory;
   };
 
   // Render a level column
   const renderLevel = (level: number) => {
     // For future levels (beyond unlocked), don't render active options
     const options = level <= unlockedLevel ? getOptionsAtLevelWithPrevPath(level) : [];
-    const historyItems = getHistoryAtLevel(level);
+    
+    // Get center Y from previous level's selection
+    const prevSelectedY = level > 0 ? getSelectedYAtLevel(level - 1) : containerHeight / 2;
+    
+    // Calculate active Y positions first
+    const activeYPositions = options.map((_, idx) => getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined));
+    
+    // Get filtered history items (no overlaps with active or each other)
+    const historyItems = getFilteredHistoryAtLevel(level, activeYPositions);
 
     // If no options and no history, skip
     if (options.length === 0 && historyItems.length === 0) return null;
@@ -350,9 +376,6 @@ export function WordTreeDiagram({
     // Allow selection if: level is unlocked AND (no selection yet OR can change existing selection)
     const canSelect = level > 0 && level <= unlockedLevel;
     const isCurrentFrontier = level === unlockedLevel && !selections[level];
-
-    // Get center Y from previous level's selection
-    const prevSelectedY = level > 0 ? getSelectedYAtLevel(level - 1) : containerHeight / 2;
 
     return (
       <div 
