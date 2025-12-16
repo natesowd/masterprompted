@@ -557,7 +557,17 @@ export function WordTreeDiagram({
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
           <p className="text-xl font-medium text-foreground truncate">
-            {displayHeadline || "European Union"}
+            {(() => {
+              const words = (displayHeadline || "European Union").split(" ");
+              const lastWord = words.pop();
+              const prefix = words.join(" ");
+              return (
+                <>
+                  {prefix && <>{prefix} </>}
+                  <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
+                </>
+              );
+            })()}
             {headline && <span className="text-muted-foreground"> {headline}</span>}
             {!headline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
           </p>
