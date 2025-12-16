@@ -465,16 +465,15 @@ export function FullBranchDiagram({
   };
 
   // Calculate Y position for a path based on its word choices
-  // Use larger spread to prevent overlap of word options (min 30px between options)
   const getPathY = (path: TreePath, level: number): number => {
     const height = 280;
     const centerY = height / 2;
     let y = centerY;
-    let spread = height / 3; // Increased from /4 to /3 for more vertical spacing
+    let spread = height / 4;
     for (let l = 1; l <= Math.min(level, 6); l++) {
       const wordIndex = levelOptions[l].findIndex(o => o.word === path.words[l]);
       y += wordIndex === 0 ? -spread : spread;
-      spread = Math.max(spread / 2, 25); // Minimum spread of 25px
+      spread /= 2;
     }
     return y;
   };
@@ -643,20 +642,31 @@ export function FullBranchDiagram({
               {selectedFullPath.headline}
             </text>}
           </> : <>
-            {/* Normal view: Full tree with all branches - stop lines before word option buttons */}
+            {/* Normal view: Full tree with all branches (truncate at current choice so lines never pass behind buttons) */}
             {treePaths.map((path, pathIndex) => {
               const isSelected = pathMatchesSelections(path);
+              const maxLevel = Math.min(6, currentLevel);
               let d = `M 50 150`;
-              for (let level = 1; level <= 6; level++) {
+
+              for (let level = 1; level <= maxLevel; level++) {
                 const x = getLevelX(level);
                 const y = getPathY(path, level);
-                // Stop the line short if this is where unselected options are
-                const stopBeforeButtons = level === currentLevel && currentLevel <= 6;
-                const adjustedX = stopBeforeButtons ? x - 55 : x;
+                const stopBeforeButtons = currentLevel <= 6 && level === currentLevel;
+                const adjustedX = stopBeforeButtons ? x - 70 : x;
                 d += ` L ${adjustedX} ${y}`;
               }
 
-              return <path key={pathIndex} d={d} fill="none" stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isSelected ? 2.5 : 0.5} strokeOpacity={isSelected ? 1 : 0.15} className="transition-all duration-300" />;
+              return (
+                <path
+                  key={pathIndex}
+                  d={d}
+                  fill="none"
+                  stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                  strokeWidth={isSelected ? 2.5 : 0.5}
+                  strokeOpacity={isSelected ? 1 : 0.15}
+                  className="transition-all duration-300"
+                />
+              );
             })}
 
             {/* Words along the selected path */}
@@ -721,79 +731,141 @@ export function FullBranchDiagram({
             {/* Word selection controls at branch intersections */}
             {currentLevel <= 6 && (() => {
               // Calculate intersection Y position based on parent word's position
-              const parentY = selectedFullPath ? getPathY(selectedFullPath, currentLevel - 1) : 150;
-              // Calculate the spread for this level's branches (matching getPathY logic)
-              let spread = 280 / 3;
+              const parentYRaw = selectedFullPath ? getPathY(selectedFullPath, currentLevel - 1) : 150;
+
+              // Spread at this depth (matches getPathY)
+              let spread = 280 / 4;
               for (let l = 1; l < currentLevel; l++) {
-                spread = Math.max(spread / 2, 25);
+                spread /= 2;
               }
-              const topY = parentY - spread;
-              const bottomY = parentY + spread;
+
+              // Ensure the two option buttons never overlap
+              const optionOffset = Math.max(spread, 70);
+
+              // Clamp so controls stay inside the SVG
+              const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+              const pad = 28;
+              const parentY = clamp(parentYRaw, pad + optionOffset, svgHeight - pad - optionOffset);
+
+              const topY = parentY - optionOffset;
+              const bottomY = parentY + optionOffset;
               const intersectionX = getLevelX(currentLevel);
 
               return (
                 <>
-                  {/* Auto button at the parent position */}
-                  <foreignObject x={intersectionX - 45} y={parentY - 35} width={90} height={25}>
-                    <div className="flex justify-center">
-                      <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-5 gap-1 text-[9px] px-2" title="Watch computer select">
-                        <Monitor className={cn("h-2.5 w-2.5", isAnimating ? "text-primary animate-pulse" : "text-muted-foreground")} />
-                        Auto
-                      </Button>
-                    </div>
-                  </foreignObject>
-
-                  {/* LLM Selection Message */}
-                  {showSelectionMessage && animatedWord && selectedProbability !== null && (
-                    <foreignObject x={intersectionX - 60} y={parentY + 20} width={120} height={30}>
-                      <div className="flex items-center justify-center gap-1 py-1 px-2 bg-primary/10 border border-primary/30 rounded-md animate-fade-in">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <span className="text-[9px] font-medium text-primary">
-                          "{animatedWord}" ({(selectedProbability * 100).toFixed(0)}%)
-                        </span>
+                  {/* Auto button at the parent position (with occluder so no lines show behind) */}
+                  <g>
+                    <rect
+                      x={intersectionX - 52}
+                      y={parentY - 38}
+                      width={104}
+                      height={30}
+                      rx={8}
+                      fill="hsl(var(--background))"
+                    />
+                    <foreignObject x={intersectionX - 45} y={parentY - 35} width={90} height={25}>
+                      <div className="flex justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={playAnimation}
+                          disabled={isAnimating}
+                          className="h-5 gap-1 text-[9px] px-2"
+                          title="Watch computer select"
+                        >
+                          <Monitor
+                            className={cn(
+                              "h-2.5 w-2.5",
+                              isAnimating ? "text-primary animate-pulse" : "text-muted-foreground"
+                            )}
+                          />
+                          Auto
+                        </Button>
                       </div>
                     </foreignObject>
-                  )}
+                  </g>
 
-                  {/* Word options at branch intersection points */}
-                  {!showSelectionMessage && levelOptions[currentLevel].map((option, idx) => {
-                    const isAnimated = animatedWord === option.word;
-                    const flagConfig = TOKEN_FLAGS[option.word];
-                    const isFlagged = !!flagConfig;
-                    const isDestructive = isFlagged && flagConfig.props.severity === 'error';
-                    const optionY = idx === 0 ? topY : bottomY;
-
-                    return (
-                      <foreignObject key={option.word} x={intersectionX - 50} y={optionY - 20} width={100} height={44}>
-                        <div className="flex justify-center">
-                          <Button
-                            variant="outline"
-                            onClick={() => handleWordSelect(option.word)}
-                            disabled={isAnimating}
-                            className={cn(
-                              "h-10 min-w-[80px] flex flex-col gap-0 px-3 text-xs transition-all duration-200",
-                              isDestructive && "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
-                              isAnimated && "ring-2 ring-primary ring-offset-1 animate-pulse bg-primary/10"
-                            )}
-                          >
-                            <span className={cn("text-xs font-medium", isDestructive && "text-destructive")}>
-                              {isFlagged ? (
-                                <TextFlag
-                                  text={option.word}
-                                  {...flagConfig.props}
-                                  className="no-underline decoration-0"
-                                  noUnderline={true}
-                                />
-                              ) : option.word}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              {(option.prob * 100).toFixed(0)}%
-                            </span>
-                          </Button>
+                  {/* LLM Selection Message (with occluder) */}
+                  {showSelectionMessage && animatedWord && selectedProbability !== null && (
+                    <g>
+                      <rect
+                        x={intersectionX - 66}
+                        y={parentY + 18}
+                        width={132}
+                        height={34}
+                        rx={10}
+                        fill="hsl(var(--background))"
+                      />
+                      <foreignObject x={intersectionX - 60} y={parentY + 20} width={120} height={30}>
+                        <div className="flex items-center justify-center gap-1 py-1 px-2 bg-primary/10 border border-primary/30 rounded-md animate-fade-in">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                          <span className="text-[9px] font-medium text-primary">
+                            "{animatedWord}" ({(selectedProbability * 100).toFixed(0)}%)
+                          </span>
                         </div>
                       </foreignObject>
-                    );
-                  })}
+                    </g>
+                  )}
+
+                  {/* Word options at branch intersection points (occluded background) */}
+                  {!showSelectionMessage &&
+                    levelOptions[currentLevel].map((option, idx) => {
+                      const isAnimated = animatedWord === option.word;
+                      const flagConfig = TOKEN_FLAGS[option.word];
+                      const isFlagged = !!flagConfig;
+                      const isDestructive = isFlagged && flagConfig.props.severity === "error";
+                      const optionY = idx === 0 ? topY : bottomY;
+
+                      return (
+                        <g key={option.word}>
+                          <rect
+                            x={intersectionX - 56}
+                            y={optionY - 26}
+                            width={112}
+                            height={56}
+                            rx={12}
+                            fill="hsl(var(--background))"
+                          />
+                          <foreignObject x={intersectionX - 50} y={optionY - 20} width={100} height={44}>
+                            <div className="flex justify-center">
+                              <Button
+                                variant="outline"
+                                onClick={() => handleWordSelect(option.word)}
+                                disabled={isAnimating}
+                                className={cn(
+                                  "h-10 min-w-[80px] flex flex-col gap-0 px-3 text-xs transition-all duration-200",
+                                  isDestructive &&
+                                    "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
+                                  isAnimated &&
+                                    "ring-2 ring-primary ring-offset-1 animate-pulse bg-primary/10"
+                                )}
+                              >
+                                <span
+                                  className={cn(
+                                    "text-xs font-medium",
+                                    isDestructive && "text-destructive"
+                                  )}
+                                >
+                                  {isFlagged ? (
+                                    <TextFlag
+                                      text={option.word}
+                                      {...flagConfig.props}
+                                      className="no-underline decoration-0"
+                                      noUnderline={true}
+                                    />
+                                  ) : (
+                                    option.word
+                                  )}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {(option.prob * 100).toFixed(0)}%
+                                </span>
+                              </Button>
+                            </div>
+                          </foreignObject>
+                        </g>
+                      );
+                    })}
                 </>
               );
             })()}
