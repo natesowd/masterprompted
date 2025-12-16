@@ -510,10 +510,10 @@ export function BranchTreeDiagram({
       </div>
     </div>
 
-    {/* Main layout: tree on left, selection panel on right */}
-    <div className="flex gap-6">
+    {/* Main layout: tree above, selection panel below */}
+    <div className="flex flex-col gap-4">
       {/* Branch visualization - card style */}
-      <div className="flex-1 bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg 
@@ -642,113 +642,112 @@ export function BranchTreeDiagram({
         </div>
       </div>
 
-      {/* Word selection panel - right side */}
-      <div className="w-72 shrink-0">
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm sticky top-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-foreground">
-              {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Complete!"}
-            </h3>
-            {currentLevel <= 6 && <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground" title="Watch LLM select highest probability">
-              <Monitor className={cn("h-3.5 w-3.5", isAnimating && "text-primary animate-pulse")} />
-              Auto-select
-            </Button>}
-          </div>
+      {/* Word selection panel - below tree */}
+      <div className="w-full">
+        <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm font-semibold text-foreground">
+                {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Complete!"}
+              </h3>
+              {currentLevel <= 6 && <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground" title="Watch LLM select highest probability">
+                <Monitor className={cn("h-3.5 w-3.5", isAnimating && "text-primary animate-pulse")} />
+                Auto-select
+              </Button>}
+            </div>
 
-          {/* Progress indicator */}
-          {currentLevel > 1 && currentLevel <= 6}
+            {/* LLM Selection Message */}
+            {showSelectionMessage && animatedWord && selectedProbability !== null && <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs font-medium text-primary">
+                LLM selected "{animatedWord}" — {(selectedProbability * 100).toFixed(0)}%
+              </span>
+            </div>}
 
-          {/* LLM Selection Message */}
-          {showSelectionMessage && animatedWord && selectedProbability !== null && <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-xs font-medium text-primary">
-              LLM selected "{animatedWord}" — {(selectedProbability * 100).toFixed(0)}%
-            </span>
-          </div>}
-
-          {currentLevel <= 6 ? <div className="space-y-2">
-            {currentOptions.map(({
-              word,
-              probability
-            }) => {
-              const isAnimated = animatedWord === word;
-              const flagConfig = TOKEN_FLAGS[word];
-              const isFlagged = !!flagConfig;
-              const isHighestProb = showSelectionMessage && isAnimated;
-
-              // Determine container styles based on severity
-              const getSeverityStyles = (severity?: string) => {
-                switch (severity) {
-                  case 'error':
-                    return "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50";
-                  case 'warning':
-                    return "border-yellow-500 bg-yellow-50 hover:bg-yellow-100 focus:ring-yellow-500/50";
-                  case 'info':
-                    return "border-blue-500 bg-blue-50 hover:bg-blue-100 focus:ring-blue-500/50";
-                  default:
-                    // Default flagged style if no severity match (fallback to error/destructive)
-                    return "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50";
-                }
-              };
-
-              const flaggedStyles = isFlagged ? getSeverityStyles(flagConfig.props.severity) : "";
-              const defaultStyles = "border-border bg-card hover:border-primary hover:bg-primary/5 focus:ring-primary/50";
-
-              return <button key={word} onClick={() => handleWordClick(currentLevel, word)} disabled={isAnimating} className={cn("w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-200", "focus:outline-none focus:ring-2 focus:ring-offset-2", isFlagged ? flaggedStyles : defaultStyles, isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 bg-primary/10 border-primary", isHighestProb && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg")}>
-                <div className={cn("font-semibold text-sm", isFlagged && !isHighestProb ? "text-destructive" : "", isHighestProb ? "text-primary-foreground" : "text-foreground")}>
-                  {isFlagged ? (
-                    <TextFlag
-                      text={word}
-                      {...flagConfig.props}
-                      className={cn(
-                        isHighestProb ? "text-primary-foreground no-underline decoration-0" : ""
-                      )}
-                      noUnderline={isHighestProb || flagConfig.props.noUnderline}
-                    />
-                  ) : word}                </div>
-                <div className={cn("text-xs mt-0.5", isHighestProb ? "text-primary-foreground/80" : "text-muted-foreground")}>
-                  {(probability * 100).toFixed(0)}% probability
-                </div>
-              </button>;
-            })}
-          </div> : <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              All words selected. Your headline is ready!
-            </p>
-            <Button variant="outline" size="sm" onClick={handleReset} className="w-full gap-1.5">
-              <RotateCcw className="h-3.5 w-3.5" />
-              Try another path
-            </Button>
-          </div>}
-
-          {/* Selected words trail */}
-          {currentLevel > 1 && currentLevel <= 6 && <div className="mt-4 pt-4 border-t border-border">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Selected:</p>
-            <div className="flex flex-wrap gap-1.5">
-              {selections.slice(0, currentLevel).filter(Boolean).map((word, i) => {
+            {currentLevel <= 6 ? <div className="flex gap-2">
+              {currentOptions.map(({
+                word,
+                probability
+              }) => {
+                const isAnimated = animatedWord === word;
                 const flagConfig = TOKEN_FLAGS[word];
                 const isFlagged = !!flagConfig;
-                const isDestructive = isFlagged && flagConfig.props.severity === 'error';
+                const isHighestProb = showSelectionMessage && isAnimated;
 
-                if (isFlagged) {
-                  return <TextFlag
-                    key={i}
-                    text={word === "European Union" ? "EU" : word}
-                    {...flagConfig.props}
-                    className={cn(
-                      "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium no-underline decoration-0 border-0",
-                      isDestructive ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
-                    )}
-                    noUnderline={true}
-                  />;
-                }
+                // Determine container styles based on severity
+                const getSeverityStyles = (severity?: string) => {
+                  switch (severity) {
+                    case 'error':
+                      return "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50";
+                    case 'warning':
+                      return "border-yellow-500 bg-yellow-50 hover:bg-yellow-100 focus:ring-yellow-500/50";
+                    case 'info':
+                      return "border-blue-500 bg-blue-50 hover:bg-blue-100 focus:ring-blue-500/50";
+                    default:
+                      return "border-destructive bg-destructive/5 hover:bg-destructive/10 focus:ring-destructive/50";
+                  }
+                };
 
-                return <span key={i} className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium", isDestructive ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary")}>
-                  {word === "European Union" ? "EU" : word}
-                </span>;
+                const flaggedStyles = isFlagged ? getSeverityStyles(flagConfig.props.severity) : "";
+                const defaultStyles = "border-border bg-card hover:border-primary hover:bg-primary/5 focus:ring-primary/50";
+
+                return <button key={word} onClick={() => handleWordClick(currentLevel, word)} disabled={isAnimating} className={cn("text-left px-4 py-2 rounded-lg border-2 transition-all duration-200", "focus:outline-none focus:ring-2 focus:ring-offset-2", isFlagged ? flaggedStyles : defaultStyles, isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 bg-primary/10 border-primary", isHighestProb && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg")}>
+                  <div className={cn("font-semibold text-sm", isFlagged && !isHighestProb ? "text-destructive" : "", isHighestProb ? "text-primary-foreground" : "text-foreground")}>
+                    {isFlagged ? (
+                      <TextFlag
+                        text={word}
+                        {...flagConfig.props}
+                        className={cn(
+                          isHighestProb ? "text-primary-foreground no-underline decoration-0" : ""
+                        )}
+                        noUnderline={isHighestProb || flagConfig.props.noUnderline}
+                      />
+                    ) : word}
+                  </div>
+                  <div className={cn("text-xs mt-0.5", isHighestProb ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                    {(probability * 100).toFixed(0)}%
+                  </div>
+                </button>;
               })}
-            </div>
-          </div>}
+            </div> : <div className="flex items-center gap-3">
+              <p className="text-sm text-muted-foreground">
+                All words selected!
+              </p>
+              <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5">
+                <RotateCcw className="h-3.5 w-3.5" />
+                Try another path
+              </Button>
+            </div>}
+
+            {/* Selected words trail */}
+            {currentLevel > 1 && currentLevel <= 6 && <div className="flex items-center gap-2 ml-auto">
+              <span className="text-xs font-medium text-muted-foreground">Selected:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {selections.slice(0, currentLevel).filter(Boolean).map((word, i) => {
+                  const flagConfig = TOKEN_FLAGS[word];
+                  const isFlagged = !!flagConfig;
+                  const isDestructive = isFlagged && flagConfig.props.severity === 'error';
+
+                  if (isFlagged) {
+                    return <TextFlag
+                      key={i}
+                      text={word === "European Union" ? "EU" : word}
+                      {...flagConfig.props}
+                      className={cn(
+                        "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium no-underline decoration-0 border-0",
+                        isDestructive ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
+                      )}
+                      noUnderline={true}
+                    />;
+                  }
+
+                  return <span key={i} className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium", isDestructive ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary")}>
+                    {word === "European Union" ? "EU" : word}
+                  </span>;
+                })}
+              </div>
+            </div>}
+          </div>
         </div>
       </div>
     </div>
