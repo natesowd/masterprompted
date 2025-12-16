@@ -486,12 +486,12 @@ export function WordTreeDiagram({
                 className={cn(
                   "relative px-4 py-2 rounded-lg text-sm font-medium border-2 whitespace-nowrap",
                   "min-w-[100px] h-11",
-                  "bg-muted/10 border-muted/20 text-muted-foreground/40 opacity-50",
+                  "bg-muted border-muted-foreground/40 text-muted-foreground",
                   "border-dashed"
                 )}
               >
                 {historyItem.word}
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted/10 text-muted-foreground/30">
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
                   (previous)
                 </span>
               </div>
@@ -515,33 +515,11 @@ export function WordTreeDiagram({
     // Get the Y position of the selected word at fromLevel
     const fromY = getSelectedYAtLevel(fromLevel);
     
-    // Draw many varied curves from selected "from" node to ALL "to" options
-    // Add extra ghost lines to show branching complexity
-    const ghostLineCount = Math.min(8, toOptions.length * 3);
+    // Draw clean lines from selected "from" node to "to" options
 
     return (
       <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-24" style={{ height: containerHeight }}>
         <svg className="w-full h-full" viewBox={`0 0 96 ${containerHeight}`} preserveAspectRatio="none">
-          {/* Ghost lines to show complexity - fan out wildly */}
-          {Array.from({ length: ghostLineCount }).map((_, ghostIdx) => {
-            // Distribute ghost lines around the fromY with variance
-            const spreadRange = 100;
-            const targetY = fromY + (ghostIdx - ghostLineCount / 2) * (spreadRange / ghostLineCount);
-            const curveVariance = (ghostIdx % 3 - 1) * 15;
-            const midX1 = 30 + curveVariance;
-            const midX2 = 66 - curveVariance;
-            
-            return (
-              <path
-                key={`ghost-${ghostIdx}`}
-                d={`M 0 ${fromY} C ${midX1} ${fromY + (ghostIdx % 2 ? 10 : -10)}, ${midX2} ${targetY}, 96 ${targetY}`}
-                fill="none"
-                stroke="hsl(var(--muted-foreground))"
-                strokeWidth={0.5}
-                strokeOpacity={0.08}
-              />
-            );
-          })}
           
           {/* Real option lines - varied curves */}
           {toOptions.map((toOpt, toIdx) => {
