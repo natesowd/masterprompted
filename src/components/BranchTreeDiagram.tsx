@@ -1,7 +1,9 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Monitor } from "lucide-react";
+import { RotateCcw, Monitor, ZoomIn, ZoomOut } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import TextFlag from "@/components/TextFlag";
 
 /**
@@ -312,7 +314,20 @@ export function BranchTreeDiagram({
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);
   const [selectedProbability, setSelectedProbability] = useState<number | null>(null);
+  const [closeUpView, setCloseUpView] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll in close-up view to follow selections
+  useEffect(() => {
+    if (scrollContainerRef.current && closeUpView && currentLevel > 1) {
+      // Calculate scroll position to center on current selection area
+      const scrollX = Math.max(0, (currentLevel - 1) * 200 - 100);
+      scrollContainerRef.current.scrollTo({
+        left: scrollX,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentLevel, closeUpView]);
 
   // Get options at each level based on current selections
   const getOptionsAtLevel = (level: number): {
@@ -439,10 +454,12 @@ export function BranchTreeDiagram({
     return yPositions[level] || baseY;
   };
 
-  // Use same positions for both views - close-up just scales/zooms
-  const levelXPositions = [20, 100, 180, 260, 340, 420, 500];
+  // X positions vary based on view mode - close-up spreads words further apart
+  const levelXPositions = closeUpView 
+    ? [40, 240, 440, 640, 840, 1040, 1240] // Wider spacing for close-up (200px apart)
+    : [20, 100, 180, 260, 340, 420, 500];   // Normal compact view
   const baseSpread = 180; // Keep constant for consistent branch shape
-  const svgWidth = 600;
+  const svgWidth = closeUpView ? 1400 : 600;
   const svgHeight = 400;
 
   // Build current headline
@@ -478,6 +495,13 @@ export function BranchTreeDiagram({
           </p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+            <Switch id="closeup-paths" checked={closeUpView} onCheckedChange={setCloseUpView} className="scale-90" />
+            <Label htmlFor="closeup-paths" className="text-xs font-medium text-muted-foreground cursor-pointer flex items-center gap-1">
+              {closeUpView ? <ZoomIn className="h-3 w-3" /> : <ZoomOut className="h-3 w-3" />}
+              Close-up
+            </Label>
+          </div>
           {currentLevel > 1 && <Button variant="outline" size="sm" onClick={handleReset} className="h-8 text-xs gap-1.5">
             <RotateCcw className="h-3.5 w-3.5" />
             Reset
@@ -491,8 +515,12 @@ export function BranchTreeDiagram({
       {/* Branch visualization - card style */}
       <div className="flex-1 bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto" ref={scrollContainerRef}>
-          <div className="p-6 min-w-[600px]">
-            <svg className="w-full h-[320px]" viewBox={`0 0 ${svgWidth} ${svgHeight}`} preserveAspectRatio="xMidYMid meet">
+          <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
+            <svg 
+              className={cn("w-full", closeUpView ? "h-[320px]" : "h-[320px]")} 
+              viewBox={closeUpView ? `0 0 1400 ${svgHeight}` : `0 0 ${svgWidth} ${svgHeight}`} 
+              preserveAspectRatio="xMidYMid meet"
+            >
               {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
                 const isMatching = pathMatchesSelections(path);
