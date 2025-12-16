@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { ListChecks, Target, Mic, Scale, Copy } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useEvaluation } from "@/contexts/EvaluationContext";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -53,7 +54,7 @@ const iconMap = {
 
 const labelMap = {
   "factual_accuracy": "Factual Accuracy",
-  "relevance": "Relevance", 
+  "relevance": "Relevance",
   "voice": "Voice",
   "bias": "Bias",
   "plagiarism": "Plagiarism",
@@ -72,11 +73,11 @@ interface TextFlagProps extends VariantProps<typeof textFlagVariants> {
   href?: string;
 }
 
-export default function TextFlag({ 
-  text, 
-  evaluationFactor, 
-  explanation, 
-  className = "", 
+export default function TextFlag({
+  text,
+  evaluationFactor,
+  explanation,
+  className = "",
   href,
   severity,
   noUnderline
@@ -85,40 +86,22 @@ export default function TextFlag({
   const label = labelMap[evaluationFactor];
   const [hoverCardOpen, setHoverCardOpen] = useState(false);
   const { t } = useLanguage();
-  
+  const { registerFactor, deregisterFactor } = useEvaluation();
+
   // Highlight the corresponding evaluation criterion when component is mounted
   useEffect(() => {
-    const criterionElement = document.querySelector(`[data-criterion-id="${evaluationFactor}"]`);
-    if (criterionElement) {
-      const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') || 
-                            criterionElement.querySelector('.flex.items-center.justify-between') ||
-                            criterionElement.querySelector('button') ||
-                            criterionElement.querySelector('[role="button"]');
-      if (triggerElement) {
-        triggerElement.classList.add('ring-2', 'ring-red-500', 'bg-red-50');
-        triggerElement.classList.remove('bg-muted', 'hover:bg-muted/80');
-      }
-    }
+    registerFactor(evaluationFactor);
 
     // Cleanup: remove highlighting when component unmounts
     return () => {
-      if (criterionElement) {
-        const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') || 
-                              criterionElement.querySelector('.flex.items-center.justify-between') ||
-                              criterionElement.querySelector('button') ||
-                              criterionElement.querySelector('[role="button"]');
-        if (triggerElement) {
-          triggerElement.classList.remove('ring-2', 'ring-red-500', 'bg-red-50');
-          triggerElement.classList.add('bg-muted', 'hover:bg-muted/80');
-        }
-      }
+      deregisterFactor(evaluationFactor);
     };
-  }, [evaluationFactor]);
+  }, [evaluationFactor, registerFactor, deregisterFactor]);
 
   return (
     <HoverCard open={hoverCardOpen} onOpenChange={setHoverCardOpen}>
       <HoverCardTrigger asChild>
-        <span 
+        <span
           className={cn(textFlagVariants({ severity, noUnderline }), "inline-flex items-center gap-0.5 whitespace-nowrap", className)}
           onClick={(e) => {
             e.stopPropagation();
@@ -127,10 +110,10 @@ export default function TextFlag({
         >
           <Icon className="inline-block h-3 w-3 text-destructive flex-shrink-0" />
           {href ? (
-            <a 
-              href={href} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="underline decoration-2 underline-offset-2 text-current hover:opacity-80"
               onClick={(e) => e.stopPropagation()}
             >
@@ -143,7 +126,7 @@ export default function TextFlag({
           )}
         </span>
       </HoverCardTrigger>
-      <HoverCardContent 
+      <HoverCardContent
         className="w-72 max-w-[85vw] bg-card border-destructive/20 shadow-lg rounded-lg p-3 overflow-hidden"
         sideOffset={5}
       >

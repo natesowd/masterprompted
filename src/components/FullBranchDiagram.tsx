@@ -17,6 +17,28 @@ interface TreePath {
   headline: string;
 }
 
+// Flag configuration for words in the tree
+interface TokenFlagConfig {
+  props: {
+    evaluationFactor: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
+    explanation: string;
+    severity?: "error" | "warning" | "info";
+    noUnderline?: boolean;
+    href?: string;
+  };
+}
+
+const TOKEN_FLAGS: Record<string, TokenFlagConfig> = {
+  "Charter": {
+    props: {
+      evaluationFactor: "factual_accuracy",
+      explanation: "The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate.",
+      severity: "error",
+      noUnderline: true
+    }
+  }
+};
+
 // All 64 paths data
 const treePaths: TreePath[] = [{
   words: ["European Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework"],
@@ -364,12 +386,38 @@ export function FullBranchDiagram({
     return matchingPaths[0];
   }, [selections, matchingPaths]);
 
-  // Build headline string
-  const buildHeadline = (): string => {
+  // Build headline element
+  const buildHeadline = (): React.ReactNode => {
+    const renderWords = (words: string[]) => (
+      words.map((word, i) => {
+        const flagConfig = TOKEN_FLAGS[word];
+        const suffix = i < words.length - 1 ? " " : "";
+        if (flagConfig) {
+          return (
+            <React.Fragment key={i}>
+              <TextFlag text={word} {...flagConfig.props} className="no-underline" />
+              {suffix}
+            </React.Fragment>
+          );
+        }
+        return <span key={i}>{word}{suffix}</span>;
+      })
+    );
+
     if (selections.length === 7 && selectedFullPath) {
-      return `${selections.join(" ")}, ${selectedFullPath.headline}`;
+      return (
+        <>
+          {renderWords(selections)}
+          <span className="text-primary">, {selectedFullPath.headline}</span>
+        </>
+      );
     }
-    return selections.join(" ") + "...";
+    return (
+      <>
+        {renderWords(selections)}
+        <span className="text-muted-foreground/50">...</span>
+      </>
+    );
   };
 
   // Handle word selection - progressive reveal
@@ -498,38 +546,38 @@ export function FullBranchDiagram({
     return getLevelX(level);
   };
   return <div className={cn("relative", className)}>
-      {/* Current headline display */}
-      <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
-          <p className="text-lg font-medium text-foreground">
-            {buildHeadline()}
-          </p>
-        </div>
-        <div className="flex items-center gap-4 ml-4 flex-shrink-0">
-          {/* Close-up view toggle */}
-          <div className="flex items-center gap-2">
-            <Switch id="closeup-view" checked={closeUpView} onCheckedChange={setCloseUpView} />
-            <Label htmlFor="closeup-view" className="text-xs text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-              {closeUpView ? <ZoomIn className="h-3 w-3" /> : <ZoomOut className="h-3 w-3" />}
-              Close-up
-            </Label>
-          </div>
-          {currentLevel > 1 && <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1.5">
-              <RotateCcw className="h-3 w-3" />
-              Reset
-            </Button>}
-        </div>
+    {/* Current headline display */}
+    <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
+        <p className="text-lg font-medium text-foreground">
+          {buildHeadline()}
+        </p>
       </div>
+      <div className="flex items-center gap-4 ml-4 flex-shrink-0">
+        {/* Close-up view toggle */}
+        <div className="flex items-center gap-2">
+          <Switch id="closeup-view" checked={closeUpView} onCheckedChange={setCloseUpView} />
+          <Label htmlFor="closeup-view" className="text-xs text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+            {closeUpView ? <ZoomIn className="h-3 w-3" /> : <ZoomOut className="h-3 w-3" />}
+            Close-up
+          </Label>
+        </div>
+        {currentLevel > 1 && <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1.5">
+          <RotateCcw className="h-3 w-3" />
+          Reset
+        </Button>}
+      </div>
+    </div>
 
-      {/* Branch visualization */}
-      <div ref={scrollContainerRef} className="overflow-x-auto">
-        <div className={cn("p-4", closeUpView ? "min-w-[700px]" : "min-w-[1050px]")}>
-          <svg className={cn("w-full", closeUpView ? "h-[200px]" : "h-[380px]")} viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 380`} preserveAspectRatio="xMidYMid meet">
-            {closeUpView ? <>
-                {/* Close-up view: Show all branches but zoomed in on 3 words */}
-                {/* Draw all branch paths */}
-                {treePaths.map((path, pathIndex) => {
+    {/* Branch visualization */}
+    <div ref={scrollContainerRef} className="overflow-x-auto">
+      <div className={cn("p-4", closeUpView ? "min-w-[700px]" : "min-w-[1050px]")}>
+        <svg className={cn("w-full", closeUpView ? "h-[200px]" : "h-[380px]")} viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 380`} preserveAspectRatio="xMidYMid meet">
+          {closeUpView ? <>
+            {/* Close-up view: Show all branches but zoomed in on 3 words */}
+            {/* Draw all branch paths */}
+            {treePaths.map((path, pathIndex) => {
               const isSelected = pathMatchesSelections(path);
               let d = `M ${getCloseUpX(0)} 100`;
               for (let level = 1; level <= 6; level++) {
@@ -548,12 +596,13 @@ export function FullBranchDiagram({
               }
               return <path key={pathIndex} d={d} fill="none" stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isSelected ? 2.5 : 0.5} strokeOpacity={isSelected ? 1 : 0.15} className="transition-all duration-300" />;
             })}
-                
-                {/* Words along the visible portion */}
-                {selections.map((word, level) => {
+
+            {/* Words along the visible portion */}
+            {selections.map((word, level) => {
               if (level < visibleLevels.start || level > visibleLevels.end) return null;
               const x = getCloseUpX(level);
               const y = 100;
+              const probability = selectedFullPath?.probabilities[level] || levelOptions[level]?.[0]?.prob || 1;
               const isClickable = level > 0;
               const handleWordClick = () => {
                 if (!isClickable) return;
@@ -563,27 +612,38 @@ export function FullBranchDiagram({
                 onPathChange(newSelections);
               };
               const wordWidth = Math.max(100, word.length * 10 + 24);
+
+              const flagConfig = TOKEN_FLAGS[word];
+              const isFlagged = !!flagConfig;
+              const isDestructive = isFlagged && flagConfig.props.severity === 'error';
+
               return <g key={`word-${level}`} onClick={handleWordClick} className={cn(isClickable && "cursor-pointer")} style={{
                 pointerEvents: isClickable ? 'all' : 'none'
               }}>
-                      <rect x={x - wordWidth / 2} y={y - 18} width={wordWidth} height={36} rx={6} fill={word === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-md transition-all duration-200", isClickable && word !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && word === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
-                      <text x={x} y={y + 5} textAnchor="middle" className="text-sm font-medium fill-primary-foreground pointer-events-none select-none">
-                        {word}
-                      </text>
-                    </g>;
+                {/* Probability label above word */}
+                {level > 0 && (
+                  <text x={x} y={y - 24} textAnchor="middle" className="text-[10px] font-medium fill-muted-foreground pointer-events-none select-none">
+                    {(probability * 100).toFixed(0)}%
+                  </text>
+                )}
+                <rect x={x - wordWidth / 2} y={y - 18} width={wordWidth} height={36} rx={6} fill={isDestructive ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-md transition-all duration-200", isClickable && !isDestructive && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
+                <text x={x} y={y + 5} textAnchor="middle" className="text-sm font-medium fill-primary-foreground pointer-events-none select-none">
+                  {word}
+                </text>
+              </g>;
             })}
 
-                {/* Arrows indicating more content */}
-                {visibleLevels.start > 0 && <text x={20} y={105} className="text-lg fill-muted-foreground">←</text>}
-                {(visibleLevels.end < selections.length - 1 || currentLevel <= 6) && <text x={670} y={105} className="text-lg fill-muted-foreground">→</text>}
+            {/* Arrows indicating more content */}
+            {visibleLevels.start > 0 && <text x={20} y={105} className="text-lg fill-muted-foreground">←</text>}
+            {(visibleLevels.end < selections.length - 1 || currentLevel <= 6) && <text x={670} y={105} className="text-lg fill-muted-foreground">→</text>}
 
-                {/* Completion text in close-up - positioned after the last word */}
-                {selections.length === 7 && selectedFullPath && visibleLevels.end >= 6 && <text x={getCloseUpX(6) + 100} y={105} textAnchor="start" className="text-xs font-medium fill-primary pointer-events-none select-none">
-                    {selectedFullPath.headline}
-                  </text>}
-              </> : <>
-                {/* Normal view: Full tree with all branches - paths end at last word, not through completion */}
-                {treePaths.map((path, pathIndex) => {
+            {/* Completion text in close-up - positioned after the last word */}
+            {selections.length === 7 && selectedFullPath && visibleLevels.end >= 6 && <text x={getCloseUpX(6) + 100} y={105} textAnchor="start" className="text-xs font-medium fill-primary pointer-events-none select-none">
+              {selectedFullPath.headline}
+            </text>}
+          </> : <>
+            {/* Normal view: Full tree with all branches - paths end at last word, not through completion */}
+            {treePaths.map((path, pathIndex) => {
               const isSelected = pathMatchesSelections(path);
               let d = `M 50 150`;
               for (let level = 1; level <= 6; level++) {
@@ -595,12 +655,13 @@ export function FullBranchDiagram({
 
               return <path key={pathIndex} d={d} fill="none" stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isSelected ? 2.5 : 0.5} strokeOpacity={isSelected ? 1 : 0.15} className="transition-all duration-300" />;
             })}
-                
-                {/* Words along the selected path */}
-                {selectedFullPath && selections.map((word, level) => {
+
+            {/* Words along the selected path */}
+            {selectedFullPath && selections.map((word, level) => {
               const x = getLevelX(level);
               const y = getPathY(selectedFullPath, level);
               const isClickable = level > 0;
+              const probability = selectedFullPath.probabilities[level];
               const handleWordClick = () => {
                 if (!isClickable) return;
                 const newSelections = selections.slice(0, level);
@@ -609,109 +670,132 @@ export function FullBranchDiagram({
                 onPathChange(newSelections);
               };
               const wordWidth = Math.max(80, word.length * 8 + 16);
+
+              const flagConfig = TOKEN_FLAGS[word];
+              const isFlagged = !!flagConfig;
+              const isDestructive = isFlagged && flagConfig.props.severity === 'error';
+
               return <g key={`word-${level}`} onClick={handleWordClick} className={cn(isClickable && "cursor-pointer")} style={{
                 pointerEvents: isClickable ? 'all' : 'none'
               }}>
-                      <rect x={x - wordWidth / 2} y={y - 12} width={wordWidth} height={24} rx={4} fill={word === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && word !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && word === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
-                      <text x={x} y={y + 4} textAnchor="middle" className="text-[10px] font-medium fill-primary-foreground pointer-events-none select-none">
-                        {word}
-                      </text>
-                    </g>;
+                {/* Probability label above word */}
+                {level > 0 && (
+                  <text x={x} y={y - 24} textAnchor="middle" className="text-[10px] font-medium fill-muted-foreground pointer-events-none select-none">
+                    {(probability * 100).toFixed(0)}%
+                  </text>
+                )}
+                <rect x={x - wordWidth / 2} y={y - 12} width={wordWidth} height={24} rx={4} fill={isDestructive ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && !isDestructive && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
+                <text x={x} y={y + 4} textAnchor="middle" className="text-[10px] font-medium fill-primary-foreground pointer-events-none select-none">
+                  {word}
+                </text>
+              </g>;
             })}
 
-                {/* Connecting line to completion and completion text */}
-                {selections.length === 7 && selectedFullPath && <g>
-                    {/* Connecting line from last word to completion */}
-                    <path 
-                      d={`M ${getLevelX(6) + 40} ${getPathY(selectedFullPath, 6)} L ${getLevelX(6) + 60} ${getPathY(selectedFullPath, 6)}`}
-                      fill="none"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2.5}
-                      className="transition-all duration-300"
-                    />
-                    <rect 
-                      x={getLevelX(6) + 65} 
-                      y={getPathY(selectedFullPath, 6) - 14} 
-                      width={Math.min(selectedFullPath.headline.length * 7, 280)} 
-                      height={28} 
-                      rx={6} 
-                      fill="hsl(var(--primary))" 
-                      className="drop-shadow-md"
-                    />
-                    <text x={getLevelX(6) + 73} y={getPathY(selectedFullPath, 6) + 5} textAnchor="start" className="text-[13px] font-semibold fill-primary-foreground pointer-events-none select-none">
-                      {selectedFullPath.headline}
-                    </text>
-                  </g>}
+            {/* Connecting line to completion and completion text */}
+            {selections.length === 7 && selectedFullPath && <g>
+              {/* Connecting line from last word to completion */}
+              <path
+                d={`M ${getLevelX(6) + 40} ${getPathY(selectedFullPath, 6)} L ${getLevelX(6) + 60} ${getPathY(selectedFullPath, 6)}`}
+                fill="none"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2.5}
+                className="transition-all duration-300"
+              />
+              <rect
+                x={getLevelX(6) + 65}
+                y={getPathY(selectedFullPath, 6) - 14}
+                width={Math.min(selectedFullPath.headline.length * 7, 280)}
+                height={28}
+                rx={6}
+                fill="hsl(var(--primary))"
+                className="drop-shadow-md"
+              />
+              <text x={getLevelX(6) + 73} y={getPathY(selectedFullPath, 6) + 5} textAnchor="start" className="text-[13px] font-semibold fill-primary-foreground pointer-events-none select-none">
+                {selectedFullPath.headline}
+              </text>
+            </g>}
 
-                {/* Word selection controls inside SVG - only in normal view */}
-                {currentLevel <= 6 && (
-                  <foreignObject x={getLevelX(currentLevel) - 100} y={260} width={200} height={120}>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-xs text-muted-foreground">Select next word:</p>
-                        <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-6 gap-1 text-[10px] px-2" title="Watch computer select">
-                          <Monitor className={cn("h-3 w-3", isAnimating ? "text-primary animate-pulse" : "text-muted-foreground")} />
-                          Auto
-                        </Button>
-                      </div>
-                      
-                      {/* LLM Selection Message */}
-                      {showSelectionMessage && animatedWord && selectedProbability !== null && (
-                        <div className="flex items-center gap-1.5 py-1.5 px-3 bg-primary/10 border border-primary/30 rounded-md animate-fade-in">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                          <span className="text-xs font-medium text-primary">
-                            "{animatedWord}" ({(selectedProbability * 100).toFixed(0)}%)
-                          </span>
-                        </div>
-                      )}
-                      
-                      {!showSelectionMessage && (
-                        <div className="flex gap-2">
-                          {levelOptions[currentLevel].map(option => {
-                            const isAnimated = animatedWord === option.word;
-                            const isCharter = option.word === "Charter";
-                            return (
-                              <Button
-                                key={option.word}
-                                variant="outline"
-                                onClick={() => handleWordSelect(option.word)}
-                                disabled={isAnimating}
-                                className={cn(
-                                  "h-10 min-w-[80px] flex flex-col gap-0 px-3 text-xs transition-all duration-200",
-                                  isCharter && "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
-                                  isAnimated && "ring-2 ring-primary ring-offset-1 animate-pulse bg-primary/10"
-                                )}
-                              >
-                                <span className={cn("text-xs font-medium", isCharter && "text-destructive")}>
-                                  {option.word}
-                                </span>
-                                <span className="text-[10px] text-muted-foreground">
-                                  {(option.prob * 100).toFixed(0)}%
-                                </span>
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </foreignObject>
-                )}
+            {/* Word selection controls inside SVG - only in normal view */}
+            {currentLevel <= 6 && (
+              <foreignObject x={getLevelX(currentLevel) - 100} y={260} width={200} height={120}>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-xs text-muted-foreground">Select next word:</p>
+                    <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-6 gap-1 text-[10px] px-2" title="Watch computer select">
+                      <Monitor className={cn("h-3 w-3", isAnimating ? "text-primary animate-pulse" : "text-muted-foreground")} />
+                      Auto
+                    </Button>
+                  </div>
 
-                {/* Completion controls inside SVG */}
-                {currentLevel > 6 && (
-                  <foreignObject x={getLevelX(6) - 50} y={260} width={200} height={60}>
-                    <div className="flex flex-col items-center gap-2">
-                      <p className="text-xs text-muted-foreground">Complete!</p>
-                      <Button variant="outline" size="sm" onClick={handleReset} className="h-7 gap-1.5 text-xs">
-                        <RotateCcw className="h-3 w-3" />
-                        Start Over
-                      </Button>
+                  {/* LLM Selection Message */}
+                  {showSelectionMessage && animatedWord && selectedProbability !== null && (
+                    <div className="flex items-center gap-1.5 py-1.5 px-3 bg-primary/10 border border-primary/30 rounded-md animate-fade-in">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                      <span className="text-xs font-medium text-primary">
+                        "{animatedWord}" ({(selectedProbability * 100).toFixed(0)}%)
+                      </span>
                     </div>
-                  </foreignObject>
-                )}
-              </>}
-          </svg>
-        </div>
+                  )}
+
+                  {!showSelectionMessage && (
+                    <div className="flex gap-2">
+                      {levelOptions[currentLevel].map(option => {
+                        const isAnimated = animatedWord === option.word;
+
+                        const flagConfig = TOKEN_FLAGS[option.word];
+                        const isFlagged = !!flagConfig;
+                        // For buttons in the SVG foreignObject, we use the button styles but include TextFlag for logic
+                        const isDestructive = isFlagged && flagConfig.props.severity === 'error';
+
+                        return (
+                          <Button
+                            key={option.word}
+                            variant="outline"
+                            onClick={() => handleWordSelect(option.word)}
+                            disabled={isAnimating}
+                            className={cn(
+                              "h-10 min-w-[80px] flex flex-col gap-0 px-3 text-xs transition-all duration-200",
+                              isDestructive && "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
+                              isAnimated && "ring-2 ring-primary ring-offset-1 animate-pulse bg-primary/10"
+                            )}
+                          >
+                            <span className={cn("text-xs font-medium", isDestructive && "text-destructive")}>
+                              {isFlagged ? (
+                                <TextFlag
+                                  text={option.word}
+                                  {...flagConfig.props}
+                                  className="no-underline decoration-0"
+                                  noUnderline={true}
+                                />
+                              ) : option.word}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {(option.prob * 100).toFixed(0)}%
+                            </span>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </foreignObject>
+            )}
+
+            {/* Completion controls inside SVG */}
+            {currentLevel > 6 && (
+              <foreignObject x={getLevelX(6) - 50} y={260} width={200} height={60}>
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-xs text-muted-foreground">Complete!</p>
+                  <Button variant="outline" size="sm" onClick={handleReset} className="h-7 gap-1.5 text-xs">
+                    <RotateCcw className="h-3 w-3" />
+                    Start Over
+                  </Button>
+                </div>
+              </foreignObject>
+            )}
+          </>}
+        </svg>
       </div>
-    </div>;
+    </div>
+  </div>;
 }

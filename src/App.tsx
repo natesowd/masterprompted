@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { EvaluationProvider } from "./contexts/EvaluationContext";
 import Landing from "./pages/Landing";
 import Modules from "./pages/Modules";
 import Introduction from "./pages/IntroBase";
@@ -36,48 +37,50 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-          {/* NAV BAR */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/modules" element={<Modules />} />
-          <Route path="/playground" element={<PromptPlayground />} />
-          {/* Hidden pages - uncomment to restore: */}
-          {/* <Route path="/about" element={<About />} /> */}
-          <Route path="/contact" element={<Contact />} />
-          {/* <Route path="/imprint" element={<Imprint />} /> */}
+        <EvaluationProvider>
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* NAV BAR */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/modules" element={<Modules />} />
+              <Route path="/playground" element={<PromptPlayground />} />
+              {/* Hidden pages - uncomment to restore: */}
+              {/* <Route path="/about" element={<About />} /> */}
+              <Route path="/contact" element={<Contact />} />
+              {/* <Route path="/imprint" element={<Imprint />} /> */}
 
-          {/* INTRO MODULE */}
-          <Route path="/module/intro" element={<Introduction />} />
-          <Route path="/module/intro/about-simulator" element={<AboutSimulator />} />
+              {/* INTRO MODULE */}
+              <Route path="/module/intro" element={<Introduction />} />
+              <Route path="/module/intro/about-simulator" element={<AboutSimulator />} />
 
-          {/* NEXT WORD PREDICTION MODULE */}
-          <Route path="/module/next-word-prediction" element={<NextWordPredictionIntro />} />
-          <Route path="/module/next-word-prediction/prompt" element={<NextWordPredictionPrompt />} />
-          <Route path="/module/next-word-prediction/response" element={<HeadlineResponse />} />
-          <Route path="/module/next-word-prediction/takeaways" element={<Takeaways />} />
+              {/* NEXT WORD PREDICTION MODULE */}
+              <Route path="/module/next-word-prediction" element={<NextWordPredictionIntro />} />
+              <Route path="/module/next-word-prediction/prompt" element={<NextWordPredictionPrompt />} />
+              <Route path="/module/next-word-prediction/response" element={<HeadlineResponse />} />
+              <Route path="/module/next-word-prediction/takeaways" element={<Takeaways />} />
 
-          {/* PROMPT CONSTRUCTION MODULE */}
-          <Route path="/module/prompt-construction" element={<PromptConstruction />} />
-          <Route path="/module/prompt-construction/summarize" element={<PromptConstructionSummarize />} />
-          <Route path="/module/prompt-construction/specificity" element={<Specificity />} />
-          <Route path="/module/prompt-construction/specificity/response" element={<SpecificityResponse />} />
-          <Route path="/module/prompt-construction/specificity/takeaways" element={<PromptConstructionSpecificityTakeaways />} />
-          <Route path="/module/prompt-construction/conversation-style" element={<ConversationStyle />} />
-          <Route path="/module/prompt-construction/context" element={<Context />} />
-          <Route path="/module/prompt-construction/bias" element={<Bias />} />
+              {/* PROMPT CONSTRUCTION MODULE */}
+              <Route path="/module/prompt-construction" element={<PromptConstruction />} />
+              <Route path="/module/prompt-construction/summarize" element={<PromptConstructionSummarize />} />
+              <Route path="/module/prompt-construction/specificity" element={<Specificity />} />
+              <Route path="/module/prompt-construction/specificity/response" element={<SpecificityResponse />} />
+              <Route path="/module/prompt-construction/specificity/takeaways" element={<PromptConstructionSpecificityTakeaways />} />
+              <Route path="/module/prompt-construction/conversation-style" element={<ConversationStyle />} />
+              <Route path="/module/prompt-construction/context" element={<Context />} />
+              <Route path="/module/prompt-construction/bias" element={<Bias />} />
 
-          {/* UNIMPLEMENTED */}
-          <Route path="/module/system-parameters" element={<SystemParameters />} />
-          <Route path="/module/multiple-sources" element={<MultipleSources />} />
-          <Route path="/module/llm-training" element={<LLMTraining />} />
-          <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+              {/* UNIMPLEMENTED */}
+              <Route path="/module/system-parameters" element={<SystemParameters />} />
+              <Route path="/module/multiple-sources" element={<MultipleSources />} />
+              <Route path="/module/llm-training" element={<LLMTraining />} />
+              <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
+
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </EvaluationProvider>
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>

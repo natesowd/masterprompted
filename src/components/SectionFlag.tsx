@@ -19,6 +19,7 @@ import { useEffect, ReactNode } from "react";
 import { ListChecks, Target, Mic, Scale, Copy } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useEvaluation } from "@/contexts/EvaluationContext";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -85,13 +86,13 @@ interface SectionFlagProps extends VariantProps<typeof sectionFlagVariants> {
   className?: string;
 }
 
-export default function SectionFlag({ 
-  children, 
-  evaluationFactor, 
-  explanation, 
+export default function SectionFlag({
+  children,
+  evaluationFactor,
+  explanation,
   className = "",
   severity,
-  size 
+  size
 }: SectionFlagProps) {
   const labelMap = {
     "factual_accuracy": "Factual Accuracy",
@@ -100,35 +101,21 @@ export default function SectionFlag({
     "bias": "Bias",
     "plagiarism": "Plagiarism",
   };
-  
+
   const Icon = iconMap[evaluationFactor];
   const label = labelMap[evaluationFactor];
   const { t } = useLanguage();
+  const { registerFactor, deregisterFactor } = useEvaluation();
 
   // Highlight the corresponding evaluation criterion when component is mounted
   useEffect(() => {
-    const criterionElement = document.querySelector(`[data-criterion-id="${evaluationFactor}"]`);
-    if (criterionElement) {
-      const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') ||
-        criterionElement.querySelector('.flex.items-center.justify-between');
-      if (triggerElement) {
-        triggerElement.classList.add('ring-2', 'ring-red-500', 'bg-red-50');
-        triggerElement.classList.remove('bg-gray-50', 'hover:bg-gray-100');
-      }
-    }
+    registerFactor(evaluationFactor);
 
     // Cleanup: remove highlighting when component unmounts
     return () => {
-      if (criterionElement) {
-        const triggerElement = criterionElement.querySelector('[data-radix-collection-item]') ||
-          criterionElement.querySelector('.flex.items-center.justify-between');
-        if (triggerElement) {
-          triggerElement.classList.remove('ring-2', 'ring-red-500', 'bg-red-50');
-          triggerElement.classList.add('bg-gray-50', 'hover:bg-gray-100');
-        }
-      }
+      deregisterFactor(evaluationFactor);
     };
-  }, [evaluationFactor]);
+  }, [evaluationFactor, registerFactor, deregisterFactor]);
 
   return (
     <HoverCard>

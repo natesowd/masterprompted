@@ -31,18 +31,28 @@ export const COMPONENT_MANIFEST = {
   // Evaluation Components
   EvaluationPanel: {
     description: "Collapsible panel displaying journalistic evaluation criteria",
-    features: ["Expandable criteria", "Icon indicators", "Highlight sync", "Localization"],
+    features: ["Expandable criteria", "Icon indicators", "Context-based highlighting", "Auto-expand", "Localization"],
     path: "src/components/EvaluationPanel.tsx"
   },
   SectionFlag: {
     description: "Highlights problematic sections with evaluation criteria badges",
-    features: ["Hover explanations", "Criterion highlighting", "Visual borders", "Icon badges"],
+    features: ["Hover explanations", "Context-based highlighting", "Visual borders", "Icon badges"],
     path: "src/components/SectionFlag.tsx"
   },
   TextFlag: {
     description: "Inline text annotation with evaluation criteria and explanations",
-    features: ["Inline icons", "Hover cards", "External links", "Criterion sync"],
+    features: ["Inline icons", "Hover cards", "External links", "Context-based highlighting", "Auto-expand trigger"],
     path: "src/components/TextFlag.tsx"
+  },
+  BranchTreeDiagram: {
+    description: "Interactive tree diagram visualizing next-word probabilities and branching paths",
+    features: ["Interactive nodes", "Probability visualization", "Automated path selection", "Flagged token integration"],
+    path: "src/components/BranchTreeDiagram.tsx"
+  },
+  FullBranchDiagram: {
+    description: "Comprehensive visualization of all possible text generation paths with probability weighting",
+    features: ["Pan and zoom", "Complete path exploration", "Probability heatmaps", "Flagged token integration"],
+    path: "src/components/FullBranchDiagram.tsx"
   },
 
   // UI Components

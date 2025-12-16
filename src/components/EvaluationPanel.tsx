@@ -17,6 +17,7 @@ import { ListChecks, Target, Mic, Scale, Copy, ChevronDown, ListChevronsUpDown, 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useEvaluation } from "@/contexts/EvaluationContext";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -65,7 +66,7 @@ interface EvaluationPanelProps extends VariantProps<typeof panelVariants> {
 
 export default function EvaluationPanel({ initialIsOpen = true, canClose = false, size }: EvaluationPanelProps) {
   const { t } = useLanguage();
-  
+
   const evaluationCriteria = [
     {
       id: "factual_accuracy",
@@ -98,7 +99,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
       description: t('components.evaluationPanel.criteria.plagiarism.description')
     }
   ];
-  
+
   // Use state to manage the main panel open state
   const [isPanelOpen, setIsPanelOpen] = useState(initialIsOpen);
 
@@ -106,7 +107,15 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
   useEffect(() => {
     setIsPanelOpen(initialIsOpen);
   }, [initialIsOpen]);
-  
+
+  // Expand panel when a new factor signals via context
+  const { activeEvaluationFactors, panelOpenSignal } = useEvaluation();
+  useEffect(() => {
+    if (panelOpenSignal > 0) {
+      setIsPanelOpen(true);
+    }
+  }, [panelOpenSignal]);
+
   // State for managing which criteria item is open
   const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -145,7 +154,9 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
                 data-criterion-id={criterion.id}
               >
                 <CollapsibleTrigger className="w-full">
-                  <div className={cn(criterionVariants())}>
+                  <div className={cn(criterionVariants({
+                    variant: activeEvaluationFactors.has(criterion.id) ? "highlighted" : "default"
+                  }))}>
                     <div className="flex items-center gap-3 mr-20">
                       <criterion.icon className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium text-foreground">{criterion.label}</span>
