@@ -486,12 +486,12 @@ export function WordTreeDiagram({
                 className={cn(
                   "relative px-4 py-2 rounded-lg text-sm font-medium border-2 whitespace-nowrap",
                   "min-w-[100px] h-11",
-                  "bg-green-200 border-green-400 text-green-900",
+                  "bg-muted/50 border-muted-foreground/20 text-muted-foreground/50",
                   "border-dashed"
                 )}
               >
                 {historyItem.word}
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap bg-green-200 text-green-800">
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted/50 text-muted-foreground/40">
                   (previous)
                 </span>
               </div>
