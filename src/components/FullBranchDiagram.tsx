@@ -573,7 +573,7 @@ export function FullBranchDiagram({
     {/* Branch visualization */}
     <div ref={scrollContainerRef} className="overflow-x-auto">
       <div className={cn("p-4", closeUpView ? "min-w-[700px]" : "min-w-[1050px]")}>
-        <svg className={cn("w-full", closeUpView ? "h-[200px]" : "h-[380px]")} viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 380`} preserveAspectRatio="xMidYMid meet">
+        <svg className={cn("w-full", closeUpView ? "h-[200px]" : "h-[300px]")} viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 300`} preserveAspectRatio="xMidYMid meet">
           {closeUpView ? <>
             {/* Close-up view: Show all branches but zoomed in on 3 words */}
             {/* Draw all branch paths */}
@@ -715,41 +715,55 @@ export function FullBranchDiagram({
               </text>
             </g>}
 
-            {/* Word selection controls inside SVG - only in normal view */}
-            {currentLevel <= 6 && (
-              <foreignObject x={getLevelX(currentLevel) - 100} y={260} width={200} height={120}>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-xs text-muted-foreground">Select next word:</p>
-                    <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-6 gap-1 text-[10px] px-2" title="Watch computer select">
-                      <Monitor className={cn("h-3 w-3", isAnimating ? "text-primary animate-pulse" : "text-muted-foreground")} />
-                      Auto
-                    </Button>
-                  </div>
+            {/* Word selection controls at branch intersections */}
+            {currentLevel <= 6 && (() => {
+              // Calculate intersection Y position based on parent word's position
+              const parentY = selectedFullPath ? getPathY(selectedFullPath, currentLevel - 1) : 150;
+              // Calculate the spread for this level's branches
+              let spread = 280 / 4;
+              for (let l = 1; l < currentLevel; l++) {
+                spread /= 2;
+              }
+              const topY = parentY - spread;
+              const bottomY = parentY + spread;
+              const intersectionX = getLevelX(currentLevel);
+
+              return (
+                <>
+                  {/* Auto button at the parent position */}
+                  <foreignObject x={intersectionX - 45} y={parentY - 35} width={90} height={25}>
+                    <div className="flex justify-center">
+                      <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-5 gap-1 text-[9px] px-2" title="Watch computer select">
+                        <Monitor className={cn("h-2.5 w-2.5", isAnimating ? "text-primary animate-pulse" : "text-muted-foreground")} />
+                        Auto
+                      </Button>
+                    </div>
+                  </foreignObject>
 
                   {/* LLM Selection Message */}
                   {showSelectionMessage && animatedWord && selectedProbability !== null && (
-                    <div className="flex items-center gap-1.5 py-1.5 px-3 bg-primary/10 border border-primary/30 rounded-md animate-fade-in">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                      <span className="text-xs font-medium text-primary">
-                        "{animatedWord}" ({(selectedProbability * 100).toFixed(0)}%)
-                      </span>
-                    </div>
+                    <foreignObject x={intersectionX - 60} y={parentY + 20} width={120} height={30}>
+                      <div className="flex items-center justify-center gap-1 py-1 px-2 bg-primary/10 border border-primary/30 rounded-md animate-fade-in">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                        <span className="text-[9px] font-medium text-primary">
+                          "{animatedWord}" ({(selectedProbability * 100).toFixed(0)}%)
+                        </span>
+                      </div>
+                    </foreignObject>
                   )}
 
-                  {!showSelectionMessage && (
-                    <div className="flex gap-2">
-                      {levelOptions[currentLevel].map(option => {
-                        const isAnimated = animatedWord === option.word;
+                  {/* Word options at branch intersection points */}
+                  {!showSelectionMessage && levelOptions[currentLevel].map((option, idx) => {
+                    const isAnimated = animatedWord === option.word;
+                    const flagConfig = TOKEN_FLAGS[option.word];
+                    const isFlagged = !!flagConfig;
+                    const isDestructive = isFlagged && flagConfig.props.severity === 'error';
+                    const optionY = idx === 0 ? topY : bottomY;
 
-                        const flagConfig = TOKEN_FLAGS[option.word];
-                        const isFlagged = !!flagConfig;
-                        // For buttons in the SVG foreignObject, we use the button styles but include TextFlag for logic
-                        const isDestructive = isFlagged && flagConfig.props.severity === 'error';
-
-                        return (
+                    return (
+                      <foreignObject key={option.word} x={intersectionX - 50} y={optionY - 20} width={100} height={44}>
+                        <div className="flex justify-center">
                           <Button
-                            key={option.word}
                             variant="outline"
                             onClick={() => handleWordSelect(option.word)}
                             disabled={isAnimating}
@@ -773,21 +787,20 @@ export function FullBranchDiagram({
                               {(option.prob * 100).toFixed(0)}%
                             </span>
                           </Button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </foreignObject>
-            )}
+                        </div>
+                      </foreignObject>
+                    );
+                  })}
+                </>
+              );
+            })()}
 
-            {/* Completion controls inside SVG */}
-            {currentLevel > 6 && (
-              <foreignObject x={getLevelX(6) - 50} y={260} width={200} height={60}>
-                <div className="flex flex-col items-center gap-2">
-                  <p className="text-xs text-muted-foreground">Complete!</p>
-                  <Button variant="outline" size="sm" onClick={handleReset} className="h-7 gap-1.5 text-xs">
-                    <RotateCcw className="h-3 w-3" />
+            {/* Completion controls positioned near the completion text */}
+            {currentLevel > 6 && selectedFullPath && (
+              <foreignObject x={getLevelX(6) + 65} y={getPathY(selectedFullPath, 6) + 20} width={150} height={40}>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={handleReset} className="h-6 gap-1 text-[10px]">
+                    <RotateCcw className="h-2.5 w-2.5" />
                     Start Over
                   </Button>
                 </div>
