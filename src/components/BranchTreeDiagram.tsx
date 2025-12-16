@@ -611,8 +611,8 @@ export function BranchTreeDiagram({
                   onPathChange(newSelections.filter(Boolean) as string[]);
                 };
                 const displayWord = word === "European Union" ? "EU" : word;
-                const wordWidth = Math.max(50, displayWord.length * 7 + 12);
-                const rectHeight = 20;
+                const wordWidth = Math.max(70, displayWord.length * 10 + 16);
+                const rectHeight = 28;
                 const probability = selectedFullPath.probabilities[level];
 
 
@@ -627,12 +627,12 @@ export function BranchTreeDiagram({
                 }}>
                   {/* Probability label above word */}
                   {level > 0 && (
-                    <text x={x} y={y - rectHeight / 2 - 4} textAnchor="middle" className="text-[8px] font-medium fill-muted-foreground pointer-events-none select-none">
+                    <text x={x} y={y - rectHeight / 2 - 6} textAnchor="middle" className="text-[10px] font-medium fill-muted-foreground pointer-events-none select-none">
                       {(probability * 100).toFixed(0)}%
                     </text>
                   )}
-                  <rect x={x - wordWidth / 2} y={y - rectHeight / 2} width={wordWidth} height={rectHeight} rx={4} fill={isDestructive ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && !isDestructive && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
-                  <text x={x} y={y + 4} textAnchor="middle" className="text-[9px] font-medium fill-primary-foreground pointer-events-none select-none">
+                  <rect x={x - wordWidth / 2} y={y - rectHeight / 2} width={wordWidth} height={rectHeight} rx={5} fill={isDestructive ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && !isDestructive && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
+                  <text x={x} y={y + 5} textAnchor="middle" className="text-[12px] font-semibold fill-primary-foreground pointer-events-none select-none">
                     {displayWord}
                   </text>
                 </g>;
