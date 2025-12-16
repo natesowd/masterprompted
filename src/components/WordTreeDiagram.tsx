@@ -579,19 +579,23 @@ export function WordTreeDiagram({
       <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
-          <p className="text-xl font-medium text-foreground truncate">
+          <p className="text-xl font-medium text-foreground">
             {(() => {
               const words = (displayHeadline || "European Union").split(" ");
-              const lastWord = words.pop();
-              const prefix = words.join(" ");
-              return (
-                <>
-                  {prefix && <>{prefix} </>}
-                  <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
-                </>
-              );
+              // Only highlight last word if headline is not complete
+              if (!headline) {
+                const lastWord = words.pop();
+                const prefix = words.join(" ");
+                return (
+                  <>
+                    {prefix && <>{prefix} </>}
+                    <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
+                  </>
+                );
+              }
+              return words.join(" ");
             })()}
-            {headline && <span className="text-muted-foreground"> {headline}</span>}
+            {headline && <span className="bg-green-200 text-green-900 px-1 rounded ml-1">{headline}</span>}
             {!headline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
           </p>
         </div>
