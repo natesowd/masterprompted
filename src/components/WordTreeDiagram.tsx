@@ -311,13 +311,16 @@ export function WordTreeDiagram({
       .sort((a, b) => b.probability - a.probability);
   };
 
-  // Render a level column - only show if unlocked
+  // Render a level column - show all levels, with ghost options for passed levels
   const renderLevel = (level: number) => {
+    // For future levels (beyond unlocked), don't render
     if (level > unlockedLevel) return null;
     
     const options = getOptionsAtLevelWithPrevPath(level);
     if (options.length === 0) return null;
 
+    // Determine if this is a "passed" level (selection made and moved on)
+    const isPastLevel = level < unlockedLevel && selections[level] !== null;
     // Allow selection if: level is unlocked AND (no selection yet OR can change existing selection)
     const canSelect = level > 0 && level <= unlockedLevel;
     const isCurrentFrontier = level === unlockedLevel && !selections[level];
@@ -337,6 +340,9 @@ export function WordTreeDiagram({
           const isSelected = selections[level] === option.word;
           const isAnimated = animatingLevel === level && animatedWord === option.word;
           const isPulsing = showPulse && animatingLevel === level && animatedWord === option.word;
+          
+          // Ghost styling: show unselected options at passed levels as faded
+          const isGhost = isPastLevel && !isSelected;
           
           // Calculate Y position centered around previous selection
           const nodeY = getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined);
@@ -389,25 +395,28 @@ export function WordTreeDiagram({
               )}
               
               <button
-                onClick={() => canSelect && handleWordClick(level, option.word)}
-                disabled={!canSelect}
+                onClick={() => canSelect && !isGhost && handleWordClick(level, option.word)}
+                disabled={!canSelect || isGhost}
                 className={cn(
                   "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
                   level === 0 ? "min-w-[140px]" : "min-w-[100px]",
                   "h-11",
-                  level === 0 
-                    ? "bg-primary text-primary-foreground border-primary cursor-default"
-                    : option.word === "Charter"
-                      ? isSelected
-                        ? "bg-destructive/30 border-destructive text-destructive shadow-md scale-105 cursor-pointer"
-                        : canSelect
-                          ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer"
-                          : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed"
-                      : isSelected 
-                        ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
-                        : canSelect
-                          ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
-                          : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
+                  // Ghost styling - faded appearance for unselected options at past levels
+                  isGhost
+                    ? "bg-muted/20 border-muted/30 text-muted-foreground/30 cursor-default opacity-40"
+                    : level === 0 
+                      ? "bg-primary text-primary-foreground border-primary cursor-default"
+                      : option.word === "Charter"
+                        ? isSelected
+                          ? "bg-destructive/30 border-destructive text-destructive shadow-md scale-105 cursor-pointer"
+                          : canSelect
+                            ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer"
+                            : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed"
+                        : isSelected 
+                          ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" 
+                          : canSelect
+                            ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
+                            : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                   isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10",
                   isPulsing && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                 )}
@@ -421,7 +430,7 @@ export function WordTreeDiagram({
                     noUnderline={true}
                   />
                 ) : option.word}
-                {level > 0 && (
+                {level > 0 && !isGhost && (
                   <span className={cn(
                     "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
                     isPulsing
@@ -430,6 +439,12 @@ export function WordTreeDiagram({
                         ? "bg-green-200 text-green-800" 
                         : "bg-muted text-muted-foreground"
                   )}>
+                    {option.probability.toFixed(2)}
+                  </span>
+                )}
+                {/* Ghost probability badge - more faded */}
+                {level > 0 && isGhost && (
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted/20 text-muted-foreground/30">
                     {option.probability.toFixed(2)}
                   </span>
                 )}
