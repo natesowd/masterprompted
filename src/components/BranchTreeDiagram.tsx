@@ -1,9 +1,7 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Monitor } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import TextFlag from "@/components/TextFlag";
 
 /**
@@ -314,19 +312,7 @@ export function BranchTreeDiagram({
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);
   const [selectedProbability, setSelectedProbability] = useState<number | null>(null);
-  const [closeUpView, setCloseUpView] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll in close-up view
-  useEffect(() => {
-    if (scrollContainerRef.current && closeUpView && currentLevel > 2) {
-      const scrollX = Math.max(0, (currentLevel - 2) * 160);
-      scrollContainerRef.current.scrollTo({
-        left: scrollX,
-        behavior: 'smooth'
-      });
-    }
-  }, [currentLevel, closeUpView]);
 
   // Get options at each level based on current selections
   const getOptionsAtLevel = (level: number): {
@@ -492,12 +478,6 @@ export function BranchTreeDiagram({
           </p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
-            <Switch id="closeup-branch" checked={closeUpView} onCheckedChange={setCloseUpView} className="scale-90" />
-            <Label htmlFor="closeup-branch" className="text-xs font-medium text-muted-foreground cursor-pointer">
-              Close-up
-            </Label>
-          </div>
           {currentLevel > 1 && <Button variant="outline" size="sm" onClick={handleReset} className="h-8 text-xs gap-1.5">
             <RotateCcw className="h-3.5 w-3.5" />
             Reset
@@ -510,14 +490,9 @@ export function BranchTreeDiagram({
     <div className="flex gap-6">
       {/* Branch visualization - card style */}
       <div className="flex-1 bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-        <div className={cn("overflow-x-auto", closeUpView && "overflow-y-auto")} ref={scrollContainerRef}>
-          <div className={cn("p-6", closeUpView ? "min-w-[2400px]" : "min-w-[600px]")} style={closeUpView ? {
-            minHeight: 800
-          } : undefined}>
-            <svg className={cn("w-full", closeUpView ? "h-[800px]" : "h-[320px]")} viewBox={`0 0 ${svgWidth} ${svgHeight}`} preserveAspectRatio="xMidYMid meet" style={closeUpView ? {
-              transform: 'scale(2)',
-              transformOrigin: '0 0'
-            } : undefined}>
+        <div className="overflow-x-auto" ref={scrollContainerRef}>
+          <div className="p-6 min-w-[600px]">
+            <svg className="w-full h-[320px]" viewBox={`0 0 ${svgWidth} ${svgHeight}`} preserveAspectRatio="xMidYMid meet">
               {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
                 const isMatching = pathMatchesSelections(path);
