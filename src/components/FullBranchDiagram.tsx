@@ -465,15 +465,16 @@ export function FullBranchDiagram({
   };
 
   // Calculate Y position for a path based on its word choices
+  // Use larger spread to prevent overlap of word options (min 30px between options)
   const getPathY = (path: TreePath, level: number): number => {
     const height = 280;
     const centerY = height / 2;
     let y = centerY;
-    let spread = height / 4;
+    let spread = height / 3; // Increased from /4 to /3 for more vertical spacing
     for (let l = 1; l <= Math.min(level, 6); l++) {
       const wordIndex = levelOptions[l].findIndex(o => o.word === path.words[l]);
       y += wordIndex === 0 ? -spread : spread;
-      spread /= 2;
+      spread = Math.max(spread / 2, 25); // Minimum spread of 25px
     }
     return y;
   };
@@ -516,7 +517,7 @@ export function FullBranchDiagram({
 
   // SVG dimensions based on view mode
   const svgWidth = closeUpView ? 1500 : 1050;
-  const svgHeight = closeUpView ? 200 : 300;
+  const svgHeight = closeUpView ? 200 : 350;
 
   // Calculate which levels to show in close-up view (3 words visible)
   const getVisibleLevels = (): {
@@ -573,7 +574,7 @@ export function FullBranchDiagram({
     {/* Branch visualization */}
     <div ref={scrollContainerRef} className="overflow-x-auto">
       <div className={cn("p-4", closeUpView ? "min-w-[700px]" : "min-w-[1050px]")}>
-        <svg className={cn("w-full", closeUpView ? "h-[200px]" : "h-[300px]")} viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 300`} preserveAspectRatio="xMidYMid meet">
+        <svg className={cn("w-full", closeUpView ? "h-[200px]" : "h-[350px]")} viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 350`} preserveAspectRatio="xMidYMid meet">
           {closeUpView ? <>
             {/* Close-up view: Show all branches but zoomed in on 3 words */}
             {/* Draw all branch paths */}
@@ -642,16 +643,18 @@ export function FullBranchDiagram({
               {selectedFullPath.headline}
             </text>}
           </> : <>
-            {/* Normal view: Full tree with all branches - paths end at last word, not through completion */}
+            {/* Normal view: Full tree with all branches - stop lines before word option buttons */}
             {treePaths.map((path, pathIndex) => {
               const isSelected = pathMatchesSelections(path);
               let d = `M 50 150`;
               for (let level = 1; level <= 6; level++) {
                 const x = getLevelX(level);
                 const y = getPathY(path, level);
-                d += ` L ${x} ${y}`;
+                // Stop the line short if this is where unselected options are
+                const stopBeforeButtons = level === currentLevel && currentLevel <= 6;
+                const adjustedX = stopBeforeButtons ? x - 55 : x;
+                d += ` L ${adjustedX} ${y}`;
               }
-              // Don't extend line to completion text area
 
               return <path key={pathIndex} d={d} fill="none" stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isSelected ? 2.5 : 0.5} strokeOpacity={isSelected ? 1 : 0.15} className="transition-all duration-300" />;
             })}
@@ -719,10 +722,10 @@ export function FullBranchDiagram({
             {currentLevel <= 6 && (() => {
               // Calculate intersection Y position based on parent word's position
               const parentY = selectedFullPath ? getPathY(selectedFullPath, currentLevel - 1) : 150;
-              // Calculate the spread for this level's branches
-              let spread = 280 / 4;
+              // Calculate the spread for this level's branches (matching getPathY logic)
+              let spread = 280 / 3;
               for (let l = 1; l < currentLevel; l++) {
-                spread /= 2;
+                spread = Math.max(spread / 2, 25);
               }
               const topY = parentY - spread;
               const bottomY = parentY + spread;
