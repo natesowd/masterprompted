@@ -33,8 +33,8 @@ export interface DisinformationResponse {
   };
 }
 
-// const DISINFORMATION_ENDPOINT = "https://fd-vc.ilabhub.atc.gr/api/v1/disinformation_signals";
-const DISINFORMATION_ENDPOINT = "https://claim-detection-aicode.ilabhub.atc.gr/extract_claims";
+const DISINFORMATION_ENDPOINT = "https://fd-vc.ilabhub.atc.gr/api/v1/disinformation_signals";
+// const DISINFORMATION_ENDPOINT = "https://claim-detection-aicode.ilabhub.atc.gr/extract_claims";
 /**
  * Check text for disinformation signals (fallacies)
  * @param text - The text to analyze
@@ -48,9 +48,9 @@ export async function checkDisinformation(text: string): Promise<DisinformationS
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: text,
-        // use_groq: true,
-        // double_stage: false,
+        text,
+        use_groq: true,
+        double_stage: false,
       }),
     });
 
