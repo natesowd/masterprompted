@@ -579,9 +579,16 @@ export function BranchTreeDiagram({
                 const displayWord = word === "European Union" ? "EU" : word;
                 const wordWidth = Math.max(50, displayWord.length * 7 + 12);
                 const rectHeight = 20;
+                const probability = selectedFullPath.probabilities[level];
                 return <g key={`word-${level}`} onClick={handleWordClickOnTree} className={cn(isClickable && "cursor-pointer")} style={{
                   pointerEvents: isClickable ? 'all' : 'none'
                 }}>
+                      {/* Probability label above word */}
+                      {level > 0 && (
+                        <text x={x} y={y - rectHeight / 2 - 4} textAnchor="middle" className="text-[8px] font-medium fill-muted-foreground pointer-events-none select-none">
+                          {(probability * 100).toFixed(0)}%
+                        </text>
+                      )}
                       <rect x={x - wordWidth / 2} y={y - rectHeight / 2} width={wordWidth} height={rectHeight} rx={4} fill={displayWord === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && displayWord !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && displayWord === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
                       <text x={x} y={y + 4} textAnchor="middle" className="text-[9px] font-medium fill-primary-foreground pointer-events-none select-none">
                         {displayWord}
