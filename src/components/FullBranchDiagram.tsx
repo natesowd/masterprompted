@@ -555,6 +555,7 @@ export function FullBranchDiagram({
               const x = getCloseUpX(level);
               const y = 100;
               const isClickable = level > 0;
+              const probability = selectedFullPath?.probabilities[level] || levelOptions[level]?.[0]?.prob || 1;
               const handleWordClick = () => {
                 if (!isClickable) return;
                 const newSelections = selections.slice(0, level);
@@ -566,6 +567,12 @@ export function FullBranchDiagram({
               return <g key={`word-${level}`} onClick={handleWordClick} className={cn(isClickable && "cursor-pointer")} style={{
                 pointerEvents: isClickable ? 'all' : 'none'
               }}>
+                      {/* Probability label above word */}
+                      {level > 0 && (
+                        <text x={x} y={y - 24} textAnchor="middle" className="text-[10px] font-medium fill-muted-foreground pointer-events-none select-none">
+                          {(probability * 100).toFixed(0)}%
+                        </text>
+                      )}
                       <rect x={x - wordWidth / 2} y={y - 18} width={wordWidth} height={36} rx={6} fill={word === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-md transition-all duration-200", isClickable && word !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && word === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
                       <text x={x} y={y + 5} textAnchor="middle" className="text-sm font-medium fill-primary-foreground pointer-events-none select-none">
                         {word}
@@ -601,6 +608,7 @@ export function FullBranchDiagram({
               const x = getLevelX(level);
               const y = getPathY(selectedFullPath, level);
               const isClickable = level > 0;
+              const probability = selectedFullPath.probabilities[level];
               const handleWordClick = () => {
                 if (!isClickable) return;
                 const newSelections = selections.slice(0, level);
@@ -612,6 +620,12 @@ export function FullBranchDiagram({
               return <g key={`word-${level}`} onClick={handleWordClick} className={cn(isClickable && "cursor-pointer")} style={{
                 pointerEvents: isClickable ? 'all' : 'none'
               }}>
+                      {/* Probability label above word */}
+                      {level > 0 && (
+                        <text x={x} y={y - 16} textAnchor="middle" className="text-[9px] font-medium fill-muted-foreground pointer-events-none select-none">
+                          {(probability * 100).toFixed(0)}%
+                        </text>
+                      )}
                       <rect x={x - wordWidth / 2} y={y - 12} width={wordWidth} height={24} rx={4} fill={word === "Charter" ? "hsl(var(--destructive))" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && word !== "Charter" && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && word === "Charter" && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
                       <text x={x} y={y + 4} textAnchor="middle" className="text-[10px] font-medium fill-primary-foreground pointer-events-none select-none">
                         {word}
