@@ -307,9 +307,12 @@ export function BranchTreeDiagram({
   onPathChange,
   className
 }: BranchTreeDiagramProps) {
-  // Track selections at each level (0 = root always selected)
-  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
-  const [currentLevel, setCurrentLevel] = useState(1);
+  // Default complete path: "European Union Reaches On Historic AI Ethics Framework"
+  const defaultSelections: (string | null)[] = ["European Union", "Reaches", "On", "Historic", "AI", "Ethics", "Framework"];
+  
+  // Track selections at each level (all selected by default)
+  const [selections, setSelections] = useState<(string | null)[]>(defaultSelections);
+  const [currentLevel, setCurrentLevel] = useState(7);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);
@@ -388,11 +391,11 @@ export function BranchTreeDiagram({
     onPathChange(newPath);
   };
 
-  // Reset
+  // Reset to default complete headline
   const handleReset = () => {
-    setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
-    setCurrentLevel(1);
-    onPathChange([treePaths[0].words[0]]);
+    setSelections(defaultSelections);
+    setCurrentLevel(7);
+    onPathChange(defaultSelections.filter(Boolean) as string[]);
   };
 
   // Play computer selection animation
