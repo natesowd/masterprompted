@@ -98,13 +98,11 @@ export function WordTreeDiagram({
   onPathChange,
   className
 }: WordTreeDiagramProps) {
-  // Default path - pre-select first complete headline for discovery-based learning
-  const defaultPath = treePaths[0];
-  
-  // Track unlocked level - start at 7 (complete) so users see full headline
-  const [unlockedLevel, setUnlockedLevel] = useState(7);
-  // Track selected words at each level - start with complete path
-  const [selections, setSelections] = useState<(string | null)[]>([...defaultPath.words]);
+  // Track unlocked level (0 = only root + first choices visible)
+  const [unlockedLevel, setUnlockedLevel] = useState(1);
+  // Track selected words at each level
+  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
+  const [headlineAnimating, setHeadlineAnimating] = useState(false);
   
   // Track history of selections - words that were selected before user went back and chose differently
   // Each entry: { level, word, pathPrefix, yPosition (exact position when selected) }
@@ -123,10 +121,10 @@ export function WordTreeDiagram({
 
   // Reset to initial state
   const handleReset = () => {
-    setUnlockedLevel(7);
-    setSelections([...defaultPath.words]);
+    setUnlockedLevel(1);
+    setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
     setSelectionHistory([]); // Clear history on reset
-    onPathChange([...defaultPath.words]);
+    onPathChange([treePaths[0].words[0]]);
   };
 
   // Get the current partial path based on selections
@@ -183,6 +181,10 @@ export function WordTreeDiagram({
 
   // Handle word selection - unlock next level
   const handleWordClick = (level: number, word: string) => {
+    // Trigger headline animation
+    setHeadlineAnimating(true);
+    setTimeout(() => setHeadlineAnimating(false), 500);
+    
     const newSelections = [...selections];
     
     // Save current selections from this level onwards to history before clearing
@@ -551,7 +553,10 @@ export function WordTreeDiagram({
       <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
-          <p className="text-xl font-medium text-foreground">
+          <p className={cn(
+            "text-xl font-medium text-foreground transition-all duration-300",
+            headlineAnimating && "scale-105 text-primary"
+          )}>
             {(() => {
               const words = (displayHeadline || "European Union").split(" ");
               // Only highlight last word if headline is not complete
@@ -561,7 +566,10 @@ export function WordTreeDiagram({
                 return (
                   <>
                     {prefix && <>{prefix} </>}
-                    <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
+                    <span className={cn(
+                      "px-1 rounded transition-all duration-300",
+                      headlineAnimating ? "bg-primary text-primary-foreground" : "bg-green-200 text-green-900"
+                    )}>{lastWord}</span>
                   </>
                 );
               }
