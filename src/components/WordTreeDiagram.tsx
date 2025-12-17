@@ -490,37 +490,6 @@ export function WordTreeDiagram({
           );
         })}
 
-        {/* Ghost words from history - previous selections that were replaced */}
-        {historyItems.map((historyItem, histIdx) => {
-          // Use the stored Y position where this word was originally selected
-          const ghostY = historyItem.yPosition;
-          
-          return (
-            <div
-              key={`ghost-${historyItem.word}-${histIdx}`}
-              style={{
-                position: 'absolute',
-                top: ghostY - nodeHeight / 2,
-                left: 0,
-                right: 0,
-              }}
-            >
-              <div
-                className={cn(
-                  "relative px-4 py-2 rounded-lg text-sm font-medium border-2 whitespace-nowrap",
-                  "min-w-[100px] h-11",
-                  "bg-muted/50 border-muted-foreground/20 text-muted-foreground/50",
-                  "border-dashed"
-                )}
-              >
-                {historyItem.word}
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted/50 text-muted-foreground/40">
-                  (previous)
-                </span>
-              </div>
-            </div>
-          );
-        })}
       </div>
     );
   };
