@@ -307,12 +307,10 @@ export function BranchTreeDiagram({
   onPathChange,
   className
 }: BranchTreeDiagramProps) {
-  // Default path - pre-select first complete headline for discovery-based learning
-  const defaultPath = treePaths[0];
-  
-  // Track selections at each level - start with complete path so users see full headline
-  const [selections, setSelections] = useState<(string | null)[]>([...defaultPath.words]);
-  const [currentLevel, setCurrentLevel] = useState(7); // Complete path
+  // Track selections at each level (0 = root always selected)
+  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [headlineAnimating, setHeadlineAnimating] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);
@@ -376,6 +374,10 @@ export function BranchTreeDiagram({
 
   // Handle word selection
   const handleWordClick = (level: number, word: string) => {
+    // Trigger headline animation
+    setHeadlineAnimating(true);
+    setTimeout(() => setHeadlineAnimating(false), 500);
+    
     const newSelections = [...selections];
 
     // Clear selections from this level onwards
@@ -490,7 +492,10 @@ export function BranchTreeDiagram({
     <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 border border-border/50">
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
-        <p className="text-xl font-medium text-foreground">
+        <p className={cn(
+          "text-xl font-medium text-foreground transition-all duration-300",
+          headlineAnimating && "scale-105 text-primary"
+        )}>
           {(() => {
             const words = (displayHeadline || "European Union").split(" ");
             // Only highlight last word if headline is not complete
@@ -500,7 +505,10 @@ export function BranchTreeDiagram({
               return (
                 <>
                   {prefix && <>{prefix} </>}
-                  <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
+                  <span className={cn(
+                    "px-1 rounded transition-all duration-300",
+                    headlineAnimating ? "bg-primary text-primary-foreground" : "bg-green-200 text-green-900"
+                  )}>{lastWord}</span>
                 </>
               );
             }
