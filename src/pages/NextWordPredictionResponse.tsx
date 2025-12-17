@@ -47,6 +47,14 @@ export default function HeadlineResponse() {
   const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  // When entering animated diagram modes, reset evaluation gating
+  useEffect(() => {
+    if (viewMode === "tree" || viewMode === "branch") {
+      setEvaluationPanelOpen(false);
+      setHasInteracted(false);
+    }
+  }, [viewMode]);
+
   // Watch for "Charter" word specifically in the sentence to expand evaluation panel
   // Only trigger after user has interacted (not during intro animation)
   useEffect(() => {
@@ -397,9 +405,9 @@ export default function HeadlineResponse() {
                 <WordTreeDiagram
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
-                    // Update sentence with the path - this triggers Charter detection
+                    // Update sentence with the path - this can trigger Charter detection
                     setCurrentSentence(path);
-                    setHasInteracted(true);
+                    if (path.length > 1) setHasInteracted(true);
                   }}
                 />
               ) : viewMode === "full" ? (
@@ -407,7 +415,7 @@ export default function HeadlineResponse() {
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
                     setCurrentSentence(path);
-                    setHasInteracted(true);
+                    if (path.length > 1) setHasInteracted(true);
                   }}
                 />
               ) : viewMode === "branch" ? (
@@ -415,7 +423,7 @@ export default function HeadlineResponse() {
                   selectedPath={currentSentence}
                   onPathChange={(path) => {
                     setCurrentSentence(path);
-                    setHasInteracted(true);
+                    if (path.length > 1) setHasInteracted(true);
                   }}
                 />
               ) : (

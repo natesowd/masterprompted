@@ -610,7 +610,7 @@ export function WordTreeDiagram({
       {/* Content wrapper - blurs when intro complete */}
       <div className={cn(
         "transition-all duration-500",
-        isIntroComplete && !isInteractive && "opacity-40 pointer-events-none"
+        isIntroComplete && !isInteractive && "opacity-25 blur-md pointer-events-none"
       )}>
         {/* Current headline display - fixed above scrollable tree */}
         <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
@@ -724,9 +724,9 @@ export function WordTreeDiagram({
         </div>
       </div>
       
-      {/* Start your own overlay - centered over entire component */}
+      {/* Start your own - between headline and diagram */}
       {isIntroComplete && !isInteractive && (
-        <div className="absolute inset-0 flex items-center justify-center animate-fade-in z-10" style={{ marginTop: '-100px' }}>
+        <div className="absolute left-0 right-0 top-24 flex justify-center animate-fade-in z-10">
           <Button 
             onClick={handleStartOwn}
             className="gap-2"
