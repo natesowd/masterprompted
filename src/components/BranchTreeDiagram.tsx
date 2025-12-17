@@ -301,23 +301,28 @@ interface BranchTreeDiagramProps {
   selectedPath: string[];
   onPathChange: (path: string[]) => void;
   className?: string;
+  /** Skip intro animation and start interactive immediately */
+  skipIntro?: boolean;
 }
 export function BranchTreeDiagram({
   selectedPath,
   onPathChange,
-  className
+  className,
+  skipIntro = false
 }: BranchTreeDiagramProps) {
   // Default complete path: "European Union Reaches On Historic AI Ethics Framework"
   const defaultSelections: (string | null)[] = ["European Union", "Reaches", "On", "Historic", "AI", "Ethics", "Framework"];
   
-  // Intro animation states
-  const [isIntroAnimating, setIsIntroAnimating] = useState(true);
+  // Intro animation states - skip if skipIntro is true
+  const [isIntroAnimating, setIsIntroAnimating] = useState(!skipIntro);
   const [introLevel, setIntroLevel] = useState(0);
-  const [isIntroComplete, setIsIntroComplete] = useState(false);
-  const [isInteractive, setIsInteractive] = useState(false);
+  const [isIntroComplete, setIsIntroComplete] = useState(skipIntro);
+  const [isInteractive, setIsInteractive] = useState(skipIntro);
   
-  // Track selections at each level (starts with root only during intro)
-  const [selections, setSelections] = useState<(string | null)[]>(["European Union", null, null, null, null, null, null]);
+  // Track selections at each level (starts ready if skipIntro)
+  const [selections, setSelections] = useState<(string | null)[]>(
+    skipIntro ? ["European Union", null, null, null, null, null, null] : ["European Union", null, null, null, null, null, null]
+  );
   const [currentLevel, setCurrentLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
@@ -326,9 +331,9 @@ export function BranchTreeDiagram({
   const [closeUpView, setCloseUpView] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Intro animation effect - plays once on mount
+  // Intro animation effect - plays once on mount (skipped if skipIntro)
   useEffect(() => {
-    if (!isIntroAnimating) return;
+    if (!isIntroAnimating || skipIntro) return;
     
     const animateNextWord = (level: number) => {
       if (level > 6) {

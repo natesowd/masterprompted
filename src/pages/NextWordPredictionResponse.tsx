@@ -43,11 +43,12 @@ export default function HeadlineResponse() {
   const [isAnimatingThird, setIsAnimatingThird] = useState(false);
   const [animatedThirdWord, setAnimatedThirdWord] = useState<string | null>(null);
   const [showHighlightPulseThird, setShowHighlightPulseThird] = useState(false);
-  const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full">("tree");
+  const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full" | "paths">("tree");
   const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
   // When entering animated diagram modes, reset evaluation gating
+  // "paths" mode skips intro so doesn't need reset
   useEffect(() => {
     if (viewMode === "tree" || viewMode === "branch") {
       setEvaluationPanelOpen(false);
@@ -392,10 +393,14 @@ export default function HeadlineResponse() {
                     <GitBranch className="h-3.5 w-3.5 rotate-90" />
                     Tree
                   </ToggleGroupItem>
+                  <ToggleGroupItem value="paths" aria-label="Paths View (No Animation)" className="gap-1.5 text-xs">
+                    <Network className="h-3.5 w-3.5" />
+                    Paths
+                  </ToggleGroupItem>
                   {/* Hidden views - kept for future use:
                   <ToggleGroupItem value="full" aria-label="Full Branch View" className="gap-1.5 text-xs">
                     <Network className="h-3.5 w-3.5" />
-                    Branch
+                    Full
                   </ToggleGroupItem>
                   */}
                 </ToggleGroup>
@@ -425,6 +430,15 @@ export default function HeadlineResponse() {
                     setCurrentSentence(path);
                     if (path.length > 1) setHasInteracted(true);
                   }}
+                />
+              ) : viewMode === "paths" ? (
+                <BranchTreeDiagram
+                  selectedPath={currentSentence}
+                  onPathChange={(path) => {
+                    setCurrentSentence(path);
+                    setHasInteracted(true);
+                  }}
+                  skipIntro={true}
                 />
               ) : (
               <div className="space-y-6">
