@@ -98,10 +98,13 @@ export function WordTreeDiagram({
   onPathChange,
   className
 }: WordTreeDiagramProps) {
-  // Track unlocked level (0 = only root + first choices visible)
-  const [unlockedLevel, setUnlockedLevel] = useState(1);
-  // Track selected words at each level
-  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
+  // Default path - pre-select first complete headline for discovery-based learning
+  const defaultPath = treePaths[0];
+  
+  // Track unlocked level - start at 7 (complete) so users see full headline
+  const [unlockedLevel, setUnlockedLevel] = useState(7);
+  // Track selected words at each level - start with complete path
+  const [selections, setSelections] = useState<(string | null)[]>([...defaultPath.words]);
   
   // Track history of selections - words that were selected before user went back and chose differently
   // Each entry: { level, word, pathPrefix, yPosition (exact position when selected) }
@@ -120,10 +123,10 @@ export function WordTreeDiagram({
 
   // Reset to initial state
   const handleReset = () => {
-    setUnlockedLevel(1);
-    setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
+    setUnlockedLevel(7);
+    setSelections([...defaultPath.words]);
     setSelectionHistory([]); // Clear history on reset
-    onPathChange([treePaths[0].words[0]]);
+    onPathChange([...defaultPath.words]);
   };
 
   // Get the current partial path based on selections
