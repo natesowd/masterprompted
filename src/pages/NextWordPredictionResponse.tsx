@@ -372,9 +372,9 @@ export default function HeadlineResponse() {
                     Dropdown
                   </ToggleGroupItem>
                   */}
-                  <ToggleGroupItem value="tree" aria-label="Tree View" className="gap-1.5 text-xs">
+                  <ToggleGroupItem value="tree" aria-label="Branch View" className="gap-1.5 text-xs">
                     <GitBranch className="h-3.5 w-3.5" />
-                    Tree
+                    Branch
                   </ToggleGroupItem>
                   <ToggleGroupItem value="branch" aria-label="Branch View" className="gap-1.5 text-xs">
                     <GitBranch className="h-3.5 w-3.5 rotate-90" />
