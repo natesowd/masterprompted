@@ -474,7 +474,53 @@ export function BranchTreeDiagram({
 
   // Get current level options
   const currentOptions = currentLevel <= 6 ? getOptionsAtLevel(currentLevel) : [];
+  // Get complete headline match
+  const completeHeadline = currentLevel === 7 
+    ? treePaths.find(p => p.words.every((word, i) => word === selections[i]))?.headline 
+    : null;
+
+  // Build display headline from selections
+  const displayHeadline = selections.filter(Boolean).join(" ");
+
   return <div className={cn("relative space-y-6", className)}>
+    {/* Current headline header - sticky */}
+    <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 border border-border/50">
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
+        <p className="text-xl font-medium text-foreground">
+          {(() => {
+            const words = (displayHeadline || "European Union").split(" ");
+            // Only highlight last word if headline is not complete
+            if (!completeHeadline) {
+              const lastWord = words.pop();
+              const prefix = words.join(" ");
+              return (
+                <>
+                  {prefix && <>{prefix} </>}
+                  <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
+                </>
+              );
+            }
+            return words.join(" ");
+          })()}
+          {completeHeadline && <span className="bg-green-200 text-green-900 px-1 rounded ml-1">{completeHeadline}</span>}
+          {!completeHeadline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
+        </p>
+      </div>
+      {/* Reset button */}
+      {currentLevel > 1 && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleReset}
+          className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
+        >
+          <RotateCcw className="h-3 w-3" />
+          Reset
+        </Button>
+      )}
+    </div>
+
     {/* Main layout: tree above, selection panel below */}
     <div className="flex flex-col gap-4">
       {/* Branch visualization - card style */}
