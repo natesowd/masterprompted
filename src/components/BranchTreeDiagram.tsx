@@ -307,9 +307,9 @@ export function BranchTreeDiagram({
   onPathChange,
   className
 }: BranchTreeDiagramProps) {
-  // Track selections at each level (0 = root always selected)
-  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
-  const [currentLevel, setCurrentLevel] = useState(1);
+  // Track selections at each level (0 = root always selected) - start with "Unites" selected
+  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], "Unites", null, null, null, null, null]);
+  const [currentLevel, setCurrentLevel] = useState(2);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);

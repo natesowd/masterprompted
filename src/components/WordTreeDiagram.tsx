@@ -99,9 +99,9 @@ export function WordTreeDiagram({
   className
 }: WordTreeDiagramProps) {
   // Track unlocked level (0 = only root + first choices visible)
-  const [unlockedLevel, setUnlockedLevel] = useState(1);
-  // Track selected words at each level
-  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
+  const [unlockedLevel, setUnlockedLevel] = useState(2);
+  // Track selected words at each level - start with "Unites" selected
+  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], "Unites", null, null, null, null, null]);
   
   // Track history of selections - words that were selected before user went back and chose differently
   // Each entry: { level, word, pathPrefix, yPosition (exact position when selected) }
