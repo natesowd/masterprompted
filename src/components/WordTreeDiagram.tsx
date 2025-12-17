@@ -175,6 +175,10 @@ export function WordTreeDiagram({
     setSelections(["European Union", null, null, null, null, null, null]);
     setSelectionHistory([]);
     onPathChange(["European Union"]);
+    // Scroll back to start
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+    }
   };
 
   // Reset to default complete headline
@@ -603,67 +607,68 @@ export function WordTreeDiagram({
 
   return (
     <div className={cn("relative", className)}>
-      {/* Current headline display - fixed above scrollable tree */}
-      <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
-            {isIntroAnimating ? "System generating headline:" : "Current Headline:"}
-          </p>
-          <p className="text-xl font-medium text-foreground">
-            {(() => {
-              const words = (displayHeadline || "European Union").split(" ");
-              // During intro animation, highlight the word being selected
-              if (isIntroAnimating && introLevel > 0) {
-                return words.map((word, idx) => (
-                  <span key={idx}>
-                    {idx > 0 && " "}
-                    <span className={cn(
-                      idx === introLevel ? "bg-primary text-primary-foreground px-1 rounded animate-pulse" : ""
-                    )}>
-                      {word}
+      {/* Content wrapper - blurs when intro complete */}
+      <div className={cn(
+        "transition-all duration-500",
+        isIntroComplete && !isInteractive && "opacity-40 pointer-events-none"
+      )}>
+        {/* Current headline display - fixed above scrollable tree */}
+        <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
+              {isIntroAnimating ? "System generating headline:" : "Current Headline:"}
+            </p>
+            <p className="text-xl font-medium text-foreground">
+              {(() => {
+                const words = (displayHeadline || "European Union").split(" ");
+                // During intro animation, highlight the word being selected
+                if (isIntroAnimating && introLevel > 0) {
+                  return words.map((word, idx) => (
+                    <span key={idx}>
+                      {idx > 0 && " "}
+                      <span className={cn(
+                        idx === introLevel ? "bg-primary text-primary-foreground px-1 rounded animate-pulse" : ""
+                      )}>
+                        {word}
+                      </span>
                     </span>
-                  </span>
-                ));
-              }
-              // Normal display logic
-              if (!headline && !isIntroComplete) {
-                const lastWord = words.pop();
-                const prefix = words.join(" ");
-                return (
-                  <>
-                    {prefix && <>{prefix} </>}
-                    <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
-                  </>
-                );
-              }
-              return words.join(" ");
-            })()}
-            {headline && !isIntroAnimating && <span className={cn("px-1 rounded ml-1", isInteractive ? "bg-green-200 text-green-900" : "")}>{headline}</span>}
-            {!headline && displayHeadline && !isIntroAnimating && <span className="text-muted-foreground/50">...</span>}
-          </p>
+                  ));
+                }
+                // Normal display logic
+                if (!headline && !isIntroComplete) {
+                  const lastWord = words.pop();
+                  const prefix = words.join(" ");
+                  return (
+                    <>
+                      {prefix && <>{prefix} </>}
+                      <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
+                    </>
+                  );
+                }
+                return words.join(" ");
+              })()}
+              {headline && !isIntroAnimating && <span className={cn("px-1 rounded ml-1", isInteractive ? "bg-green-200 text-green-900" : "")}>{headline}</span>}
+              {!headline && displayHeadline && !isIntroAnimating && <span className="text-muted-foreground/50">...</span>}
+            </p>
+          </div>
+          {/* Reset button - only show when interactive */}
+          {isInteractive && unlockedLevel > 1 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset
+            </Button>
+          )}
         </div>
-        {/* Reset button - only show when interactive */}
-        {isInteractive && unlockedLevel > 1 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
-          >
-            <RotateCcw className="h-3 w-3" />
-            Reset
-          </Button>
-        )}
-      </div>
-      
-      {/* Scrollable tree container with overlay */}
-      <div className="relative">
+        
+        {/* Scrollable tree container */}
         <div 
           ref={containerRef} 
-          className={cn(
-            "overflow-x-auto scroll-smooth transition-all duration-500",
-            isIntroComplete && !isInteractive && "opacity-40 pointer-events-none"
-          )}
+          className="overflow-x-auto scroll-smooth"
         >
           <div className="min-w-[1600px] p-6 pr-[320px]">
           <div className="flex items-start gap-1">
@@ -717,25 +722,25 @@ export function WordTreeDiagram({
           </div>
         </div>
         </div>
-        
-        {/* Start your own overlay */}
-        {isIntroComplete && !isInteractive && (
-          <div className="absolute inset-0 flex items-center justify-center animate-fade-in">
-            <div className="bg-card border border-border rounded-xl p-6 shadow-lg text-center max-w-sm">
-              <p className="text-sm text-muted-foreground mb-4">
-                The system selected words to form this headline. Now it's your turn!
-              </p>
-              <Button 
-                onClick={handleStartOwn}
-                className="gap-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Start Your Own Headline
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
+      
+      {/* Start your own overlay - centered over entire component */}
+      {isIntroComplete && !isInteractive && (
+        <div className="absolute inset-0 flex items-center justify-center animate-fade-in z-10">
+          <div className="bg-card border border-border rounded-xl p-6 shadow-lg text-center max-w-sm">
+            <p className="text-sm text-muted-foreground mb-4">
+              The system selected words to form this headline. Now it's your turn!
+            </p>
+            <Button 
+              onClick={handleStartOwn}
+              className="gap-2"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Start Your Own Headline
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
