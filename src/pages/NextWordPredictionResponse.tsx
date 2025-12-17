@@ -43,7 +43,7 @@ export default function HeadlineResponse() {
   const [isAnimatingThird, setIsAnimatingThird] = useState(false);
   const [animatedThirdWord, setAnimatedThirdWord] = useState<string | null>(null);
   const [showHighlightPulseThird, setShowHighlightPulseThird] = useState(false);
-  const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full">("dropdown");
+  const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full">("tree");
   const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
 
   // Watch for "Charter" word specifically in the sentence to expand evaluation panel
@@ -366,10 +366,12 @@ export default function HeadlineResponse() {
                   onValueChange={(value) => value && setViewMode(value as typeof viewMode)}
                   className="ml-4 shrink-0"
                 >
+                  {/* Hidden views - kept for future use:
                   <ToggleGroupItem value="dropdown" aria-label="Dropdown View" className="gap-1.5 text-xs">
                     <List className="h-3.5 w-3.5" />
                     Dropdown
                   </ToggleGroupItem>
+                  */}
                   <ToggleGroupItem value="tree" aria-label="Tree View" className="gap-1.5 text-xs">
                     <GitBranch className="h-3.5 w-3.5" />
                     Tree
@@ -378,10 +380,12 @@ export default function HeadlineResponse() {
                     <GitBranch className="h-3.5 w-3.5 rotate-90" />
                     Paths
                   </ToggleGroupItem>
+                  {/* Hidden views - kept for future use:
                   <ToggleGroupItem value="full" aria-label="Full Branch View" className="gap-1.5 text-xs">
                     <Network className="h-3.5 w-3.5" />
                     Branch
                   </ToggleGroupItem>
+                  */}
                 </ToggleGroup>
               </div>
 
