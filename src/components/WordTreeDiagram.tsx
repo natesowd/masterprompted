@@ -101,10 +101,16 @@ export function WordTreeDiagram({
   // Default complete path: "European Union Reaches On Historic AI Ethics Framework"
   const defaultSelections: (string | null)[] = ["European Union", "Reaches", "On", "Historic", "AI", "Ethics", "Framework"];
   
-  // Track unlocked level (7 = all levels unlocked with default complete headline)
-  const [unlockedLevel, setUnlockedLevel] = useState(7);
-  // Track selected words at each level
-  const [selections, setSelections] = useState<(string | null)[]>(defaultSelections);
+  // Intro animation states
+  const [isIntroAnimating, setIsIntroAnimating] = useState(true);
+  const [introLevel, setIntroLevel] = useState(0);
+  const [isIntroComplete, setIsIntroComplete] = useState(false);
+  const [isInteractive, setIsInteractive] = useState(false);
+  
+  // Track unlocked level (starts at 0 during intro, then 7 after)
+  const [unlockedLevel, setUnlockedLevel] = useState(0);
+  // Track selected words at each level (starts empty during intro)
+  const [selections, setSelections] = useState<(string | null)[]>(["European Union", null, null, null, null, null, null]);
   
   // Track history of selections - words that were selected before user went back and chose differently
   // Each entry: { level, word, pathPrefix, yPosition (exact position when selected) }
@@ -120,6 +126,56 @@ export function WordTreeDiagram({
   // Ref for auto-scroll
   const containerRef = useRef<HTMLDivElement>(null);
   const levelRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Intro animation effect - plays once on mount
+  useEffect(() => {
+    if (!isIntroAnimating) return;
+    
+    const animateNextWord = (level: number) => {
+      if (level > 6) {
+        // Animation complete
+        setIsIntroAnimating(false);
+        setIsIntroComplete(true);
+        return;
+      }
+      
+      setIntroLevel(level);
+      setUnlockedLevel(level);
+      
+      // Select the word for this level after a brief delay
+      setTimeout(() => {
+        const word = defaultSelections[level];
+        if (word) {
+          setSelections(prev => {
+            const newSelections = [...prev];
+            newSelections[level] = word;
+            return newSelections;
+          });
+        }
+        
+        // Move to next level
+        setTimeout(() => {
+          animateNextWord(level + 1);
+        }, 400);
+      }, 300);
+    };
+    
+    // Start animation after a brief delay
+    const timer = setTimeout(() => {
+      animateNextWord(1);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle "Start your own" click
+  const handleStartOwn = () => {
+    setIsInteractive(true);
+    setUnlockedLevel(1);
+    setSelections(["European Union", null, null, null, null, null, null]);
+    setSelectionHistory([]);
+    onPathChange(["European Union"]);
+  };
 
   // Reset to default complete headline
   const handleReset = () => {
@@ -550,12 +606,27 @@ export function WordTreeDiagram({
       {/* Current headline display - fixed above scrollable tree */}
       <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
+          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
+            {isIntroAnimating ? "System generating headline:" : "Current Headline:"}
+          </p>
           <p className="text-xl font-medium text-foreground">
             {(() => {
               const words = (displayHeadline || "European Union").split(" ");
-              // Only highlight last word if headline is not complete
-              if (!headline) {
+              // During intro animation, highlight the word being selected
+              if (isIntroAnimating && introLevel > 0) {
+                return words.map((word, idx) => (
+                  <span key={idx}>
+                    {idx > 0 && " "}
+                    <span className={cn(
+                      idx === introLevel ? "bg-primary text-primary-foreground px-1 rounded animate-pulse" : ""
+                    )}>
+                      {word}
+                    </span>
+                  </span>
+                ));
+              }
+              // Normal display logic
+              if (!headline && !isIntroComplete) {
                 const lastWord = words.pop();
                 const prefix = words.join(" ");
                 return (
@@ -567,12 +638,12 @@ export function WordTreeDiagram({
               }
               return words.join(" ");
             })()}
-            {headline && <span className="bg-green-200 text-green-900 px-1 rounded ml-1">{headline}</span>}
-            {!headline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
+            {headline && !isIntroAnimating && <span className={cn("px-1 rounded ml-1", isInteractive ? "bg-green-200 text-green-900" : "")}>{headline}</span>}
+            {!headline && displayHeadline && !isIntroAnimating && <span className="text-muted-foreground/50">...</span>}
           </p>
         </div>
-        {/* Reset button */}
-        {unlockedLevel > 1 && (
+        {/* Reset button - only show when interactive */}
+        {isInteractive && unlockedLevel > 1 && (
           <Button
             variant="outline"
             size="sm"
@@ -585,59 +656,85 @@ export function WordTreeDiagram({
         )}
       </div>
       
-      {/* Scrollable tree container */}
-      <div ref={containerRef} className="overflow-x-auto scroll-smooth">
-        <div className="min-w-[1600px] p-6 pr-[320px]">
-        <div className="flex items-start gap-1">
-          {/* Level 0: Root */}
-          {renderLevel(0)}
-          
-          {/* Levels 1-6 with connectors */}
-          {[1, 2, 3, 4, 5, 6].map(level => (
-            <React.Fragment key={level}>
-              {renderConnector(level - 1, level)}
-              {renderLevel(level)}
-            </React.Fragment>
-          ))}
-
-          {/* Final connector to headline - only when complete */}
-          {headline && (
-            <>
-              <div className="flex items-center w-6" style={{ height: containerHeight }}>
-                <svg className="w-full h-full" viewBox={`0 0 24 ${containerHeight}`} preserveAspectRatio="none">
-                  {(() => {
-                    const y = getSelectedYAtLevel(6);
-                    return (
-                      <path
-                        d={`M 0 ${y} L 24 ${y}`}
-                        fill="none"
-                        stroke="hsl(var(--primary))"
-                        strokeWidth={2.5}
-                      />
-                    );
-                  })()}
-                </svg>
-              </div>
-
-              {/* Headline completion */}
-              <div className="relative" style={{ height: containerHeight, minWidth: 280 }}>
-                <div 
-                  className="absolute bg-muted/30 rounded-lg p-4 animate-fade-in w-[260px]"
-                  style={{ 
-                    top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
-                    left: 16 
-                  }}
-                >
-                  <p className="text-[10px] text-muted-foreground mb-2 uppercase tracking-wide">Completion:</p>
-                  <p className="text-sm text-foreground leading-relaxed">
-                    ...{headline}
-                  </p>
-                </div>
-              </div>
-            </>
+      {/* Scrollable tree container with overlay */}
+      <div className="relative">
+        <div 
+          ref={containerRef} 
+          className={cn(
+            "overflow-x-auto scroll-smooth transition-all duration-500",
+            isIntroComplete && !isInteractive && "opacity-40 pointer-events-none"
           )}
+        >
+          <div className="min-w-[1600px] p-6 pr-[320px]">
+          <div className="flex items-start gap-1">
+            {/* Level 0: Root */}
+            {renderLevel(0)}
+            
+            {/* Levels 1-6 with connectors */}
+            {[1, 2, 3, 4, 5, 6].map(level => (
+              <React.Fragment key={level}>
+                {renderConnector(level - 1, level)}
+                {renderLevel(level)}
+              </React.Fragment>
+            ))}
+
+            {/* Final connector to headline - only when complete */}
+            {headline && (
+              <>
+                <div className="flex items-center w-6" style={{ height: containerHeight }}>
+                  <svg className="w-full h-full" viewBox={`0 0 24 ${containerHeight}`} preserveAspectRatio="none">
+                    {(() => {
+                      const y = getSelectedYAtLevel(6);
+                      return (
+                        <path
+                          d={`M 0 ${y} L 24 ${y}`}
+                          fill="none"
+                          stroke="hsl(var(--primary))"
+                          strokeWidth={2.5}
+                        />
+                      );
+                    })()}
+                  </svg>
+                </div>
+
+                {/* Headline completion */}
+                <div className="relative" style={{ height: containerHeight, minWidth: 280 }}>
+                  <div 
+                    className="absolute bg-muted/30 rounded-lg p-4 animate-fade-in w-[260px]"
+                    style={{ 
+                      top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
+                      left: 16 
+                    }}
+                  >
+                    <p className="text-[10px] text-muted-foreground mb-2 uppercase tracking-wide">Completion:</p>
+                    <p className="text-sm text-foreground leading-relaxed">
+                      ...{headline}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+        </div>
+        
+        {/* Start your own overlay */}
+        {isIntroComplete && !isInteractive && (
+          <div className="absolute inset-0 flex items-center justify-center animate-fade-in">
+            <div className="bg-card border border-border rounded-xl p-6 shadow-lg text-center max-w-sm">
+              <p className="text-sm text-muted-foreground mb-4">
+                The system selected words to form this headline. Now it's your turn!
+              </p>
+              <Button 
+                onClick={handleStartOwn}
+                className="gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Start Your Own Headline
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

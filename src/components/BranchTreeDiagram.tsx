@@ -310,15 +310,63 @@ export function BranchTreeDiagram({
   // Default complete path: "European Union Reaches On Historic AI Ethics Framework"
   const defaultSelections: (string | null)[] = ["European Union", "Reaches", "On", "Historic", "AI", "Ethics", "Framework"];
   
-  // Track selections at each level (all selected by default)
-  const [selections, setSelections] = useState<(string | null)[]>(defaultSelections);
-  const [currentLevel, setCurrentLevel] = useState(7);
+  // Intro animation states
+  const [isIntroAnimating, setIsIntroAnimating] = useState(true);
+  const [introLevel, setIntroLevel] = useState(0);
+  const [isIntroComplete, setIsIntroComplete] = useState(false);
+  const [isInteractive, setIsInteractive] = useState(false);
+  
+  // Track selections at each level (starts with root only during intro)
+  const [selections, setSelections] = useState<(string | null)[]>(["European Union", null, null, null, null, null, null]);
+  const [currentLevel, setCurrentLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);
   const [selectedProbability, setSelectedProbability] = useState<number | null>(null);
   const [closeUpView, setCloseUpView] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Intro animation effect - plays once on mount
+  useEffect(() => {
+    if (!isIntroAnimating) return;
+    
+    const animateNextWord = (level: number) => {
+      if (level > 6) {
+        // Animation complete
+        setIsIntroAnimating(false);
+        setIsIntroComplete(true);
+        setCurrentLevel(7);
+        return;
+      }
+      
+      setIntroLevel(level);
+      setCurrentLevel(level);
+      
+      // Select the word for this level after a brief delay
+      setTimeout(() => {
+        const word = defaultSelections[level];
+        if (word) {
+          setSelections(prev => {
+            const newSelections = [...prev];
+            newSelections[level] = word;
+            return newSelections;
+          });
+        }
+        
+        // Move to next level
+        setTimeout(() => {
+          animateNextWord(level + 1);
+        }, 400);
+      }, 300);
+    };
+    
+    // Start animation after a brief delay
+    const timer = setTimeout(() => {
+      animateNextWord(1);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Auto-scroll in close-up view to follow selections
   useEffect(() => {
@@ -376,6 +424,8 @@ export function BranchTreeDiagram({
 
   // Handle word selection
   const handleWordClick = (level: number, word: string) => {
+    if (!isInteractive) return;
+    
     const newSelections = [...selections];
 
     // Clear selections from this level onwards
@@ -389,6 +439,14 @@ export function BranchTreeDiagram({
     // Notify parent
     const newPath = newSelections.filter(Boolean) as string[];
     onPathChange(newPath);
+  };
+
+  // Handle "Start your own" click
+  const handleStartOwn = () => {
+    setIsInteractive(true);
+    setCurrentLevel(1);
+    setSelections(["European Union", null, null, null, null, null, null]);
+    onPathChange(["European Union"]);
   };
 
   // Reset to default complete headline
@@ -489,12 +547,27 @@ export function BranchTreeDiagram({
     {/* Current headline header - sticky */}
     <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 border border-border/50">
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Current Headline:</p>
+        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
+          {isIntroAnimating ? "System generating headline:" : "Current Headline:"}
+        </p>
         <p className="text-xl font-medium text-foreground">
           {(() => {
             const words = (displayHeadline || "European Union").split(" ");
-            // Only highlight last word if headline is not complete
-            if (!completeHeadline) {
+            // During intro animation, highlight the word being selected
+            if (isIntroAnimating && introLevel > 0) {
+              return words.map((word, idx) => (
+                <span key={idx}>
+                  {idx > 0 && " "}
+                  <span className={cn(
+                    idx === introLevel ? "bg-primary text-primary-foreground px-1 rounded animate-pulse" : ""
+                  )}>
+                    {word}
+                  </span>
+                </span>
+              ));
+            }
+            // Normal display logic
+            if (!completeHeadline && !isIntroComplete) {
               const lastWord = words.pop();
               const prefix = words.join(" ");
               return (
@@ -506,12 +579,12 @@ export function BranchTreeDiagram({
             }
             return words.join(" ");
           })()}
-          {completeHeadline && <span className="bg-green-200 text-green-900 px-1 rounded ml-1">{completeHeadline}</span>}
-          {!completeHeadline && displayHeadline && <span className="text-muted-foreground/50">...</span>}
+          {completeHeadline && !isIntroAnimating && <span className={cn("px-1 rounded ml-1", isInteractive ? "bg-green-200 text-green-900" : "")}>{completeHeadline}</span>}
+          {!completeHeadline && displayHeadline && !isIntroAnimating && <span className="text-muted-foreground/50">...</span>}
         </p>
       </div>
-      {/* Reset button */}
-      {currentLevel > 1 && (
+      {/* Reset button - only show when interactive */}
+      {isInteractive && currentLevel > 1 && (
         <Button
           variant="outline"
           size="sm"
@@ -525,9 +598,12 @@ export function BranchTreeDiagram({
     </div>
 
     {/* Main layout: tree above, selection panel below */}
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 relative">
       {/* Branch visualization - card style */}
-      <div className="bg-card rounded-xl shadow-sm overflow-hidden">
+      <div className={cn(
+        "bg-card rounded-xl shadow-sm overflow-hidden transition-all duration-500",
+        isIntroComplete && !isInteractive && "opacity-40"
+      )}>
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg 
@@ -657,14 +733,17 @@ export function BranchTreeDiagram({
       </div>
 
       {/* Word selection panel - below tree */}
-      <div className="w-full">
+      <div className={cn(
+        "w-full transition-all duration-500",
+        isIntroComplete && !isInteractive && "opacity-40 pointer-events-none"
+      )}>
         <div className="bg-card rounded-xl p-4 shadow-sm">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-3">
               <h3 className="text-sm font-semibold text-foreground">
                 {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Complete!"}
               </h3>
-              {currentLevel <= 6 && <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground" title="Watch LLM select highest probability">
+              {currentLevel <= 6 && isInteractive && <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground" title="Watch LLM select highest probability">
                 <Monitor className={cn("h-3.5 w-3.5", isAnimating && "text-primary animate-pulse")} />
                 Auto-select
               </Button>}
@@ -705,7 +784,7 @@ export function BranchTreeDiagram({
                 const flaggedStyles = isFlagged ? getSeverityStyles(flagConfig.props.severity) : "";
                 const defaultStyles = "border-border bg-card hover:border-primary hover:bg-primary/5 focus:ring-primary/50";
 
-                return <button key={word} onClick={() => handleWordClick(currentLevel, word)} disabled={isAnimating} className={cn("text-left px-4 py-2 rounded-lg border-2 transition-all duration-200", "focus:outline-none focus:ring-2 focus:ring-offset-2", isFlagged ? flaggedStyles : defaultStyles, isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 bg-primary/10 border-primary", isHighestProb && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg")}>
+                return <button key={word} onClick={() => handleWordClick(currentLevel, word)} disabled={isAnimating || !isInteractive} className={cn("text-left px-4 py-2 rounded-lg border-2 transition-all duration-200", "focus:outline-none focus:ring-2 focus:ring-offset-2", isFlagged ? flaggedStyles : defaultStyles, isAnimated && !isHighestProb && "ring-2 ring-primary ring-offset-2 bg-primary/10 border-primary", isHighestProb && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg")}>
                   <div className={cn("font-semibold text-sm", isFlagged && !isHighestProb ? "text-destructive" : "", isHighestProb ? "text-primary-foreground" : "text-foreground")}>
                     {isFlagged ? (
                       <TextFlag
@@ -727,14 +806,16 @@ export function BranchTreeDiagram({
               <p className="text-sm text-muted-foreground">
                 All words selected!
               </p>
-              <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5">
-                <RotateCcw className="h-3.5 w-3.5" />
-                Try another path
-              </Button>
+              {isInteractive && (
+                <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5">
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Try another path
+                </Button>
+              )}
             </div>}
 
             {/* Selected words trail */}
-            {currentLevel > 1 && currentLevel <= 6 && <div className="flex items-center gap-2 ml-auto">
+            {isInteractive && currentLevel > 1 && currentLevel <= 6 && <div className="flex items-center gap-2 ml-auto">
               <span className="text-xs font-medium text-muted-foreground">Selected:</span>
               <div className="flex flex-wrap gap-1.5">
                 {selections.slice(0, currentLevel).filter(Boolean).map((word, i) => {
@@ -764,6 +845,24 @@ export function BranchTreeDiagram({
           </div>
         </div>
       </div>
+      
+      {/* Start your own overlay */}
+      {isIntroComplete && !isInteractive && (
+        <div className="absolute inset-0 flex items-center justify-center animate-fade-in">
+          <div className="bg-card border border-border rounded-xl p-6 shadow-lg text-center max-w-sm">
+            <p className="text-sm text-muted-foreground mb-4">
+              The system selected words to form this headline. Now it's your turn!
+            </p>
+            <Button 
+              onClick={handleStartOwn}
+              className="gap-2"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Start Your Own Headline
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   </div>;
 }
