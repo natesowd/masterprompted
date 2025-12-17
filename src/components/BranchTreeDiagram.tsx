@@ -475,41 +475,6 @@ export function BranchTreeDiagram({
   // Get current level options
   const currentOptions = currentLevel <= 6 ? getOptionsAtLevel(currentLevel) : [];
   return <div className={cn("relative space-y-6", className)}>
-    {/* Current headline display - card style */}
-    <div className="bg-card rounded-xl p-6 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-muted-foreground mb-3">Generated Headline</p>
-          <p className="text-xl font-semibold text-foreground leading-relaxed">
-            {selections.filter(Boolean).map((word, i, arr) => {
-              const flagConfig = TOKEN_FLAGS[word];
-              if (flagConfig) {
-                return <span key={i}>
-                  <TextFlag text={word} {...flagConfig.props} className="no-underline" />
-                  {i < arr.length - 1 && " "}
-                </span>;
-              }
-              return <span key={i}>{word}{i < arr.length - 1 && " "}</span>;
-            })}
-            {currentLevel <= 6 ? <span className="text-muted-foreground/50">...</span> : selectedFullPath && <span className="text-primary">, {selectedFullPath.headline}</span>}
-          </p>
-        </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
-            <Switch id="closeup-paths" checked={closeUpView} onCheckedChange={setCloseUpView} className="scale-90" />
-            <Label htmlFor="closeup-paths" className="text-xs font-medium text-muted-foreground cursor-pointer flex items-center gap-1">
-              {closeUpView ? <ZoomIn className="h-3 w-3" /> : <ZoomOut className="h-3 w-3" />}
-              Close-up
-            </Label>
-          </div>
-          {currentLevel > 1 && <Button variant="outline" size="sm" onClick={handleReset} className="h-8 text-xs gap-1.5">
-            <RotateCcw className="h-3.5 w-3.5" />
-            Reset
-          </Button>}
-        </div>
-      </div>
-    </div>
-
     {/* Main layout: tree above, selection panel below */}
     <div className="flex flex-col gap-4">
       {/* Branch visualization - card style */}
