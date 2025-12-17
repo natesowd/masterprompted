@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Manrope:wght@500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Manrope&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -22,19 +23,19 @@ All colors MUST be HSL.
 
     /* Primary: #1F1F1F (Primary 500) -> 0 0% 12% */
     --primary: 0 0% 12%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 98%;
 
     /* Secondary: #64DB96 (Secondary 500) -> 145 62% 63% */
     --secondary: 145 62% 63%;
     /* Secondary Foreground: #244F36 (Secondary 900) -> 145 35% 22% */
-    --secondary-foreground: 145 35% 22%;
+    --secondary-foreground: 162 77% 34%;
 
     /* Muted and Accent are maintained from previous values as no new mapping was provided */
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 145 100% 88%;
-    --accent-foreground: 145 62% 20%;
+    --accent: 145 62% 80%;
+    --accent-foreground: 145 64% 15%;
 
     /* Destructive: #F44336 (Error 500) -> 3 90% 63% */
     --destructive: 3 90% 63%;
