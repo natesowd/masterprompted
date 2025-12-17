@@ -307,9 +307,12 @@ export function BranchTreeDiagram({
   onPathChange,
   className
 }: BranchTreeDiagramProps) {
-  // Track selections at each level (0 = root always selected)
-  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
-  const [currentLevel, setCurrentLevel] = useState(1);
+  // Default path - pre-select first complete headline for discovery-based learning
+  const defaultPath = treePaths[0];
+  
+  // Track selections at each level - start with complete path so users see full headline
+  const [selections, setSelections] = useState<(string | null)[]>([...defaultPath.words]);
+  const [currentLevel, setCurrentLevel] = useState(7); // Complete path
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatedWord, setAnimatedWord] = useState<string | null>(null);
   const [showSelectionMessage, setShowSelectionMessage] = useState(false);
