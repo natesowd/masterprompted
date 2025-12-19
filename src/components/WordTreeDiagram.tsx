@@ -822,7 +822,7 @@ export function WordTreeDiagram({
                   <svg className="w-full h-full" viewBox={`0 0 24 ${containerHeight}`} preserveAspectRatio="none">
                     {(() => {
                     const y = getSelectedYAtLevel(6);
-                    return <path d={`M 0 ${y} L 24 ${y}`} fill="none" stroke="hsl(var(--primary))" strokeWidth={2.5} />;
+                    return <path d={`M 0 ${y} L 24 ${y}`} fill="none" stroke="rgb(74 222 128)" strokeWidth={2.5} />;
                   })()}
                   </svg>
                 </div>
@@ -840,7 +840,7 @@ export function WordTreeDiagram({
                     <path 
                       d={`M 0 ${getSelectedYAtLevel(6)} C 34 ${getSelectedYAtLevel(6)}, 62 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}, 96 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}`}
                       fill="none"
-                      stroke="hsl(var(--primary))"
+                      stroke="rgb(74 222 128)"
                       strokeWidth={2.5}
                     />
                   </svg>
@@ -848,7 +848,7 @@ export function WordTreeDiagram({
                     top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
                     left: 96
                   }}>
-                    <p className="text-sm font-medium text-foreground leading-relaxed px-4 py-2 rounded-lg border-2 border-primary bg-primary/10 whitespace-nowrap">
+                    <p className="text-sm font-medium text-green-900 leading-relaxed px-4 py-2 rounded-lg border-2 border-green-400 bg-green-200 whitespace-nowrap">
                       ...{headline}
                     </p>
                   </div>
