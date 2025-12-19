@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Monitor, ZoomIn, ZoomOut } from "lucide-react";
+import { RotateCcw, Monitor, ZoomIn, ZoomOut, SkipForward } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import TextFlag from "@/components/TextFlag";
@@ -441,6 +441,16 @@ export function BranchTreeDiagram({
     onPathChange(newPath);
   };
 
+  // Handle skip intro - jump straight to interactive mode
+  const handleSkipIntro = () => {
+    setIsIntroAnimating(false);
+    setIsIntroComplete(false);
+    setIsInteractive(true);
+    setCurrentLevel(1);
+    setSelections(["European Union", null, null, null, null, null, null]);
+    onPathChange(["European Union"]);
+  };
+
   // Handle "Start your own" click
   const handleStartOwn = () => {
     setIsInteractive(true);
@@ -592,6 +602,18 @@ export function BranchTreeDiagram({
             {!completeHeadline && displayHeadline && !isIntroAnimating && <span className="text-muted-foreground/50">...</span>}
           </p>
         </div>
+        {/* Skip intro button - only show during animation */}
+        {isIntroAnimating && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSkipIntro}
+            className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0"
+          >
+            <SkipForward className="h-3 w-3" />
+            Skip Intro
+          </Button>
+        )}
         {/* Reset button - only show when interactive */}
         {isInteractive && currentLevel > 1 && (
           <Button
