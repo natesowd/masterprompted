@@ -832,12 +832,12 @@ export function WordTreeDiagram({
                 height: containerHeight,
                 minWidth: 280
               }}>
-                  <div className="absolute bg-muted/30 rounded-lg p-4 animate-fade-in w-[260px]" style={{
+                  <div className="absolute animate-fade-in w-[260px] flex items-center" style={{
                   top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
-                  left: 16
+                  left: 0
                 }}>
-                    
-                    <p className="text-sm text-foreground leading-relaxed">
+                    <div className="w-4 h-px bg-muted-foreground/40" />
+                    <p className="text-sm text-muted-foreground leading-relaxed pl-2">
                       ...{headline}
                     </p>
                   </div>
