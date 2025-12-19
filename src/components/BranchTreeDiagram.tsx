@@ -886,9 +886,11 @@ export function BranchTreeDiagram({
                 </button>;
               })}
             </div> : <div className="flex items-center gap-3">
-              <p className="text-sm text-muted-foreground">
-                All words selected!
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium px-4 py-2 rounded-lg border-2 border-green-400 bg-green-200 text-green-900 whitespace-nowrap">
+                  {selectedFullPath ? `European Union ${selectedFullPath.words.slice(1).join(" ")} ${selectedFullPath.headline}` : "Complete!"}
+                </p>
+              </div>
               {isInteractive && (
                 <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5">
                   <RotateCcw className="h-3.5 w-3.5" />
