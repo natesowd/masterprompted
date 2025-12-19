@@ -551,7 +551,7 @@ export function BranchTreeDiagram({
     {/* Content wrapper - blurs when intro complete */}
     <div className={cn(
       "space-y-6 transition-all duration-500",
-      isIntroComplete && !isInteractive && "opacity-25 blur-md pointer-events-none"
+      isIntroComplete && !isInteractive && "opacity-25 blur-sm pointer-events-none"
     )}>
       {/* Current headline header - sticky */}
       <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 border border-border/50">

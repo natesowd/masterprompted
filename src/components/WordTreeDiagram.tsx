@@ -610,7 +610,7 @@ export function WordTreeDiagram({
       {/* Content wrapper - blurs when intro complete */}
       <div className={cn(
         "transition-all duration-500",
-        isIntroComplete && !isInteractive && "opacity-25 blur-md pointer-events-none"
+        isIntroComplete && !isInteractive && "opacity-25 blur-sm pointer-events-none"
       )}>
         {/* Current headline display - fixed above scrollable tree */}
         <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
