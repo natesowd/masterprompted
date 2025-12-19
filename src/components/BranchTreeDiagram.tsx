@@ -591,16 +591,27 @@ export function BranchTreeDiagram({
               if (!hasUserSelected && isInteractive) {
                 // Show the default sentence with "European Union" normal and rest greyed
                 const defaultWords = defaultSelections.filter(Boolean) as string[];
-                return defaultWords.map((word, idx) => (
-                  <span key={idx}>
-                    {idx > 0 && " "}
-                    <span className={cn(
-                      idx === 0 ? "" : "text-muted-foreground/50"
-                    )}>
-                      {word}
-                    </span>
-                  </span>
-                ));
+                // Find the headline for the default path
+                const defaultHeadline = treePaths.find(p => 
+                  defaultSelections.every((word, i) => word === p.words[i])
+                )?.headline;
+                return (
+                  <>
+                    {defaultWords.map((word, idx) => (
+                      <span key={idx}>
+                        {idx > 0 && " "}
+                        <span className={cn(
+                          idx === 0 ? "" : "text-muted-foreground/50"
+                        )}>
+                          {word}
+                        </span>
+                      </span>
+                    ))}
+                    {defaultHeadline && (
+                      <span className="text-muted-foreground/50 ml-1">{defaultHeadline}</span>
+                    )}
+                  </>
+                );
               }
               
               // Normal display logic after user has made selections
