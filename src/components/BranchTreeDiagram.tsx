@@ -319,8 +319,8 @@ export function BranchTreeDiagram({
   const [isIntroComplete, setIsIntroComplete] = useState(false);
   const [isInteractive, setIsInteractive] = useState(true);
   
-  // Track selections at each level - starts with full sentence visible but greyed
-  const [selections, setSelections] = useState<(string | null)[]>(defaultSelections);
+  // Track selections at each level - tree starts with only root selected
+  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
   const [currentLevel, setCurrentLevel] = useState(1);
   // Track if user has made their first selection (to show greyed hint state initially)
   const [hasUserSelected, setHasUserSelected] = useState(false);

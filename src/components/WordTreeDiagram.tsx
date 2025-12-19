@@ -112,8 +112,8 @@ export function WordTreeDiagram({
   
   // Track unlocked level (starts at 1 for immediate interactivity)
   const [unlockedLevel, setUnlockedLevel] = useState(1);
-  // Track selected words at each level - starts with full sentence visible but greyed
-  const [selections, setSelections] = useState<(string | null)[]>(defaultSelections);
+  // Track selected words at each level - tree starts with only root selected
+  const [selections, setSelections] = useState<(string | null)[]>([treePaths[0].words[0], null, null, null, null, null, null]);
   // Track if user has made their first selection (to show greyed hint state initially)
   const [hasUserSelected, setHasUserSelected] = useState(false);
   
