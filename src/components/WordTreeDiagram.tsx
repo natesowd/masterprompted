@@ -627,7 +627,7 @@ export function WordTreeDiagram({
         <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
-              {isIntroAnimating ? "System generating headline:" : hasUserSelected ? "Current Headline:" : "Select words from the tree below to build your headline:"}
+              {isIntroAnimating ? "System generating headline:" : "Current Headline:"}
             </p>
             <p className="text-xl font-medium text-foreground">
               {(() => {
@@ -704,6 +704,13 @@ export function WordTreeDiagram({
             </Button>
           )}
         </div>
+        
+        {/* Instruction text - only show when user hasn't selected yet */}
+        {!hasUserSelected && isInteractive && (
+          <p className="text-sm text-muted-foreground mb-3 px-2">
+            Select words from the tree below to build your headline:
+          </p>
+        )}
         
         {/* Scrollable tree container */}
         <div 
