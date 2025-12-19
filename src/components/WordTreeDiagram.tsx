@@ -186,12 +186,13 @@ export function WordTreeDiagram({
     }
   };
 
-  // Reset to default complete headline
+  // Reset to initial starting state (only root selected)
   const handleReset = () => {
-    setUnlockedLevel(7);
-    setSelections(defaultSelections);
-    setSelectionHistory([]); // Clear history on reset
-    onPathChange(defaultSelections.filter(Boolean) as string[]);
+    setUnlockedLevel(1);
+    setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
+    setSelectionHistory([]);
+    setHasUserSelected(false);
+    onPathChange([treePaths[0].words[0]]);
   };
 
   // Get the current partial path based on selections

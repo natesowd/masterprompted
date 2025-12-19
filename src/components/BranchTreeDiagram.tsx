@@ -463,11 +463,12 @@ export function BranchTreeDiagram({
     }
   };
 
-  // Reset to default complete headline
+  // Reset to initial starting state (only root selected)
   const handleReset = () => {
-    setSelections(defaultSelections);
-    setCurrentLevel(7);
-    onPathChange(defaultSelections.filter(Boolean) as string[]);
+    setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
+    setCurrentLevel(1);
+    setHasUserSelected(false);
+    onPathChange([treePaths[0].words[0]]);
   };
 
   // Play computer selection animation
