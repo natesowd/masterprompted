@@ -832,12 +832,23 @@ export function WordTreeDiagram({
                 height: containerHeight,
                 minWidth: 280
               }}>
-                  <div className="absolute animate-fade-in w-[260px] flex items-center" style={{
-                  top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
-                  left: 0
-                }}>
-                    <div className="w-4 h-px bg-muted-foreground/40" />
-                    <p className="text-sm text-muted-foreground leading-relaxed pl-2">
+                  {/* Connector line to headline */}
+                  <svg className="absolute left-0 w-24" style={{
+                    top: 0,
+                    height: containerHeight
+                  }} viewBox={`0 0 96 ${containerHeight}`} preserveAspectRatio="none">
+                    <path 
+                      d={`M 0 ${getSelectedYAtLevel(6)} C 34 ${getSelectedYAtLevel(6)}, 62 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}, 96 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}`}
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2.5}
+                    />
+                  </svg>
+                  <div className="absolute animate-fade-in" style={{
+                    top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
+                    left: 96
+                  }}>
+                    <p className="text-sm font-medium text-foreground leading-relaxed px-4 py-2 rounded-lg border-2 border-primary bg-primary/10 whitespace-nowrap">
                       ...{headline}
                     </p>
                   </div>
