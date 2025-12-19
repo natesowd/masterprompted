@@ -479,7 +479,7 @@ export function WordTreeDiagram({
             >
               {/* Monitor button - above first option at frontier */}
               {level > 0 && isCurrentFrontier && idx === 0 && (
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2">
+                <div className="absolute top-1/2 -translate-y-1/2 -right-10">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
