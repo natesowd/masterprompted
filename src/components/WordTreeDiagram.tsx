@@ -497,7 +497,7 @@ export function WordTreeDiagram({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Watch LLM select word</p>
+                        <p>See what word the LLM would be likely to select</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
