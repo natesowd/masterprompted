@@ -543,25 +543,50 @@ export function WordTreeDiagram({
     onPathChange(newPath);
   };
 
-  // Auto-scroll when unlocked level changes - only after 3rd word selection, show 2 levels at a time
+  // Auto-scroll when unlocked level changes - scroll both horizontally and vertically to keep selection visible
   useEffect(() => {
-    if (unlockedLevel > 2 && containerRef.current) {
+    if (unlockedLevel > 1 && containerRef.current) {
       // Wait for the new level to render
       requestAnimationFrame(() => {
-        // Scroll to show the previous level and current level (2 levels visible)
-        const prevLevelEl = levelRefs.current[unlockedLevel - 1];
-        if (prevLevelEl && containerRef.current) {
+        const currentLevelEl = levelRefs.current[unlockedLevel - 1];
+        if (currentLevelEl && containerRef.current) {
           const containerRect = containerRef.current.getBoundingClientRect();
-          const levelRect = prevLevelEl.getBoundingClientRect();
-          const scrollLeft = containerRef.current.scrollLeft + levelRect.left - containerRect.left - 50;
-          containerRef.current.scrollTo({
-            left: scrollLeft,
-            behavior: 'smooth'
-          });
+          const levelRect = currentLevelEl.getBoundingClientRect();
+          
+          // Horizontal scroll - show previous level and current level
+          if (unlockedLevel > 2) {
+            const prevLevelEl = levelRefs.current[unlockedLevel - 1];
+            if (prevLevelEl) {
+              const scrollLeft = containerRef.current.scrollLeft + levelRect.left - containerRect.left - 50;
+              containerRef.current.scrollTo({
+                left: scrollLeft,
+                behavior: 'smooth'
+              });
+            }
+          }
+          
+          // Vertical scroll - find the selected node and scroll to keep it visible
+          const selectedNode = currentLevelEl.querySelector('[data-selected="true"]');
+          if (selectedNode) {
+            const nodeRect = selectedNode.getBoundingClientRect();
+            const containerTop = containerRect.top;
+            const containerBottom = containerRect.bottom;
+            const nodeTop = nodeRect.top;
+            const nodeBottom = nodeRect.bottom;
+            
+            // If node is above or below the visible area, scroll to center it
+            if (nodeTop < containerTop + 50 || nodeBottom > containerBottom - 50) {
+              const scrollTop = containerRef.current.scrollTop + (nodeTop - containerTop) - (containerRect.height / 2) + (nodeRect.height / 2);
+              containerRef.current.scrollTo({
+                top: Math.max(0, scrollTop),
+                behavior: 'smooth'
+              });
+            }
+          }
         }
       });
     }
-  }, [unlockedLevel]);
+  }, [unlockedLevel, selections]);
 
   // Play animation for a level
   const playAnimation = (level: number) => {
@@ -735,7 +760,11 @@ export function WordTreeDiagram({
                   </div>
                 </div>}
               
-              <button onClick={() => canSelect && handleWordClick(level, option.word)} disabled={!canSelect} className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap", level === 0 ? "min-w-[140px]" : "min-w-[100px]", "h-11", level === 0 ? "bg-primary text-primary-foreground border-primary cursor-default" : option.word === "Charter" ? isSelected ? "bg-destructive/30 border-destructive text-destructive shadow-md scale-105 cursor-pointer" : canSelect ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed" : isSelected ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" : canSelect ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed", isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10", isPulsing && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg scale-110")}>
+              <button 
+                onClick={() => canSelect && handleWordClick(level, option.word)} 
+                disabled={!canSelect} 
+                data-selected={isSelected ? "true" : "false"}
+                className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap", level === 0 ? "min-w-[140px]" : "min-w-[100px]", "h-11", level === 0 ? "bg-primary text-primary-foreground border-primary cursor-default" : option.word === "Charter" ? isSelected ? "bg-destructive/30 border-destructive text-destructive shadow-md scale-105 cursor-pointer" : canSelect ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed" : isSelected ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" : canSelect ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed", isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10", isPulsing && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg scale-110")}>
                 {option.word === "Charter" && !isPulsing ? <TextFlag text="Charter" evaluationFactor="factual_accuracy" explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate." severity="error" noUnderline={true} /> : option.word}
                 {level > 0 && <span className={cn("absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap", isPulsing ? "bg-primary text-primary-foreground" : isSelected ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
                     {option.probability.toFixed(2)}
@@ -849,7 +878,7 @@ export function WordTreeDiagram({
           </p>}
         
         {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto scroll-smooth">
+        <div ref={containerRef} className="overflow-x-auto overflow-y-auto max-h-[600px] scroll-smooth">
           <div className="min-w-[1600px] p-6 pr-[320px]">
           <div className="flex items-start gap-1">
             {/* Level 0: Root */}

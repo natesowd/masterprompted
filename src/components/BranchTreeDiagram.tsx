@@ -410,17 +410,46 @@ export function BranchTreeDiagram({
     return () => clearTimeout(timer);
   }, []);
 
-  // Auto-scroll in close-up view to follow selections
+  // Auto-scroll in close-up view to follow selections (horizontal and vertical)
   useEffect(() => {
-    if (scrollContainerRef.current && closeUpView && currentLevel > 1) {
-      // Calculate scroll position to center on current selection area
-      const scrollX = Math.max(0, (currentLevel - 1) * 200 - 100);
-      scrollContainerRef.current.scrollTo({
-        left: scrollX,
-        behavior: 'smooth'
+    if (scrollContainerRef.current && currentLevel > 1) {
+      requestAnimationFrame(() => {
+        if (!scrollContainerRef.current) return;
+        
+        // Horizontal scroll - calculate scroll position to center on current selection area
+        if (closeUpView) {
+          const scrollX = Math.max(0, (currentLevel - 1) * 200 - 100);
+          scrollContainerRef.current.scrollTo({
+            left: scrollX,
+            behavior: 'smooth'
+          });
+        }
+        
+        // Vertical scroll - find selected path in SVG and scroll to keep it visible
+        const container = scrollContainerRef.current;
+        const containerRect = container.getBoundingClientRect();
+        const svgElement = container.querySelector('svg');
+        if (svgElement) {
+          // Get the selected path element
+          const selectedPath = svgElement.querySelector('path[stroke="rgb(34 197 94)"]');
+          if (selectedPath) {
+            const pathRect = selectedPath.getBoundingClientRect();
+            const pathCenterY = pathRect.top + pathRect.height / 2;
+            const containerCenterY = containerRect.top + containerRect.height / 2;
+            
+            // If the path is too far from center, scroll to it
+            const offset = pathCenterY - containerCenterY;
+            if (Math.abs(offset) > containerRect.height / 4) {
+              container.scrollTo({
+                top: container.scrollTop + offset,
+                behavior: 'smooth'
+              });
+            }
+          }
+        }
       });
     }
-  }, [currentLevel, closeUpView]);
+  }, [currentLevel, closeUpView, selections]);
 
   // Get options at each level based on current selections
   const getOptionsAtLevel = (level: number): {
@@ -692,7 +721,7 @@ export function BranchTreeDiagram({
       <div className="flex flex-col gap-4">
         {/* Branch visualization - card style */}
         <div className="bg-card rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto" ref={scrollContainerRef}>
+        <div className="overflow-x-auto overflow-y-auto max-h-[400px]" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg 
               className={cn("w-full", closeUpView ? "h-[320px]" : "h-[320px]")} 
