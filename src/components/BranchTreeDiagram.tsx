@@ -721,7 +721,7 @@ export function BranchTreeDiagram({
       <div className="flex flex-col gap-4">
         {/* Branch visualization - card style */}
         <div className="bg-card rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto overflow-y-auto max-h-[500px]" ref={scrollContainerRef}>
+        <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg 
               className={cn("w-full", closeUpView ? "h-[420px]" : "h-[420px]")}

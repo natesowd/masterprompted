@@ -898,7 +898,7 @@ export function WordTreeDiagram({
           </p>}
         
         {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto overflow-y-auto max-h-[600px] scroll-smooth">
+        <div ref={containerRef} className="overflow-x-auto scroll-smooth">
           <div className="min-w-[1600px] p-6 pr-[320px]">
           <div className="flex items-start gap-1">
             {/* Level 0: Root */}
