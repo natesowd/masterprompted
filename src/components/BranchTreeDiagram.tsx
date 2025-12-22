@@ -505,6 +505,11 @@ export function BranchTreeDiagram({
     setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
     setCurrentLevel(1);
     setHasUserSelected(false);
+    // Reset animation states
+    setIsAnimating(false);
+    setAnimatedWord(null);
+    setShowSelectionMessage(false);
+    setSelectedProbability(null);
     onPathChange([treePaths[0].words[0]]);
   };
 

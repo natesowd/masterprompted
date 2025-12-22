@@ -424,6 +424,11 @@ export function WordTreeDiagram({
     setSelections([treePaths[0].words[0], null, null, null, null, null, null]);
     setSelectionHistory([]);
     setHasUserSelected(false);
+    // Reset animation states
+    setAnimatingLevel(null);
+    setAnimatedWord(null);
+    setShowPulse(false);
+    setShowSelectionMessage(false);
     onPathChange([treePaths[0].words[0]]);
   };
 
