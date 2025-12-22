@@ -429,6 +429,10 @@ export function WordTreeDiagram({
     setAnimatedWord(null);
     setShowPulse(false);
     setShowSelectionMessage(false);
+    // Scroll back to start
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+    }
     onPathChange([treePaths[0].words[0]]);
   };
 
