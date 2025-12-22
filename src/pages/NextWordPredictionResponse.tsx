@@ -47,6 +47,31 @@ export default function HeadlineResponse() {
   const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  // Reset everything when component mounts (user navigates to page)
+  useEffect(() => {
+    setSelectedWord(null);
+    setCurrentSentence(["European", "Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"]);
+    setShowTooltip(false);
+    setTooltipShown(false);
+    setShowFactualInaccuracyTooltip(false);
+    setFactualTooltipShown(false);
+    setShowCharterTooltip(false);
+    setCharterTooltipShown(false);
+    setShowIntroPopover(true);
+    setSecondProbTooltipOpen(false);
+    setThirdProbTooltipOpen(false);
+    setDropdownProbTooltips({});
+    setIsAnimating(false);
+    setAnimatedWord(null);
+    setShowHighlightPulse(false);
+    setIsAnimatingThird(false);
+    setAnimatedThirdWord(null);
+    setShowHighlightPulseThird(false);
+    setViewMode("tree");
+    setEvaluationPanelOpen(false);
+    setHasInteracted(false);
+  }, []);
+
   // When entering animated diagram modes, reset evaluation gating
   useEffect(() => {
     if (viewMode === "tree" || viewMode === "branch") {
