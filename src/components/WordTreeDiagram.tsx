@@ -543,69 +543,32 @@ export function WordTreeDiagram({
     onPathChange(newPath);
   };
 
-  // Auto-scroll when unlocked level changes - scroll both horizontally and vertically to keep selection visible
+  // Auto-scroll when unlocked level changes (and selections update)
+  // Ensures the newly unlocked options (and the last selection) stay visible both horizontally and vertically.
   useEffect(() => {
-    if (unlockedLevel > 1 && containerRef.current) {
-      // Wait for the new level to render
-      requestAnimationFrame(() => {
-        if (!containerRef.current) return;
-        const containerRect = containerRef.current.getBoundingClientRect();
-        
-        // Horizontal scroll - show previous level and current level
-        if (unlockedLevel > 2) {
-          const prevLevelEl = levelRefs.current[unlockedLevel - 1];
-          if (prevLevelEl) {
-            const levelRect = prevLevelEl.getBoundingClientRect();
-            const scrollLeft = containerRef.current.scrollLeft + levelRect.left - containerRect.left - 50;
-            containerRef.current.scrollTo({
-              left: scrollLeft,
-              behavior: 'smooth'
-            });
-          }
-        }
-        
-        // Vertical scroll - look at the most recently selected level to find its selected node
-        const lastSelectedLevel = unlockedLevel - 1;
-        const lastSelectedLevelEl = levelRefs.current[lastSelectedLevel];
-        if (lastSelectedLevelEl) {
-          const selectedNode = lastSelectedLevelEl.querySelector('[data-selected="true"]');
-          if (selectedNode) {
-            const nodeRect = selectedNode.getBoundingClientRect();
-            const containerTop = containerRect.top;
-            const containerBottom = containerRect.bottom;
-            const nodeTop = nodeRect.top;
-            const nodeBottom = nodeRect.bottom;
-            
-            // If node is above or below the visible area, scroll to center it
-            if (nodeTop < containerTop + 80 || nodeBottom > containerBottom - 80) {
-              const scrollTop = containerRef.current.scrollTop + (nodeTop - containerTop) - (containerRect.height / 2) + (nodeRect.height / 2);
-              containerRef.current.scrollTo({
-                top: Math.max(0, scrollTop),
-                behavior: 'smooth'
-              });
-            }
-          }
-        }
-        
-        // Also check the current frontier level options
-        const frontierLevelEl = levelRefs.current[unlockedLevel];
-        if (frontierLevelEl) {
-          const frontierRect = frontierLevelEl.getBoundingClientRect();
-          const containerTop = containerRect.top;
-          const containerBottom = containerRect.bottom;
-          
-          // Check if any part of the frontier level is cut off
-          if (frontierRect.top < containerTop + 50 || frontierRect.bottom > containerBottom - 50) {
-            // Center the frontier level vertically
-            const scrollTop = containerRef.current.scrollTop + (frontierRect.top + frontierRect.height / 2 - containerTop) - (containerRect.height / 2);
-            containerRef.current.scrollTo({
-              top: Math.max(0, scrollTop),
-              behavior: 'smooth'
-            });
-          }
-        }
+    if (unlockedLevel < 1) return;
+
+    requestAnimationFrame(() => {
+      const targetLevel = Math.min(unlockedLevel, 6);
+      const levelEl = levelRefs.current[targetLevel];
+      if (!levelEl) return;
+
+      // Prefer scrolling to the newly unlocked options (frontier) so the user can continue.
+      const optionButtons = Array.from(
+        levelEl.querySelectorAll<HTMLButtonElement>('button[data-word]')
+      );
+
+      const isFrontier = selections[targetLevel] == null;
+      const target = isFrontier
+        ? optionButtons[optionButtons.length - 1] ?? optionButtons[0] ?? levelEl
+        : (levelEl.querySelector<HTMLElement>('[data-selected="true"]') ?? levelEl);
+
+      (target as HTMLElement).scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center',
       });
-    }
+    });
   }, [unlockedLevel, selections]);
 
   // Play animation for a level
@@ -783,6 +746,7 @@ export function WordTreeDiagram({
               <button 
                 onClick={() => canSelect && handleWordClick(level, option.word)} 
                 disabled={!canSelect} 
+                data-word={option.word}
                 data-selected={isSelected ? "true" : "false"}
                 className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap", level === 0 ? "min-w-[140px]" : "min-w-[100px]", "h-11", level === 0 ? "bg-primary text-primary-foreground border-primary cursor-default" : option.word === "Charter" ? isSelected ? "bg-destructive/30 border-destructive text-destructive shadow-md scale-105 cursor-pointer" : canSelect ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed" : isSelected ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" : canSelect ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed", isAnimated && !isPulsing && "ring-2 ring-primary ring-offset-1 bg-primary/10", isPulsing && "ring-4 ring-primary ring-offset-2 bg-primary text-primary-foreground border-primary shadow-lg scale-110")}>
                 {option.word === "Charter" && !isPulsing ? <TextFlag text="Charter" evaluationFactor="factual_accuracy" explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate." severity="error" noUnderline={true} /> : option.word}
