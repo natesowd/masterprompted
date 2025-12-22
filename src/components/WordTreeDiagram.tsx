@@ -604,18 +604,34 @@ export function WordTreeDiagram({
   };
   const nodeHeight = 44;
   const levelGap = 85;
-  const containerHeight = 700; // Increased to ensure all branching paths are visible
+  const edgePad = 24;
+
+  // Dynamically size the diagram so it “hugs” its content (instead of a fixed tall box).
+  // This also prevents top options (like “Charter”) from being pushed outside the visible area.
+  const maxVisibleLevel = Math.min(unlockedLevel, 6);
+  const maxOptionCount = Math.max(
+    ...Array.from({ length: maxVisibleLevel + 1 }, (_, level) => getOptionsAtLevel(level).length),
+    1
+  );
+  const contentHeight = maxOptionCount * nodeHeight + (maxOptionCount - 1) * levelGap;
+  const containerHeight = contentHeight + edgePad * 2;
+
+  const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
   // Get Y position for a node, optionally centered around a reference Y
   const getNodeY = (idx: number, count: number, centerY?: number) => {
     const totalHeight = count * nodeHeight + (count - 1) * levelGap;
+
+    // Ensure a valid range even when count is small.
+    const maxStart = Math.max(edgePad, containerHeight - totalHeight - edgePad);
+
     if (centerY !== undefined) {
-      // Center the group around centerY
-      const startOffset = centerY - totalHeight / 2;
+      const startOffset = clamp(centerY - totalHeight / 2, edgePad, maxStart);
       return startOffset + idx * (nodeHeight + levelGap) + nodeHeight / 2;
     }
+
     // Default: center in container
-    const startOffset = (containerHeight - totalHeight) / 2;
+    const startOffset = clamp((containerHeight - totalHeight) / 2, edgePad, maxStart);
     return startOffset + idx * (nodeHeight + levelGap) + nodeHeight / 2;
   };
 
@@ -861,70 +877,103 @@ export function WordTreeDiagram({
             Select words from the tree below to build your headline:
           </p>}
         
-        {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto scroll-smooth">
-          <div className="min-w-[1600px] p-6 pr-[320px]">
-          <div className="flex items-start gap-1">
-            {/* Level 0: Root */}
-            {renderLevel(0)}
-            
-            {/* Levels 1-6 with connectors */}
-            {[1, 2, 3, 4, 5, 6].map(level => <React.Fragment key={level}>
-                {renderConnector(level - 1, level)}
-                {renderLevel(level)}
-              </React.Fragment>)}
+        {/* Tree container (hug content) */}
+        <div className="rounded-xl border border-border bg-card p-[50px]">
+          <div ref={containerRef} className="overflow-auto scroll-smooth">
+            <div className="min-w-[1600px] pr-[320px]">
+              <div className="flex items-start gap-1">
+                {/* Level 0: Root */}
+                {renderLevel(0)}
 
-            {/* Final connector to headline - only when complete */}
-            {headline && <>
-                <div className="flex items-center w-6" style={{
-                height: containerHeight
-              }}>
-                  <svg className="w-full h-full" viewBox={`0 0 24 ${containerHeight}`} preserveAspectRatio="none">
-                    {(() => {
-                    const y = getSelectedYAtLevel(6);
-                    return <path d={`M 0 ${y} L 24 ${y}`} fill="none" stroke="rgb(74 222 128)" strokeWidth={2.5} />;
-                  })()}
-                  </svg>
-                </div>
+                {/* Levels 1-6 with connectors */}
+                {[1, 2, 3, 4, 5, 6].map((level) => (
+                  <React.Fragment key={level}>
+                    {renderConnector(level - 1, level)}
+                    {renderLevel(level)}
+                  </React.Fragment>
+                ))}
 
-                {/* Headline completion */}
-                <div className="relative" style={{
-                height: containerHeight,
-                minWidth: 280
-              }}>
-                  {/* Connector line to headline */}
-                  <svg className="absolute left-0 w-24" style={{
-                    top: 0,
-                    height: containerHeight
-                  }} viewBox={`0 0 96 ${containerHeight}`} preserveAspectRatio="none">
-                    <path 
-                      d={`M 0 ${getSelectedYAtLevel(6)} C 34 ${getSelectedYAtLevel(6)}, 62 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}, 96 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}`}
-                      fill="none"
-                      stroke="rgb(74 222 128)"
-                      strokeWidth={2.5}
-                    />
-                  </svg>
-                  <div className="absolute animate-fade-in" style={{
-                    top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
-                    left: 96
-                  }}>
-                    <p className="text-sm font-medium text-green-900 leading-relaxed px-4 py-2 rounded-lg border-2 border-green-400 bg-green-200 whitespace-nowrap">
-                      ...{headline}
-                    </p>
-                  </div>
-                </div>
-              </>}
+                {/* Final connector to headline - only when complete */}
+                {headline && (
+                  <>
+                    <div
+                      className="flex items-center w-6"
+                      style={{
+                        height: containerHeight,
+                      }}
+                    >
+                      <svg
+                        className="w-full h-full"
+                        viewBox={`0 0 24 ${containerHeight}`}
+                        preserveAspectRatio="none"
+                      >
+                        {(() => {
+                          const y = getSelectedYAtLevel(6);
+                          return (
+                            <path
+                              d={`M 0 ${y} L 24 ${y}`}
+                              fill="none"
+                              stroke="rgb(74 222 128)"
+                              strokeWidth={2.5}
+                            />
+                          );
+                        })()}
+                      </svg>
+                    </div>
+
+                    {/* Headline completion */}
+                    <div
+                      className="relative"
+                      style={{
+                        height: containerHeight,
+                        minWidth: 280,
+                      }}
+                    >
+                      {/* Connector line to headline */}
+                      <svg
+                        className="absolute left-0 w-24"
+                        style={{
+                          top: 0,
+                          height: containerHeight,
+                        }}
+                        viewBox={`0 0 96 ${containerHeight}`}
+                        preserveAspectRatio="none"
+                      >
+                        <path
+                          d={`M 0 ${getSelectedYAtLevel(6)} C 34 ${getSelectedYAtLevel(6)}, 62 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}, 96 ${Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2) + nodeHeight / 2}`}
+                          fill="none"
+                          stroke="rgb(74 222 128)"
+                          strokeWidth={2.5}
+                        />
+                      </svg>
+                      <div
+                        className="absolute animate-fade-in"
+                        style={{
+                          top: Math.max(20, getSelectedYAtLevel(6) - nodeHeight / 2),
+                          left: 96,
+                        }}
+                      >
+                        <p className="text-sm font-medium text-green-900 leading-relaxed px-4 py-2 rounded-lg border-2 border-green-400 bg-green-200 whitespace-nowrap">
+                          ...{headline}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-        </div>
       </div>
-      
+
       {/* Start your own - between headline and diagram */}
-      {isIntroComplete && !isInteractive && <div className="absolute left-0 right-0 top-24 flex justify-center animate-fade-in z-10">
+      {isIntroComplete && !isInteractive && (
+        <div className="absolute left-0 right-0 top-24 flex justify-center animate-fade-in z-10">
           <Button onClick={handleStartOwn} className="gap-2">
             <RotateCcw className="h-4 w-4" />
             Start Your Own Headline
           </Button>
-        </div>}
+        </div>
+      )}
     </div>;
 }
