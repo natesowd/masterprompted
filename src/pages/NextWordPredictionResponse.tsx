@@ -24,7 +24,7 @@ export default function HeadlineResponse() {
     t
   } = useLanguage();
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
-  const [currentSentence, setCurrentSentence] = useState(["European", "Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"]);
+  const [currentSentence, setCurrentSentence] = useState(["European", "Union"]);
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipShown, setTooltipShown] = useState(false);
   const [showFactualInaccuracyTooltip, setShowFactualInaccuracyTooltip] = useState(false);
@@ -50,7 +50,7 @@ export default function HeadlineResponse() {
   // Reset everything when component mounts (user navigates to page)
   useEffect(() => {
     setSelectedWord(null);
-    setCurrentSentence(["European", "Union", "Unites", "On", "Historic", "AI", "Ethics", "Framework,", "Charting", "Path", "For", "Responsible", "Technology", "Development"]);
+    setCurrentSentence(["European", "Union"]);
     setShowTooltip(false);
     setTooltipShown(false);
     setShowFactualInaccuracyTooltip(false);
