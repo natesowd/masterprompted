@@ -1,3 +1,6 @@
+After X-Mas TODO:
+- NWP: make the container a hug the contents within so that we can always see the word selection (currenltly the up most word selection is cut off)
+
 TODO:
 - align theming with greater AI-Code design philosophy
 - look into scraping data from google sheets
