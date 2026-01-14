@@ -917,22 +917,6 @@ export function WordTreeDiagram({
           left: 0,
           right: 0
         }}>
-              {/* Monitor button - above first option at frontier */}
-              {level > 0 && isCurrentFrontier && idx === 0 && <div className="absolute top-1/2 -translate-y-1/2 -right-10">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button onClick={() => playAnimation(level)} disabled={animatingLevel !== null} className={cn("p-1 rounded-md transition-all duration-200", animatingLevel === level ? "bg-primary/20 text-primary animate-pulse" : "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary")}>
-                          <Monitor className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>See what word the LLM would be likely to select</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>}
-              
               {/* LLM Selection Message - show above selected word */}
               {showSelectionMessage && isPulsing && <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
@@ -1124,11 +1108,63 @@ export function WordTreeDiagram({
             {/* Level 0: Root */}
             {renderLevel(0)}
             
-            {/* Levels 1-6 with connectors */}
-            {[1, 2, 3, 4, 5, 6].map(level => <React.Fragment key={level}>
-                {renderConnector(level - 1, level)}
-                {renderLevel(level)}
-              </React.Fragment>)}
+            {/* Levels 1-6 with connectors and monitor button column */}
+            {[1, 2, 3, 4, 5, 6].map(level => {
+              const isCurrentFrontier = level === unlockedLevel && !selections[level];
+              const options = level <= unlockedLevel ? getOptionsAtLevelWithPrevPath(level) : [];
+              const prevSelectedY = level > 0 ? getSelectedYAtLevel(level - 1) : containerHeight / 2;
+              
+              // Calculate vertical center between the word options
+              const optionYPositions = options.map((_, idx) =>
+                getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined)
+              );
+              const minY = Math.min(...optionYPositions);
+              const maxY = Math.max(...optionYPositions);
+              const centerY = options.length > 0 ? (minY + maxY) / 2 : prevSelectedY;
+              
+              return (
+                <React.Fragment key={level}>
+                  {renderConnector(level - 1, level)}
+                  
+                  {/* Monitor button column - between connector and frontier level */}
+                  {isCurrentFrontier && (
+                    <div 
+                      className="relative flex items-center justify-center" 
+                      style={{ height: containerHeight, width: 40 }}
+                    >
+                      <div 
+                        className="absolute"
+                        style={{ top: centerY - 14 }}
+                      >
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button 
+                                onClick={() => playAnimation(level)} 
+                                disabled={animatingLevel !== null} 
+                                className={cn(
+                                  "p-1.5 rounded-md transition-all duration-200",
+                                  animatingLevel === level 
+                                    ? "bg-primary/20 text-primary animate-pulse" 
+                                    : "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary"
+                                )}
+                              >
+                                <Monitor className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>See what word the LLM would be likely to select</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {renderLevel(level)}
+                </React.Fragment>
+              );
+            })}
 
             {/* Final connector to headline - only when complete */}
             {headline && <>
