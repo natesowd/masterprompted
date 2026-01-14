@@ -715,14 +715,37 @@ export function WordTreeDiagram({
     const moreCount = level > 0 ? 30 + (level * 7) : 0; // Remaining count
     
     // Calculate positions
-    const realYPositions = options.map((_, idx) => getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined));
+    const realYPositions = options.map((_, idx) =>
+      getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined)
+    );
     const minRealY = Math.min(...realYPositions);
     const maxRealY = Math.max(...realYPositions);
-    
-    // Spacing constants
-    const ghostChipSpacing = 32; // Space between real options and ghost chips
-    const dotSpacing = 20; // Space between dots
-    const moreSpacing = 28; // Space after dots to "+N more"
+
+    // Spacing (prevent overlap with probability badges above buttons)
+    const ghostChipHeight = 28;
+    const ghostGapToReal = 44; // ensure clear separation from top badge + button
+    const ghostGapToDots = 18;
+    const dotSizes = [6, 5];
+    const dotSpacing = 22;
+    const moreSpacing = 18;
+
+    const topRealTop = minRealY - nodeHeight / 2;
+    const bottomRealBottom = maxRealY + nodeHeight / 2;
+
+    const ghostAboveTop = topRealTop - ghostGapToReal - ghostChipHeight;
+    const ghostBelowTop = bottomRealBottom + ghostGapToReal;
+
+    const dotAboveTops = [
+      ghostAboveTop - ghostGapToDots - dotSizes[0],
+      ghostAboveTop - ghostGapToDots - dotSizes[0] - dotSpacing - dotSizes[1]
+    ];
+
+    const dotBelowTops = [
+      ghostBelowTop + ghostChipHeight + ghostGapToDots,
+      ghostBelowTop + ghostChipHeight + ghostGapToDots + dotSizes[0] + dotSpacing
+    ];
+
+    const moreTop = dotBelowTops[1] + dotSizes[1] + moreSpacing;
 
     return <div key={level} ref={el => {
       levelRefs.current[level] = el;
@@ -731,57 +754,52 @@ export function WordTreeDiagram({
       minWidth: level === 0 ? 140 : 110
     }}>
         {/* Ghost word chip above */}
-        {level > 0 && level <= unlockedLevel && ghostsAbove.map((ghost, idx) => {
-          const ghostY = minRealY - ghostChipSpacing - idx * 36;
-          return <div 
-            key={`ghost-above-${ghost}`} 
+        {level > 0 && level <= unlockedLevel && ghostsAbove.map(ghost => (
+          <div
+            key={`ghost-above-${level}-${ghost}`}
             style={{
-              position: 'absolute',
-              top: ghostY - nodeHeight / 2,
-              left: 0,
-              right: 0,
-              pointerEvents: 'none'
+              position: "absolute",
+              top: ghostAboveTop,
+              left: "50%",
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
             }}
           >
-            <div 
-              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap inline-block"
-              style={{ 
+            <div
+              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
+              style={{
                 opacity: 0.35,
-                borderColor: 'hsl(var(--muted-foreground))',
-                color: 'hsl(var(--muted-foreground))'
+                borderColor: "hsl(var(--muted-foreground))",
+                color: "hsl(var(--muted-foreground))",
               }}
             >
               {ghost}
             </div>
-          </div>;
-        })}
-        
+          </div>
+        ))}
+
         {/* Trailing dots above ghost chip */}
-        {level > 0 && level <= unlockedLevel && [1, 2].map((dot, idx) => {
-          const baseY = minRealY - ghostChipSpacing - 36; // After ghost chip
-          const dotY = baseY - dotSpacing - idx * dotSpacing;
-          const opacity = 0.25 - idx * 0.08;
-          const size = 6 - idx * 1;
-          return <div 
-            key={`dot-above-${idx}`} 
+        {level > 0 && level <= unlockedLevel && dotAboveTops.map((top, idx) => (
+          <div
+            key={`dot-above-${level}-${idx}`}
             style={{
-              position: 'absolute',
-              top: dotY - size / 2,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              pointerEvents: 'none'
+              position: "absolute",
+              top,
+              left: "50%",
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
             }}
           >
-            <div 
+            <div
               className="rounded-full bg-muted-foreground"
-              style={{ 
-                width: size,
-                height: size,
-                opacity: Math.max(0.08, opacity)
+              style={{
+                width: dotSizes[idx],
+                height: dotSizes[idx],
+                opacity: Math.max(0.08, 0.26 - idx * 0.1),
               }}
             />
-          </div>;
-        })}
+          </div>
+        ))}
 
         {/* Current active word buttons */}
         {options.map((option, idx) => {
@@ -836,72 +854,69 @@ export function WordTreeDiagram({
       })}
 
         {/* Ghost word chip below */}
-        {level > 0 && level <= unlockedLevel && ghostsBelow.map((ghost, idx) => {
-          const ghostY = maxRealY + ghostChipSpacing + idx * 36;
-          return <div 
-            key={`ghost-below-${ghost}`} 
+        {level > 0 && level <= unlockedLevel && ghostsBelow.map(ghost => (
+          <div
+            key={`ghost-below-${level}-${ghost}`}
             style={{
-              position: 'absolute',
-              top: ghostY - nodeHeight / 2,
-              left: 0,
-              right: 0,
-              pointerEvents: 'none'
+              position: "absolute",
+              top: ghostBelowTop,
+              left: "50%",
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
             }}
           >
-            <div 
-              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap inline-block"
-              style={{ 
+            <div
+              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
+              style={{
                 opacity: 0.35,
-                borderColor: 'hsl(var(--muted-foreground))',
-                color: 'hsl(var(--muted-foreground))'
+                borderColor: "hsl(var(--muted-foreground))",
+                color: "hsl(var(--muted-foreground))",
               }}
             >
               {ghost}
             </div>
-          </div>;
-        })}
-        
+          </div>
+        ))}
+
         {/* Trailing dots below ghost chip */}
-        {level > 0 && level <= unlockedLevel && [1, 2].map((dot, idx) => {
-          const baseY = maxRealY + ghostChipSpacing + 36; // After ghost chip
-          const dotY = baseY + dotSpacing + idx * dotSpacing;
-          const opacity = 0.25 - idx * 0.08;
-          const size = 6 - idx * 1;
-          return <div 
-            key={`dot-below-${idx}`} 
+        {level > 0 && level <= unlockedLevel && dotBelowTops.map((top, idx) => (
+          <div
+            key={`dot-below-${level}-${idx}`}
             style={{
-              position: 'absolute',
-              top: dotY - size / 2,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              pointerEvents: 'none'
+              position: "absolute",
+              top,
+              left: "50%",
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
             }}
           >
-            <div 
+            <div
               className="rounded-full bg-muted-foreground"
-              style={{ 
-                width: size,
-                height: size,
-                opacity: Math.max(0.08, opacity)
+              style={{
+                width: dotSizes[idx],
+                height: dotSizes[idx],
+                opacity: Math.max(0.08, 0.26 - idx * 0.1),
               }}
             />
-          </div>;
-        })}
-        
-        {/* "+N more" badge at the bottom */}
-        {level > 0 && level <= unlockedLevel && <div 
-          style={{
-            position: 'absolute',
-            top: maxRealY + ghostChipSpacing + 36 + dotSpacing * 2 + moreSpacing,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            pointerEvents: 'none'
-          }}
-        >
-          <div className="text-[10px] text-muted-foreground/40 whitespace-nowrap">
-            +{moreCount} more
           </div>
-        </div>}
+        ))}
+
+        {/* "+N more" badge at the bottom */}
+        {level > 0 && level <= unlockedLevel && (
+          <div
+            style={{
+              position: "absolute",
+              top: moreTop,
+              left: "50%",
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
+            }}
+          >
+            <div className="text-[10px] text-muted-foreground/40 whitespace-nowrap">
+              +{moreCount} more
+            </div>
+          </div>
+        )}
 
       </div>;
   };
