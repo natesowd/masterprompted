@@ -371,50 +371,6 @@ export function WordTreeDiagram({
   const containerRef = useRef<HTMLDivElement>(null);
   const levelRefs = useRef<(HTMLDivElement | null)[]>([]);
   
-  // Scroll bounce-back state for each level
-  const scrollRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [scrollOffsets, setScrollOffsets] = useState<Record<number, number>>({});
-  const [isScrolling, setIsScrolling] = useState<Record<number, boolean>>({});
-  
-  // Handle scroll with bounce-back
-  const handleScroll = (level: number, scrollTop: number) => {
-    setScrollOffsets(prev => ({ ...prev, [level]: scrollTop }));
-  };
-  
-  const handleScrollEnd = (level: number) => {
-    // Start bounce-back animation
-    setIsScrolling(prev => ({ ...prev, [level]: false }));
-    
-    // Smoothly animate back to center (0)
-    const scrollEl = scrollRefs.current[level];
-    if (scrollEl) {
-      scrollEl.scrollTo({
-        top: scrollEl.scrollHeight / 2 - scrollEl.clientHeight / 2,
-        behavior: 'smooth'
-      });
-    }
-  };
-  
-  const handleScrollStart = (level: number) => {
-    setIsScrolling(prev => ({ ...prev, [level]: true }));
-  };
-  
-  // Center scroll area when a new frontier level appears
-  useEffect(() => {
-    const frontierLevel = selections.findIndex((s, i) => i > 0 && s === null);
-    if (frontierLevel > 0 && frontierLevel <= unlockedLevel) {
-      const scrollEl = scrollRefs.current[frontierLevel];
-      if (scrollEl) {
-        // Center the scroll after a brief delay for render
-        requestAnimationFrame(() => {
-          scrollEl.scrollTo({
-            top: scrollEl.scrollHeight / 2 - scrollEl.clientHeight / 2,
-            behavior: 'auto'
-          });
-        });
-      }
-    }
-  }, [unlockedLevel, selections]);
 
   // Intro animation effect - plays once on mount
   useEffect(() => {
@@ -810,207 +766,13 @@ export function WordTreeDiagram({
 
     const moreTop = dotBelowTops[1] + dotSizes[1] + moreSpacing;
 
-    // Calculate total scroll content height (for scrollable version)
-    const scrollPadding = 150; // Extra padding above and below for scrolling
-    const optionsHeight = options.length * nodeHeight + (options.length - 1) * levelGap;
-    const ghostAboveHeight = ghostsAbove.length > 0 ? 120 : 0; // Space for ghost above + dots
-    const ghostBelowHeight = ghostsBelow.length > 0 ? 150 : 0; // Space for ghost below + dots + more
-    const totalScrollHeight = optionsHeight + ghostAboveHeight + ghostBelowHeight + scrollPadding * 2;
-    
-    // Use a scrollable container for the current frontier level
-    const isScrollable = isCurrentFrontier && level > 0;
-    
     return <div key={level} ref={el => {
       levelRefs.current[level] = el;
     }} className="relative" style={{
       height: containerHeight,
       minWidth: level === 0 ? 140 : 110
     }}>
-        {/* Scrollable wrapper for current frontier - allows exploration with bounce-back */}
-        {isScrollable ? (
-          <div
-            ref={el => { scrollRefs.current[level] = el; }}
-            className="absolute inset-0 overflow-y-auto scrollbar-hide"
-            style={{
-              scrollBehavior: isScrolling[level] ? 'auto' : 'smooth',
-            }}
-            onScroll={(e) => {
-              const target = e.target as HTMLDivElement;
-              handleScroll(level, target.scrollTop);
-            }}
-            onMouseDown={() => handleScrollStart(level)}
-            onMouseUp={() => handleScrollEnd(level)}
-            onMouseLeave={() => {
-              if (isScrolling[level]) handleScrollEnd(level);
-            }}
-            onTouchStart={() => handleScrollStart(level)}
-            onTouchEnd={() => handleScrollEnd(level)}
-          >
-            {/* Scrollable content with centered options */}
-            <div style={{ height: totalScrollHeight, position: 'relative' }}>
-              {/* Ghost elements above */}
-              {ghostsAbove.map((ghost, idx) => (
-                <div
-                  key={`ghost-above-${level}-${ghost}`}
-                  style={{
-                    position: "absolute",
-                    top: scrollPadding,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <div
-                    className="relative px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap transition-opacity duration-200 cursor-default"
-                    style={{
-                      opacity: 0.35,
-                      borderColor: "hsl(var(--muted-foreground))",
-                      color: "hsl(var(--muted-foreground))",
-                    }}
-                  >
-                    {ghost}
-                    <span 
-                      className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground"
-                      style={{ opacity: 0.35 }}
-                    >
-                      {ghostProbs[idx]?.toFixed(2) || '0.05'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              
-              {/* Dots above */}
-              {ghostsAbove.length > 0 && [0, 1].map((idx) => (
-                <div
-                  key={`dot-above-scroll-${level}-${idx}`}
-                  style={{
-                    position: "absolute",
-                    top: scrollPadding - 20 - idx * 22,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <div
-                    className="rounded-full bg-muted-foreground"
-                    style={{
-                      width: 6 - idx,
-                      height: 6 - idx,
-                      opacity: 0.15 - idx * 0.05,
-                    }}
-                  />
-                </div>
-              ))}
-              
-              {/* Real word options - centered in scroll area */}
-              {options.map((option, idx) => {
-                const isSelected = selections[level] === option.word;
-                const isAnimated = animatingLevel === level && animatedWord === option.word;
-                const isPulsing = showPulse && animatingLevel === level && animatedWord === option.word;
-                
-                // Position within scroll content
-                const optionTop = scrollPadding + ghostAboveHeight + idx * (nodeHeight + levelGap);
-                
-                return <div key={option.word} style={{
-                  position: 'absolute',
-                  top: optionTop,
-                  left: 0,
-                  right: 0
-                }}>
-                  {/* LLM Selection Message */}
-                  {showSelectionMessage && isPulsing && <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
-                      Highest: {selectedProbability !== null ? (selectedProbability * 100).toFixed(0) : 0}%
-                    </div>
-                  </div>}
-                  
-                  <button 
-                    onClick={() => canSelect && handleWordClick(level, option.word)} 
-                    disabled={!canSelect} 
-                    data-word={option.word}
-                    data-selected={isSelected ? "true" : "false"}
-                    className={cn("relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap", level === 0 ? "min-w-[140px]" : "min-w-[100px]", "h-11", option.word === "Charter" ? isSelected ? "bg-destructive/30 border-destructive text-destructive shadow-md scale-105 cursor-pointer" : canSelect ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed" : isSelected ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" : canSelect ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed", isAnimated && !isPulsing && "border-primary bg-primary/10", isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110")}>
-                    {option.word === "Charter" && !isPulsing ? <TextFlag text="Charter" evaluationFactor="factual_accuracy" explanation="The EU AI Act is officially called the 'AI Act' or 'Artificial Intelligence Act', not a 'Charter'. Using 'Charter' is factually inaccurate." severity="error" noUnderline={true} /> : option.word}
-                    <span className={cn("absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap", isPulsing ? "bg-primary text-primary-foreground" : isSelected ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground")}>
-                      {option.probability.toFixed(2)}
-                    </span>
-                  </button>
-                </div>;
-              })}
-              
-              {/* Ghost elements below */}
-              {ghostsBelow.map((ghost, idx) => (
-                <div
-                  key={`ghost-below-${level}-${ghost}`}
-                  style={{
-                    position: "absolute",
-                    top: scrollPadding + ghostAboveHeight + optionsHeight + 50,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <div
-                    className="relative px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap transition-opacity duration-200 cursor-default"
-                    style={{
-                      opacity: 0.35,
-                      borderColor: "hsl(var(--muted-foreground))",
-                      color: "hsl(var(--muted-foreground))",
-                    }}
-                  >
-                    {ghost}
-                    <span 
-                      className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground"
-                      style={{ opacity: 0.35 }}
-                    >
-                      {ghostProbs[idx + 1]?.toFixed(2) || '0.03'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              
-              {/* Dots below */}
-              {ghostsBelow.length > 0 && [0, 1].map((idx) => (
-                <div
-                  key={`dot-below-scroll-${level}-${idx}`}
-                  style={{
-                    position: "absolute",
-                    top: scrollPadding + ghostAboveHeight + optionsHeight + 90 + idx * 22,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <div
-                    className="rounded-full bg-muted-foreground"
-                    style={{
-                      width: 6 - idx,
-                      height: 6 - idx,
-                      opacity: 0.15 - idx * 0.05,
-                    }}
-                  />
-                </div>
-              ))}
-              
-              {/* "+N more" badge */}
-              {moreCount > 0 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: scrollPadding + ghostAboveHeight + optionsHeight + 140,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <div
-                    className="text-[10px] whitespace-nowrap"
-                    style={{ color: "hsl(var(--muted-foreground) / 0.5)" }}
-                  >
-                    +{moreCount} more
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
+        <>
             {/* Ghost elements container - only visible for current frontier (where user needs to select) */}
             {level > 0 && isCurrentFrontier && (
               <div
@@ -1202,7 +964,6 @@ export function WordTreeDiagram({
               </div>;
             })}
           </>
-        )}
       </div>;
   };
 
