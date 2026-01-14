@@ -604,9 +604,9 @@ export function BranchTreeDiagram({
   // X positions vary based on view mode - close-up spreads words further apart
   const levelXPositions = closeUpView 
     ? [40, 240, 440, 640, 840, 1040, 1240] // Wider spacing for close-up (200px apart)
-    : [20, 100, 180, 260, 340, 420, 500];   // Normal compact view
+    : [20, 140, 260, 380, 500, 620, 740];   // Increased spacing for normal view (120px apart)
   const baseSpread = 180; // Keep constant for consistent branch shape
-  const svgWidth = closeUpView ? 1400 : 600;
+  const svgWidth = closeUpView ? 1400 : 860; // Increased width to accommodate new spacing
   const svgHeight = 500; // Increased to ensure all branching paths are visible
 
   // Build current headline
