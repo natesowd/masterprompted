@@ -553,8 +553,10 @@ export function WordTreeDiagram({
 
   // Auto-scroll when unlocked level changes (and selections update)
   // Ensures the newly unlocked options (and the last selection) stay visible both horizontally and vertically.
+  // Only scroll after user has made their first selection (not during intro animation)
   useEffect(() => {
     if (unlockedLevel < 1) return;
+    if (!hasUserSelected) return; // Don't auto-scroll during intro or before user interaction
 
     requestAnimationFrame(() => {
       const targetLevel = Math.min(unlockedLevel, 6);
@@ -577,7 +579,7 @@ export function WordTreeDiagram({
         inline: 'center',
       });
     });
-  }, [unlockedLevel, selections]);
+  }, [unlockedLevel, selections, hasUserSelected]);
 
   // Play animation for a level
   const playAnimation = (level: number) => {
