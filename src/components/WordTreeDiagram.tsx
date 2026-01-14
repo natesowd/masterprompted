@@ -699,25 +699,17 @@ export function WordTreeDiagram({
     // Allow selection if: level is unlocked AND (no selection yet OR can change existing selection)
     const canSelect = level > 0 && level <= unlockedLevel;
     const isCurrentFrontier = level === unlockedLevel && !selections[level];
-    // Ghost words for this level
-    const levelGhostWords: Record<number, string[]> = {
-      1: ["Agrees", "Decides", "Moves", "Acts", "Votes"],
-      2: ["For", "Toward", "With", "After", "Upon"],
-      3: ["Major", "New", "Bold", "Landmark", "Key"],
-      4: ["Digital", "Machine", "Data", "Automation", "Computing"],
-      5: ["Standards", "Rules", "Policy", "Regulation", "Guidelines"],
-      6: ["Bill", "Law", "Act", "Plan", "Accord"]
-    };
-    const ghosts = levelGhostWords[level] || [];
+    // Alternative approach: "+N more" badge with trailing dots instead of named ghost words
+    const moreCount = level > 0 ? 30 + (level * 7) : 0; // Varying "more" counts per level
     
-    // Calculate ghost positions above and below real options
+    // Calculate positions for dot indicators
     const realYPositions = options.map((_, idx) => getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined));
     const minRealY = Math.min(...realYPositions);
     const maxRealY = Math.max(...realYPositions);
     
-    // Split ghosts: some above, some below
-    const ghostsAbove = ghosts.slice(0, Math.ceil(ghosts.length / 2));
-    const ghostsBelow = ghosts.slice(Math.ceil(ghosts.length / 2));
+    // Dots above and below to suggest more options
+    const dotsAbove = [1, 2, 3];
+    const dotsBelow = [1, 2, 3];
 
     return <div key={level} ref={el => {
       levelRefs.current[level] = el;
@@ -725,31 +717,30 @@ export function WordTreeDiagram({
       height: containerHeight,
       minWidth: level === 0 ? 140 : 110
     }}>
-        {/* Ghost word chips above - faded and non-interactive */}
-        {level > 0 && level <= unlockedLevel && ghostsAbove.map((ghost, idx) => {
-          const offsetY = 25 + idx * 18 + (idx * 7 % 5) * 4;
-          const ghostY = minRealY - offsetY;
-          const opacity = 0.25 - idx * 0.05;
+        {/* Trailing dots above - suggesting more alternatives */}
+        {level > 0 && level <= unlockedLevel && dotsAbove.map((dot, idx) => {
+          const offsetY = 20 + idx * 16;
+          const dotY = minRealY - offsetY;
+          const opacity = 0.35 - idx * 0.1;
+          const size = 8 - idx * 1.5;
           return <div 
-            key={`ghost-above-${ghost}`} 
+            key={`dot-above-${idx}`} 
             style={{
               position: 'absolute',
-              top: ghostY - nodeHeight / 2,
-              left: 0,
-              right: 0,
+              top: dotY - size / 2,
+              left: '50%',
+              transform: 'translateX(-50%)',
               pointerEvents: 'none'
             }}
           >
             <div 
-              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
+              className="rounded-full bg-muted-foreground"
               style={{ 
-                opacity: Math.max(0.1, opacity),
-                borderColor: 'hsl(var(--muted-foreground))',
-                color: 'hsl(var(--muted-foreground))'
+                width: size,
+                height: size,
+                opacity: Math.max(0.1, opacity)
               }}
-            >
-              {ghost}
-            </div>
+            />
           </div>;
         })}
 
@@ -805,33 +796,47 @@ export function WordTreeDiagram({
             </div>;
       })}
 
-        {/* Ghost word chips below - faded and non-interactive */}
-        {level > 0 && level <= unlockedLevel && ghostsBelow.map((ghost, idx) => {
-          const offsetY = 25 + idx * 18 + (idx * 3 % 5) * 4;
-          const ghostY = maxRealY + offsetY;
-          const opacity = 0.25 - idx * 0.05;
+        {/* Trailing dots below - suggesting more alternatives */}
+        {level > 0 && level <= unlockedLevel && dotsBelow.map((dot, idx) => {
+          const offsetY = 20 + idx * 16;
+          const dotY = maxRealY + offsetY;
+          const opacity = 0.35 - idx * 0.1;
+          const size = 8 - idx * 1.5;
           return <div 
-            key={`ghost-below-${ghost}`} 
+            key={`dot-below-${idx}`} 
             style={{
               position: 'absolute',
-              top: ghostY - nodeHeight / 2,
-              left: 0,
-              right: 0,
+              top: dotY - size / 2,
+              left: '50%',
+              transform: 'translateX(-50%)',
               pointerEvents: 'none'
             }}
           >
             <div 
-              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
+              className="rounded-full bg-muted-foreground"
               style={{ 
-                opacity: Math.max(0.1, opacity),
-                borderColor: 'hsl(var(--muted-foreground))',
-                color: 'hsl(var(--muted-foreground))'
+                width: size,
+                height: size,
+                opacity: Math.max(0.1, opacity)
               }}
-            >
-              {ghost}
-            </div>
+            />
           </div>;
         })}
+        
+        {/* "+N more" badge at the bottom */}
+        {level > 0 && level <= unlockedLevel && <div 
+          style={{
+            position: 'absolute',
+            top: maxRealY + 65,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            pointerEvents: 'none'
+          }}
+        >
+          <div className="text-[10px] text-muted-foreground/50 whitespace-nowrap">
+            +{moreCount} more
+          </div>
+        </div>}
 
       </div>;
   };
