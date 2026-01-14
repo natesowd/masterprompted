@@ -610,9 +610,9 @@ export function WordTreeDiagram({
       }
     }, 180);
   };
-  const nodeHeight = 44;
-  const levelGap = 85;
-  const containerHeight = 700; // Increased to ensure all branching paths are visible
+  const nodeHeight = 40;
+  const levelGap = 65;
+  const containerHeight = 480; // Reduced to fit better in viewport while showing all paths
 
   // Get Y position for a node, optionally centered around a reference Y
   const getNodeY = (idx: number, count: number, centerY?: number) => {
