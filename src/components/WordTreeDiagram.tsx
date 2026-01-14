@@ -699,12 +699,60 @@ export function WordTreeDiagram({
     // Allow selection if: level is unlocked AND (no selection yet OR can change existing selection)
     const canSelect = level > 0 && level <= unlockedLevel;
     const isCurrentFrontier = level === unlockedLevel && !selections[level];
+    // Ghost words for this level
+    const levelGhostWords: Record<number, string[]> = {
+      1: ["Agrees", "Decides", "Moves", "Acts", "Votes"],
+      2: ["For", "Toward", "With", "After", "Upon"],
+      3: ["Major", "New", "Bold", "Landmark", "Key"],
+      4: ["Digital", "Machine", "Data", "Automation", "Computing"],
+      5: ["Standards", "Rules", "Policy", "Regulation", "Guidelines"],
+      6: ["Bill", "Law", "Act", "Plan", "Accord"]
+    };
+    const ghosts = levelGhostWords[level] || [];
+    
+    // Calculate ghost positions above and below real options
+    const realYPositions = options.map((_, idx) => getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined));
+    const minRealY = Math.min(...realYPositions);
+    const maxRealY = Math.max(...realYPositions);
+    
+    // Split ghosts: some above, some below
+    const ghostsAbove = ghosts.slice(0, Math.ceil(ghosts.length / 2));
+    const ghostsBelow = ghosts.slice(Math.ceil(ghosts.length / 2));
+
     return <div key={level} ref={el => {
       levelRefs.current[level] = el;
     }} className="relative" style={{
       height: containerHeight,
       minWidth: level === 0 ? 140 : 110
     }}>
+        {/* Ghost word chips above - faded and non-interactive */}
+        {level > 0 && level <= unlockedLevel && ghostsAbove.map((ghost, idx) => {
+          const offsetY = 25 + idx * 18 + (idx * 7 % 5) * 4;
+          const ghostY = minRealY - offsetY;
+          const opacity = 0.25 - idx * 0.05;
+          return <div 
+            key={`ghost-above-${ghost}`} 
+            style={{
+              position: 'absolute',
+              top: ghostY - nodeHeight / 2,
+              left: 0,
+              right: 0,
+              pointerEvents: 'none'
+            }}
+          >
+            <div 
+              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
+              style={{ 
+                opacity: Math.max(0.1, opacity),
+                borderColor: 'hsl(var(--muted-foreground))',
+                color: 'hsl(var(--muted-foreground))'
+              }}
+            >
+              {ghost}
+            </div>
+          </div>;
+        })}
+
         {/* Current active word buttons */}
         {options.map((option, idx) => {
         const isSelected = selections[level] === option.word;
@@ -757,7 +805,45 @@ export function WordTreeDiagram({
             </div>;
       })}
 
+        {/* Ghost word chips below - faded and non-interactive */}
+        {level > 0 && level <= unlockedLevel && ghostsBelow.map((ghost, idx) => {
+          const offsetY = 25 + idx * 18 + (idx * 3 % 5) * 4;
+          const ghostY = maxRealY + offsetY;
+          const opacity = 0.25 - idx * 0.05;
+          return <div 
+            key={`ghost-below-${ghost}`} 
+            style={{
+              position: 'absolute',
+              top: ghostY - nodeHeight / 2,
+              left: 0,
+              right: 0,
+              pointerEvents: 'none'
+            }}
+          >
+            <div 
+              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
+              style={{ 
+                opacity: Math.max(0.1, opacity),
+                borderColor: 'hsl(var(--muted-foreground))',
+                color: 'hsl(var(--muted-foreground))'
+              }}
+            >
+              {ghost}
+            </div>
+          </div>;
+        })}
+
       </div>;
+  };
+
+  // Ghost word alternatives to show LLMs choose from many words
+  const ghostWords: Record<number, string[]> = {
+    1: ["Agrees", "Decides", "Moves", "Acts", "Votes"],
+    2: ["For", "Toward", "With", "After", "Upon"],
+    3: ["Major", "New", "Bold", "Landmark", "Key"],
+    4: ["Digital", "Machine", "Data", "Automation", "Computing"],
+    5: ["Standards", "Rules", "Policy", "Regulation", "Guidelines"],
+    6: ["Bill", "Law", "Act", "Plan", "Accord"]
   };
 
   // Render connector lines - show many branches fanning out from selected node
@@ -771,12 +857,60 @@ export function WordTreeDiagram({
     // Get the Y position of the selected word at fromLevel
     const fromY = getSelectedYAtLevel(fromLevel);
 
-    // Draw clean lines from selected "from" node to "to" options
+    // Generate ghost line positions (above and below real options)
+    const ghostCount = 4; // Number of ghost lines on each side
+    const ghostLinesAbove: number[] = [];
+    const ghostLinesBelow: number[] = [];
+    
+    // Calculate the bounds of real options
+    const realYPositions = toOptions.map((_, idx) => getNodeY(idx, toOptions.length, fromY));
+    const minRealY = Math.min(...realYPositions);
+    const maxRealY = Math.max(...realYPositions);
+    
+    // Add ghost lines above and below with varying distances
+    for (let i = 1; i <= ghostCount; i++) {
+      const offsetAbove = 25 + i * 18 + (i * 7 % 5) * 4;
+      const offsetBelow = 25 + i * 18 + (i * 3 % 5) * 4;
+      ghostLinesAbove.push(minRealY - offsetAbove);
+      ghostLinesBelow.push(maxRealY + offsetBelow);
+    }
 
     return <div key={`conn-${fromLevel}-${toLevel}`} className="flex items-center w-24" style={{
       height: containerHeight
     }}>
         <svg className="w-full h-full" viewBox={`0 0 96 ${containerHeight}`} preserveAspectRatio="none">
+          
+          {/* Ghost lines above - faded alternatives */}
+          {ghostLinesAbove.map((toY, idx) => {
+            const curveOffset = ((idx + 1) * 11 % 7 - 3) * 6;
+            const vertOffset = ((idx + 1) * 5 % 4 - 2) * 4;
+            const opacity = 0.12 - idx * 0.025;
+            return <path 
+              key={`ghost-above-${idx}`} 
+              d={`M 0 ${fromY} C ${34 + curveOffset} ${fromY + vertOffset}, ${62 - curveOffset} ${toY - vertOffset}, 96 ${toY}`} 
+              fill="none" 
+              stroke="hsl(var(--muted-foreground))" 
+              strokeWidth={0.75} 
+              strokeOpacity={Math.max(0.04, opacity)}
+              strokeDasharray="3 4"
+            />;
+          })}
+          
+          {/* Ghost lines below - faded alternatives */}
+          {ghostLinesBelow.map((toY, idx) => {
+            const curveOffset = ((idx + 2) * 13 % 7 - 3) * 6;
+            const vertOffset = ((idx + 2) * 7 % 4 - 2) * 4;
+            const opacity = 0.12 - idx * 0.025;
+            return <path 
+              key={`ghost-below-${idx}`} 
+              d={`M 0 ${fromY} C ${34 + curveOffset} ${fromY + vertOffset}, ${62 - curveOffset} ${toY - vertOffset}, 96 ${toY}`} 
+              fill="none" 
+              stroke="hsl(var(--muted-foreground))" 
+              strokeWidth={0.75} 
+              strokeOpacity={Math.max(0.04, opacity)}
+              strokeDasharray="3 4"
+            />;
+          })}
           
           {/* Real option lines - varied curves */}
           {toOptions.map((toOpt, toIdx) => {
