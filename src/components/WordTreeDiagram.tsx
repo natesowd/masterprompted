@@ -760,8 +760,8 @@ export function WordTreeDiagram({
       height: containerHeight,
       minWidth: level === 0 ? 140 : 110
     }}>
-        {/* Ghost elements container - wraps all ghost UI with hover detection */}
-        {level > 0 && level <= unlockedLevel && (
+        {/* Ghost elements container - only visible for current frontier (where user needs to select) */}
+        {level > 0 && isCurrentFrontier && (
           <div
             className="cursor-default"
             style={{
