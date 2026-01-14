@@ -552,11 +552,9 @@ export function WordTreeDiagram({
   };
 
   // Auto-scroll when unlocked level changes (and selections update)
-  // Only scroll horizontally within the container, not the full page
-  // Only scroll after user has made their first selection (not during intro animation)
+  // Scrolls horizontally within the container to keep current progress visible
   useEffect(() => {
     if (unlockedLevel < 1) return;
-    if (!hasUserSelected) return; // Don't auto-scroll during intro or before user interaction
     if (!containerRef.current) return;
 
     requestAnimationFrame(() => {
@@ -581,7 +579,7 @@ export function WordTreeDiagram({
         behavior: 'smooth'
       });
     });
-  }, [unlockedLevel, selections, hasUserSelected]);
+  }, [unlockedLevel, selections]);
 
   // Play animation for a level
   const playAnimation = (level: number) => {
