@@ -753,53 +753,146 @@ export function WordTreeDiagram({
       height: containerHeight,
       minWidth: level === 0 ? 140 : 110
     }}>
-        {/* Ghost word chip above */}
-        {level > 0 && level <= unlockedLevel && ghostsAbove.map(ghost => (
+        {/* Ghost elements container - wraps all ghost UI with hover detection */}
+        {level > 0 && level <= unlockedLevel && (
           <div
-            key={`ghost-above-${level}-${ghost}`}
+            className="group/ghost cursor-default"
             style={{
               position: "absolute",
-              top: ghostAboveTop,
-              left: "50%",
-              transform: "translateX(-50%)",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: containerHeight,
               pointerEvents: "none",
             }}
           >
+            {/* Invisible hover target spanning ghost elements */}
             <div
-              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
               style={{
-                opacity: 0.35,
-                borderColor: "hsl(var(--muted-foreground))",
-                color: "hsl(var(--muted-foreground))",
-              }}
-            >
-              {ghost}
-            </div>
-          </div>
-        ))}
-
-        {/* Trailing dots above ghost chip */}
-        {level > 0 && level <= unlockedLevel && dotAboveTops.map((top, idx) => (
-          <div
-            key={`dot-above-${level}-${idx}`}
-            style={{
-              position: "absolute",
-              top,
-              left: "50%",
-              transform: "translateX(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            <div
-              className="rounded-full bg-muted-foreground"
-              style={{
-                width: dotSizes[idx],
-                height: dotSizes[idx],
-                opacity: Math.max(0.08, 0.26 - idx * 0.1),
+                position: "absolute",
+                top: dotAboveTops[1] - 8,
+                left: -10,
+                right: -10,
+                height: (moreTop - dotAboveTops[1]) + 60,
+                pointerEvents: "auto",
               }}
             />
+
+            {/* Ghost word chip above */}
+            {ghostsAbove.map(ghost => (
+              <div
+                key={`ghost-above-${level}-${ghost}`}
+                style={{
+                  position: "absolute",
+                  top: ghostAboveTop,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                }}
+              >
+                <div
+                  className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap transition-opacity duration-200 group-hover/ghost:opacity-60"
+                  style={{
+                    opacity: 0.35,
+                    borderColor: "hsl(var(--muted-foreground))",
+                    color: "hsl(var(--muted-foreground))",
+                  }}
+                >
+                  {ghost}
+                </div>
+              </div>
+            ))}
+
+            {/* Trailing dots above ghost chip */}
+            {dotAboveTops.map((top, idx) => (
+              <div
+                key={`dot-above-${level}-${idx}`}
+                style={{
+                  position: "absolute",
+                  top,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                }}
+              >
+                <div
+                  className="rounded-full bg-muted-foreground transition-opacity duration-200 group-hover/ghost:opacity-50"
+                  style={{
+                    width: dotSizes[idx],
+                    height: dotSizes[idx],
+                    opacity: Math.max(0.08, 0.26 - idx * 0.1),
+                  }}
+                />
+              </div>
+            ))}
+
+            {/* Ghost word chip below */}
+            {ghostsBelow.map(ghost => (
+              <div
+                key={`ghost-below-${level}-${ghost}`}
+                style={{
+                  position: "absolute",
+                  top: ghostBelowTop,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                }}
+              >
+                <div
+                  className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap transition-opacity duration-200 group-hover/ghost:opacity-60"
+                  style={{
+                    opacity: 0.35,
+                    borderColor: "hsl(var(--muted-foreground))",
+                    color: "hsl(var(--muted-foreground))",
+                  }}
+                >
+                  {ghost}
+                </div>
+              </div>
+            ))}
+
+            {/* Trailing dots below ghost chip */}
+            {dotBelowTops.map((top, idx) => (
+              <div
+                key={`dot-below-${level}-${idx}`}
+                style={{
+                  position: "absolute",
+                  top,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                }}
+              >
+                <div
+                  className="rounded-full bg-muted-foreground transition-opacity duration-200 group-hover/ghost:opacity-50"
+                  style={{
+                    width: dotSizes[idx],
+                    height: dotSizes[idx],
+                    opacity: Math.max(0.08, 0.26 - idx * 0.1),
+                  }}
+                />
+              </div>
+            ))}
+
+            {/* "+N more" badge */}
+            <div
+              style={{
+                position: "absolute",
+                top: moreTop,
+                left: "50%",
+                transform: "translateX(-50%)",
+              }}
+            >
+              <div className="flex flex-col items-center gap-1">
+                <div className="text-[10px] text-muted-foreground/50 whitespace-nowrap transition-all duration-200 group-hover/ghost:text-muted-foreground/80">
+                  +{moreCount} more
+                </div>
+                {/* Hover explanation - appears on hover */}
+                <div className="opacity-0 group-hover/ghost:opacity-100 transition-opacity duration-300 max-w-[160px]">
+                  <div className="text-[9px] text-muted-foreground/70 text-center leading-tight px-2 py-1.5 bg-muted/90 rounded-md border border-border/50">
+                    At each step, the LLM evaluates thousands of possible next tokens and assigns a probability to each one
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        ))}
+        )}
 
         {/* Current active word buttons */}
         {options.map((option, idx) => {
@@ -852,76 +945,6 @@ export function WordTreeDiagram({
               </button>
             </div>;
       })}
-
-        {/* Ghost word chip below */}
-        {level > 0 && level <= unlockedLevel && ghostsBelow.map(ghost => (
-          <div
-            key={`ghost-below-${level}-${ghost}`}
-            style={{
-              position: "absolute",
-              top: ghostBelowTop,
-              left: "50%",
-              transform: "translateX(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            <div
-              className="px-3 py-1.5 rounded-md text-xs border border-dashed whitespace-nowrap"
-              style={{
-                opacity: 0.35,
-                borderColor: "hsl(var(--muted-foreground))",
-                color: "hsl(var(--muted-foreground))",
-              }}
-            >
-              {ghost}
-            </div>
-          </div>
-        ))}
-
-        {/* Trailing dots below ghost chip */}
-        {level > 0 && level <= unlockedLevel && dotBelowTops.map((top, idx) => (
-          <div
-            key={`dot-below-${level}-${idx}`}
-            style={{
-              position: "absolute",
-              top,
-              left: "50%",
-              transform: "translateX(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            <div
-              className="rounded-full bg-muted-foreground"
-              style={{
-                width: dotSizes[idx],
-                height: dotSizes[idx],
-                opacity: Math.max(0.08, 0.26 - idx * 0.1),
-              }}
-            />
-          </div>
-        ))}
-
-        {/* "+N more" badge with explanation at the bottom */}
-        {level > 0 && level <= unlockedLevel && (
-          <div
-            style={{
-              position: "absolute",
-              top: moreTop,
-              left: "50%",
-              transform: "translateX(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            <div className="flex flex-col items-center gap-0.5">
-              <div className="text-[10px] text-muted-foreground/50 whitespace-nowrap">
-                +{moreCount} more
-              </div>
-              <div className="text-[9px] text-muted-foreground/30 whitespace-nowrap italic">
-                LLM considers many candidates
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>;
   };
