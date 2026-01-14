@@ -49,6 +49,9 @@ export default function HeadlineResponse() {
 
   // Reset everything when component mounts (user navigates to page)
   useEffect(() => {
+    // Scroll to top on page load
+    window.scrollTo(0, 0);
+    
     setSelectedWord(null);
     setCurrentSentence(["European", "Union"]);
     setShowTooltip(false);
