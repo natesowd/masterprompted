@@ -725,7 +725,7 @@ export function BranchTreeDiagram({
       {/* Main layout: tree above, selection panel below */}
       <div className="flex flex-col gap-4">
         {/* Branch visualization - card style */}
-        <div className="bg-card rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-card rounded-xl overflow-hidden">
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg
@@ -905,7 +905,7 @@ export function BranchTreeDiagram({
         "w-full transition-all duration-500",
         isIntroComplete && !isInteractive && "opacity-40 pointer-events-none"
       )}>
-        <div className="bg-card rounded-xl p-4 shadow-sm">
+        <div className="bg-card rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-3">
               <h3 className="text-sm font-semibold text-foreground">
