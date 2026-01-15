@@ -836,7 +836,7 @@ export function BranchTreeDiagram({
                 // but could be expanded to use flagConfig.props.severity
                 const isDestructive = isFlagged && flagConfig.props.severity === 'error';
 
-                const isLatestSelection = level === currentLevel - 1;
+                const isLatestSelection = level > 0 && level === currentLevel - 1;
                 return <g key={`word-${level}`} onClick={handleWordClickOnTree} className={cn(isClickable && "cursor-pointer")} style={{
                   pointerEvents: isClickable ? 'all' : 'none'
                 }}>
