@@ -410,43 +410,29 @@ export function BranchTreeDiagram({
     return () => clearTimeout(timer);
   }, []);
 
-  // Auto-scroll horizontally to keep the active selection (and completion) in view
+  // Auto-scroll horizontally only when currentLevel increases (user advances)
+  const prevLevelRef = React.useRef(currentLevel);
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (!container || currentLevel <= 1) return;
+    if (!container) return;
+
+    // Only auto-scroll when advancing forward
+    if (currentLevel <= prevLevelRef.current) {
+      prevLevelRef.current = currentLevel;
+      return;
+    }
+    prevLevelRef.current = currentLevel;
 
     requestAnimationFrame(() => {
       const stepX = closeUpView ? 200 : 120;
-      const isComplete = selections.filter(Boolean).length >= 7;
+      const isCompleteNow = selections.filter(Boolean).length >= 7;
 
       // Progressively scroll right as the user advances through levels; once complete, reveal the end.
-      const targetLeft = isComplete
+      const targetLeft = isCompleteNow
         ? Math.max(0, container.scrollWidth - container.clientWidth)
         : Math.max(0, (currentLevel - 2) * stepX);
 
       container.scrollTo({ left: targetLeft, behavior: "smooth" });
-
-      // Vertical scroll - find selected path in SVG and scroll to keep it visible
-      const containerRect = container.getBoundingClientRect();
-      const svgElement = container.querySelector("svg");
-      if (svgElement) {
-        // Get the selected path element
-        const selectedPath = svgElement.querySelector('path[stroke="rgb(34 197 94)"]');
-        if (selectedPath) {
-          const pathRect = selectedPath.getBoundingClientRect();
-          const pathCenterY = pathRect.top + pathRect.height / 2;
-          const containerCenterY = containerRect.top + containerRect.height / 2;
-
-          // If the path is too far from center, scroll to it
-          const offset = pathCenterY - containerCenterY;
-          if (Math.abs(offset) > containerRect.height / 4) {
-            container.scrollTo({
-              top: container.scrollTop + offset,
-              behavior: "smooth"
-            });
-          }
-        }
-      }
     });
   }, [currentLevel, closeUpView, selections]);
 
