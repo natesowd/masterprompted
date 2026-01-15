@@ -918,57 +918,66 @@ export function BranchTreeDiagram({
                 
                 return options.map((opt, idx) => {
                   const optY = getOptionY(opt.word);
-                  const optWordWidth = Math.max(70, opt.word.length * 10 + 16);
-                  const rectHeight = 28;
+                  const buttonWidth = 100;
+                  const buttonHeight = 44;
                   const isAnimated = animatedWord === opt.word;
                   const flagConfig = TOKEN_FLAGS[opt.word];
                   const isFlagged = !!flagConfig;
                   const isDestructive = isFlagged && flagConfig.props.severity === 'error';
                   
                   return (
-                    <g 
-                      key={`option-${idx}`} 
-                      onClick={() => handleWordClick(currentLevel, opt.word)}
-                      className="cursor-pointer group"
-                      style={{ pointerEvents: 'all' }}
-                    >
-                      {/* Probability label above word */}
-                      <text 
-                        x={x} 
-                        y={optY - rectHeight / 2 - 6} 
-                        textAnchor="middle" 
-                        className="text-[10px] font-medium fill-muted-foreground pointer-events-none select-none"
-                      >
-                        {(opt.probability * 100).toFixed(0)}%
-                      </text>
-                      <rect 
-                        x={x - optWordWidth / 2} 
-                        y={optY - rectHeight / 2} 
-                        width={optWordWidth} 
-                        height={rectHeight} 
-                        rx={5} 
-                        fill={isDestructive ? "hsl(var(--destructive))" : isAnimated ? "hsl(var(--primary))" : "hsl(var(--muted))"}
-                        stroke={isDestructive ? "hsl(var(--destructive))" : isAnimated ? "hsl(var(--primary))" : "hsl(var(--border))"}
-                        strokeWidth={isAnimated ? 2 : 1}
-                        className={cn(
-                          "transition-all duration-200",
-                          !isDestructive && !isAnimated && "hover:fill-[hsl(var(--primary))] hover:stroke-[hsl(var(--primary))]",
-                          isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]",
-                          isAnimated && "animate-pulse"
-                        )} 
+                    <g key={`option-${idx}`}>
+                      {/* Background occluder */}
+                      <rect
+                        x={x - buttonWidth / 2 - 6}
+                        y={optY - buttonHeight / 2 - 6}
+                        width={buttonWidth + 12}
+                        height={buttonHeight + 12}
+                        rx={12}
+                        fill="hsl(var(--background))"
                       />
-                      <text 
-                        x={x} 
-                        y={optY + 5} 
-                        textAnchor="middle" 
-                        className={cn(
-                          "text-[12px] font-semibold pointer-events-none select-none transition-all duration-200",
-                          isAnimated ? "fill-primary-foreground" : "fill-foreground",
-                          !isDestructive && !isAnimated && "group-hover:fill-primary-foreground"
-                        )}
+                      <foreignObject 
+                        x={x - buttonWidth / 2} 
+                        y={optY - buttonHeight / 2} 
+                        width={buttonWidth} 
+                        height={buttonHeight}
                       >
-                        {opt.word}
-                      </text>
+                        <div className="flex justify-center h-full items-center">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleWordClick(currentLevel, opt.word)}
+                            disabled={isAnimating}
+                            className={cn(
+                              "h-10 min-w-[80px] flex flex-col gap-0 px-3 text-xs transition-all duration-200",
+                              isDestructive &&
+                                "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
+                              isAnimated &&
+                                "ring-2 ring-primary ring-offset-1 animate-pulse bg-primary/10"
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "text-xs font-medium",
+                                isDestructive && "text-destructive"
+                              )}
+                            >
+                              {isFlagged ? (
+                                <TextFlag
+                                  text={opt.word}
+                                  {...flagConfig.props}
+                                  className="no-underline decoration-0"
+                                  noUnderline={true}
+                                />
+                              ) : (
+                                opt.word
+                              )}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {(opt.probability * 100).toFixed(0)}%
+                            </span>
+                          </Button>
+                        </div>
+                      </foreignObject>
                     </g>
                   );
                 });
