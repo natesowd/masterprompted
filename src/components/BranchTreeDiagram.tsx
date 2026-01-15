@@ -595,76 +595,6 @@ export function BranchTreeDiagram({
     : [leftPadding, leftPadding + 120, leftPadding + 240, leftPadding + 360, leftPadding + 480, leftPadding + 600, leftPadding + 720];
   const baseSpread = 180; // Keep constant for consistent branch shape
   const svgHeight = 500; // Increased to ensure all branching paths are visible
-  
-  // Base SVG width - must be defined before getZoomedViewBox
-  const baseSvgWidth = closeUpView ? (leftPadding + 1200 + 100) : (leftPadding + 720 + 100);
-
-  // Progressive zoom: calculate viewBox based on current level to prevent option overlap
-  const getZoomedViewBox = (): { x: number; y: number; width: number; height: number } => {
-    // No zoom for close-up view (it has its own spacing)
-    if (closeUpView) {
-      return { x: 0, y: 0, width: 1400, height: svgHeight };
-    }
-    
-    // Base dimensions
-    const baseWidth = baseSvgWidth;
-    const baseHeight = svgHeight;
-    
-    // Calculate zoom factor based on level - more zoom as branches get thinner
-    // Level 1: no zoom, Level 2-3: slight zoom, Level 4+: more zoom
-    const zoomFactors = [1, 1, 0.85, 0.7, 0.55, 0.45, 0.4, 0.35];
-    const zoomFactor = zoomFactors[Math.min(currentLevel, 7)];
-    
-    // Calculate the center point to focus on (based on last selected word position)
-    let focusX = levelXPositions[Math.max(0, currentLevel - 1)];
-    let focusY = svgHeight / 2;
-    
-    // Calculate Y based on current selections for better centering
-    if (currentLevel >= 1 && selections[1]) {
-      const group1 = selections[1] === "Unites" ? 0 : 1;
-      focusY = svgHeight / 2 + (group1 - 0.5) * baseSpread;
-      
-      if (currentLevel >= 2 && selections[2]) {
-        const group2 = selections[2] === "On" ? 0 : 1;
-        focusY = focusY + (group2 - 0.5) * (baseSpread / 2);
-        
-        if (currentLevel >= 3 && selections[3]) {
-          const group3 = selections[3] === "Historic" ? 0 : 1;
-          focusY = focusY + (group3 - 0.5) * (baseSpread / 4);
-          
-          if (currentLevel >= 4 && selections[4]) {
-            const group4 = selections[4] === "AI" ? 0 : 1;
-            focusY = focusY + (group4 - 0.5) * (baseSpread / 8);
-            
-            if (currentLevel >= 5 && selections[5]) {
-              const group5 = selections[5] === "Ethics" ? 0 : 1;
-              focusY = focusY + (group5 - 0.5) * (baseSpread / 16);
-            }
-          }
-        }
-      }
-    }
-    
-    // For later levels, shift focus more towards current level
-    if (currentLevel >= 2) {
-      focusX = (levelXPositions[currentLevel - 1] + levelXPositions[Math.min(currentLevel, 6)]) / 2;
-    }
-    
-    const viewWidth = baseWidth * zoomFactor;
-    const viewHeight = baseHeight * zoomFactor;
-    
-    // Calculate viewBox origin to center on focus point
-    let viewX = focusX - viewWidth / 2;
-    let viewY = focusY - viewHeight / 2;
-    
-    // Clamp to ensure we don't go out of bounds
-    viewX = Math.max(0, Math.min(viewX, baseWidth - viewWidth));
-    viewY = Math.max(0, Math.min(viewY, baseHeight - viewHeight));
-    
-    return { x: viewX, y: viewY, width: viewWidth, height: viewHeight };
-  };
-  
-  const zoomedViewBox = getZoomedViewBox();
 
   const isComplete = selections.filter(Boolean).length >= 7;
 
@@ -688,6 +618,7 @@ export function BranchTreeDiagram({
   const completionTextWidth = completeHeadline ? completeHeadline.length * charWidth : 0;
   const completionBoxWidth = completionTextWidth + completionBoxPaddingX * 2;
 
+  const baseSvgWidth = closeUpView ? (leftPadding + 1200 + 100) : (leftPadding + 720 + 100);
   const svgWidth = baseSvgWidth + (isComplete && completeHeadline ? lastWordWidth / 2 + completionLineGap + lineLength + completionBoxWidth + 20 : 0);
 
   // Build current headline
@@ -798,11 +729,11 @@ export function BranchTreeDiagram({
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg
-              className="h-[420px] transition-all duration-500"
+              className="h-[420px]"
               width={closeUpView ? 1400 : svgWidth}
               height={420}
-              viewBox={`${zoomedViewBox.x} ${zoomedViewBox.y} ${zoomedViewBox.width} ${zoomedViewBox.height}`}
-              preserveAspectRatio="xMidYMid meet"
+              viewBox={closeUpView ? `0 0 1400 ${svgHeight}` : `0 0 ${svgWidth} ${svgHeight}`}
+              preserveAspectRatio="xMinYMid meet"
             >
               {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
