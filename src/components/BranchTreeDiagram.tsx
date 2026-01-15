@@ -576,12 +576,12 @@ export function BranchTreeDiagram({
     const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
     const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
     const level6Group = selectedFullPath.words[6] === "Framework" ? 0 : 1;
-    const y1 = baseY + (level1Group - 0.5) * spread;
-    const y2 = y1 + (level2Group - 0.5) * (spread / 2);
-    const y3 = y2 + (level3Group - 0.5) * (spread / 4);
-    const y4 = y3 + (level4Group - 0.5) * (spread / 8);
-    const y5 = y4 + (level5Group - 0.5) * (spread / 16);
-    const y6 = y5 + (level6Group - 0.5) * (spread / 32);
+    const y1 = baseY + (level1Group - 0.5) * (spread * 0.5);
+    const y2 = y1 + (level2Group - 0.5) * (spread * 0.35);
+    const y3 = y2 + (level3Group - 0.5) * (spread * 0.25);
+    const y4 = y3 + (level4Group - 0.5) * (spread * 0.18);
+    const y5 = y4 + (level5Group - 0.5) * (spread * 0.12);
+    const y6 = y5 + (level6Group - 0.5) * (spread * 0.08);
     const yPositions = [baseY, y1, y2, y3, y4, y5, y6];
     return yPositions[level] || baseY;
   };
@@ -594,7 +594,12 @@ export function BranchTreeDiagram({
     ? [leftPadding, leftPadding + 200, leftPadding + 400, leftPadding + 600, leftPadding + 800, leftPadding + 1000, leftPadding + 1200]
     : [leftPadding, leftPadding + 120, leftPadding + 240, leftPadding + 360, leftPadding + 480, leftPadding + 600, leftPadding + 720];
   const baseSpread = 180; // Keep constant for consistent branch shape
-  const svgHeight = 500; // Increased to ensure all branching paths are visible
+  
+  // Calculate progressive SVG height based on total vertical spread needed
+  // Total spread = 0.5 + 0.35 + 0.25 + 0.18 + 0.12 + 0.08 = 1.48 * baseSpread per side
+  // Need enough height for full tree expansion with padding
+  const totalSpreadMultiplier = 0.5 + 0.35 + 0.25 + 0.18 + 0.12 + 0.08; // 1.48
+  const svgHeight = Math.max(500, baseSpread * totalSpreadMultiplier * 2 + 120); // ~650px
 
   const isComplete = selections.filter(Boolean).length >= 7;
 
@@ -729,9 +734,9 @@ export function BranchTreeDiagram({
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg
-              className="h-[420px]"
+              style={{ height: svgHeight }}
               width={closeUpView ? 1400 : svgWidth}
-              height={420}
+              height={svgHeight}
               viewBox={closeUpView ? `0 0 1400 ${svgHeight}` : `0 0 ${svgWidth} ${svgHeight}`}
               preserveAspectRatio="xMinYMid meet"
             >
