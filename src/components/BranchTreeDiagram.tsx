@@ -852,7 +852,7 @@ export function BranchTreeDiagram({
                 </g>;
               })}
 
-              {/* Current selection options shown on the diagram */}
+              {/* Current selection options shown on the diagram - positioned over branch nodes */}
               {currentLevel <= 6 && currentLevel > 0 && isInteractive && (() => {
                 const options = currentOptions;
                 if (options.length === 0) return null;
@@ -861,40 +861,62 @@ export function BranchTreeDiagram({
                 const baseY = svgHeight / 2;
                 const spread = baseSpread;
                 
-                // Calculate the Y position based on the current selected path
-                let anchorY = baseY;
-                if (currentLevel >= 1 && selections[0]) {
-                  const level1Group = selections[1] === "Unites" ? 0 : (selections[1] === "Reaches" ? 1 : 0.5);
-                  anchorY = baseY + (level1Group - 0.5) * spread;
+                // Calculate Y position for each option based on actual branch positions
+                const getOptionY = (word: string): number => {
+                  // Build a hypothetical selection with this word
+                  const hypotheticalSelections = [...selections];
+                  hypotheticalSelections[currentLevel] = word;
                   
-                  if (currentLevel >= 2 && selections[1]) {
-                    const level2Group = selections[2] === "On" ? 0 : 1;
-                    anchorY = anchorY + (level2Group - 0.5) * (spread / 2);
-                    
-                    if (currentLevel >= 3 && selections[2]) {
-                      const level3Group = selections[3] === "Historic" ? 0 : 1;
-                      anchorY = anchorY + (level3Group - 0.5) * (spread / 4);
-                      
-                      if (currentLevel >= 4 && selections[3]) {
-                        const level4Group = selections[4] === "AI" ? 0 : 1;
-                        anchorY = anchorY + (level4Group - 0.5) * (spread / 8);
-                        
-                        if (currentLevel >= 5 && selections[4]) {
-                          const level5Group = selections[5] === "Ethics" ? 0 : 1;
-                          anchorY = anchorY + (level5Group - 0.5) * (spread / 16);
-                        }
-                      }
-                    }
+                  // Calculate Y using the same logic as the tree paths
+                  let y = baseY;
+                  
+                  // Level 1 branching
+                  if (currentLevel >= 1) {
+                    const word1 = currentLevel === 1 ? word : selections[1];
+                    const group1 = word1 === "Unites" ? 0 : 1;
+                    y = baseY + (group1 - 0.5) * spread;
                   }
-                }
-                
-                // Position options vertically around the anchor point
-                const optionSpacing = 40;
-                const totalHeight = (options.length - 1) * optionSpacing;
-                const startY = anchorY - totalHeight / 2;
+                  
+                  // Level 2 branching
+                  if (currentLevel >= 2) {
+                    const word2 = currentLevel === 2 ? word : selections[2];
+                    const group2 = word2 === "On" ? 0 : 1;
+                    y = y + (group2 - 0.5) * (spread / 2);
+                  }
+                  
+                  // Level 3 branching
+                  if (currentLevel >= 3) {
+                    const word3 = currentLevel === 3 ? word : selections[3];
+                    const group3 = word3 === "Historic" ? 0 : 1;
+                    y = y + (group3 - 0.5) * (spread / 4);
+                  }
+                  
+                  // Level 4 branching
+                  if (currentLevel >= 4) {
+                    const word4 = currentLevel === 4 ? word : selections[4];
+                    const group4 = word4 === "AI" ? 0 : 1;
+                    y = y + (group4 - 0.5) * (spread / 8);
+                  }
+                  
+                  // Level 5 branching
+                  if (currentLevel >= 5) {
+                    const word5 = currentLevel === 5 ? word : selections[5];
+                    const group5 = word5 === "Ethics" ? 0 : 1;
+                    y = y + (group5 - 0.5) * (spread / 16);
+                  }
+                  
+                  // Level 6 branching
+                  if (currentLevel >= 6) {
+                    const word6 = currentLevel === 6 ? word : selections[6];
+                    const group6 = word6 === "Framework" ? 0 : 1;
+                    y = y + (group6 - 0.5) * (spread / 32);
+                  }
+                  
+                  return y;
+                };
                 
                 return options.map((opt, idx) => {
-                  const optY = startY + idx * optionSpacing;
+                  const optY = getOptionY(opt.word);
                   const optWordWidth = Math.max(70, opt.word.length * 10 + 16);
                   const rectHeight = 28;
                   const isAnimated = animatedWord === opt.word;
