@@ -911,10 +911,6 @@ export function BranchTreeDiagram({
               <h3 className="text-sm font-semibold text-foreground">
                 {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Complete!"}
               </h3>
-              {currentLevel <= 6 && isInteractive && <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground" title="Watch LLM select highest probability">
-                <Monitor className={cn("h-3.5 w-3.5", isAnimating && "text-primary animate-pulse")} />
-                Auto-select
-              </Button>}
             </div>
 
             {/* LLM Selection Message */}
@@ -925,11 +921,12 @@ export function BranchTreeDiagram({
               </span>
             </div>}
 
-            {currentLevel <= 6 ? <div className="flex gap-2">
-              {currentOptions.map(({
-                word,
-                probability
-              }) => {
+            {currentLevel <= 6 ? <div className="flex items-center gap-3">
+              <div className="flex gap-2">
+                {currentOptions.map(({
+                  word,
+                  probability
+                }) => {
                 const isAnimated = animatedWord === word;
                 const flagConfig = TOKEN_FLAGS[word];
                 const isFlagged = !!flagConfig;
@@ -970,6 +967,11 @@ export function BranchTreeDiagram({
                   </div>
                 </button>;
               })}
+              </div>
+              {isInteractive && <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground" title="Watch LLM select highest probability">
+                <Monitor className={cn("h-3.5 w-3.5", isAnimating && "text-primary animate-pulse")} />
+                Auto-select
+              </Button>}
             </div> : <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium px-4 py-2 rounded-lg border-2 border-green-400 bg-green-200 text-green-900 whitespace-nowrap">
