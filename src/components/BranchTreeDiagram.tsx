@@ -581,9 +581,9 @@ export function BranchTreeDiagram({
 
   // Calculate Y position for selected path at each level
   const getSelectedPathY = (level: number): number => {
-    if (!selectedFullPath) return 200;
-    const baseY = 200;
-    const spread = 180;
+    if (!selectedFullPath) return svgHeight / 2;
+    const baseY = svgHeight / 2;
+    const spread = baseSpread;
     const level1Group = selectedFullPath.words[1] === "Unites" ? 0 : 1;
     const level2Group = selectedFullPath.words[2] === "On" ? 0 : 1;
     const level3Group = selectedFullPath.words[3] === "Historic" ? 0 : 1;
