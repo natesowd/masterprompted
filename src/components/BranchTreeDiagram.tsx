@@ -930,6 +930,13 @@ export function BranchTreeDiagram({
                 const baseY = svgHeight / 2;
                 const spread = baseSpread;
                 
+                // Get the position of the last selected word for connector lines
+                const prevLevel = currentLevel - 1;
+                const prevX = levelXPositions[prevLevel];
+                const prevY = prevLevel === 0 ? svgHeight / 2 : getSelectedPathY(prevLevel);
+                const prevWord = selections[prevLevel] || "European Union";
+                const prevWordWidth = Math.max(70, prevWord.length * 10 + 16);
+                
                 // Calculate Y position for each option based on actual branch positions
                 const getOptionY = (word: string): number => {
                   // Build a hypothetical selection with this word
@@ -984,7 +991,29 @@ export function BranchTreeDiagram({
                   return y;
                 };
                 
-                return options.map((opt, idx) => {
+                // Render connector lines first (behind the word boxes)
+                const connectorLines = options.map((opt, idx) => {
+                  const optY = getOptionY(opt.word);
+                  const optWordWidth = Math.max(70, opt.word.length * 10 + 16);
+                  
+                  return (
+                    <path
+                      key={`connector-${idx}`}
+                      d={`M ${prevX + prevWordWidth / 2} ${prevY} 
+                          C ${prevX + prevWordWidth / 2 + 30} ${prevY}, 
+                            ${x - optWordWidth / 2 - 30} ${optY}, 
+                            ${x - optWordWidth / 2} ${optY}`}
+                      fill="none"
+                      stroke="hsl(var(--border))"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 2"
+                      opacity={0.6}
+                      className="pointer-events-none"
+                    />
+                  );
+                });
+                
+                const wordNodes = options.map((opt, idx) => {
                   const optY = getOptionY(opt.word);
                   const optWordWidth = Math.max(70, opt.word.length * 10 + 16);
                   const rectHeight = 28;
@@ -1039,6 +1068,13 @@ export function BranchTreeDiagram({
                     </g>
                   );
                 });
+                
+                return (
+                  <>
+                    {connectorLines}
+                    {wordNodes}
+                  </>
+                );
               })()}
 
               {isComplete && completeHeadline && selectedFullPath && (() => {
