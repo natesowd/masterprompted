@@ -972,6 +972,69 @@ export function BranchTreeDiagram({
                 });
               })()}
 
+              {/* Auto-select button between word options */}
+              {currentLevel <= 6 && isInteractive && (() => {
+                const x = levelXPositions[currentLevel] || 0;
+                const baseY = svgHeight / 2;
+                const spread = svgHeight * 0.3;
+                
+                // Calculate center Y between the two options
+                let centerY = baseY;
+                
+                // Calculate based on current selections path
+                if (currentLevel >= 1 && selections[1]) {
+                  const group1 = selections[1] === "Unites" ? 0 : 1;
+                  centerY = baseY + (group1 - 0.5) * spread;
+                }
+                if (currentLevel >= 2 && selections[2]) {
+                  const group2 = selections[2] === "On" ? 0 : 1;
+                  centerY = centerY + (group2 - 0.5) * (spread / 2);
+                }
+                if (currentLevel >= 3 && selections[3]) {
+                  const group3 = selections[3] === "Historic" ? 0 : 1;
+                  centerY = centerY + (group3 - 0.5) * (spread / 4);
+                }
+                if (currentLevel >= 4 && selections[4]) {
+                  const group4 = selections[4] === "AI" ? 0 : 1;
+                  centerY = centerY + (group4 - 0.5) * (spread / 8);
+                }
+                if (currentLevel >= 5 && selections[5]) {
+                  const group5 = selections[5] === "Ethics" ? 0 : 1;
+                  centerY = centerY + (group5 - 0.5) * (spread / 16);
+                }
+                
+                const buttonWidth = 90;
+                const buttonHeight = 24;
+                
+                return (
+                  <g 
+                    onClick={() => !isAnimating && playAnimation()}
+                    className={cn("cursor-pointer", isAnimating && "pointer-events-none opacity-50")}
+                    style={{ pointerEvents: 'all' }}
+                  >
+                    <rect 
+                      x={x - buttonWidth / 2} 
+                      y={centerY - buttonHeight / 2} 
+                      width={buttonWidth} 
+                      height={buttonHeight} 
+                      rx={4} 
+                      fill="hsl(var(--muted))"
+                      stroke="hsl(var(--border))"
+                      strokeWidth={1}
+                      className="transition-all duration-200 hover:fill-[hsl(var(--accent))]"
+                    />
+                    <text 
+                      x={x} 
+                      y={centerY + 4} 
+                      textAnchor="middle" 
+                      className="text-[11px] font-medium fill-muted-foreground pointer-events-none select-none"
+                    >
+                      Auto-select
+                    </text>
+                  </g>
+                );
+              })()}
+
               {isComplete && completeHeadline && selectedFullPath && (() => {
                 const endX = levelXPositions[6];
                 const endY = getSelectedPathY(6);
@@ -1036,10 +1099,6 @@ export function BranchTreeDiagram({
             </div>}
 
             {currentLevel <= 6 ? <div className="flex items-center gap-3">
-              {isInteractive && <Button variant="ghost" size="sm" onClick={playAnimation} disabled={isAnimating} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground" title="Watch LLM select highest probability">
-                <Monitor className={cn("h-3.5 w-3.5", isAnimating && "text-primary animate-pulse")} />
-                Auto-select
-              </Button>}
             </div> : <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium px-4 py-2 rounded-lg border-2 border-green-400 bg-green-200 text-green-900 whitespace-nowrap">
