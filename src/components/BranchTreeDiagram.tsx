@@ -1018,8 +1018,8 @@ export function BranchTreeDiagram({
                       disabled={isAnimating}
                       className={cn(
                         "w-8 h-8 rounded-md flex items-center justify-center",
-                        "bg-muted border border-border",
-                        "hover:bg-accent hover:border-primary transition-all duration-200",
+                        "bg-muted",
+                        "hover:bg-accent transition-all duration-200",
                         "cursor-pointer",
                         isAnimating && "opacity-50 pointer-events-none"
                       )}
