@@ -595,6 +595,9 @@ export function BranchTreeDiagram({
     : [leftPadding, leftPadding + 120, leftPadding + 240, leftPadding + 360, leftPadding + 480, leftPadding + 600, leftPadding + 720];
   const baseSpread = 180; // Keep constant for consistent branch shape
   const svgHeight = 500; // Increased to ensure all branching paths are visible
+  
+  // Define baseSvgWidth early so it can be used in getZoomedViewBox
+  const baseSvgWidth = closeUpView ? (leftPadding + 1200 + 100) : (leftPadding + 720 + 100);
 
   // Progressive zoom: calculate viewBox based on current level to prevent option overlap
   const getZoomedViewBox = (): { x: number; y: number; width: number; height: number } => {
@@ -685,7 +688,6 @@ export function BranchTreeDiagram({
   const completionTextWidth = completeHeadline ? completeHeadline.length * charWidth : 0;
   const completionBoxWidth = completionTextWidth + completionBoxPaddingX * 2;
 
-  const baseSvgWidth = closeUpView ? (leftPadding + 1200 + 100) : (leftPadding + 720 + 100);
   const svgWidth = baseSvgWidth + (isComplete && completeHeadline ? lastWordWidth / 2 + completionLineGap + lineLength + completionBoxWidth + 20 : 0);
 
   // Build current headline
