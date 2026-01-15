@@ -1003,35 +1003,31 @@ export function BranchTreeDiagram({
                   centerY = centerY + (group5 - 0.5) * (spread / 16);
                 }
                 
-                const buttonWidth = 90;
-                const buttonHeight = 24;
+                const buttonSize = 32;
                 
                 return (
-                  <g 
-                    onClick={() => !isAnimating && playAnimation()}
-                    className={cn("cursor-pointer", isAnimating && "pointer-events-none opacity-50")}
-                    style={{ pointerEvents: 'all' }}
+                  <foreignObject
+                    x={x - buttonSize / 2}
+                    y={centerY - buttonSize / 2}
+                    width={buttonSize}
+                    height={buttonSize}
+                    style={{ overflow: 'visible' }}
                   >
-                    <rect 
-                      x={x - buttonWidth / 2} 
-                      y={centerY - buttonHeight / 2} 
-                      width={buttonWidth} 
-                      height={buttonHeight} 
-                      rx={4} 
-                      fill="hsl(var(--muted))"
-                      stroke="hsl(var(--border))"
-                      strokeWidth={1}
-                      className="transition-all duration-200 hover:fill-[hsl(var(--accent))]"
-                    />
-                    <text 
-                      x={x} 
-                      y={centerY + 4} 
-                      textAnchor="middle" 
-                      className="text-[11px] font-medium fill-muted-foreground pointer-events-none select-none"
+                    <button
+                      onClick={() => !isAnimating && playAnimation()}
+                      disabled={isAnimating}
+                      className={cn(
+                        "w-8 h-8 rounded-md flex items-center justify-center",
+                        "bg-muted border border-border",
+                        "hover:bg-accent hover:border-primary transition-all duration-200",
+                        "cursor-pointer",
+                        isAnimating && "opacity-50 pointer-events-none"
+                      )}
+                      title="Watch LLM select highest probability"
                     >
-                      Auto-select
-                    </text>
-                  </g>
+                      <Monitor className={cn("h-4 w-4 text-muted-foreground", isAnimating && "text-primary animate-pulse")} />
+                    </button>
+                  </foreignObject>
                 );
               })()}
 
