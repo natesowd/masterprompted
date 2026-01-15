@@ -906,7 +906,7 @@ export function BranchTreeDiagram({
         isIntroComplete && !isInteractive && "opacity-40 pointer-events-none"
       )}>
         <div className="bg-card rounded-xl p-4">
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
 
             {/* LLM Selection Message */}
             {showSelectionMessage && animatedWord && selectedProbability !== null && <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
