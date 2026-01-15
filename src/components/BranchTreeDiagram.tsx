@@ -587,9 +587,12 @@ export function BranchTreeDiagram({
   };
 
   // X positions vary based on view mode - close-up spreads words further apart
+  // X positions - shifted right to ensure "European Union" is fully visible
+  const firstWordWidth = Math.max(70, "European Union".length * 10 + 16); // ~156px
+  const leftPadding = firstWordWidth / 2 + 10; // half the word width + margin
   const levelXPositions = closeUpView
-    ? [40, 240, 440, 640, 840, 1040, 1240] // Wider spacing for close-up (200px apart)
-    : [20, 140, 260, 380, 500, 620, 740]; // Normal view (120px apart)
+    ? [leftPadding, leftPadding + 200, leftPadding + 400, leftPadding + 600, leftPadding + 800, leftPadding + 1000, leftPadding + 1200]
+    : [leftPadding, leftPadding + 120, leftPadding + 240, leftPadding + 360, leftPadding + 480, leftPadding + 600, leftPadding + 720];
   const baseSpread = 180; // Keep constant for consistent branch shape
   const svgHeight = 500; // Increased to ensure all branching paths are visible
 
@@ -615,7 +618,8 @@ export function BranchTreeDiagram({
   const completionTextWidth = completeHeadline ? completeHeadline.length * charWidth : 0;
   const completionBoxWidth = completionTextWidth + completionBoxPaddingX * 2;
 
-  const svgWidth = (closeUpView ? 1400 : 860) + (isComplete && completeHeadline ? lastWordWidth / 2 + completionLineGap + lineLength + completionBoxWidth + 20 : 0);
+  const baseSvgWidth = closeUpView ? (leftPadding + 1200 + 100) : (leftPadding + 720 + 100);
+  const svgWidth = baseSvgWidth + (isComplete && completeHeadline ? lastWordWidth / 2 + completionLineGap + lineLength + completionBoxWidth + 20 : 0);
 
   // Build current headline
   const buildHeadline = (): string => {
