@@ -565,11 +565,19 @@ export function BranchTreeDiagram({
     return treePaths.find(p => pathPrefix.every((word, i) => p.words[i] === word));
   }, [selections]);
 
-  // Helper to get spread for a level - progressively increases to prevent overlap
-  const getSpreadForLevel = (levelNum: number, spread: number): number => {
-    const minSpacing = 60; // Minimum vertical gap between word options
+  // Helper to get spread for a level - only increases spacing for levels up to currentLevel
+  // Levels beyond currentLevel use tight spacing, levels at/before currentLevel get progressive spacing
+  const getSpreadForLevel = (levelNum: number, spread: number, activeLevel: number): number => {
     const baseSpreadForLevel = spread / Math.pow(2, levelNum - 1);
-    return Math.max(baseSpreadForLevel, minSpacing * (1 + (levelNum - 1) * 0.3));
+    
+    // Only apply increased spacing for levels that have been selected (up to activeLevel)
+    if (levelNum <= activeLevel) {
+      const minSpacing = 60; // Minimum vertical gap between word options
+      return Math.max(baseSpreadForLevel, minSpacing * (1 + (levelNum - 1) * 0.3));
+    }
+    
+    // Use original tight spacing for levels not yet reached
+    return baseSpreadForLevel;
   };
 
   // Calculate Y position for selected path at each level
@@ -583,12 +591,12 @@ export function BranchTreeDiagram({
     const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
     const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
     const level6Group = selectedFullPath.words[6] === "Framework" ? 0 : 1;
-    const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread);
-    const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread);
-    const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread);
-    const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread);
-    const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread);
-    const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread);
+    const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel);
+    const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel);
+    const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel);
+    const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel);
+    const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel);
+    const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel);
     const yPositions = [baseY, y1, y2, y3, y4, y5, y6];
     return yPositions[level] || baseY;
   };
@@ -759,12 +767,12 @@ export function BranchTreeDiagram({
                 const spread = baseSpread;
 
                 // Progressive Y calculation with guaranteed minimum spacing
-                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread);
-                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread);
-                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread);
-                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread);
-                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread);
-                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread);
+                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel);
+                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel);
+                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel);
+                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel);
+                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel);
+                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel);
                 const points = [{
                   x: levelXPositions[0],
                   y: baseY
@@ -814,12 +822,12 @@ export function BranchTreeDiagram({
                 const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
                 const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
                 const level6Group = selectedFullPath.words[6] === "Framework" ? 0 : 1;
-                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread);
-                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread);
-                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread);
-                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread);
-                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread);
-                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread);
+                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel);
+                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel);
+                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel);
+                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel);
+                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel);
+                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel);
                 const yPositions = [baseY, y1, y2, y3, y4, y5, y6];
                 const y = yPositions[level] || baseY;
                 const isClickable = level > 0;
@@ -880,42 +888,42 @@ export function BranchTreeDiagram({
                   if (currentLevel >= 1) {
                     const word1 = currentLevel === 1 ? word : selections[1];
                     const group1 = word1 === "Unites" ? 0 : 1;
-                    y = baseY + (group1 - 0.5) * getSpreadForLevel(1, spread);
+                    y = baseY + (group1 - 0.5) * getSpreadForLevel(1, spread, currentLevel);
                   }
                   
                   // Level 2 branching
                   if (currentLevel >= 2) {
                     const word2 = currentLevel === 2 ? word : selections[2];
                     const group2 = word2 === "On" ? 0 : 1;
-                    y = y + (group2 - 0.5) * getSpreadForLevel(2, spread);
+                    y = y + (group2 - 0.5) * getSpreadForLevel(2, spread, currentLevel);
                   }
                   
                   // Level 3 branching
                   if (currentLevel >= 3) {
                     const word3 = currentLevel === 3 ? word : selections[3];
                     const group3 = word3 === "Historic" ? 0 : 1;
-                    y = y + (group3 - 0.5) * getSpreadForLevel(3, spread);
+                    y = y + (group3 - 0.5) * getSpreadForLevel(3, spread, currentLevel);
                   }
                   
                   // Level 4 branching
                   if (currentLevel >= 4) {
                     const word4 = currentLevel === 4 ? word : selections[4];
                     const group4 = word4 === "AI" ? 0 : 1;
-                    y = y + (group4 - 0.5) * getSpreadForLevel(4, spread);
+                    y = y + (group4 - 0.5) * getSpreadForLevel(4, spread, currentLevel);
                   }
                   
                   // Level 5 branching
                   if (currentLevel >= 5) {
                     const word5 = currentLevel === 5 ? word : selections[5];
                     const group5 = word5 === "Ethics" ? 0 : 1;
-                    y = y + (group5 - 0.5) * getSpreadForLevel(5, spread);
+                    y = y + (group5 - 0.5) * getSpreadForLevel(5, spread, currentLevel);
                   }
                   
                   // Level 6 branching
                   if (currentLevel >= 6) {
                     const word6 = currentLevel === 6 ? word : selections[6];
                     const group6 = word6 === "Framework" ? 0 : 1;
-                    y = y + (group6 - 0.5) * getSpreadForLevel(6, spread);
+                    y = y + (group6 - 0.5) * getSpreadForLevel(6, spread, currentLevel);
                   }
                   
                   return y;
@@ -1001,32 +1009,32 @@ export function BranchTreeDiagram({
                   if (currentLevel >= 1) {
                     const word1 = currentLevel === 1 ? word : selections[1];
                     const group1 = word1 === "Unites" ? 0 : 1;
-                    y = baseY + (group1 - 0.5) * getSpreadForLevel(1, spread);
+                    y = baseY + (group1 - 0.5) * getSpreadForLevel(1, spread, currentLevel);
                   }
                   if (currentLevel >= 2) {
                     const word2 = currentLevel === 2 ? word : selections[2];
                     const group2 = word2 === "On" ? 0 : 1;
-                    y = y + (group2 - 0.5) * getSpreadForLevel(2, spread);
+                    y = y + (group2 - 0.5) * getSpreadForLevel(2, spread, currentLevel);
                   }
                   if (currentLevel >= 3) {
                     const word3 = currentLevel === 3 ? word : selections[3];
                     const group3 = word3 === "Historic" ? 0 : 1;
-                    y = y + (group3 - 0.5) * getSpreadForLevel(3, spread);
+                    y = y + (group3 - 0.5) * getSpreadForLevel(3, spread, currentLevel);
                   }
                   if (currentLevel >= 4) {
                     const word4 = currentLevel === 4 ? word : selections[4];
                     const group4 = word4 === "AI" ? 0 : 1;
-                    y = y + (group4 - 0.5) * getSpreadForLevel(4, spread);
+                    y = y + (group4 - 0.5) * getSpreadForLevel(4, spread, currentLevel);
                   }
                   if (currentLevel >= 5) {
                     const word5 = currentLevel === 5 ? word : selections[5];
                     const group5 = word5 === "Ethics" ? 0 : 1;
-                    y = y + (group5 - 0.5) * getSpreadForLevel(5, spread);
+                    y = y + (group5 - 0.5) * getSpreadForLevel(5, spread, currentLevel);
                   }
                   if (currentLevel >= 6) {
                     const word6 = currentLevel === 6 ? word : selections[6];
                     const group6 = word6 === "Framework" ? 0 : 1;
-                    y = y + (group6 - 0.5) * getSpreadForLevel(6, spread);
+                    y = y + (group6 - 0.5) * getSpreadForLevel(6, spread, currentLevel);
                   }
                   
                   return y;
