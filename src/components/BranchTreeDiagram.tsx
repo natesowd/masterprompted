@@ -836,6 +836,7 @@ export function BranchTreeDiagram({
                 // but could be expanded to use flagConfig.props.severity
                 const isDestructive = isFlagged && flagConfig.props.severity === 'error';
 
+                const isLatestSelection = level === currentLevel - 1;
                 return <g key={`word-${level}`} onClick={handleWordClickOnTree} className={cn(isClickable && "cursor-pointer")} style={{
                   pointerEvents: isClickable ? 'all' : 'none'
                 }}>
@@ -845,7 +846,7 @@ export function BranchTreeDiagram({
                       {(probability * 100).toFixed(0)}%
                     </text>
                   )}
-                  <rect x={x - wordWidth / 2} y={y - rectHeight / 2} width={wordWidth} height={rectHeight} rx={5} fill={isDestructive ? "hsl(var(--destructive))" : level === 0 ? "hsl(var(--primary))" : "hsl(142 76% 36%)"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && !isDestructive && "hover:fill-[hsl(142_76%_30%)]", isClickable && isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
+                  <rect x={x - wordWidth / 2} y={y - rectHeight / 2} width={wordWidth} height={rectHeight} rx={5} fill={isDestructive ? "hsl(var(--destructive))" : isLatestSelection ? "hsl(var(--primary))" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && !isDestructive && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
                   <text x={x} y={y + 5} textAnchor="middle" className="text-[12px] font-semibold fill-primary-foreground pointer-events-none select-none">
                     {displayWord}
                   </text>
@@ -928,7 +929,7 @@ export function BranchTreeDiagram({
                     <g 
                       key={`option-${idx}`} 
                       onClick={() => handleWordClick(currentLevel, opt.word)}
-                      className="cursor-pointer"
+                      className="cursor-pointer group"
                       style={{ pointerEvents: 'all' }}
                     >
                       {/* Probability label above word */}
@@ -947,11 +948,11 @@ export function BranchTreeDiagram({
                         height={rectHeight} 
                         rx={5} 
                         fill={isDestructive ? "hsl(var(--destructive))" : isAnimated ? "hsl(var(--primary))" : "hsl(var(--muted))"}
-                        stroke={isDestructive ? "hsl(var(--destructive))" : "hsl(var(--border))"}
-                        strokeWidth={1}
+                        stroke={isDestructive ? "hsl(var(--destructive))" : isAnimated ? "hsl(var(--primary))" : "hsl(var(--border))"}
+                        strokeWidth={isAnimated ? 2 : 1}
                         className={cn(
                           "transition-all duration-200",
-                          !isDestructive && "hover:fill-[hsl(var(--primary))]",
+                          !isDestructive && !isAnimated && "hover:fill-[hsl(var(--primary))] hover:stroke-[hsl(var(--primary))]",
                           isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]",
                           isAnimated && "animate-pulse"
                         )} 
@@ -961,8 +962,9 @@ export function BranchTreeDiagram({
                         y={optY + 5} 
                         textAnchor="middle" 
                         className={cn(
-                          "text-[12px] font-semibold pointer-events-none select-none",
-                          isAnimated ? "fill-primary-foreground" : "fill-foreground"
+                          "text-[12px] font-semibold pointer-events-none select-none transition-all duration-200",
+                          isAnimated ? "fill-primary-foreground" : "fill-foreground",
+                          !isDestructive && !isAnimated && "group-hover:fill-primary-foreground"
                         )}
                       >
                         {opt.word}
@@ -972,36 +974,54 @@ export function BranchTreeDiagram({
                 });
               })()}
 
-              {/* Auto-select button between word options */}
-              {currentLevel <= 6 && isInteractive && (() => {
+              {/* Auto-select button between word options - equidistant from both */}
+              {currentLevel <= 6 && isInteractive && currentOptions.length >= 2 && (() => {
                 const x = levelXPositions[currentLevel] || 0;
                 const baseY = svgHeight / 2;
-                const spread = svgHeight * 0.3;
+                const spread = baseSpread;
                 
-                // Calculate center Y between the two options
-                let centerY = baseY;
+                // Calculate Y positions for both options using the same logic as getOptionY
+                const getOptionYForWord = (word: string): number => {
+                  let y = baseY;
+                  
+                  if (currentLevel >= 1) {
+                    const word1 = currentLevel === 1 ? word : selections[1];
+                    const group1 = word1 === "Unites" ? 0 : 1;
+                    y = baseY + (group1 - 0.5) * spread;
+                  }
+                  if (currentLevel >= 2) {
+                    const word2 = currentLevel === 2 ? word : selections[2];
+                    const group2 = word2 === "On" ? 0 : 1;
+                    y = y + (group2 - 0.5) * (spread / 2);
+                  }
+                  if (currentLevel >= 3) {
+                    const word3 = currentLevel === 3 ? word : selections[3];
+                    const group3 = word3 === "Historic" ? 0 : 1;
+                    y = y + (group3 - 0.5) * (spread / 4);
+                  }
+                  if (currentLevel >= 4) {
+                    const word4 = currentLevel === 4 ? word : selections[4];
+                    const group4 = word4 === "AI" ? 0 : 1;
+                    y = y + (group4 - 0.5) * (spread / 8);
+                  }
+                  if (currentLevel >= 5) {
+                    const word5 = currentLevel === 5 ? word : selections[5];
+                    const group5 = word5 === "Ethics" ? 0 : 1;
+                    y = y + (group5 - 0.5) * (spread / 16);
+                  }
+                  if (currentLevel >= 6) {
+                    const word6 = currentLevel === 6 ? word : selections[6];
+                    const group6 = word6 === "Framework" ? 0 : 1;
+                    y = y + (group6 - 0.5) * (spread / 32);
+                  }
+                  
+                  return y;
+                };
                 
-                // Calculate based on current selections path
-                if (currentLevel >= 1 && selections[1]) {
-                  const group1 = selections[1] === "Unites" ? 0 : 1;
-                  centerY = baseY + (group1 - 0.5) * spread;
-                }
-                if (currentLevel >= 2 && selections[2]) {
-                  const group2 = selections[2] === "On" ? 0 : 1;
-                  centerY = centerY + (group2 - 0.5) * (spread / 2);
-                }
-                if (currentLevel >= 3 && selections[3]) {
-                  const group3 = selections[3] === "Historic" ? 0 : 1;
-                  centerY = centerY + (group3 - 0.5) * (spread / 4);
-                }
-                if (currentLevel >= 4 && selections[4]) {
-                  const group4 = selections[4] === "AI" ? 0 : 1;
-                  centerY = centerY + (group4 - 0.5) * (spread / 8);
-                }
-                if (currentLevel >= 5 && selections[5]) {
-                  const group5 = selections[5] === "Ethics" ? 0 : 1;
-                  centerY = centerY + (group5 - 0.5) * (spread / 16);
-                }
+                // Calculate center Y as average of the two option Y positions
+                const option1Y = getOptionYForWord(currentOptions[0].word);
+                const option2Y = getOptionYForWord(currentOptions[1].word);
+                const centerY = (option1Y + option2Y) / 2;
                 
                 const buttonSize = 32;
                 
