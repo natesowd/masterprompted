@@ -907,11 +907,6 @@ export function BranchTreeDiagram({
       )}>
         <div className="bg-card rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-3">
-              <h3 className="text-sm font-semibold text-foreground">
-                {currentLevel <= 6 ? `Step ${currentLevel}: Select next word` : "Complete!"}
-              </h3>
-            </div>
 
             {/* LLM Selection Message */}
             {showSelectionMessage && animatedWord && selectedProbability !== null && <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/30 rounded-lg animate-fade-in">
