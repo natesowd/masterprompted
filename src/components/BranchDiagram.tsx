@@ -1066,11 +1066,13 @@ export function BranchDiagram({
       {/* Content wrapper - blurs when intro complete */}
       <div className={cn("transition-all duration-500", isIntroComplete && !isInteractive && "opacity-25 blur-sm pointer-events-none")}>
         {/* Current headline display - fixed above scrollable tree */}
-        <div className="mb-4 p-4 bg-muted/30 rounded-lg flex items-center justify-between">
+        <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 border border-border/50 mb-4">
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
-              {isIntroAnimating ? "System generating headline:" : "Current Headline:"}
-            </p>
+            {!hasUserSelected && isInteractive && (
+              <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
+                Select words from the tree below to build your headline:
+              </p>
+            )}
             <p className="text-xl font-medium text-foreground">
               {(() => {
               // During intro animation, highlight the word being selected
@@ -1123,12 +1125,7 @@ export function BranchDiagram({
               Reset
             </Button>}
         </div>
-        
-        {/* Instruction text - only show when user hasn't selected yet */}
-        {!hasUserSelected && isInteractive && <p className="text-sm text-muted-foreground mb-3 px-2">
-            Select words from the tree below to build your headline:
-          </p>}
-        
+
         {/* Scrollable tree container */}
         <div ref={containerRef} className="overflow-x-auto scroll-smooth">
           <div className="min-w-[1600px] p-6 pr-[320px]">
