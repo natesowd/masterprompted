@@ -146,21 +146,21 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* White Footer Section */}
-        <footer className="bg-white py-16">
+        {/* Footer Section */}
+        <footer className="bg-card py-16">
           <div className="max-w-6xl mx-auto px-6 text-center space-y-8">
             <div className="space-y-4">
-              <h3 className="text-2xl font-semibold text-gray-900">
+              <h3 className="text-h5 font-heading text-foreground">
                 {t('landing.footer.llmUsage')}
               </h3>
-              <div className="space-y-2 text-gray-700">
+              <div className="space-y-2 text-muted-foreground">
                 <p><strong>{t('landing.footer.guidedExploration')}</strong> {t('landing.footer.guidedExplorationDesc')}</p>
                 <p><strong>{t('landing.footer.promptPlayground')}</strong> {t('landing.footer.promptPlaygroundDesc')}</p>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-gray-200">
-              <p className="text-gray-600">
+            <div className="pt-8 border-t border-border">
+              <p className="text-muted-foreground">
                 <strong>{t('landing.footer.modelsUsed')}</strong> {t('landing.footer.models')}
               </p>
             </div>
