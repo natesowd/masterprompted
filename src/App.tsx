@@ -30,6 +30,7 @@ import Contact from "./pages/Contact";
 import Imprint from "./pages/Imprint";
 import Takeaways from "./pages/NextWordPredictionTakeaways";
 import NotFound from "./pages/NotFound";
+import DesignSystem from "./pages/DesignSystem";
 
 const queryClient = new QueryClient();
 
@@ -48,7 +49,8 @@ const App = () => (
               {/* Hidden pages - uncomment to restore: */}
               {/* <Route path="/about" element={<About />} /> */}
               <Route path="/contact" element={<Contact />} />
-              {/* <Route path="/imprint" element={<Imprint />} /> */}
+              <Route path="/design-system" element={<DesignSystem />} />
+              {/* <Route path="/imprint" element={<Imprint />} */}
 
               {/* INTRO MODULE */}
               <Route path="/module/intro" element={<Introduction />} />

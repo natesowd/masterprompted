@@ -35,6 +35,7 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
   const navigationItems = [
     { label: t('nav.promptPlayground'), path: "/playground" },
     { label: t('nav.contact'), path: "/contact" },
+    { label: "Design System", path: "/design-system" },
     // Hidden pages - uncomment to restore:
     // { label: t('nav.about'), path: "/about" },
     // { label: t('nav.imprint'), path: "/imprint" }
