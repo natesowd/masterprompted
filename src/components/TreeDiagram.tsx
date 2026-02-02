@@ -754,9 +754,9 @@ export function TreeDiagram({
 
       {/* Main layout: tree above, selection panel below */}
       <div className="flex flex-col gap-4">
-        {/* Branch visualization - card style */}
-        <div className="bg-card rounded-xl overflow-hidden">
-        <div className="overflow-x-auto" ref={scrollContainerRef}>
+        {/* Branch visualization - card style with fixed height container that masks overflow */}
+        <div className="bg-card rounded-xl overflow-hidden h-[480px]">
+        <div className="overflow-x-auto overflow-y-auto h-full" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg
               style={{ height: svgHeight }}
