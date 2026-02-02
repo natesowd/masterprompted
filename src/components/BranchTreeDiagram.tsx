@@ -609,7 +609,21 @@ export function BranchTreeDiagram({
     ? [leftPadding, leftPadding + 200, leftPadding + 400, leftPadding + 600, leftPadding + 800, leftPadding + 1000, leftPadding + 1200]
     : [leftPadding, leftPadding + 120, leftPadding + 240, leftPadding + 360, leftPadding + 480, leftPadding + 600, leftPadding + 720];
   const baseSpread = 220; // Keep constant for consistent branch shape
-  const svgHeight = 580; // Increased to ensure all branching paths are visible
+  
+  // Calculate dynamic SVG height based on currentLevel to prevent branch overlap
+  // As more levels are selected, more vertical space is needed for branching
+  const calculateSvgHeight = (): number => {
+    const baseHeight = 400;
+    const minSpacing = 60;
+    // Each level adds spacing, cumulative effect
+    let totalSpread = 0;
+    for (let i = 1; i <= Math.min(currentLevel, 6); i++) {
+      totalSpread += minSpacing * (1 + (i - 1) * 0.3);
+    }
+    // Total height needs to accommodate branches going both up and down from center
+    return Math.max(baseHeight, baseHeight + totalSpread * 2);
+  };
+  const svgHeight = calculateSvgHeight();
 
   const isComplete = selections.filter(Boolean).length >= 7;
 
@@ -744,9 +758,9 @@ export function BranchTreeDiagram({
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg
-              className="h-[520px]"
+              style={{ height: svgHeight }}
               width={closeUpView ? 1400 : svgWidth}
-              height={520}
+              height={svgHeight}
               viewBox={closeUpView ? `0 0 1400 ${svgHeight}` : `0 0 ${svgWidth} ${svgHeight}`}
               preserveAspectRatio="xMinYMid meet"
             >
