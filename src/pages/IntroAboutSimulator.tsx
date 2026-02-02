@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+/**
+ * IntroAboutSimulator - About page explaining the simulator before starting
+ * Shows information about LLMs used and the simulator purpose
+ */
 const AboutSimulator = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -20,15 +24,7 @@ const AboutSimulator = () => {
       <main className="container mx-auto px-6 py-6">
         <Breadcrumb />
         <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[600px] relative">
-          <Card 
-            className="w-full max-w-4xl transition-all duration-200 flex flex-col md:flex-row items-start p-8 md:p-10 gap-6 md:gap-8"
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid #C5C5C5',
-              boxShadow: '0px 6px 15px rgba(62, 62, 62, 0.15)',
-              borderRadius: '20px'
-            }}
-          >
+          <Card className="w-full max-w-4xl flex flex-col md:flex-row items-start p-8 md:p-10 gap-6 md:gap-8 bg-card border border-border shadow-lg rounded-2xl">
             {/* Image inside the popup - aligned to top and smaller */}
             <img 
               src="/whatis.png" 
@@ -39,53 +35,49 @@ const AboutSimulator = () => {
             <CardContent className="p-0 w-full flex flex-col">
               {/* About label */}
               <div className="mb-6">
-                <span className="text-gray-500 text-sm">{t('intro.aboutSimulator.label')}</span>
+                <span className="text-muted-foreground text-sm">
+                  {t('intro.aboutSimulator.label')}
+                </span>
               </div>
 
               {/* Main heading */}
-              <h1 className="text-[40px] font-barlow-semi font-bold text-gray-900 leading-tight" style={{ marginBottom: '10px' }}>
+              <h1 className="text-h2 font-heading text-foreground mb-3">
                 {t('intro.aboutSimulator.title')}
               </h1>
 
               {/* Description */}
-              <p className="text-gray-600 text-lg leading-relaxed mb-6">
+              <p className="text-muted-foreground text-body-1 leading-relaxed mb-6">
                 {t('intro.aboutSimulator.description')}
               </p>
 
               {/* LLMs info */}
-              <p className="text-gray-600 text-base leading-relaxed mb-8">
+              <p className="text-muted-foreground text-body-2 leading-relaxed mb-8">
                 {t('intro.aboutSimulator.llmsUsed')}
               </p>
 
               {/* Continue button */}
-                <Button 
-                  onClick={handleStartSimulator}
-                  className="transition-all duration-200"
-                  style={{ 
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '15px 40px',
-                    gap: '12px',
-                    width: '220px',
-                    height: '58px',
-                    background: '#64DB96',
-                    borderRadius: '100px',
-                    border: 'none',
-                    color: '#1F1F1F',
-                    fontFamily: 'Manrope',
-                    fontStyle: 'normal',
-                    fontWeight: '700',
-                    fontSize: '18px',
-                    lineHeight: '28px'
-                  }}
+              <Button 
+                onClick={handleStartSimulator}
+                className="w-fit px-10 py-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold text-lg rounded-full transition-colors"
+              >
+                {t('intro.aboutSimulator.continue')}
+                <svg 
+                  width="10" 
+                  height="8" 
+                  viewBox="0 0 12 10" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="ml-3"
                 >
-                  {t('intro.aboutSimulator.continue')}
-                  <svg width="10" height="8" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 5H11M11 5L7 1M11 5L7 9" stroke="#1F1F1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Button>
+                  <path 
+                    d="M1 5H11M11 5L7 1M11 5L7 9" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Button>
             </CardContent>
           </Card>
         </div>

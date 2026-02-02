@@ -32,10 +32,10 @@ export default function PromptConstructionSummarize() {
           
           {/* Add Document Card */}
           <Card 
-            className={`cursor-pointer transition-all duration-300 bg-white border border-gray-200 rounded-2xl shadow-lg ${
+            className={`cursor-pointer transition-all duration-300 bg-card border border-border rounded-2xl shadow-lg ${
               isDocumentAttached 
                 ? 'border-primary bg-primary/5' 
-                : 'hover:border-gray-300'
+                : 'hover:border-muted-foreground'
             }`}
             style={{
               position: 'absolute',
@@ -49,20 +49,20 @@ export default function PromptConstructionSummarize() {
           >
             <CardContent className="p-6">
               {!isDocumentAttached ? (
-                <div className="flex items-center gap-4 text-gray-700">
+                <div className="flex items-center gap-4 text-muted-foreground">
                   <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                    <Plus className="h-6 w-6 text-white" />
+                    <Plus className="h-6 w-6 text-primary-foreground" />
                   </div>
                   <span className="text-lg font-medium">{t('promptConstructionModule.summarize.addDocument')}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-4 text-primary">
                   <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                    <Paperclip className="h-6 w-6 text-white" />
+                    <Paperclip className="h-6 w-6 text-primary-foreground" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-lg font-medium text-gray-900">{t('promptConstructionModule.summarize.documentAttached')}</span>
-                    <span className="text-sm text-gray-600">{t('promptConstructionModule.summarize.fileName')}</span>
+                    <span className="text-lg font-medium text-foreground">{t('promptConstructionModule.summarize.documentAttached')}</span>
+                    <span className="text-sm text-muted-foreground">{t('promptConstructionModule.summarize.fileName')}</span>
                   </div>
                 </div>
               )}

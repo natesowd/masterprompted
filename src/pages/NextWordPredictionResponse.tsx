@@ -395,7 +395,7 @@ export default function HeadlineResponse() {
             {/* AI Response */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <p className="text-gray-700 text-lg">
+                <p className="text-muted-foreground text-body-1">
                   Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
                 </p>
                 
@@ -457,7 +457,7 @@ export default function HeadlineResponse() {
               ) : (
               <div className="space-y-6">
                 <div className="relative">
-                  <h1 className="text-2xl text-gray-900 leading-loose font-normal md:text-4xl" style={{
+                  <h1 className="text-2xl text-foreground leading-loose font-normal md:text-4xl" style={{
                     wordSpacing: '0.2em',
                     lineHeight: '1.8'
                   }}>
@@ -530,12 +530,12 @@ export default function HeadlineResponse() {
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-[9999] min-w-[120px]">
-                              {options.map(option => <DropdownMenuItem key={option.word} onClick={() => handleWordSelection(option.word, index)} className={`cursor-pointer flex justify-between items-center gap-2 ${option.word === "Unites" ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-100"}`}>
+                            <DropdownMenuContent className="bg-popover border border-border shadow-lg rounded-md z-[9999] min-w-[120px]">
+                              {options.map(option => <DropdownMenuItem key={option.word} onClick={() => handleWordSelection(option.word, index)} className={`cursor-pointer flex justify-between items-center gap-2 ${option.word === "Unites" ? "bg-destructive/10 hover:bg-destructive/20" : "hover:bg-muted"}`}>
                                 <span className="inline-flex items-center gap-2">
                                   {option.word}
                                 </span>
-                                <span className="flex items-center gap-1 text-xs text-gray-500">
+                                <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                   {option.probability}
                                   <TooltipProvider>
                                     <Tooltip open={dropdownProbTooltips[`second-${option.word}`]} onOpenChange={open => toggleDropdownTooltip(`second-${option.word}`, open)}>
@@ -612,12 +612,12 @@ export default function HeadlineResponse() {
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-[9999] min-w-[120px]">
-                              {optionsThird.map(option => <DropdownMenuItem key={option.word} onClick={() => handleWordSelection(option.word, 3)} className={`cursor-pointer flex justify-between items-center gap-2 ${option.word === "Around" ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-100"}`}>
+                            <DropdownMenuContent className="bg-popover border border-border shadow-lg rounded-md z-[9999] min-w-[120px]">
+                              {optionsThird.map(option => <DropdownMenuItem key={option.word} onClick={() => handleWordSelection(option.word, 3)} className={`cursor-pointer flex justify-between items-center gap-2 ${option.word === "Around" ? "bg-destructive/10 hover:bg-destructive/20" : "hover:bg-muted"}`}>
                                 <span className="inline-flex items-center gap-2">
                                   {option.word}
                                 </span>
-                                <span className="flex items-center gap-1 text-xs text-gray-500">
+                                <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                   {option.probability}
                                   <TooltipProvider>
                                     <Tooltip open={dropdownProbTooltips[`third-${option.word}`]} onOpenChange={open => toggleDropdownTooltip(`third-${option.word}`, open)}>
