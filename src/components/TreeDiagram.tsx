@@ -472,21 +472,31 @@ export function TreeDiagram({
         }
       }
       
-      // Find the vertical center of the chain (midpoint between min and max Y)
-      const minY = Math.min(...chainYPositions);
-      const maxY = Math.max(...chainYPositions);
-      const chainCenterY = (minY + maxY) / 2;
+      // Calculate scroll positions
+      let targetTop: number;
+      let targetLeft: number;
       
-      // Calculate horizontal center of the chain
-      const firstWordWidth = 156; // "European Union" width estimate
-      const leftPadding = firstWordWidth / 2 + 10;
-      const chainEndX = leftPadding + (currentLevel - 1) * stepX + padding;
-      
-      // Calculate scroll positions to center the chain
-      const targetTop = Math.max(0, chainCenterY - containerHeight / 2);
-      const targetLeft = isCompleteNow
-        ? Math.max(0, container.scrollWidth - containerWidth)
-        : Math.max(0, chainEndX - containerWidth + 150); // Keep latest selection visible with some margin
+      if (isCompleteNow) {
+        // When complete, scroll to show the completion text
+        // The last word's Y position is where the completion callout is
+        const lastWordY = cumulativeY;
+        targetTop = Math.max(0, lastWordY - containerHeight / 2);
+        // Scroll to the far right to show completion text
+        targetLeft = Math.max(0, container.scrollWidth - containerWidth);
+      } else {
+        // Find the vertical center of the chain (midpoint between min and max Y)
+        const minY = Math.min(...chainYPositions);
+        const maxY = Math.max(...chainYPositions);
+        const chainCenterY = (minY + maxY) / 2;
+        
+        // Calculate horizontal position to keep latest selection visible
+        const firstWordWidth = 156; // "European Union" width estimate
+        const leftPadding = firstWordWidth / 2 + 10;
+        const chainEndX = leftPadding + (currentLevel - 1) * stepX + padding;
+        
+        targetTop = Math.max(0, chainCenterY - containerHeight / 2);
+        targetLeft = Math.max(0, chainEndX - containerWidth + 150);
+      }
 
       container.scrollTo({ left: targetLeft, top: targetTop, behavior: "smooth" });
     });
