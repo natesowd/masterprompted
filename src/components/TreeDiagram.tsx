@@ -424,7 +424,9 @@ export function TreeDiagram({
     }
     prevLevelRef.current = currentLevel;
 
-    requestAnimationFrame(() => {
+    // Delay scroll slightly to allow height transition to settle
+    setTimeout(() => {
+      requestAnimationFrame(() => {
       const stepX = closeUpView ? 200 : 120;
       const isCompleteNow = selections.filter(Boolean).length >= 7;
       const containerHeight = container.clientHeight;
@@ -499,7 +501,8 @@ export function TreeDiagram({
       }
 
       container.scrollTo({ left: targetLeft, top: targetTop, behavior: "smooth" });
-    });
+      });
+    }, 150); // Wait for height transition to begin
   }, [currentLevel, closeUpView, selections]);
 
   // Get options at each level based on current selections
@@ -837,9 +840,9 @@ export function TreeDiagram({
           "h-full",
           currentLevel > 1 ? "overflow-x-auto overflow-y-auto" : "overflow-hidden"
         )} ref={scrollContainerRef}>
-          <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
+          <div className={cn("p-6 transition-all duration-300 ease-out", closeUpView ? "min-w-[1600px]" : "min-w-[600px]")}>
             <svg
-              style={{ height: svgHeight }}
+              style={{ height: svgHeight, transition: 'height 300ms ease-out' }}
               width={closeUpView ? 1400 : svgWidth}
               height={svgHeight}
               viewBox={closeUpView ? `0 0 1400 ${svgHeight}` : `0 0 ${svgWidth} ${svgHeight}`}
