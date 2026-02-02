@@ -612,22 +612,32 @@ export function TreeDiagram({
     return treePaths.find(p => pathPrefix.every((word, i) => p.words[i] === word));
   }, [selections]);
 
-  // Helper to get spread for a level - only increases spacing for levels up to currentLevel
-  // Levels beyond currentLevel use tight spacing, levels at/before currentLevel get progressive spacing
-  const getSpreadForLevel = (levelNum: number, spread: number, activeLevel: number): number => {
+  // Helper to get spread for a level - only increases spacing for levels that have been selected
+  // AND only for branches that match the current selection up to that point
+  const getSpreadForLevel = (levelNum: number, spread: number, activeLevel: number, pathMatchesAtLevel?: boolean): number => {
     const baseSpreadForLevel = spread / Math.pow(2, levelNum - 1);
     
-    // Only apply increased spacing for levels that have been selected (up to activeLevel)
-    if (levelNum <= activeLevel) {
+    // Only apply increased spacing for levels that have been selected AND path matches selection
+    if (levelNum <= activeLevel && pathMatchesAtLevel !== false) {
       const minSpacing = 60; // Minimum vertical gap between word options
       return Math.max(baseSpreadForLevel, minSpacing * (1 + (levelNum - 1) * 0.3));
     }
     
-    // Use original tight spacing for levels not yet reached
+    // Use original tight spacing for levels not yet reached or non-matching paths
     return baseSpreadForLevel;
   };
+  
+  // Helper to check if a path matches selections up to a given level
+  const pathMatchesSelectionsAtLevel = (path: TreePath, level: number): boolean => {
+    for (let i = 0; i <= level && i < selections.length; i++) {
+      if (selections[i] && path.words[i] !== selections[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
 
-  // Calculate Y position for selected path at each level
+  // Calculate Y position for selected path at each level (always uses expanded spread since it IS selected)
   const getSelectedPathY = (level: number): number => {
     if (!selectedFullPath) return svgHeight / 2;
     const baseY = svgHeight / 2;
@@ -638,12 +648,13 @@ export function TreeDiagram({
     const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
     const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
     const level6Group = selectedFullPath.words[6] === "Framework" ? 0 : 1;
-    const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel);
-    const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel);
-    const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel);
-    const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel);
-    const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel);
-    const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel);
+    // Selected path always gets expanded spacing (true for pathMatchesAtLevel)
+    const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel, true);
+    const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel, true);
+    const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel, true);
+    const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel, true);
+    const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel, true);
+    const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel, true);
     const yPositions = [baseY, y1, y2, y3, y4, y5, y6];
     return yPositions[level] || baseY;
   };
@@ -823,17 +834,25 @@ export function TreeDiagram({
                 const level5Group = path.words[5] === "Ethics" ? 0 : 1;
                 const level6Group = path.words[6] === "Framework" ? 0 : 1;
 
-                // Calculate Y positions - progressively increase spacing to prevent overlap
+                // Calculate Y positions - only expand branches that match current selection
                 const baseY = svgHeight / 2;
                 const spread = baseSpread;
 
-                // Progressive Y calculation with guaranteed minimum spacing
-                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel);
-                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel);
-                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel);
-                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel);
-                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel);
-                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel);
+                // Check if path matches selection at each level to determine spacing
+                const matchesAt1 = pathMatchesSelectionsAtLevel(path, 0);
+                const matchesAt2 = pathMatchesSelectionsAtLevel(path, 1);
+                const matchesAt3 = pathMatchesSelectionsAtLevel(path, 2);
+                const matchesAt4 = pathMatchesSelectionsAtLevel(path, 3);
+                const matchesAt5 = pathMatchesSelectionsAtLevel(path, 4);
+                const matchesAt6 = pathMatchesSelectionsAtLevel(path, 5);
+
+                // Progressive Y calculation - only matching branches get expanded spacing
+                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel, matchesAt1);
+                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel, matchesAt2);
+                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel, matchesAt3);
+                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel, matchesAt4);
+                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel, matchesAt5);
+                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel, matchesAt6);
                 const points = [{
                   x: levelXPositions[0],
                   y: baseY
@@ -874,7 +893,7 @@ export function TreeDiagram({
               {selectedFullPath && selections.map((word, level) => {
                 if (!word || level > 6) return null;
                 const x = levelXPositions[level];
-                // Recalculate Y - use progressive spread
+                // Recalculate Y - selected path always uses expanded spread
                 const baseY = svgHeight / 2;
                 const spread = baseSpread;
                 const level1Group = selectedFullPath.words[1] === "Unites" ? 0 : 1;
@@ -883,12 +902,12 @@ export function TreeDiagram({
                 const level4Group = selectedFullPath.words[4] === "AI" ? 0 : 1;
                 const level5Group = selectedFullPath.words[5] === "Ethics" ? 0 : 1;
                 const level6Group = selectedFullPath.words[6] === "Framework" ? 0 : 1;
-                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel);
-                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel);
-                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel);
-                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel);
-                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel);
-                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel);
+                const y1 = baseY + (level1Group - 0.5) * getSpreadForLevel(1, spread, currentLevel, true);
+                const y2 = y1 + (level2Group - 0.5) * getSpreadForLevel(2, spread, currentLevel, true);
+                const y3 = y2 + (level3Group - 0.5) * getSpreadForLevel(3, spread, currentLevel, true);
+                const y4 = y3 + (level4Group - 0.5) * getSpreadForLevel(4, spread, currentLevel, true);
+                const y5 = y4 + (level5Group - 0.5) * getSpreadForLevel(5, spread, currentLevel, true);
+                const y6 = y5 + (level6Group - 0.5) * getSpreadForLevel(6, spread, currentLevel, true);
                 const yPositions = [baseY, y1, y2, y3, y4, y5, y6];
                 const y = yPositions[level] || baseY;
                 const isClickable = level > 0;
@@ -941,6 +960,7 @@ export function TreeDiagram({
                 const spread = baseSpread;
                 
                 // Calculate Y position for each option based on actual branch positions
+                // Options are on the selected path, so use expanded spacing (true)
                 const getOptionY = (word: string): number => {
                   // Calculate Y using the same logic as the tree paths
                   let y = baseY;
@@ -949,42 +969,42 @@ export function TreeDiagram({
                   if (currentLevel >= 1) {
                     const word1 = currentLevel === 1 ? word : selections[1];
                     const group1 = word1 === "Unites" ? 0 : 1;
-                    y = baseY + (group1 - 0.5) * getSpreadForLevel(1, spread, currentLevel);
+                    y = baseY + (group1 - 0.5) * getSpreadForLevel(1, spread, currentLevel, true);
                   }
                   
                   // Level 2 branching
                   if (currentLevel >= 2) {
                     const word2 = currentLevel === 2 ? word : selections[2];
                     const group2 = word2 === "On" ? 0 : 1;
-                    y = y + (group2 - 0.5) * getSpreadForLevel(2, spread, currentLevel);
+                    y = y + (group2 - 0.5) * getSpreadForLevel(2, spread, currentLevel, true);
                   }
                   
                   // Level 3 branching
                   if (currentLevel >= 3) {
                     const word3 = currentLevel === 3 ? word : selections[3];
                     const group3 = word3 === "Historic" ? 0 : 1;
-                    y = y + (group3 - 0.5) * getSpreadForLevel(3, spread, currentLevel);
+                    y = y + (group3 - 0.5) * getSpreadForLevel(3, spread, currentLevel, true);
                   }
                   
                   // Level 4 branching
                   if (currentLevel >= 4) {
                     const word4 = currentLevel === 4 ? word : selections[4];
                     const group4 = word4 === "AI" ? 0 : 1;
-                    y = y + (group4 - 0.5) * getSpreadForLevel(4, spread, currentLevel);
+                    y = y + (group4 - 0.5) * getSpreadForLevel(4, spread, currentLevel, true);
                   }
                   
                   // Level 5 branching
                   if (currentLevel >= 5) {
                     const word5 = currentLevel === 5 ? word : selections[5];
                     const group5 = word5 === "Ethics" ? 0 : 1;
-                    y = y + (group5 - 0.5) * getSpreadForLevel(5, spread, currentLevel);
+                    y = y + (group5 - 0.5) * getSpreadForLevel(5, spread, currentLevel, true);
                   }
                   
                   // Level 6 branching
                   if (currentLevel >= 6) {
                     const word6 = currentLevel === 6 ? word : selections[6];
                     const group6 = word6 === "Framework" ? 0 : 1;
-                    y = y + (group6 - 0.5) * getSpreadForLevel(6, spread, currentLevel);
+                    y = y + (group6 - 0.5) * getSpreadForLevel(6, spread, currentLevel, true);
                   }
                   
                   return y;
