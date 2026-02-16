@@ -1066,7 +1066,7 @@ export function BranchDiagram({
       {/* Content wrapper - blurs when intro complete */}
       <div className={cn("transition-all duration-500", isIntroComplete && !isInteractive && "opacity-25 blur-sm pointer-events-none")}>
         {/* Current headline display - fixed above scrollable tree */}
-        <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 border border-border/50 mb-4">
+        <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 mb-4">
           <div className="min-w-0 flex-1">
             {!hasUserSelected && isInteractive && (
               <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">

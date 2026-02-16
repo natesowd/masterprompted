@@ -747,7 +747,7 @@ export function TreeDiagram({
       isIntroComplete && !isInteractive && "opacity-25 blur-sm pointer-events-none"
     )}>
       {/* Current headline header - sticky */}
-      <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 border border-border/50">
+      <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3">
         <div className="flex-1 min-w-0">
           {!hasUserSelected && isInteractive && (
             <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
