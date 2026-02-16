@@ -1,8 +1,0 @@
-Options -MultiViews
-RewriteEngine On
-# If the requested path is NOT a physical file
-RewriteCond %{REQUEST_FILENAME} !-f
-# AND is NOT a physical directory
-RewriteCond %{REQUEST_FILENAME} !-d
-# Then rewrite the request to index.html
-RewriteRule ^ index.html [L]
