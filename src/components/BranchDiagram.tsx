@@ -1068,11 +1068,6 @@ export function BranchDiagram({
         {/* Current headline display - fixed above scrollable tree */}
         <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 mb-4">
           <div className="min-w-0 flex-1">
-            {!hasUserSelected && isInteractive && (
-              <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
-                Select words from the tree below to build your headline:
-              </p>
-            )}
             <p className="text-xl font-medium text-foreground">
               {(() => {
               // During intro animation, highlight the word being selected

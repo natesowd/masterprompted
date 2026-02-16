@@ -749,11 +749,6 @@ export function TreeDiagram({
       {/* Current headline header - sticky */}
       <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3">
         <div className="flex-1 min-w-0">
-          {!hasUserSelected && isInteractive && (
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
-              Select words from the tree below to build your headline:
-            </p>
-          )}
           <p className="text-xl font-medium text-foreground">
             {(() => {
               // During intro animation, highlight the word being selected
