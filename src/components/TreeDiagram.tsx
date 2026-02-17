@@ -909,8 +909,6 @@ export function TreeDiagram({
                 }).join(" ");
                 return <g key={pathIndex}>
                   <path d={pathD} fill="none" stroke={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} strokeWidth={isMatching ? 0.75 : 0.35} opacity={isMatching ? 1 : 0.15} className="transition-all duration-300" />
-                  {/* End node */}
-                  <circle cx={levelXPositions[6]} cy={y6} r={isMatching ? 2 : 1} fill={isMatching ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"} opacity={isMatching ? 1 : 0.25} className="transition-all duration-300" />
                 </g>;
               })}
 
