@@ -808,7 +808,7 @@ export function TreeDiagram({
               }
               return words.join(" ");
             })()}
-            {completeHeadline && !isIntroAnimating && hasUserSelected && <span className={cn("px-1 rounded ml-1", isInteractive ? "bg-green-200 text-green-900" : "")}>{completeHeadline}</span>}
+            {completeHeadline && !isIntroAnimating && hasUserSelected && <span className={cn("px-1 rounded ml-1", isInteractive ? "bg-green-200 text-green-900" : "")}>...{completeHeadline}</span>}
             {!completeHeadline && displayHeadline && !isIntroAnimating && hasUserSelected && <span className="text-muted-foreground/50">...</span>}
           </p>
         </div>
@@ -962,12 +962,17 @@ export function TreeDiagram({
                 }}>
                   {/* Probability label above word */}
                   {level > 0 && (
-                    <text x={x} y={y - rectHeight / 2 - 6} textAnchor="middle" className="text-[10px] font-medium fill-muted-foreground pointer-events-none select-none">
-                      {(probability * 100).toFixed(0)}%
+                    <text x={x} y={y - rectHeight / 2 - 6} textAnchor="middle" className="text-[10px] font-medium pointer-events-none select-none" fill={isLatestSelection ? "hsl(142 76% 36%)" : "hsl(var(--muted-foreground))"}>
+                      {probability.toFixed(2)}
                     </text>
                   )}
-                  <rect x={x - wordWidth / 2} y={y - rectHeight / 2} width={wordWidth} height={rectHeight} rx={5} fill={isDestructive ? "hsl(var(--destructive))" : isLatestSelection ? "hsl(142 76% 36%)" : "hsl(var(--primary))"} className={cn("drop-shadow-sm transition-all duration-200", isClickable && !isDestructive && !isLatestSelection && "hover:fill-[hsl(var(--primary)/0.8)]", isClickable && isLatestSelection && "hover:fill-[hsl(142_76%_30%)]", isClickable && isDestructive && "hover:fill-[hsl(var(--destructive)/0.8)]")} />
-                  <text x={x} y={y + 5} textAnchor="middle" className="text-[12px] font-semibold fill-primary-foreground pointer-events-none select-none">
+                  <rect x={x - wordWidth / 2} y={y - rectHeight / 2} width={wordWidth} height={rectHeight} rx={8} 
+                    fill={isDestructive ? "hsl(var(--destructive) / 0.3)" : isLatestSelection ? "hsl(142 76% 90%)" : level === 0 ? "hsl(var(--primary))" : "hsl(142 76% 90%)"}
+                    stroke={isDestructive ? "hsl(var(--destructive))" : isLatestSelection ? "hsl(142 76% 56%)" : level === 0 ? "hsl(var(--primary))" : "hsl(142 76% 56%)"}
+                    strokeWidth={2}
+                    className={cn("transition-all duration-200", isClickable && "cursor-pointer")}
+                  />
+                  <text x={x} y={y + 5} textAnchor="middle" className="text-[12px] font-semibold pointer-events-none select-none" fill={isDestructive ? "hsl(var(--destructive))" : level === 0 ? "hsl(var(--primary-foreground))" : "hsl(142 76% 20%)"}>
                     {displayWord}
                   </text>
                 </g>;
@@ -1060,39 +1065,35 @@ export function TreeDiagram({
                         height={buttonHeight}
                       >
                         <div className="flex justify-center h-full items-center">
-                          <Button
-                            variant="outline"
+                          <button
                             onClickCapture={() => handleWordClick(currentLevel, opt.word)}
                             disabled={isAnimating}
                             className={cn(
-                              "h-10 min-w-[80px] flex flex-col gap-0 px-3 text-xs transition-all duration-200",
-                              isDestructive &&
-                                "border-destructive bg-destructive/10 hover:bg-destructive/20 text-destructive",
+                              "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap min-w-[100px] h-11",
+                              isDestructive
+                                ? "bg-destructive/10 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/20 cursor-pointer"
+                                : "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer",
                               isAnimated &&
-                                "ring-2 ring-primary ring-offset-1 animate-pulse bg-primary/10"
+                                "border-primary bg-primary/10"
                             )}
                           >
-                            <span
-                              className={cn(
-                                "text-xs font-medium",
-                                isDestructive && "text-destructive"
-                              )}
-                            >
-                              {isFlagged ? (
-                                <TextFlag
-                                  text={opt.word}
-                                  {...flagConfig.props}
-                                  className="no-underline decoration-0"
-                                  noUnderline={true}
-                                />
-                              ) : (
-                                opt.word
-                              )}
+                            {isFlagged ? (
+                              <TextFlag
+                                text={opt.word}
+                                {...flagConfig.props}
+                                className="no-underline decoration-0"
+                                noUnderline={true}
+                              />
+                            ) : (
+                              opt.word
+                            )}
+                            <span className={cn(
+                              "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
+                              "bg-muted text-muted-foreground"
+                            )}>
+                              {opt.probability.toFixed(2)}
                             </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              {(opt.probability * 100).toFixed(0)}%
-                            </span>
-                          </Button>
+                          </button>
                         </div>
                       </foreignObject>
                     </g>
@@ -1193,8 +1194,8 @@ export function TreeDiagram({
                       y1={endY}
                       x2={lineEndX}
                       y2={endY}
-                      stroke="hsl(var(--border))"
-                      strokeWidth={1}
+                      stroke="rgb(74 222 128)"
+                      strokeWidth={1.5}
                       opacity={0.9}
                     />
                     <rect
@@ -1202,9 +1203,10 @@ export function TreeDiagram({
                       y={boxY}
                       width={completionBoxWidth}
                       height={completionBoxHeight}
-                      rx={6}
-                      fill="hsl(var(--card))"
-                      stroke="hsl(var(--border))"
+                      rx={8}
+                      fill="hsl(142 76% 90%)"
+                      stroke="hsl(142 76% 56%)"
+                      strokeWidth={2}
                     />
                     <text
                       x={boxX + completionBoxPaddingX}
@@ -1212,9 +1214,9 @@ export function TreeDiagram({
                       textAnchor="start"
                       dominantBaseline="middle"
                       className="text-[12px] font-medium"
-                      fill="hsl(var(--foreground))"
+                      fill="hsl(142 76% 20%)"
                     >
-                      {completeHeadline}
+                      ...{completeHeadline}
                     </text>
                   </g>
                 );
