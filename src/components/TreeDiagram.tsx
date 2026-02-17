@@ -837,7 +837,11 @@ export function TreeDiagram({
         )} ref={scrollContainerRef}>
           <div className={cn("p-6", closeUpView ? "min-w-[1600px]" : currentLevel > 1 ? "min-w-[600px]" : "")}>
             <svg
-              style={{ height: svgHeight, width: currentLevel <= 1 ? '100%' : (closeUpView ? 1400 : svgWidth) }}
+              style={{ 
+                height: currentLevel <= 1 ? '100%' : svgHeight, 
+                width: currentLevel <= 1 ? '100%' : (closeUpView ? 1400 : svgWidth),
+                maxHeight: currentLevel <= 1 ? 'calc(480px - 48px)' : undefined
+              }}
               width={closeUpView ? 1400 : svgWidth}
               height={svgHeight}
               viewBox={closeUpView ? `0 0 1400 ${svgHeight}` : `0 0 ${svgWidth} ${svgHeight}`}
