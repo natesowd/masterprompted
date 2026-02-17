@@ -125,26 +125,26 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
 
   return (
     <div className="z-10">
-      {isPanelOpen ? (
-        <div className={cn(panelVariants({ size, state: "open" }))}>
-          {/* Expand/Minimize button in top-right */}
-          <button
-            aria-label={isPanelOpen ? t('components.evaluationPanel.minimize') : t('components.evaluationPanel.expand')}
-            className={cn(
-              "absolute top-1 right-1 p-1 rounded-full hover:bg-muted/50",
-              !canClose && "opacity-50 cursor-not-allowed"
-            )}
-            onClick={() => { if (canClose) setIsPanelOpen(false); }}
-            aria-disabled={!canClose}
-            title={!canClose ? t('components.evaluationPanel.cannotMinimize') : undefined}
-          >
-            <ListChevronsDownUp className="h-5 w-5 text-muted-foreground" />
-          </button>
+      <div className={cn(panelVariants({ size, state: "open" }))}>
+        {/* Header with title and minimize/expand toggle */}
+        <div className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground mb-2">
+          <span>{t('components.evaluationPanel.title')}</span>
+          {canClose && (
+            <button
+              aria-label={isPanelOpen ? t('components.evaluationPanel.minimize') : t('components.evaluationPanel.expand')}
+              className="p-1 rounded-full hover:bg-muted/50"
+              onClick={() => setIsPanelOpen(!isPanelOpen)}
+            >
+              {isPanelOpen ? (
+                <ListChevronsDownUp className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <ListChevronsUpDown className="h-5 w-5 text-muted-foreground" />
+              )}
+            </button>
+          )}
+        </div>
 
-          <div className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground mb-2">
-            <span>{t('components.evaluationPanel.title')}</span>
-          </div>
-
+        {isPanelOpen && (
           <div className="space-y-3 mt-4">
             {evaluationCriteria.map((criterion) => (
               <Collapsible
@@ -177,18 +177,8 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
               </Collapsible>
             ))}
           </div>
-        </div>
-      ) : (
-        <div className="w-10 h-10">
-          <button
-            aria-label={t('components.evaluationPanel.expand')}
-            className="p-2 rounded-full hover:bg-muted/50"
-            onClick={() => setIsPanelOpen(true)}
-          >
-            <ListChevronsUpDown className="h-5 w-5 text-muted-foreground" />
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
