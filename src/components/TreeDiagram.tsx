@@ -489,13 +489,14 @@ export function TreeDiagram({
         const maxY = Math.max(...chainYPositions);
         const chainCenterY = (minY + maxY) / 2;
         
-        // Calculate horizontal position to keep latest selection visible
+        // Calculate horizontal position to ensure the next word options are visible
         const firstWordWidth = 156; // "European Union" width estimate
         const leftPadding = firstWordWidth / 2 + 10;
-        const chainEndX = leftPadding + (currentLevel - 1) * stepX + padding;
+        // Target the next level (where the two word options appear)
+        const nextLevelX = leftPadding + currentLevel * stepX + padding;
         
         targetTop = Math.max(0, chainCenterY - containerHeight / 2);
-        targetLeft = Math.max(0, chainEndX - containerWidth + 150);
+        targetLeft = Math.max(0, nextLevelX - containerWidth + 200);
       }
 
       container.scrollTo({ left: targetLeft, top: targetTop, behavior: "smooth" });
