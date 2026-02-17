@@ -571,7 +571,7 @@ export function FullBranchDiagram({
     </div>
 
     {/* Branch visualization */}
-    <div ref={scrollContainerRef} className="overflow-x-auto">
+    <div ref={scrollContainerRef} className="overflow-x-auto bg-card rounded-xl">
       <div className={cn("p-4", closeUpView ? "min-w-[700px]" : "min-w-[1050px]")}>
         <svg className={cn("w-full", closeUpView ? "h-[200px]" : "h-[350px]")} viewBox={closeUpView ? `0 0 700 200` : `0 0 ${svgWidth} 350`} preserveAspectRatio="xMidYMid meet">
           {closeUpView ? <>

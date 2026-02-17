@@ -1124,7 +1124,7 @@ export function BranchDiagram({
         </div>
 
         {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto scroll-smooth">
+        <div ref={containerRef} className="overflow-x-auto scroll-smooth bg-card rounded-xl">
           <div className="min-w-[1600px] p-6 pr-[320px]">
           <div className="flex items-start gap-1">
             {/* Level 0: Root */}
