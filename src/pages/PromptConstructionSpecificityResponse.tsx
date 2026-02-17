@@ -111,8 +111,9 @@ export default function SpecificityResponse() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           {/* Article Content with scroll */}
-          <div className="bg-white rounded-lg rounded-b-none p-8 max-h-[500px] overflow-y-auto flex-1">
+          <div className="bg-white rounded-lg rounded-b-none p-8 flex-1 flex flex-col">
             <ChatPrompt text={sentPrompt} />
+            <div className="max-h-[500px] overflow-y-auto flex-1">
             {showGeneralOutput ? (
               // General content
               <div className="space-y-4">
@@ -708,6 +709,7 @@ export default function SpecificityResponse() {
                 </p>
               </div>
             )}
+            </div>
           </div>
 
           {/* Navigation Button - Fixed at bottom */}
