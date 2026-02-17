@@ -388,7 +388,7 @@ export default function HeadlineResponse() {
           {/* Left column - Main content */}
           <div className={cn("flex-1 min-w-0 max-w-4xl", !evaluationPanelOpen && "mx-auto")}>
             {/* Original Prompt */}
-            <div className="mb-4">
+            <div className="mb-8">
               <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
             </div>
 
