@@ -559,26 +559,28 @@ export function BranchDiagram({
     if (!containerRef.current) return;
 
     requestAnimationFrame(() => {
-      const targetLevel = Math.min(unlockedLevel, 6);
-      const levelEl = levelRefs.current[targetLevel];
-      if (!levelEl) return;
+      // Target the next level (where the two word options appear) to ensure they're visible
+      const nextLevel = Math.min(unlockedLevel + 1, 7);
+      const targetLevelEl = levelRefs.current[nextLevel] || levelRefs.current[unlockedLevel];
+      if (!targetLevelEl) return;
 
-      // Only scroll horizontally within the tree container, not the page
       const container = containerRef.current;
       if (!container) return;
       
-      const levelRect = levelEl.getBoundingClientRect();
+      const levelRect = targetLevelEl.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
       
-      // Calculate scroll position to center the target level horizontally
-      const levelCenterX = levelRect.left + levelRect.width / 2;
-      const containerCenterX = containerRect.left + containerRect.width / 2;
-      const scrollOffset = levelCenterX - containerCenterX;
+      // Scroll so the next level's options are fully visible (shifted right of center)
+      const levelRightEdge = levelRect.right;
+      const containerRight = containerRect.right;
+      const scrollOffset = levelRightEdge - containerRight + 80; // 80px breathing room
       
-      container.scrollBy({
-        left: scrollOffset,
-        behavior: 'smooth'
-      });
+      if (scrollOffset > 0) {
+        container.scrollBy({
+          left: scrollOffset,
+          behavior: 'smooth'
+        });
+      }
     });
   }, [unlockedLevel, selections]);
 
