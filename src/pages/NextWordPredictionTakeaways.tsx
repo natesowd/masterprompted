@@ -68,7 +68,7 @@ export default function Takeaways() {
           <div className="mt-16">
             <Button 
               onClick={handleNextTask}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-8 py-6 rounded-full transition-colors"
+              className="bg-secondary hover:bg-secondary/90 text-foreground font-bold px-8 py-6 rounded-full transition-colors"
             >
               {t('nextWord.takeaways.nextTask')}
             </Button>
