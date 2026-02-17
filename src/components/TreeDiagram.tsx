@@ -490,8 +490,8 @@ export function TreeDiagram({
         const chainCenterY = (minY + maxY) / 2;
         
         // Calculate horizontal position to ensure the next word options are visible
-        const firstWordWidth = 156; // "European Union" width estimate
-        const leftPadding = firstWordWidth / 2 + 10;
+        const firstWordWidth = 124; // "European Union" width estimate (matches branch view)
+        const leftPadding = firstWordWidth / 2 + 6;
         // Target the next level (where the two word options appear)
         const nextLevelX = leftPadding + currentLevel * stepX + padding;
         
@@ -681,8 +681,8 @@ export function TreeDiagram({
 
   // X positions vary based on view mode - close-up spreads words further apart
   // X positions - shifted right to ensure "European Union" is fully visible
-  const firstWordWidth = Math.max(70, "European Union".length * 10 + 16); // ~156px
-  const leftPadding = firstWordWidth / 2 + 10; // half the word width + margin
+  const firstWordWidth = Math.max(70, "European Union".length * 8 + 12); // ~124px - matches branch view
+  const leftPadding = firstWordWidth / 2 + 6; // half the word width + small margin
   const levelXPositions = closeUpView
     ? [leftPadding, leftPadding + 200, leftPadding + 400, leftPadding + 600, leftPadding + 800, leftPadding + 1000, leftPadding + 1200]
     : [leftPadding, leftPadding + 120, leftPadding + 240, leftPadding + 360, leftPadding + 480, leftPadding + 600, leftPadding + 720];
@@ -841,7 +841,7 @@ export function TreeDiagram({
               width={closeUpView ? 1400 : svgWidth}
               height={svgHeight}
               viewBox={closeUpView ? `0 0 1400 ${svgHeight}` : `0 0 ${svgWidth} ${svgHeight}`}
-              preserveAspectRatio="xMinYMid meet"
+              preserveAspectRatio="xMidYMid meet"
             >
               {/* Draw all paths as branches from a proper tree */}
               {treePaths.map((path, pathIndex) => {
