@@ -125,27 +125,24 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
 
   return (
     <div className="z-10">
-      <div className={cn(panelVariants({ size, state: "open" }))}>
-        {/* Header with title and minimize/expand toggle */}
-        <div className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground mb-2">
-          <span>{t('components.evaluationPanel.title')}</span>
-          {canClose && (
-            <button
-              aria-label={isPanelOpen ? t('components.evaluationPanel.minimize') : t('components.evaluationPanel.expand')}
-              className="p-1 rounded-full hover:bg-muted/50"
-              onClick={() => setIsPanelOpen(!isPanelOpen)}
-            >
-              {isPanelOpen ? (
-                <ListChevronsDownUp className="h-5 w-5 text-muted-foreground" />
-              ) : (
-                <ListChevronsUpDown className="h-5 w-5 text-muted-foreground" />
+      <div className={cn(isPanelOpen ? panelVariants({ size, state: "open" }) : "")}>
+        {isPanelOpen ? (
+          <>
+            {/* Header with title and minimize toggle */}
+            <div className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground mb-2">
+              <span>{t('components.evaluationPanel.title')}</span>
+              {canClose && (
+                <button
+                  aria-label={t('components.evaluationPanel.minimize')}
+                  className="p-1 rounded-full hover:bg-muted/50"
+                  onClick={() => setIsPanelOpen(false)}
+                >
+                  <ListChevronsDownUp className="h-5 w-5 text-muted-foreground" />
+                </button>
               )}
-            </button>
-          )}
-        </div>
+            </div>
 
-        {isPanelOpen && (
-          <div className="space-y-3 mt-4">
+            <div className="space-y-3 mt-4">
             {evaluationCriteria.map((criterion) => (
               <Collapsible
                 key={criterion.id}
@@ -177,6 +174,15 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
               </Collapsible>
             ))}
           </div>
+          </>
+        ) : (
+          <button
+            aria-label={t('components.evaluationPanel.expand')}
+            className="p-2 rounded-full hover:bg-muted/50"
+            onClick={() => setIsPanelOpen(true)}
+          >
+            <ListChevronsUpDown className="h-5 w-5 text-muted-foreground" />
+          </button>
         )}
       </div>
     </div>
