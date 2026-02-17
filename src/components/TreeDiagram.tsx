@@ -1042,6 +1042,7 @@ export function TreeDiagram({
                   const optY = getOptionY(opt.word);
                   const buttonWidth = 100;
                   const buttonHeight = 44;
+                  const foreignObjectPadTop = 18;
                   const isAnimated = animatedWord === opt.word;
                   const flagConfig = TOKEN_FLAGS[opt.word];
                   const isFlagged = !!flagConfig;
@@ -1052,19 +1053,19 @@ export function TreeDiagram({
                       {/* Background occluder */}
                       <rect
                         x={x - buttonWidth / 2 - 6}
-                        y={optY - buttonHeight / 2 - 6}
+                        y={optY - buttonHeight / 2 - foreignObjectPadTop - 6}
                         width={buttonWidth + 12}
-                        height={buttonHeight + 12}
+                        height={buttonHeight + foreignObjectPadTop + 12}
                         rx={12}
                         fill="hsl(var(--background))"
                       />
                       <foreignObject 
                         x={x - buttonWidth / 2} 
-                        y={optY - buttonHeight / 2} 
+                        y={optY - buttonHeight / 2 - foreignObjectPadTop} 
                         width={buttonWidth} 
-                        height={buttonHeight}
+                        height={buttonHeight + foreignObjectPadTop}
                       >
-                        <div className="flex justify-center h-full items-center">
+                        <div className="flex justify-center h-full items-end pb-0">
                           <button
                             onClickCapture={() => handleWordClick(currentLevel, opt.word)}
                             disabled={isAnimating}
