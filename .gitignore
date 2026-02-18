@@ -41,3 +41,6 @@ lerna-debug.log*
 # Personal Testing
 rag_testen.html
 prompt_experiment.py
+
+# Netlify
+.netlify/
