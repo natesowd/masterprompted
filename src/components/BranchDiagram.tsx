@@ -1157,17 +1157,6 @@ export function BranchDiagram({
 
             {/* Final connector to headline - only when complete */}
             {headline && <>
-                <div className="flex items-center w-6" style={{
-                height: containerHeight
-              }}>
-                  <svg className="w-full h-full" viewBox={`0 0 24 ${containerHeight}`} preserveAspectRatio="none">
-                    {(() => {
-                    const y = getSelectedYAtLevel(6);
-                    return <path d={`M 0 ${y} L 24 ${y}`} fill="none" stroke="rgb(74 222 128)" strokeWidth={1.5} />;
-                  })()}
-                  </svg>
-                </div>
-
                 {/* Headline completion */}
                 <div className="relative" style={{
                 height: containerHeight,

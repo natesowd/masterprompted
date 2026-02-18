@@ -719,7 +719,7 @@ export function TreeDiagram({
   // Completion box sizing - dynamically based on text length (single line, hugging)
   const completionBoxPaddingX = 16;
   const completionBoxHeight = 32;
-  const completionLineGap = 4; // gap between last word edge and line start
+  const completionLineGap = 0; // no gap between last word edge and line start
   const lineLength = 14; // length of the connecting line
   const charWidth = 7; // approximate width per character at 12px font
   const completionTextWidth = completeHeadline ? completeHeadline.length * charWidth : 0;
