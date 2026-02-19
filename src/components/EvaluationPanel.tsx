@@ -124,7 +124,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
   };
 
   return (
-    <div className="z-10">
+    <div className="z-10 font-heading">
       <div className={cn(isPanelOpen ? panelVariants({ size, state: "open" }) : "")}>
         {isPanelOpen ? (
           <>
