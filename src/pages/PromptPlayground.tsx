@@ -387,15 +387,9 @@ const PromptPlayground = () => {
                 files: attachedFiles,
                 onUploadFiles: handleUploadFiles
               }} />
-              {/* LLM Disclaimer inside pill (2xl only) */}
-              <div className="hidden 2xl:block px-4 pb-3 text-xs text-muted-foreground">
-                LLMs have been used in the following places:<br />
-                The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
-                LLMs used include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
-              </div>
             </div>
-            {/* LLM Disclaimer beside controls (below 2xl) */}
-            <div className="2xl:hidden mt-2 px-4 text-xs text-muted-foreground">
+            {/* LLM Disclaimer - below pill at 2xl, below controls when flat */}
+            <div className="mt-2 px-4 text-xs text-muted-foreground">
               LLMs have been used in the following places:<br />
               The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
               LLMs used include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
