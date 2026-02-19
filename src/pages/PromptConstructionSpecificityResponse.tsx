@@ -97,17 +97,11 @@ export default function SpecificityResponse() {
               specificity
             }}
             onParameterChange={(key, value) => {
-              // Reset all other parameters when one is changed
-              const resetParams: Record<keyof Parameters, string> = {
-                specificity: "",
-                style: "",
-                context: "",
-                bias: "",
-              };
-              resetParams[key] = value;
-              Object.entries(resetParams).forEach(([k, v]) => {
-                handleParameterChange(k as keyof Parameters, v);
-              });
+              // Reset all other parameters, only keep the changed one
+              setSpecificity(key === 'specificity' ? value : "");
+              setStyle(key === 'style' ? value : "");
+              setContext(key === 'context' ? value : "");
+              setBias(key === 'bias' ? value : "");
             }}
             onOptimize={handleApplyChanges}
             readOnly={true}
