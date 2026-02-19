@@ -43,12 +43,12 @@ const panelVariants = cva(
 );
 
 const criterionVariants = cva(
-  "flex items-center justify-between p-3 rounded-full transition-colors cursor-pointer",
+  "flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer",
   {
     variants: {
       variant: {
         default: "bg-muted hover:bg-muted/80",
-        highlighted: "bg-background ring-2 ring-destructive"
+        highlighted: "bg-background ring-1 ring-destructive"
       }
     },
     defaultVariants: {
