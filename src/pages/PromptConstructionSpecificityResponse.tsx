@@ -728,7 +728,7 @@ export default function SpecificityResponse() {
           {/* Navigation Button - Fixed at bottom */}
           <div className="bg-white rounded-lg rounded-t-none p-8 pt-6">
             <Button
-              variant="secondary"
+              variant="secondary-outline"
               size="lg"
               className="px-10 rounded-full font-semibold"
               onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
