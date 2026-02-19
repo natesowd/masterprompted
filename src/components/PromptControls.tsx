@@ -59,7 +59,7 @@ function Parameter({
             className={`my-3 ${!enabled && 'opacity-60 pointer-events-none'}`}
         >
             <div className="flex items-center gap-1 mb-2">
-                <span className="text-sm font-bold text-foreground">{parameterTitle}</span>
+                <span className="text-sm font-semibold text-foreground font-heading">{parameterTitle}</span>
                 {infoText && (
                     <TooltipProvider>
                         <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen} delayDuration={300}>
@@ -184,7 +184,7 @@ export default function PromptControls({
     const isAnyParameterSet = Object.values(parameters).some(p => p !== "");
 
     return (
-        <div className={`bg-surface-100 rounded-xl max-w-sm h-[calc(100vh-160px)] min-w-[300px] flex flex-col ${className}`}>
+        <div className={`bg-surface-200 min-w-[260px] flex flex-col ${className}`}>
             <div className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-1 min-h-0">
                 {/* Chatbox */}
                 <Chatbox
@@ -260,7 +260,7 @@ export default function PromptControls({
                             onClick={handleSubmitClick}
                             variant="default"
                             size="sm"
-                            className="flex-1 min-h-[48px] leading-tight rounded-full whitespace-normal text-center bg-brand-secondary-500 hover:bg-brand-secondary-600 text-white"
+                            className="flex-1 min-h-[48px] leading-tight rounded-full whitespace-normal text-center bg-brand-secondary-500 hover:bg-brand-secondary-600 text-foreground font-semibold"
                             disabled={disableOptimize}
                         >
                             {t('components.promptControls.sendOptimizedPrompt')}

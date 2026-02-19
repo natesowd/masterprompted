@@ -77,16 +77,13 @@ export default function SpecificityResponse() {
   // Check if there are unapplied changes
   const hasUnappliedChanges = bias !== appliedBias || context !== appliedContext || style !== appliedStyle || specificity !== appliedSpecificity;
 
-  return <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-white flex flex-col">
     <Header />
 
-    <main className="container mx-auto px-6 py-6">
-      <Breadcrumb />
-      <div className="mb-5"></div>
-      <div className="flex gap-6 max-w-[1400px] mx-auto">
-        {/* Left Sidebar - Sent Prompt and Controls */}
-        <div className="w-80 flex-shrink-0 space-y-6">
-          {/* Prompt Controls with Sent Prompt */}
+    <main className="flex-1 flex">
+      {/* Left Sidebar - Prompt Controls with grey background extending full height */}
+      <div className="w-72 flex-shrink-0 bg-surface-200">
+        <div className="pt-6 pb-4">
           <PromptControls
             chatValue={inputPrompt}
             showSpecificity={true}
@@ -107,6 +104,13 @@ export default function SpecificityResponse() {
             files={[{ name: "EU_AI_Act.pdf" }]}
           />
         </div>
+      </div>
+
+      {/* Right content area */}
+      <div className="flex-1 flex flex-col px-6 py-6">
+        <Breadcrumb />
+        <div className="mb-5"></div>
+        <div className="flex gap-6 max-w-[1100px]">
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
@@ -731,11 +735,12 @@ export default function SpecificityResponse() {
         </div>
       </div>
 
-      {/* Full Width Note */}
-      <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">
-        LLMs have been used in the following places:<br />
-        The creation of prompt output examples in the Guided Exploration<br />
-        LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
+        {/* Full Width Note */}
+        <div className="mt-6 text-sm text-muted-foreground">
+          LLMs have been used in the following places:<br />
+          The creation of prompt output examples in the Guided Exploration<br />
+          LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
+        </div>
       </div>
     </main>
 
