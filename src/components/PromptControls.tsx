@@ -265,7 +265,7 @@ export default function PromptControls({
                             onClick={handleSubmitClick}
                             variant="secondary"
                             size="lg"
-                            className="flex-1 min-h-[48px] leading-tight whitespace-normal text-center font-heading font-semibold"
+                            className="flex-1 min-h-[48px] leading-tight whitespace-normal text-center font-heading font-semibold bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white"
                             disabled={disableOptimize}
                         >
                             {t('components.promptControls.sendOptimizedPrompt')}
