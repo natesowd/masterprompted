@@ -129,7 +129,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
         {isPanelOpen ? (
           <>
             {/* Header with title and minimize toggle */}
-            <div className="w-full flex items-center justify-between text-lg font-semibold text-card-foreground mb-2">
+            <div className="w-full flex items-center justify-between text-lg font-semibold font-heading text-card-foreground mb-2">
               <span>{t('components.evaluationPanel.title')}</span>
               {canClose && (
                 <button

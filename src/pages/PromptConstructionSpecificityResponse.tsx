@@ -738,7 +738,7 @@ export default function SpecificityResponse() {
             <Button
               variant="secondary-outline"
               size="lg"
-              className="px-10 font-heading font-semibold"
+              className="px-10 font-heading font-semibold text-brand-tertiary-500"
               onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
             >
               {t('components.breadcrumb.takeaways')} →
