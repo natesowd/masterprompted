@@ -187,7 +187,7 @@ export default function PromptControls({
     const isAnyParameterSet = Object.values(parameters).some(p => p !== "");
 
     return (
-        <div className={cn("bg-surface-200 2xl:bg-card 2xl:rounded-2xl 2xl:border 2xl:border-border 2xl:shadow-sm flex flex-col overflow-hidden [&_*]:!font-heading", className)}>
+        <div className={cn("bg-surface-200 rounded-none border-none shadow-none 2xl:bg-card 2xl:rounded-2xl 2xl:border 2xl:border-border 2xl:shadow-sm flex flex-col overflow-hidden [&_*]:!font-heading", className)}>
             <div className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-1 min-h-0">
                 {/* Chatbox */}
                 <Chatbox
