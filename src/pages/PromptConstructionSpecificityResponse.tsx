@@ -119,7 +119,7 @@ export default function SpecificityResponse() {
           <Breadcrumb />
           <div className="mb-5"></div>
         </div>
-        <div className="flex gap-6 max-w-[1100px] w-full">
+        <div className="flex gap-6 max-w-[1100px] w-full justify-center">
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
