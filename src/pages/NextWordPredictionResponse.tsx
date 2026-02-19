@@ -378,15 +378,11 @@ export default function HeadlineResponse() {
         <Breadcrumb />
       </div>
 
-      <div className={cn("w-full", !evaluationPanelOpen && "flex justify-center")}>
-        {/* Two-column layout */}
-        <div className={cn(
-          "flex flex-col lg:flex-row gap-8 items-start",
-          evaluationPanelOpen ? "justify-between" : "justify-center"
-        )}>
-          {/* Right column - Evaluation Panel (using initialIsOpen prop) */}
+      <div className="w-full flex justify-center relative">
+        {/* Main content - always centered */}
+        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
           {/* Left column - Main content */}
-          <div className={cn("flex-1 min-w-0 max-w-4xl", !evaluationPanelOpen && "mx-auto")}>
+          <div className="flex-1 min-w-0 max-w-4xl mx-auto">
             {/* Original Prompt */}
             <div className="mb-8">
               <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
@@ -698,10 +694,10 @@ export default function HeadlineResponse() {
             </div>
           </div>
 
-          {/* Right column - Evaluation panel */}
-          <div className="w-full lg:w-auto lg:flex-shrink-0" data-evaluation-panel>
-            <EvaluationPanel initialIsOpen={evaluationPanelOpen} canClose={true} />
-          </div>
+        </div>
+        {/* Right column - Evaluation panel (absolute so it doesn't shift content) */}
+        <div className="absolute right-0 top-0" data-evaluation-panel>
+          <EvaluationPanel initialIsOpen={evaluationPanelOpen} canClose={true} />
         </div>
       </div>
     </main>
