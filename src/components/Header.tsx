@@ -115,7 +115,7 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className={`relative px-4 py-3 text-[15px] tracking-wide transition-colors duration-200 flex items-center gap-1 ${
+                  className={`group relative px-4 py-3 text-[15px] tracking-wide transition-colors duration-200 flex items-center gap-1 ${
                   isModuleActive() ?
                   transparent ?
                   'text-white' :
@@ -127,8 +127,13 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
 
                   {t('nav.guidedSimulator')}
                   <ChevronDown className="h-4 w-4" />
+                  {/* Active underline */}
                   {isModuleActive() &&
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
+                  }
+                  {/* Hover underline */}
+                  {!isModuleActive() &&
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
                   }
                 </button>
               </DropdownMenuTrigger>
@@ -171,7 +176,7 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className={`relative px-4 py-3 text-[15px] tracking-wide transition-colors duration-200 ${
+              className={`group relative px-4 py-3 text-[15px] tracking-wide transition-colors duration-200 ${
               isActive(item.path) ?
               transparent ?
               'text-white' :
@@ -182,8 +187,13 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
               }>
 
                 {item.label}
+                {/* Active underline */}
                 {isActive(item.path) &&
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
+              }
+                {/* Hover underline */}
+                {!isActive(item.path) &&
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
               }
               </button>
             )}
