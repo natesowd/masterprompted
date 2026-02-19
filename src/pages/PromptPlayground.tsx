@@ -364,7 +364,7 @@ const PromptPlayground = () => {
       <Header onLanguageChange={setPageLanguage} />
       <main className="container mx-auto px-0 py-0 flex-1 min-h-0">
         <div className="flex gap-8 h-[calc(100vh-8rem)]">
-          <div className="shrink-0 h-full bg-surface-200 2xl:bg-transparent flex flex-col items-start justify-start">
+          <div className="shrink-0 h-full bg-surface-200 2xl:bg-transparent flex flex-row items-end 2xl:flex-col 2xl:items-start justify-start">
             <div className="h-[calc(100vh-8rem)] w-fit 2xl:h-auto 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:mt-4">
               <PromptControls {...{
                 parameters,
@@ -388,8 +388,8 @@ const PromptPlayground = () => {
                 onUploadFiles: handleUploadFiles
               }} />
             </div>
-            {/* LLM Disclaimer - below pill at 2xl, below controls when flat */}
-            <div className="mt-2 px-4 text-xs text-muted-foreground">
+            {/* LLM Disclaimer - right of controls when flat, below pill at 2xl */}
+            <div className="mb-4 px-4 2xl:mb-0 2xl:mt-2 text-xs text-muted-foreground">
               LLMs have been used in the following places:<br />
               The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
               LLMs used include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
