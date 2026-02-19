@@ -28,9 +28,9 @@ const chatboxVariants = cva(
   {
     variants: {
       size: {
-        default: "min-w-[280px] min-h-[150px] max-h-[400px]",
-        compact: "min-w-[240px] min-h-[120px] max-h-[300px]",
-        expanded: "min-w-[320px] min-h-[200px] max-h-[500px]"
+        default: "min-w-0 min-h-[150px] max-h-[400px]",
+        compact: "min-w-0 min-h-[120px] max-h-[300px]",
+        expanded: "min-w-0 min-h-[200px] max-h-[500px]"
       },
       state: {
         default: "",
