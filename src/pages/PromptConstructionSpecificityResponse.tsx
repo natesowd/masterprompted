@@ -38,7 +38,7 @@ export default function SpecificityResponse() {
         : context === t("components.promptControls.context.left")
           ? "Summarize the main points in the AI Act."
           : style === t("components.promptControls.conversationStyle.right")
-            ? "TDLR; EU AI Act"
+            ? "TLDR; EU AI Act"
             : style === t("components.promptControls.conversationStyle.left")
               ? "Can you give me a summary of the main points in the AI Act?"
               : specificity === t("components.promptControls.specificity.right")
