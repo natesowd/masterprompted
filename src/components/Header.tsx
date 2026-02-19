@@ -110,7 +110,7 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center">
+          <nav className="hidden md:flex items-center font-heading">
             {/* Guided Simulator Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
