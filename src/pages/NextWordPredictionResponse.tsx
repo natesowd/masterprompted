@@ -378,8 +378,9 @@ export default function HeadlineResponse() {
         <Breadcrumb />
       </div>
 
-      <div className="w-full flex justify-center gap-4">
-        <div className="max-w-4xl w-full min-w-0">
+      <div className="flex items-start">
+        <div className="flex-1 min-w-0">
+          <div className="max-w-4xl mx-auto">
             {/* Original Prompt */}
             <div className="mb-8">
               <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
@@ -690,6 +691,7 @@ export default function HeadlineResponse() {
               )}
             </div>
           </div>
+        </div>
         {/* Evaluation panel - in flow, content shifts to accommodate */}
         <div className="flex-shrink-0" data-evaluation-panel>
           <EvaluationPanel initialIsOpen={evaluationPanelOpen} canClose={true} />
