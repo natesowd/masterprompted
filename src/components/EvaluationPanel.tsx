@@ -43,12 +43,12 @@ const panelVariants = cva(
 );
 
 const criterionVariants = cva(
-  "flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer",
+  "flex items-center justify-between p-3 rounded-full transition-colors cursor-pointer",
   {
     variants: {
       variant: {
         default: "bg-muted hover:bg-muted/80",
-        highlighted: "bg-red-50 ring-2 ring-red-500"
+        highlighted: "bg-background ring-2 ring-destructive"
       }
     },
     defaultVariants: {
@@ -155,7 +155,15 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
                     variant: activeEvaluationFactors.has(criterion.id) ? "highlighted" : "default"
                   }))}>
                     <div className="flex items-center gap-3 mr-20">
-                      <criterion.icon className="h-4 w-4 text-muted-foreground" />
+                      {activeEvaluationFactors.has(criterion.id) ? (
+                        <span className="flex items-center justify-center h-7 w-7 rounded-full bg-destructive">
+                          <criterion.icon className="h-4 w-4 text-white" />
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center h-7 w-7 rounded-full bg-muted-foreground/10">
+                          <criterion.icon className="h-4 w-4 text-muted-foreground" />
+                        </span>
+                      )}
                       <span className="text-sm font-medium text-foreground">{criterion.label}</span>
                     </div>
                     <ChevronDown
