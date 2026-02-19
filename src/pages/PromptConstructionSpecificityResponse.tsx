@@ -113,7 +113,7 @@ export default function SpecificityResponse() {
       </div>
 
       {/* Right content area */}
-      <div className="flex-1 flex flex-col px-6 py-6 items-center">
+      <div className="flex-1 flex flex-col px-6 py-6 items-start">
         <div className="w-full max-w-[1100px]">
           <Breadcrumb />
           <div className="mb-5"></div>
