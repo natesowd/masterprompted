@@ -257,6 +257,7 @@ const translations = {
       },
       promptControls: {
         title: 'Prompt Controls',
+        promptHistory: 'Prompt history',
         original: 'Original',
         specificity: {
           title: 'Specificity',
@@ -562,6 +563,7 @@ const translations = {
       },
       promptControls: {
         title: 'Controles de prompt',
+        promptHistory: 'Historial de prompts',
         original: 'Original',
         specificity: {
           title: 'Especificidad',
