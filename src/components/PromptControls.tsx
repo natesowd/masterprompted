@@ -85,7 +85,7 @@ function Parameter({
                 value={selectedValue}
                 onValueChange={handleValueChange}
                 orientation="horizontal"
-                className="relative flex w-full justify-between gap-0 py-1 px-2"
+                className="relative flex w-full justify-between items-start gap-0 py-1 px-2"
             >
                 <div className="pointer-events-none absolute top-[14px] left-[calc(16.666%+14px)] w-[calc(33.333%-26px)] h-[2px] bg-surface-500" />
                 <div className="pointer-events-none absolute top-[14px] left-[calc(50%+12px)] w-[calc(33.333%-26px)] h-[2px] bg-surface-500" />
