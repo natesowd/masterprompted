@@ -80,16 +80,19 @@ export default function SpecificityResponse() {
   return <div className="min-h-screen bg-white flex flex-col">
     <Header />
 
-    {/* Breadcrumb for 2xl bubble mode - spans full width, aligned with controls */}
-    <div className="hidden 2xl:block px-6 pt-6">
-      <Breadcrumb />
-      <div className="mb-5"></div>
-    </div>
+    <main className="flex-1 flex flex-col">
+      <div className="flex-1 flex justify-center">
+        <div className="flex flex-col">
+          {/* Breadcrumb for 2xl - starts at controls, not bound by column */}
+          <div className="hidden 2xl:block pt-6 pb-5">
+            <Breadcrumb />
+          </div>
 
-    <main className="flex-1 flex justify-center">
-      {/* Left Sidebar - Prompt Controls with grey background extending full height */}
-      <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pt-10 2xl:pb-4 flex items-start justify-center">
-        <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
+          {/* Three column layout */}
+          <div className="flex flex-1">
+          {/* Left Sidebar - Prompt Controls with grey background extending full height */}
+          <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center">
+            <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
           <PromptControls
             chatValue={inputPrompt}
             showSpecificity={true}
@@ -119,7 +122,7 @@ export default function SpecificityResponse() {
       </div>
 
       {/* Right content area */}
-      <div className="flex-initial flex flex-col px-6 py-6 items-start">
+      <div className="flex-initial flex flex-col px-6 py-6 2xl:pt-0 items-start">
         <div className="w-full max-w-[1100px] 2xl:hidden">
           <Breadcrumb />
           <div className="mb-5"></div>
@@ -756,6 +759,9 @@ export default function SpecificityResponse() {
           The creation of prompt output examples in the Guided Exploration<br />
           LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
         </div>
+      </div>
+      </div>
+      </div>
       </div>
     </main>
 
