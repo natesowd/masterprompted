@@ -82,8 +82,8 @@ export default function SpecificityResponse() {
 
     <main className="flex-1 flex">
       {/* Left Sidebar - Prompt Controls with grey background extending full height */}
-      <div className="w-72 flex-shrink-0 pt-16 pb-4 px-3">
-        <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+      <div className="w-72 flex-shrink-0 bg-surface-200 xl:bg-transparent xl:pt-16 xl:pb-4 xl:px-3">
+        <div className="pt-6 pb-4 xl:pt-0 xl:pb-0 xl:bg-card xl:border xl:border-border xl:rounded-lg xl:shadow-sm xl:overflow-hidden">
           <PromptControls
             chatValue={inputPrompt}
             showSpecificity={true}
@@ -97,7 +97,6 @@ export default function SpecificityResponse() {
               specificity
             }}
             onParameterChange={(key, value) => {
-              // Reset all other parameters, only keep the changed one
               setSpecificity(key === 'specificity' ? value : "");
               setStyle(key === 'style' ? value : "");
               setContext(key === 'context' ? value : "");
