@@ -96,7 +96,7 @@ export default function PromptConstructionSpecificityTakeaways() {
           <div className="mt-16 flex items-center gap-4">
             <Button
               onClick={() => navigate("/playground")}
-              className="bg-tertiary hover:bg-tertiary/90 text-white font-bold px-8 py-6 rounded-full transition-colors font-barlow-semi-condensed">
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-8 py-6 rounded-full transition-colors">
               {t('promptConstructionModule.takeaways.promptPlayground')}
               <svg
                 width="10"
