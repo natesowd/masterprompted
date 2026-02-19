@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -203,7 +204,7 @@ export default function PromptControls({
                     readOnly={readOnly}
                     hideSubmitButton={hideChatSubmitButton}
                     autoResize={readOnly}
-                    className="z-50 flex-auto min-h-0 w-full"
+                    className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
                 />
 
                 {/* Parameters area */}
