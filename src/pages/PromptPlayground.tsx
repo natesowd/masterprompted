@@ -388,12 +388,6 @@ const PromptPlayground = () => {
                 onUploadFiles: handleUploadFiles
               }} />
             </div>
-            {/* LLM Disclaimer - right of controls when flat, below pill at 2xl */}
-            <div className="mb-4 px-4 2xl:mb-0 2xl:mt-2 text-xs text-muted-foreground">
-              LLMs have been used in the following places:<br />
-              The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
-              LLMs used include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
-            </div>
           </div>
           <ChatBody
             threads={threads}
@@ -402,6 +396,12 @@ const PromptPlayground = () => {
             onToggleThreadDiff={handleThreadDiffToggle}
             onToggleThreadEvaluation={handleThreadEvaluationToggle}
             onRequestControlPanelHelp={() => setShowControlPanelPopover(true)} />
+        </div>
+        {/* LLM Disclaimer - outside the controls container */}
+        <div className="mt-2 px-4 text-xs text-muted-foreground">
+          LLMs have been used in the following places:<br />
+          The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
+          LLMs used include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
         </div>
       </main>
       {showControlPanelPopover &&
