@@ -378,11 +378,11 @@ export default function HeadlineResponse() {
         <Breadcrumb />
       </div>
 
-      <div className="w-full flex justify-center relative">
-        {/* Main content - always centered */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
-          {/* Left column - Main content */}
-          <div className="flex-1 min-w-0 max-w-4xl mx-auto">
+      <div className="w-full flex justify-center">
+        {/* Centered content with evaluation panel adjacent */}
+        <div className="flex items-start">
+          {/* Main content */}
+          <div className="min-w-0 max-w-4xl">
             {/* Original Prompt */}
             <div className="mb-8">
               <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
@@ -695,10 +695,10 @@ export default function HeadlineResponse() {
           </div>
 
         </div>
-        {/* Right column - Evaluation panel (absolute so it doesn't shift content) */}
-        <div className="absolute right-0 top-0" data-evaluation-panel>
-          <EvaluationPanel initialIsOpen={evaluationPanelOpen} canClose={true} />
-        </div>
+          {/* Evaluation panel - adjacent to content, expands rightward */}
+          <div className="flex-shrink-0" data-evaluation-panel>
+            <EvaluationPanel initialIsOpen={evaluationPanelOpen} canClose={true} />
+          </div>
       </div>
     </main>
 
