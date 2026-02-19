@@ -184,8 +184,8 @@ export default function PromptControls({
     const isAnyParameterSet = Object.values(parameters).some(p => p !== "");
 
     return (
-        <div className={`bg-surface-200 min-w-[260px] flex flex-col overflow-hidden ${className}`}>
-            <div className="px-3 pb-4 pt-3 flex-1 flex flex-col gap-1 min-h-0">
+        <div className={`bg-surface-200 flex flex-col overflow-hidden ${className}`}>
+            <div className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-1 min-h-0">
                 {/* Chatbox */}
                 <Chatbox
                     value={chatValue}
@@ -199,7 +199,7 @@ export default function PromptControls({
                     files={files}
                     onRemoveFile={onRemoveFile}
                     readOnly={readOnly}
-                    className="z-50 flex-auto min-h-0 max-w-full"
+                    className="z-50 flex-auto min-h-0 w-full"
                 />
 
                 {/* Parameters area */}
