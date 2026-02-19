@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import PromptControls from "@/components/PromptControls";
 import { Parameters } from "@/pages/PromptPlayground";
+import { PromptHistoryEntry } from "@/components/PromptHistoryPanel";
 import TextFlag from "@/components/TextFlag";
 import SectionFlag from "@/components/SectionFlag";
 import ChatPrompt from "@/components/ChatPrompt";
@@ -58,6 +59,9 @@ export default function SpecificityResponse() {
   const showGeneralOutput = appliedSpecificity === t("components.promptControls.specificity.left");
   const showBaseOutput = !appliedBias && !appliedContext && !appliedStyle && !appliedSpecificity;
   const [sentPrompt, setSentPrompt] = useState(inputPrompt);
+  const [promptHistory, setPromptHistory] = useState<PromptHistoryEntry[]>([
+    { prompt: inputPrompt, timestamp: new Date(), activeParameters: [] }
+  ]);
 
   const handleApplyChanges = () => {
     setAppliedBias(bias);
@@ -65,6 +69,19 @@ export default function SpecificityResponse() {
     setAppliedStyle(style);
     setAppliedSpecificity(specificity);
     setSentPrompt(inputPrompt);
+
+    // Build active parameter labels
+    const activeParams: string[] = [];
+    if (specificity) activeParams.push(specificity);
+    if (style) activeParams.push(style);
+    if (context) activeParams.push(context);
+    if (bias) activeParams.push(bias);
+
+    setPromptHistory(prev => [...prev, {
+      prompt: inputPrompt,
+      timestamp: new Date(),
+      activeParameters: activeParams,
+    }]);
   };
 
   const handleParameterChange = (key: keyof Parameters, value: string) => {
@@ -105,6 +122,7 @@ export default function SpecificityResponse() {
             disableOptimize={!hasUnappliedChanges}
             disableSend={true}
             files={[{ name: "EU_AI_Act.pdf" }]}
+            promptHistory={promptHistory}
           />
         </div>
 
