@@ -25,7 +25,7 @@ export default function PromptConstructionSpecificityTakeaways() {
         <Breadcrumb />
         <div className="mb-5" />
         
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto pt-0 mt-[130px]">
           <h1 className="text-h2 font-heading text-foreground mb-2">
             {t('promptConstructionModule.takeaways.title')}
           </h1>
@@ -66,36 +66,36 @@ export default function PromptConstructionSpecificityTakeaways() {
           </div>
           
           <div className="mt-16">
-            <Button 
+            <Button
               onClick={() => navigate("/playground")}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-8 py-6 rounded-full transition-colors"
-            >
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-8 py-6 rounded-full transition-colors">
+
               {t('promptConstructionModule.takeaways.promptPlayground')}
-              <svg 
-                width="10" 
-                height="8" 
-                viewBox="0 0 12 10" 
-                fill="none" 
+              <svg
+                width="10"
+                height="8"
+                viewBox="0 0 12 10"
+                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="ml-3"
-              >
-                <path 
-                  d="M1 5H11M11 5L7 1M11 5L7 9" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                />
+                className="ml-3">
+
+                <path
+                  d="M1 5H11M11 5L7 1M11 5L7 9"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round" />
+
               </svg>
             </Button>
           </div>
         </div>
       </main>
       
-      <ModuleNavigation 
-        previousRoute="/module/prompt-construction/specificity/response" 
-        nextRoute="/module/prompt-construction/conversation-style"
-      />
-    </div>
-  );
+      <ModuleNavigation
+        previousRoute="/module/prompt-construction/specificity/response"
+        nextRoute="/module/prompt-construction/conversation-style" />
+
+    </div>);
+
 }
