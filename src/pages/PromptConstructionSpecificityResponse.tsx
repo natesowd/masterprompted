@@ -729,7 +729,8 @@ export default function SpecificityResponse() {
           <div className="bg-white rounded-lg rounded-t-none p-8 pt-6">
             <Button
               variant="secondary"
-              className="px-8 py-2 rounded-full"
+              size="lg"
+              className="px-10 rounded-full font-semibold"
               onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
             >
               {t('components.breadcrumb.takeaways')} →
