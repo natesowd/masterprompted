@@ -82,11 +82,8 @@ export default function SpecificityResponse() {
 
     <main className="flex-1 flex">
       {/* Left Sidebar - Prompt Controls with grey background extending full height */}
-      <div className="w-72 flex-shrink-0 bg-surface-200 flex flex-col">
-        <div className="px-4 pt-6 pb-2">
-          <Breadcrumb />
-        </div>
-        <div className="flex-1 pb-4">
+      <div className="w-72 flex-shrink-0 bg-surface-200">
+        <div className="pt-6 pb-4">
           <PromptControls
             chatValue={inputPrompt}
             showSpecificity={true}
@@ -114,15 +111,14 @@ export default function SpecificityResponse() {
             files={[{ name: "EU_AI_Act.pdf" }]}
           />
         </div>
-        <div className="px-4 py-3 text-[11px] text-muted-foreground leading-relaxed">
-          LLMs have been used in the following places:<br />
-          The creation of prompt output examples in the Guided Exploration<br />
-          LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
-        </div>
       </div>
 
       {/* Right content area */}
       <div className="flex-1 flex flex-col px-6 py-6 items-center">
+        <div className="w-full max-w-[1100px]">
+          <Breadcrumb />
+          <div className="mb-5"></div>
+        </div>
         <div className="flex gap-6 max-w-[1100px] w-full">
 
         {/* Main Content */}
@@ -748,6 +744,12 @@ export default function SpecificityResponse() {
         </div>
       </div>
 
+        {/* LLM Disclaimer */}
+        <div className="mt-6 text-sm text-muted-foreground max-w-[1100px] w-full">
+          LLMs have been used in the following places:<br />
+          The creation of prompt output examples in the Guided Exploration<br />
+          LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
+        </div>
       </div>
     </main>
 
