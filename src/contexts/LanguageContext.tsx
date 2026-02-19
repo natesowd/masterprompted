@@ -283,6 +283,7 @@ const translations = {
           info: 'Explore how neutral or leading prompts can effect and bias LLM output'
         },
         promptHistory: 'Prompt history',
+        noHistory: 'No prompt history yet. Send a prompt to get started.',
         sendOptimizedPrompt: 'Improve Prompt',
         sendPrompt: 'Send Prompt',
         promptSpecificity: 'Prompt Specificity',
@@ -589,6 +590,7 @@ const translations = {
           info: 'Explora cómo los prompts neutrales o dirigidos pueden afectar y sesgar la salida del LLM'
         },
         promptHistory: 'Historial de prompts',
+        noHistory: 'Aún no hay historial. Envía un prompt para comenzar.',
         sendOptimizedPrompt: 'Mejorar Prompt',
         sendPrompt: 'Enviar Prompt',
         promptSpecificity: 'Especificidad del Prompt',

@@ -3,8 +3,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info, History } from "lucide-react";
+import { Info } from "lucide-react";
 import Chatbox from "./ChatBox";
+import PromptHistoryPanel, { PromptHistoryEntry } from "./PromptHistoryPanel";
 import { Parameters } from "@/pages/PromptPlayground";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -135,6 +136,7 @@ interface PromptControlsProps {
     onUploadFiles?: (files: FileList | File[]) => void;
     onRemoveFile?: (index: number) => void;
     readOnly?: boolean;
+    promptHistory?: PromptHistoryEntry[];
     className?: string;
 }
 
@@ -166,9 +168,11 @@ export default function PromptControls({
     onRemoveFile,
     waitingforOptimization = false,
     readOnly = false,
+    promptHistory = [],
     className
 }: PromptControlsProps) {
     const { t } = useLanguage();
+    const [historyOpen, setHistoryOpen] = useState(false);
     const handleResetClick = () => {
         if (onReset) onReset();
     };
@@ -185,13 +189,18 @@ export default function PromptControls({
 
     return (
         <div className={`bg-surface-100 rounded-xl max-w-sm h-[calc(100vh-160px)] min-w-[300px] flex flex-col ${className}`}>
-            {/* Prompt History Link */}
+            {/* Prompt History Link + Panel */}
             <button
                 className="text-brand-secondary-500 font-semibold text-sm py-3 hover:underline cursor-pointer text-center"
-                onClick={() => {/* Prompt history handler - placeholder */}}
+                onClick={() => setHistoryOpen(true)}
             >
                 {t('components.promptControls.promptHistory')}
             </button>
+            <PromptHistoryPanel
+                open={historyOpen}
+                onOpenChange={setHistoryOpen}
+                history={promptHistory}
+            />
 
             <div className="px-4 pb-4 flex-1 flex flex-col gap-1 min-h-0">
                 {/* Chatbox */}
