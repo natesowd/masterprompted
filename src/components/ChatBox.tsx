@@ -288,7 +288,7 @@ const Chatbox = ({
         <Textarea
           placeholder="Type your message here..."
           className={cn(
-            "border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-2 mt-2 mb-2 pr-12 leading-relaxed text-card-foreground font-['Manrope'] text-md resize-none",
+            "border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 px-2 py-2 mt-2 mb-2 pr-12 leading-relaxed text-card-foreground !font-sans text-md resize-none",
             autoResize ? "h-auto overflow-hidden" : "flex-1 h-full min-h-0 overflow-y-auto"
           )}
           value={value}
