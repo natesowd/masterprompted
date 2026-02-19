@@ -162,7 +162,8 @@ const translations = {
         point2: " Interacting in a human-like manner may only increase the plausibility of the LLM's response and make it harder to evaluate.",
         point3Title: 'Look out for key parameters to get better results:',
         point3: ' Include context, specificity and phrase your prompts in a neutral, technical manner',
-        promptPlayground: 'Prompt Playground'
+        promptPlayground: 'Prompt Playground',
+        download: 'Download Lessons'
       }
     },
     about: {
@@ -469,7 +470,8 @@ const translations = {
         point2: ' interactuar de manera similar a un humano solo puede aumentar la plausibilidad de la respuesta del LLM y hacerla más difícil de evaluar.',
         point3Title: 'Busca parámetros clave para obtener mejores resultados:',
         point3: ' incluye contexto, especificidad y formula tus prompts de manera neutral y técnica',
-        promptPlayground: 'Campo de práctica de prompts'
+        promptPlayground: 'Campo de práctica de prompts',
+        download: 'Descargar Lecciones'
       }
     },
     about: {
