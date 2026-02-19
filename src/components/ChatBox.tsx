@@ -24,7 +24,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const chatboxVariants = cva(
-  "relative bg-card border border-border rounded-2xl shadow-sm w-full flex flex-col",
+  "relative bg-card border border-border rounded-2xl shadow-lg w-full flex flex-col",
   {
     variants: {
       size: {
