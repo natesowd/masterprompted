@@ -47,7 +47,7 @@ const criterionVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-muted hover:bg-muted/80",
+        default: "bg-transparent border border-border hover:bg-muted/40",
         highlighted: "bg-background ring-1 ring-destructive"
       }
     },
