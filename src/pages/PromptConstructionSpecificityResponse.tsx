@@ -96,7 +96,19 @@ export default function SpecificityResponse() {
               style,
               specificity
             }}
-            onParameterChange={handleParameterChange}
+            onParameterChange={(key, value) => {
+              // Reset all other parameters when one is changed
+              const resetParams: Record<keyof Parameters, string> = {
+                specificity: "",
+                style: "",
+                context: "",
+                bias: "",
+              };
+              resetParams[key] = value;
+              Object.entries(resetParams).forEach(([k, v]) => {
+                handleParameterChange(k as keyof Parameters, v);
+              });
+            }}
             onOptimize={handleApplyChanges}
             readOnly={true}
             hideChatSubmitButton={true}
