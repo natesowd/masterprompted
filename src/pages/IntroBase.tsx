@@ -66,7 +66,7 @@ const Introduction = () => {
                 >
                   <path 
                     d="M1 5H11M11 5L7 1M11 5L7 9" 
-                    stroke="currentColor" 
+                    stroke="hsl(0 0% 12%)" 
                     strokeWidth="2" 
                     strokeLinecap="round" 
                     strokeLinejoin="round" 
