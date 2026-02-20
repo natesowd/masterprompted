@@ -701,7 +701,7 @@ export default function HeadlineResponse() {
 
     {/* Single tooltip for probability explanation */}
     {showTooltip && <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <div className="bg-emerald-600 text-white rounded-xl shadow-lg max-w-xs pointer-events-auto relative" style={{
+      <div className="bg-brand-tertiary-500 text-white rounded-xl shadow-lg max-w-xs pointer-events-auto relative" style={{
         padding: '16px 20px'
       }}>
         <p className="text-sm leading-relaxed mb-4">
@@ -710,14 +710,14 @@ export default function HeadlineResponse() {
         <p className="text-sm leading-relaxed mb-4">
           Use them to understand what would be the most probable selection by the LLM
         </p>
-        <button onClick={() => setShowTooltip(false)} className="absolute bottom-2 right-2 bg-white text-emerald-500 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100 transition-colors">
+        <button onClick={() => setShowTooltip(false)} className="absolute bottom-2 right-2 bg-card text-brand-tertiary-500 px-3 py-1 rounded text-sm font-medium hover:bg-muted transition-colors">
           Close
         </button>
       </div>
     </div>}
 
     <ModuleNavigation previousRoute="/module/next-word-prediction/prompt" nextRoute={hasInteracted ? "/module/next-word-prediction/takeaways" : undefined} />
-    <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">
+    <div className="mt-6 text-sm text-muted-foreground max-w-7xl mx-auto">
       LLMs have been used in the following places:<br />
       The creation of prompt output examples in the Guided Exploration<br />
       LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
