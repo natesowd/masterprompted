@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { SendHorizontal } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 type ChatBoxDummyProps = {
   value: string;
@@ -14,6 +14,14 @@ type ChatBoxDummyProps = {
 
 const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy", className }: ChatBoxDummyProps) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      const el = textareaRef.current;
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+  }, [value]);
 
   const handleSubmit = (e?: React.MouseEvent) => {
     e?.preventDefault();
@@ -44,9 +52,10 @@ const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy", c
         readOnly
         disabled
         ref={textareaRef}
-        rows={1}
         placeholder="Type your message here..."
-        className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-3 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-lg min-h-0 h-auto resize-none"
+        className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-3 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-lg min-h-0 h-auto resize-none overflow-hidden"
+        style={{ height: 'auto' }}
+        onInput={(e) => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }}
       />
     </div>
   );
