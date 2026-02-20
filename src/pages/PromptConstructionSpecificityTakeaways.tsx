@@ -30,6 +30,13 @@ export default function PromptConstructionSpecificityTakeaways() {
       '• Provide context – attach relevant documents or background info.',
       '• Stay neutral – avoid conversational or leading language.',
       '• Iterate – refine your prompt based on the output you receive.',
+      '',
+      '---',
+      'Practical To-Dos:',
+      '☐ Take a recent story you worked on and draft three progressively more specific prompts for it.',
+      '☐ Attach a source document to a prompt and ask the AI to summarize it – compare with your own summary.',
+      '☐ Rewrite a conversational prompt in neutral, journalistic language and compare outputs.',
+      '☐ Run the same prompt twice with slight wording changes and document how the output differs.',
     ].join('\n');
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -99,6 +106,12 @@ export default function PromptConstructionSpecificityTakeaways() {
                   <p>• Provide context – attach relevant documents or background info.</p>
                   <p>• Stay neutral – avoid conversational or leading language.</p>
                   <p>• Iterate – refine your prompt based on the output you receive.</p>
+                  <hr className="border-border my-2" />
+                  <p className="font-bold text-foreground">Practical To-Dos:</p>
+                  <p>☐ Take a recent story you worked on and draft three progressively more specific prompts for it.</p>
+                  <p>☐ Attach a source document to a prompt and ask the AI to summarize it – compare with your own summary.</p>
+                  <p>☐ Rewrite a conversational prompt in neutral, journalistic language and compare outputs.</p>
+                  <p>☐ Run the same prompt twice with slight wording changes and document how the output differs.</p>
                 </div>
                 <div className="flex justify-end mt-2">
                   <Button onClick={handleDownload} className="rounded-full">
