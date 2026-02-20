@@ -5,9 +5,8 @@ import type { Handler } from "@netlify/functions";
 // Add any other origins you need (e.g. localhost for local dev).
 const ALLOWED_ORIGINS = [
     "http://localhost:8080",
-    "http://localhost:5173",
-    // TODO: replace with your actual Apache site URL, e.g.:
-    // "https://your-apache-site.example.com",
+    "https://masterprompted.lovable.app",
+    "https://prompted.eipcm.org",
 ];
 
 const corsHeaders = (origin: string | undefined) => ({
@@ -31,7 +30,7 @@ const handler: Handler = async (event) => {
     }
 
     try {
-        const { messages, model } = JSON.parse(event.body ?? "{}");
+        const { messages, model, temperature } = JSON.parse(event.body ?? "{}");
 
         if (!messages || !Array.isArray(messages)) {
             return {
@@ -45,8 +44,9 @@ const handler: Handler = async (event) => {
         const client = new InferenceClient(process.env.HF_TOKEN);
 
         const completion = await client.chatCompletion({
-            model: model ?? "openai/gpt-oss-120b:fastest",
+            model: model ?? "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
             messages,
+            temperature: temperature ?? 0.7,
         });
 
         return {

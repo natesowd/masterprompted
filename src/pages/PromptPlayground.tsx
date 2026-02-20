@@ -7,6 +7,8 @@ import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBody";
 import { checkDisinformation, DisinformationSpan } from "@/services/disinformationApi";
+const NO_CHANGE_VALUE = "no-change";
+const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/.netlify/functions/chat";
 
 export type Parameters = {
   specificity: string;
@@ -21,7 +23,7 @@ export type VersionEvaluation = {
   data: DisinformationSpan[] | null;
 };
 
-export type ThreadVersion = {prompt: string;answer?: string;parameters?: Parameters;};
+export type ThreadVersion = { prompt: string; answer?: string; parameters?: Parameters };
 export type Thread = {
   versions: ThreadVersion[];
   currentIndex: number;
@@ -38,13 +40,6 @@ type AttachedFile = {
 const PromptPlayground = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [parameters, setParameters] = useState<Parameters>({ specificity: "", style: "", context: "", bias: "" });
-  const [sessionId] = useState<string>(() => {
-    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-      return crypto.randomUUID();
-    }
-    return Math.random().toString(36).slice(2);
-  });
-  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [disableSend, setDisableSend] = useState(true);
   const [disableOptimize, setDisableOptimize] = useState(true);
   const [optimizePulse, setOptimizePulse] = useState(0);
@@ -66,7 +61,7 @@ const PromptPlayground = () => {
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
 
   const handleThreadDiffToggle = useCallback((threadIndex: number, checked: boolean) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const next = [...prev];
       if (!next[threadIndex]) {
         return prev;
@@ -77,7 +72,7 @@ const PromptPlayground = () => {
   }, []);
 
   const handleThreadEvaluationToggle = useCallback((threadIndex: number, checked: boolean) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const next = [...prev];
       if (!next[threadIndex]) {
         return prev;
@@ -91,11 +86,11 @@ const PromptPlayground = () => {
     try {
       const seen = localStorage.getItem(LOCALSTORAGE_POPKEY);
       if (!seen) setShowControlPanelPopover(true);
-    } catch (e) {setShowControlPanelPopover(false);}
+    } catch (e) { setShowControlPanelPopover(false); }
   }, []);
 
   const handleParameterChange = (paramKey: keyof Parameters, value: string) => {
-    setParameters((prev) => ({ ...prev, [paramKey]: value }));
+    setParameters(prev => ({ ...prev, [paramKey]: value }));
   };
 
   const handleReset = () => {
@@ -103,74 +98,21 @@ const PromptPlayground = () => {
     setParameters({ specificity: "", style: "", context: "", bias: "" });
   };
 
-  const uploadRagFiles = async (files: FileList | File[]) => {
-    const fileArray = Array.from(files);
-    if (!fileArray.length) return;
 
-    const newAttachments: AttachedFile[] = fileArray.map((file) => ({
-      name: file.name,
-      isUploading: true
-    }));
-    const startIndex = attachedFiles.length;
-
-    setAttachedFiles((prev) => [...prev, ...newAttachments]);
-
-    const formData = new FormData();
-    for (const file of fileArray) {
-      formData.append("files", file);
-    }
-    formData.append("session_id", sessionId);
-
-    try {
-      const response = await fetch("https://llm1.hochschule-stralsund.de:8000/upload_rag/", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`upload_rag failed: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log("upload_rag response:", data);
-
-      setAttachedFiles((prev) =>
-      prev.map((file, index) => {
-        if (index >= startIndex && index < startIndex + newAttachments.length) {
-          return { ...file, isUploading: false };
-        }
-        return file;
-      })
-      );
-    } catch (error) {
-      console.error("uploadRagFiles error:", error);
-      setAttachedFiles((prev) =>
-      prev.filter((_, index) => index < startIndex || index >= startIndex + newAttachments.length)
-      );
-    }
-  };
-
-  const handleUploadFiles = async (files: FileList | File[]) => {
-    await uploadRagFiles(files);
-  };
 
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
-      const hasRagFiles = attachedFiles.length > 0;
-
-      const url = hasRagFiles ?
-      "https://llm1.hochschule-stralsund.de:8000/answer_rag" :
-      "https://llm1.hochschule-stralsund.de:8000/answer";
-
-      const body = hasRagFiles ?
-      { prompt: promptText, temperature: 0.7, session_id: sessionId } :
-      { prompt: promptText, temperature: 0.7, fileIds: [] };
-
-      const response = await fetch(url, {
+      const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+          temperature: 0.7,
+          messages: [
+            { role: "system", content: "You are a helpful assistant." },
+            { role: "user", content: promptText },
+          ],
+        }),
       });
 
       if (!response.ok) {
@@ -178,15 +120,17 @@ const PromptPlayground = () => {
         throw new Error(`answer request failed: ${response.status} - ${errorText}`);
       }
 
-      const data: {answer: string;} = await response.json();
+      const hfResult = await response.json();
+      const answer = hfResult.choices[0].message.content || "";
+      const data: { answer: string } = { answer };
 
       // Update answer in state
-      setThreads((prev) => {
+      setThreads(prev => {
         const copy = [...prev];
         const thread = copy[threadIndex];
         if (!thread?.versions[versionIndex]) return prev;
         const versions = thread.versions.map((version, idx) =>
-        idx === versionIndex ? { ...version, answer: data.answer } : version
+          idx === versionIndex ? { ...version, answer: data.answer } : version
         );
 
         // Initialize evaluation entry as loading and disable showEvaluation
@@ -197,7 +141,7 @@ const PromptPlayground = () => {
           ...thread,
           versions,
           evaluations,
-          showEvaluation: false // Auto-disable while loading
+          showEvaluation: false, // Auto-disable while loading
         };
         return copy;
       });
@@ -206,7 +150,7 @@ const PromptPlayground = () => {
       const evaluationResult = await checkDisinformation(data.answer);
 
       // Update evaluation state
-      setThreads((prev) => {
+      setThreads(prev => {
         const copy = [...prev];
         const thread = copy[threadIndex];
         if (!thread?.evaluations) return prev;
@@ -215,14 +159,14 @@ const PromptPlayground = () => {
         evaluations[versionIndex] = {
           loading: false,
           error: evaluationResult === null,
-          data: evaluationResult
+          data: evaluationResult,
         };
 
         copy[threadIndex] = { ...thread, evaluations };
         return copy;
       });
     },
-    [attachedFiles.length, sessionId]
+    []
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, ...args: string[]) => {
@@ -231,35 +175,70 @@ const PromptPlayground = () => {
     setPreviousPrompt(prompt);
     try {
       const [specificity, style, context, bias] = args;
-      const response = await fetch("https://llm1.hochschule-stralsund.de:8000/optimize", {
+      const paramMap: Record<string, string> = { specificity, style, context, bias };
+
+      const params = Object.entries(paramMap)
+        .filter(([_, value]) => value !== NO_CHANGE_VALUE && value !== "")
+        .map(([name, value]) => `${name} level: ${value}`)
+        .join(", ");
+
+      const optimizeUserPrompt = `Rewrite the following string to align with the following paramters: ${params}. String: "${prompt}".`;
+
+      const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, language: pageLanguage, temperature: 0.7, specificity, communication_mode: style, depth: context, bias, length: "short" })
+        body: JSON.stringify({
+          model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+          temperature: 0.7,
+          messages: [
+            {
+              role: "system",
+              content:
+                `You are an instructional refiner. Your role is to perform a seamless transformation of a provided string based on the requested modifications.
+
+              OPERATIONAL PRINCIPLES:
+              1. INTENT PRESERVATION: Maintain the fundamental objective and structural type of the original request. The core mission of the input must remain intact through the transformation. Crucially, preserve the original point of view, pronouns, and ownership; if the input says "my," "I," or "me," the output must retain that specific perspective.
+              2. LINGUISTIC INTEGRATION: Incorporate the requested shifts directly into the syntax, tone, and framing of the text. The final output should be a cohesive instruction where the modifications are inherent to the writing style rather than externally described. 
+              3. LENGTH CONCIOUSNESS: Try to mirror the length of the original string. Try to be as concise as possible in order to achieve the desired output. 
+              4. OUTPUT STRICTURE: You must output ONLY the final transformed text. Do not include introductory remarks, concluding statements, quotes, markdown formatting, or meta-commentary. The response must contain the modified instruction and nothing else.
+              `
+            },
+            { role: "user", content: optimizeUserPrompt },
+          ],
+        }),
       });
-      const data = await response.json();
-      if (data && typeof data.optimized_prompt === "string") {
-        setEditingText(data.optimized_prompt);
-        setDisableOptimize(false);
-        setOptimizePulse((prev) => prev + 1);
-      } else {
-        throw new Error("handlePromptOptimize: optimized_prompt missing or not a string");
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`optimize request failed: ${response.status} - ${errorText}`);
       }
-    } catch (err) {console.error("handlePromptOptimize failed:", err);}
+
+      const hfResult = await response.json();
+      const optimizedPrompt = hfResult.choices[0].message.content || "";
+
+      if (optimizedPrompt) {
+        setEditingText(optimizedPrompt);
+        setDisableOptimize(false);
+        setOptimizePulse(prev => prev + 1);
+      } else {
+        throw new Error("handlePromptOptimize: optimized_prompt missing or empty");
+      }
+    } catch (err) { console.error("handlePromptOptimize failed:", err); }
     setWaitingForOptimization(false);
   }, [pageLanguage]);
 
   useEffect(() => {
     if (!currentPrompt.trim() && !editingText.trim()) return;
-    if (Object.values(parameters).every((p) => p === "")) {
+    if (Object.values(parameters).every(p => p === "")) {
       if (!fullReset) {
         setEditingText(currentPrompt);
         setDisableOptimize(true);
-        setOptimizePulse((prev) => prev + 1);
+        setOptimizePulse(prev => prev + 1);
       }
       setFullReset(false);
       return;
     }
-    if (Object.values(parameters).some((p) => p !== "")) {
+    if (Object.values(parameters).some(p => p !== "")) {
       setDisableSend(true);
       const promptToOptimize = currentPrompt.trim() ? currentPrompt : editingText;
       if (promptToOptimize) {
@@ -277,7 +256,7 @@ const PromptPlayground = () => {
 
   const createNewThreadAndFetch = async (submittedText: string) => {
     const newThreadIndex = threads.length;
-    setThreads((prev) => [...prev, { versions: [{ prompt: submittedText }], currentIndex: 0, showDiff: false }]);
+    setThreads(prev => [...prev, { versions: [{ prompt: submittedText }], currentIndex: 0, showDiff: false }]);
     await submitAnswerForThreadVersion(newThreadIndex, 0, submittedText);
   };
 
@@ -287,7 +266,7 @@ const PromptPlayground = () => {
     const lastVersionPrompt = threads[threadIndex].versions.at(-1)?.prompt;
     if (promptText !== lastVersionPrompt) {
       const newVersionIndex = threads[threadIndex].versions.length;
-      setThreads((prev) => {
+      setThreads(prev => {
         const copy = [...prev];
         const targetThread = copy[threadIndex];
         if (!targetThread) {
@@ -296,7 +275,7 @@ const PromptPlayground = () => {
         copy[threadIndex] = {
           ...targetThread,
           versions: [...targetThread.versions, { prompt: promptText, answer: undefined, parameters }],
-          currentIndex: newVersionIndex
+          currentIndex: newVersionIndex,
         };
         return copy;
       });
@@ -312,7 +291,7 @@ const PromptPlayground = () => {
     setDisableSend(true);
     setDisableOptimize(true);
     setHasManualEdit(false);
-    setEnableSpecificity(true);setEnableBias(true);setEnableContext(true);setEnableStyle(true);
+    setEnableSpecificity(true); setEnableBias(true); setEnableContext(true); setEnableStyle(true);
     if (threads.length === 0 || hasManualEdit) {
       await createNewThreadAndFetch(submittedText);
     } else {
@@ -320,8 +299,8 @@ const PromptPlayground = () => {
     }
   };
 
-  const handleChatSubmit = (submittedText: string) => {void handleSubmit(submittedText, true);};
-  const handleOptimizeSubmit = async () => {if (editingText.trim()) {void handleSubmit(editingText, false);}};
+  const handleChatSubmit = (submittedText: string) => { void handleSubmit(submittedText, true); };
+  const handleOptimizeSubmit = async () => { if (editingText.trim()) { void handleSubmit(editingText, false); } };
   const handleInputChange = (input: string) => {
     setHasManualEdit(true);
     handleReset();
@@ -330,42 +309,42 @@ const PromptPlayground = () => {
     const isEmpty = !input.trim();
     setDisableSend(isEmpty);
     setDisableOptimize(true);
-    setEnableSpecificity(false);setEnableBias(false);setEnableContext(false);setEnableStyle(false);
+    setEnableSpecificity(false); setEnableBias(false); setEnableContext(false); setEnableStyle(false);
   };
 
   const handlePrevVersion = useCallback((threadIndex: number) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const copy = [...prev];
       const thread = copy[threadIndex];
       if (!thread) return prev;
       copy[threadIndex] = {
         ...thread,
-        currentIndex: Math.max(0, thread.currentIndex - 1)
+        currentIndex: Math.max(0, thread.currentIndex - 1),
       };
       return copy;
     });
   }, []);
 
   const handleNextVersion = useCallback((threadIndex: number) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const copy = [...prev];
       const thread = copy[threadIndex];
       if (!thread) return prev;
       copy[threadIndex] = {
         ...thread,
-        currentIndex: Math.min(thread.versions.length - 1, thread.currentIndex + 1)
+        currentIndex: Math.min(thread.versions.length - 1, thread.currentIndex + 1),
       };
       return copy;
     });
   }, []);
 
   return (
-    <div className="min-h-screen max-h-screen bg-background flex flex-col">
+    <div className="min-h-screen max-h-screen bg-background">
       <Header onLanguageChange={setPageLanguage} />
-      <main className="container mx-auto px-0 py-0 flex-1 min-h-0">
+      <main className="container mx-auto px-6 py-4">
         <div className="flex gap-8 h-[calc(100vh-8rem)]">
-          <div className="shrink-0 h-full bg-surface-200 2xl:bg-transparent flex flex-row items-end 2xl:flex-col 2xl:items-start justify-start">
-            <div className="h-[calc(100vh-8rem)] w-fit 2xl:h-auto 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:mt-4">
+          <div className="flex-none h-full">
+            <div className="sticky top-4 h-[calc(100vh-8rem)]">
               <PromptControls {...{
                 parameters,
                 onParameterChange: handleParameterChange,
@@ -384,8 +363,8 @@ const PromptPlayground = () => {
                 enableStyle,
                 chatAnimationKey: optimizePulse,
                 waitingforOptimization,
-                files: attachedFiles,
-                onUploadFiles: handleUploadFiles
+                files: [],
+                onUploadFiles: () => { }
               }} />
             </div>
           </div>
@@ -395,30 +374,30 @@ const PromptPlayground = () => {
             onNextVersion={handleNextVersion}
             onToggleThreadDiff={handleThreadDiffToggle}
             onToggleThreadEvaluation={handleThreadEvaluationToggle}
-            onRequestControlPanelHelp={() => setShowControlPanelPopover(true)} />
-        </div>
-        {/* LLM Disclaimer - outside the controls container */}
-        <div className="mt-2 px-4 text-xs text-muted-foreground">
-          LLMs have been used in the following places:<br />
-          The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
-          LLMs used include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+            onRequestControlPanelHelp={() => setShowControlPanelPopover(true)}
+          />
         </div>
       </main>
-      {showControlPanelPopover &&
-      <PopoverSeries
-        steps={[
-        { id: "submit-hint", trigger: "#chatbox", content: t('components.popoverSeries.promptPlayground.submitHint') },
-        { id: "controls-hint", trigger: "#parameters", content: t('components.popoverSeries.promptPlayground.controlsHint') }]
-        }
-        initialStep={0}
-        onClose={() => {
-          try {localStorage.setItem(LOCALSTORAGE_POPKEY, "true");} catch (e) {/* ignore */}
-          setShowControlPanelPopover(false);
-        }} />
-
-      }
-    </div>);
-
+      {showControlPanelPopover && (
+        <PopoverSeries
+          steps={[
+            { id: "submit-hint", trigger: "#chatbox", content: t('components.popoverSeries.promptPlayground.submitHint') },
+            { id: "controls-hint", trigger: "#parameters", content: t('components.popoverSeries.promptPlayground.controlsHint') }
+          ]}
+          initialStep={0}
+          onClose={() => {
+            try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ }
+            setShowControlPanelPopover(false);
+          }}
+        />
+      )}
+      <div className="mt-6 text-sm text-gray-500 max-w-7xl mx-auto">
+        LLMs have been used in the following places:<br />
+        The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
+        LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
+      </div>
+    </div>
+  );
 };
 
 export default PromptPlayground;
