@@ -23,7 +23,7 @@ const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy" }:
   return (
     <div
       id={id}
-      className="relative bg-card border border-border rounded-2xl shadow-lg min-h-24 max-w-3xl"
+      className="relative bg-card border border-border rounded-2xl shadow-lg max-w-3xl"
     >
       <div className="absolute top-4 right-4 z-10">
         <Button
@@ -43,7 +43,7 @@ const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy" }:
         disabled
         ref={textareaRef}
         placeholder="Type your message here..."
-        className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 mb-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-lg min-h-[100px] resize-none"
+        className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 mb-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-lg min-h-0 resize-none"
       />
     </div>
   );
