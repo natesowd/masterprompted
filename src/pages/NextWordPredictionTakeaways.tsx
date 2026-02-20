@@ -74,7 +74,7 @@ export default function Takeaways() {
           <div className="mt-16 flex items-center gap-4">
             <Button 
               onClick={() => navigate("/module/prompt-construction")}
-              className="bg-secondary hover:bg-secondary/90 text-foreground font-bold px-8 py-6 rounded-full transition-colors"
+              className="bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white font-heading font-semibold px-10 py-6 rounded-full transition-colors"
             >
               {t('nextWord.takeaways.nextTask')}
             </Button>

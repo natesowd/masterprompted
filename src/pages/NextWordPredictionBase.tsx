@@ -53,7 +53,7 @@ const NextWordPredictionIntro = () => {
               {/* Continue button */}
               <Button
                 onClick={handleContinue}
-                className="w-fit px-8 py-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold text-base rounded-full transition-colors">
+                className="w-fit px-10 py-6 bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white font-heading font-semibold text-lg rounded-full transition-colors">
 
                 {t('nextWord.intro.continue')}
                 <svg
@@ -66,7 +66,7 @@ const NextWordPredictionIntro = () => {
 
                   <path
                     d="M1 5H11M11 5L7 1M11 5L7 9"
-                    stroke="hsl(0 0% 12%)"
+                    stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round" />

@@ -67,7 +67,7 @@ export default function PromptConstruction() {
               {/* Continue button */}
               <Button 
                 onClick={handleContinue}
-                className="w-fit px-10 py-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold text-lg rounded-full transition-colors"
+                className="w-fit px-10 py-6 bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white font-heading font-semibold text-lg rounded-full transition-colors"
               >
                 {t('promptConstructionModule.intro.continue')}
                 <svg 
@@ -80,7 +80,7 @@ export default function PromptConstruction() {
                 >
                   <path 
                     d="M1 5H11M11 5L7 1M11 5L7 9" 
-                    stroke="hsl(0 0% 12%)" 
+                    stroke="currentColor" 
                     strokeWidth="2" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
