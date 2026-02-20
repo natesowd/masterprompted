@@ -64,7 +64,7 @@ export default function Specificity() {
           <ChatboxDummy
             value={t('promptConstructionModule.specificity.input')}
             submitButtonId="chatbox-submit-button"
-            onSubmit={handleSubmit} className="pb-[19px]" />
+            onSubmit={handleSubmit} className="pt-[13px] pb-[9px]" />
 
           {showPopover &&
           <PopoverSeries
