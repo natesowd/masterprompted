@@ -42,8 +42,9 @@ const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy" }:
         readOnly
         disabled
         ref={textareaRef}
+        rows={1}
         placeholder="Type your message here..."
-        className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 mb-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-lg min-h-0 resize-none"
+        className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-3 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-lg min-h-0 h-auto resize-none"
       />
     </div>
   );
