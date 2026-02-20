@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { SendHorizontal } from "lucide-react";
@@ -8,9 +9,10 @@ type ChatBoxDummyProps = {
   onSubmit?: (value: string) => void;
   submitButtonId?: string;
   id?: string;
+  className?: string;
 };
 
-const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy" }: ChatBoxDummyProps) => {
+const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy", className }: ChatBoxDummyProps) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleSubmit = (e?: React.MouseEvent) => {
@@ -23,9 +25,9 @@ const ChatBoxDummy = ({ value, onSubmit, submitButtonId, id = "chatbox-dummy" }:
   return (
     <div
       id={id}
-      className="relative bg-card border border-border rounded-2xl shadow-lg max-w-3xl"
+      className={cn("relative bg-card border border-border rounded-2xl shadow-lg max-w-3xl", className)}
     >
-      <div className="absolute top-4 right-4 z-10">
+      <div className="absolute top-1/2 -translate-y-1/2 right-3 z-10">
         <Button
           id={submitButtonId}
           onClick={handleSubmit}
