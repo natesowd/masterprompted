@@ -19,10 +19,20 @@ export default function Takeaways() {
       { title: t('nextWord.takeaways.point2Title'), body: t('nextWord.takeaways.point2') },
       { title: t('nextWord.takeaways.point3Title'), body: t('nextWord.takeaways.point3') },
     ];
+    const todos = [
+      '☐ Test an AI chatbot and observe how changing one word in your prompt shifts the entire response.',
+      '☐ Compare outputs from two different LLMs using the same prompt to spot prediction differences.',
+      '☐ Rewrite a vague prompt to be more specific and compare the before/after responses.',
+      '☐ Identify one AI-generated text in your daily media consumption and assess its accuracy.',
+    ];
     const content = [
       `${title} ${subtitle}`,
       '',
       ...points.map((p, i) => `${i + 1}. ${p.title}${p.body}`),
+      '',
+      '---',
+      'Practical To-Dos:',
+      ...todos,
     ].join('\n');
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -84,6 +94,12 @@ export default function Takeaways() {
                   <p>1. {t('nextWord.takeaways.point1Title')}{t('nextWord.takeaways.point1')}</p>
                   <p>2. {t('nextWord.takeaways.point2Title')}{t('nextWord.takeaways.point2')}</p>
                   <p>3. {t('nextWord.takeaways.point3Title')}{t('nextWord.takeaways.point3')}</p>
+                  <hr className="border-border my-2" />
+                  <p className="font-bold text-foreground">Practical To-Dos:</p>
+                  <p>☐ Test an AI chatbot and observe how changing one word in your prompt shifts the entire response.</p>
+                  <p>☐ Compare outputs from two different LLMs using the same prompt to spot prediction differences.</p>
+                  <p>☐ Rewrite a vague prompt to be more specific and compare the before/after responses.</p>
+                  <p>☐ Identify one AI-generated text in your daily media consumption and assess its accuracy.</p>
                 </div>
                 <div className="flex justify-end mt-2">
                   <Button onClick={handleDownload} className="rounded-full">
