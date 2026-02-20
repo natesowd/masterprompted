@@ -133,7 +133,7 @@ export default function SpecificityResponse() {
         <div className="flex-1 flex flex-col">
           {/* Article Content with scroll */}
           <div className="bg-white rounded-lg rounded-b-none p-8 flex-1 flex flex-col">
-            <ChatPrompt text={sentPrompt} />
+            <ChatPrompt text={sentPrompt} fileName="EU_AI_Act.pdf" />
             <div className="max-h-[500px] overflow-y-auto flex-1">
             {showGeneralOutput ?
                       // General content
