@@ -77,8 +77,10 @@ export default function PromptConstructionSpecificityTakeaways() {
           
           <div className="mt-16 flex items-center gap-4">
             <Button
+              variant="secondary"
               onClick={() => navigate("/playground")}
-              className="bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white font-heading font-semibold px-10 py-6 rounded-full transition-colors">
+              className="font-heading font-semibold px-10 py-6 rounded-full"
+            >
               {t('promptConstructionModule.takeaways.promptPlayground')}
               <svg width="10" height="8" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-3">
                  <path d="M1 5H11M11 5L7 1M11 5L7 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -114,7 +116,7 @@ export default function PromptConstructionSpecificityTakeaways() {
                   <p>☐ Iterate on prompts that produce weak results: refine wording, add constraints, and re-run.</p>
                 </div>
                 <div className="flex justify-end mt-2">
-                  <Button onClick={handleDownload} className="rounded-full">
+                  <Button variant="outline" onClick={handleDownload} className="rounded-full">
                     <Download className="h-4 w-4 mr-2" />
                     Download .txt
                   </Button>

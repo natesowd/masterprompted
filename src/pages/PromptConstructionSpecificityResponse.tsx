@@ -736,11 +736,11 @@ export default function SpecificityResponse() {
           {/* Navigation Button - Fixed at bottom */}
           <div className="bg-white rounded-lg rounded-t-none p-8 pt-6">
             <Button
-                      variant="secondary-outline"
-                      size="lg"
-                      className="px-10 font-heading font-semibold text-brand-tertiary-500"
-                      onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}>
-
+              variant="secondary"
+              size="lg"
+              className="px-10 font-heading font-semibold rounded-full"
+              onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
+            >
               {t('components.breadcrumb.takeaways')} →
             </Button>
 
