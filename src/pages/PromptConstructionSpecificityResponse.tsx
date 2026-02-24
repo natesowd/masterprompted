@@ -27,6 +27,7 @@ export default function SpecificityResponse() {
   const [appliedStyle, setAppliedStyle] = useState("");
   const [specificity, setSpecificity] = useState("");
   const [appliedSpecificity, setAppliedSpecificity] = useState("");
+  const [biasUnlocked, setBiasUnlocked] = useState(false);
 
 
   // Input prompt changes immediately
@@ -100,6 +101,10 @@ export default function SpecificityResponse() {
                   showStyle={true}
                   showContext={true}
                   showBias={true}
+                  enableSpecificity={!biasUnlocked}
+                  enableStyle={!biasUnlocked}
+                  enableContext={!biasUnlocked}
+                  enableBias={biasUnlocked}
                   parameters={{
                     bias,
                     context,
@@ -736,6 +741,29 @@ export default function SpecificityResponse() {
 
                   {/* Navigation Button - Fixed at bottom */}
                   <div className="bg-white rounded-lg rounded-t-none p-8 pt-6">
+                   {!biasUnlocked ? (
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="px-10 font-heading font-semibold rounded-full"
+                      onClick={() => {
+                        // Reset all parameters when unlocking bias
+                        setSpecificity("");
+                        setStyle("");
+                        setContext("");
+                        setBias("");
+                        setAppliedSpecificity("");
+                        setAppliedStyle("");
+                        setAppliedContext("");
+                        setAppliedBias("");
+                        setSentPrompt("Give me a summary of the main points in the AI Act.");
+                        setBiasUnlocked(true);
+                      }}
+                    >
+                      {t('common.nextStep') || 'Next Step'}
+                      <ArrowRight className="-mr-2 !h-6 !w-6" />
+                    </Button>
+                   ) : (
                     <Button
                       variant="secondary"
                       size="lg"
@@ -745,7 +773,7 @@ export default function SpecificityResponse() {
                       {t('components.breadcrumb.takeaways')}
                       <ArrowRight className="-mr-2 !h-6 !w-6" />
                     </Button>
-
+                   )}
                   </div>
                 </div>
 
