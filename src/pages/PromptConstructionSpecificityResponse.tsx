@@ -457,7 +457,12 @@ export default function SpecificityResponse() {
                                     </p>
 
                                     <p className="text-gray-700 text-base leading-relaxed">
-                                      That being said, the EU AI Act also includes provisions for exemptions and adaptations, which could help mitigate some of the potential negative effects on AI research. Additionally, the act is still in the process of being finalized, and there may be room for further adjustments and clarifications to address the concerns of the research community.
+                                      That being said, the EU AI Act also includes provisions for exemptions and adaptations, which could help mitigate some of the potential negative effects on AI research.{" "}
+                                      <TextFlag
+                                        text="Additionally, the act is still in the process of being finalized"
+                                        evaluationFactor="factual_accuracy"
+                                        explanation="An output that is not biased is not necessarily factually correct. The AI Act has been finalised, however the generated output does not reflect this fact."
+                                      />, and there may be room for further adjustments and clarifications to address the concerns of the research community.
                                     </p>
 
                                     <p className="text-gray-700 text-base leading-relaxed">
