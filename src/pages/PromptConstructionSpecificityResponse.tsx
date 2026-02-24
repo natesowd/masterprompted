@@ -31,6 +31,7 @@ export default function SpecificityResponse() {
   const [biasUnlocked, setBiasUnlocked] = useState(false);
   const [showBiasHighlight, setShowBiasHighlight] = useState(false);
   const [showBiasPromptHighlight, setShowBiasPromptHighlight] = useState(false);
+  const [showLessBiasPromptHighlight, setShowLessBiasPromptHighlight] = useState(false);
 
 
   // Input prompt changes immediately
@@ -131,6 +132,9 @@ export default function SpecificityResponse() {
                     setBias(key === 'bias' ? value : "");
                     if (key === 'bias' && value === t("components.promptControls.bias.right")) {
                       setShowBiasPromptHighlight(true);
+                    }
+                    if (key === 'bias' && value === t("components.promptControls.bias.left")) {
+                      setShowLessBiasPromptHighlight(true);
                     }
                   }}
                   onOptimize={handleApplyChanges}
@@ -796,6 +800,16 @@ export default function SpecificityResponse() {
       sideOffset={24}
     >
       This prompt is written in a biased and a commanding way – will it result in a biased output?
+    </FeatureHighlight>
+
+    <FeatureHighlight
+      target="#prompt-controls-chatbox"
+      open={showLessBiasPromptHighlight}
+      onClose={() => setShowLessBiasPromptHighlight(false)}
+      side="right"
+      sideOffset={24}
+    >
+      The prompt is now written in a non-biased and a questioning way – how will it affect the output?
     </FeatureHighlight>
 
     <ModuleNavigation
