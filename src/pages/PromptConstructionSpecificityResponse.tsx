@@ -318,11 +318,7 @@ export default function SpecificityResponse() {
                                 // Biased content about EU AI Act stifling research
                                  <div className="space-y-4">
                                   <p className="text-gray-800 leading-relaxed text-lg">
-                                    <TextFlag
-                                      text="General Purpose AI (GPAI)"
-                                      evaluationFactor="voice"
-                                      explanation={t('components.textFlag.content.biased_output_voice')} />
-                                    {' '}Big foundational models—like the ones behind chatbots or image generators—come with their own rules. Developers have to:
+                                    General Purpose AI (GPAI) Big foundational models—like the ones behind chatbots or image generators—come with their own rules. Developers have to:
                                   </p>
                                   <ul className="list-disc pl-6 text-gray-700 text-base leading-relaxed space-y-1">
                                     <li>Provide clear documentation and usage guidelines</li>
@@ -370,21 +366,14 @@ export default function SpecificityResponse() {
                                     <div>
                                       <p className="text-base font-semibold text-gray-900 mb-2">3. Uncertainty and legal risks</p>
                                       <p className="text-gray-700 text-base leading-relaxed">
-                                        <TextFlag
-                                          text="The act's requirements and potential penalties for non-compliance may create a climate of uncertainty and legal risk for researchers and organizations working on AI."
-                                          evaluationFactor="factual_accuracy"
-                                          explanation={t('components.textFlag.content.factual_liability')} />
-                                        {' '}This could discourage innovation and limit the willingness of researchers to explore new ideas and methodologies in AI.
+                                        The act&apos;s requirements and potential penalties for non-compliance may create a climate of uncertainty and legal risk for researchers and organizations working on AI. This could discourage innovation and limit the willingness of researchers to explore new ideas and methodologies in AI.
                                       </p>
                                     </div>
 
                                     <div>
                                       <p className="text-base font-semibold text-gray-900 mb-2">4. Potential for bureaucratic hurdles</p>
                                       <p className="text-gray-700 text-base leading-relaxed">
-                                        The act may introduce bureaucratic hurdles and red tape for researchers and developers, such as the need for extensive documentation, testing, and registration of AI systems. <TextFlag
-                                          text="This could slow down the research process and make it more difficult to bring new AI technologies to market."
-                                          evaluationFactor="relevance"
-                                          explanation={t('components.textFlag.content.chilling_effect')} />
+                                        The act may introduce bureaucratic hurdles and red tape for researchers and developers, such as the need for extensive documentation, testing, and registration of AI systems. This could slow down the research process and make it more difficult to bring new AI technologies to market.
                                       </p>
                                     </div>
 
