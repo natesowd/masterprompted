@@ -168,28 +168,28 @@ export default function SpecificityResponse() {
                       {showGeneralOutput ?
                         // General content
                         <div className="space-y-4">
-                          <p className="text-gray-800 leading-relaxed text-lg">
+                          <p className="text-gray-800 leading-relaxed text-base">
                             The EU AI Act is a comprehensive regulation for artificial intelligence <TextFlag
                               text="adopted by the European Union in 2024."
                               evaluationFactor="relevance"
                               explanation={t("components.textFlag.content.relevance2")} />
                             It's the first major legal framework in the world specifically created to govern AI systems.
                           </p>
-                          <p className="text-gray-800 leading-relaxed text-lg">
+                          <p className="text-gray-800 leading-relaxed text-base">
                             <TextFlag
                               text="The Act organizes AI systems into risk categories."
                               evaluationFactor="relevance"
                               explanation={t('components.textFlag.content.general_simplicity')} />
                             Some AI uses are completely prohibited, such as social scoring by governments or systems that manipulate people's behavior in harmful ways. High-risk AI systems - like those used in hiring, credit scoring, law enforcement, or critical infrastructure - face strict requirements around transparency, data quality, human oversight, and safety. Lower-risk systems mainly need to be transparent about being AI (like chatbots disclosing they're not human). Most AI applications are considered minimal risk and aren't heavily regulated.
                           </p>
-                          <p className="text-gray-800 leading-relaxed text-lg">
+                          <p className="text-gray-800 leading-relaxed text-base">
                             The legislation aims to balance protecting people's rights and safety with encouraging AI innovation. It applies to companies and organizations that offer AI systems in the EU, no matter where they're located.
                           </p>
                         </div> :
                         showSpecificOutput ?
                           // Specific content - detailed summary
                           <div className="space-y-4">
-                            <p className="text-gray-800 leading-relaxed text-lg">
+                            <p className="text-gray-800 leading-relaxed text-base">
                               <TextFlag
                                 text="Sure!"
                                 evaluationFactor="voice"
@@ -277,7 +277,7 @@ export default function SpecificityResponse() {
                           showConversationalOutput ?
                             // Conversational content
                             <div className="space-y-4">
-                              <p className="text-gray-800 leading-relaxed text-lg">
+                              <p className="text-gray-800 leading-relaxed text-base">
                                 <TextFlag
                                   text="Sure!"
                                   evaluationFactor="voice"
@@ -288,24 +288,24 @@ export default function SpecificityResponse() {
                                   explanation={t("components.textFlag.content.relevance2")} />
                                 It's the first major legislation of its kind globally.
                               </p>
-                              <p className="text-gray-800 leading-relaxed text-lg">
+                              <p className="text-gray-800 leading-relaxed text-base">
                                 The Act works on a risk-based system. AI systems are grouped by how risky they are. Some AI uses are completely banned - things like government social scoring or AI that manipulates vulnerable people. High-risk AI (used in areas like hiring, law enforcement, credit decisions, or critical infrastructure) has to meet strict rules: good data governance, transparency about how it works, human oversight, and proper risk management.
                               </p>
-                              <p className="text-gray-800 leading-relaxed text-lg">
+                              <p className="text-gray-800 leading-relaxed text-base">
                                 AI with lower risks mainly needs to be transparent - <TextFlag
                                   text="like chatbots telling you they're AI."
                                   evaluationFactor="voice"
                                   explanation={t('components.textFlag.content.voice2')} />
                                 Most AI systems are minimal risk and don't have many requirements.
                               </p>
-                              <p className="text-gray-800 leading-relaxed text-lg">
+                              <p className="text-gray-800 leading-relaxed text-base">
                                 The goal is to keep people safe and protect their rights while still letting AI innovation happen. It applies to anyone who wants to use AI systems in the EU market, whether they're based in Europe or not.
                               </p>
                             </div> :
                             showInstructionalOutput ?
                               // Instructional content - TL;DR format
                               <div className="space-y-4">
-                                <p className="text-gray-800 leading-relaxed text-lg">
+                                <p className="text-gray-800 leading-relaxed text-base">
                                   The AI Act is the EU's legislative proposal to regulate artificial intelligence.
                                 </p>
                                 <p className="text-base font-semibold text-gray-900">Here's the TL;DR:</p>
@@ -341,7 +341,7 @@ export default function SpecificityResponse() {
                               showBiasedOutput ?
                                 // Biased content about EU AI Act stifling research
                                  <div className="space-y-4">
-                                  <p className="text-gray-800 leading-relaxed text-lg">
+                                  <p className="text-gray-800 leading-relaxed text-base">
                                     General Purpose AI (GPAI) Big foundational models—like the ones behind chatbots or image generators—come with their own rules. Developers have to:
                                   </p>
                                   <ul className="list-disc pl-6 text-gray-700 text-base leading-relaxed space-y-1">
@@ -364,7 +364,7 @@ export default function SpecificityResponse() {
                                     Want to dive deeper into specific sectors like healthcare, education, or law enforcement? I can break those down too!
                                   </p>
 
-                                  <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-lg">
+                                  <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-base">
                                     <TextFlag
                                       text="The EU AI Act has the potential to stifle AI research"
                                       evaluationFactor="bias"
@@ -420,7 +420,7 @@ export default function SpecificityResponse() {
                                 showNoBiasOutput ?
                                   // Less Bias content
                                   <div className="space-y-4">
-                                    <p className="text-gray-800 leading-relaxed text-lg">
+                                    <p className="text-gray-800 leading-relaxed text-base">
                                       General Purpose AI (GPAI) Big foundational models—like the ones behind chatbots or image generators—come with their own rules. Developers have to:
                                     </p>
                                     <ul className="list-disc pl-6 text-gray-700 text-base leading-relaxed space-y-1">
@@ -443,7 +443,7 @@ export default function SpecificityResponse() {
                                       Want to dive deeper into specific sectors like healthcare, education, or law enforcement? I can break those down too!
                                     </p>
 
-                                    <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-lg">
+                                    <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-base">
                                       <TextFlag
                                         text="The EU AI Act, while comprehensive and stringent in its requirements for AI systems, does not necessarily stifle AI research."
                                         evaluationFactor="voice"
@@ -477,7 +477,7 @@ export default function SpecificityResponse() {
                                   showWithBackgroundOutput ?
                                     // With Background content
                                     <div className="space-y-4">
-                                      <p className="text-gray-800 leading-relaxed text-lg">
+                                      <p className="text-gray-800 leading-relaxed text-base">
                                         <TextFlag
                                           text="Certainly!"
                                           evaluationFactor="voice"
@@ -633,7 +633,7 @@ export default function SpecificityResponse() {
                                     showNoBackgroundOutput ?
                                       // Less Background 
                                       <div className="space-y-4">
-                                        <p className="text-gray-800 leading-relaxed text-lg">
+                                        <p className="text-gray-800 leading-relaxed text-base">
                                           The AI Act is the EU&apos;s regulation for artificial intelligence,{" "}
                                           <TextFlag
                                             text="adopted in 2024."
@@ -641,7 +641,7 @@ export default function SpecificityResponse() {
                                             explanation={t("components.textFlag.content.relevance2")} />
 
                                         </p>
-                                        <p className="text-gray-800 leading-relaxed text-lg">Here are the main points:</p>
+                                        <p className="text-gray-800 leading-relaxed text-base">Here are the main points:</p>
 
                                         <p className="text-gray-700 text-base leading-relaxed">Risk-based approach: AI systems are categorized by risk level:</p>
 
@@ -675,7 +675,7 @@ export default function SpecificityResponse() {
 
                                       // Base output when all controls are "No Change"
                                       <div className="space-y-4">
-                                        <p className="text-gray-800 leading-relaxed text-lg">
+                                        <p className="text-gray-800 leading-relaxed text-base">
                                           <TextFlag
                                             text="Certainly!"
                                             evaluationFactor="voice"
