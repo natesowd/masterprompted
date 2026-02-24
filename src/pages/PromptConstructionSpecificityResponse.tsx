@@ -760,7 +760,7 @@ export default function SpecificityResponse() {
                         setBiasUnlocked(true);
                       }}
                     >
-                      {t('common.nextStep') || 'Next Step'}
+                      Next Step
                       <ArrowRight className="-mr-2 !h-6 !w-6" />
                     </Button>
                    ) : (
