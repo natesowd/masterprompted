@@ -11,6 +11,7 @@ import { Parameters } from "@/pages/PromptPlayground";
 import TextFlag from "@/components/TextFlag";
 import SectionFlag from "@/components/SectionFlag";
 import ChatPrompt from "@/components/ChatPrompt";
+import FeatureHighlight from "@/components/FeatureHighlight";
 import { ArrowRight } from "lucide-react";
 
 import { set } from "zod";
@@ -28,6 +29,7 @@ export default function SpecificityResponse() {
   const [specificity, setSpecificity] = useState("");
   const [appliedSpecificity, setAppliedSpecificity] = useState("");
   const [biasUnlocked, setBiasUnlocked] = useState(false);
+  const [showBiasHighlight, setShowBiasHighlight] = useState(false);
 
 
   // Input prompt changes immediately
@@ -733,6 +735,7 @@ export default function SpecificityResponse() {
                         setAppliedBias("");
                         setSentPrompt("Give me a summary of the main points in the AI Act.");
                         setBiasUnlocked(true);
+                        setShowBiasHighlight(true);
                       }}
                     >
                       Next Step
@@ -769,6 +772,17 @@ export default function SpecificityResponse() {
         </div>
       </div>
     </main>
+
+    <FeatureHighlight
+      target="#bias-parameter-control"
+      open={showBiasHighlight}
+      onClose={() => setShowBiasHighlight(false)}
+      side="right"
+      sideOffset={24}
+    >
+      <strong>Confirmation Bias</strong>
+      <p className="mt-2">Confirmation bias is the tendency to favour information that confirms our existing beliefs. A biased prompt – one that is worded to suggest a particular answer – can lead the model to generate a matching output. By appearing objective or authoritative, such outputs can reinforce our beliefs, strengthening confirmation bias.</p>
+    </FeatureHighlight>
 
     <ModuleNavigation
       previousRoute="/module/prompt-construction/summarize"

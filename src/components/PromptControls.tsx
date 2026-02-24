@@ -24,6 +24,8 @@ interface ParameterProps {
     infoText?: string;
     /** Hide the middle "Original" radio option, showing only left and right */
     hideOriginal?: boolean;
+    /** Optional id for the wrapper div */
+    id?: string;
 }
 
 function Parameter({
@@ -36,7 +38,8 @@ function Parameter({
     currentValue,
     onParameterChange,
     infoText,
-    hideOriginal = false
+    hideOriginal = false,
+    id
 }: ParameterProps) {
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [pulseActive, setPulseActive] = useState(false);
@@ -71,6 +74,7 @@ function Parameter({
 
     return (
         <div
+            id={id}
             className={`my-3 rounded-lg px-2 py-1 transition-all ${!enabled ? 'opacity-30 pointer-events-none' : 'bg-background/60'} ${pulseActive ? 'animate-pulse-once' : ''}`}
         >
             <div className="flex items-center gap-1 mb-2">
@@ -288,6 +292,7 @@ export default function PromptControls({
                             onParameterChange={onParameterChange}
                             infoText={t('components.promptControls.bias.info')}
                             hideOriginal
+                            id="bias-parameter-control"
                         />
                     </div>
 
