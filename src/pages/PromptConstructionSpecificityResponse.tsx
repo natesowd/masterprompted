@@ -416,7 +416,13 @@ export default function SpecificityResponse() {
                                     </p>
 
                                     <p className="text-gray-800 leading-relaxed text-lg">
-                                      The EU AI Act, while comprehensive and stringent in its requirements for AI systems, does not necessarily stifle AI research. The act aims to establish a legal framework for the development, deployment, and use of AI in the European Union, with a focus on promoting safety, transparency, and accountability.
+                                      <TextFlag
+                                        text="The EU AI Act, while comprehensive and stringent in its requirements for AI systems, does not necessarily stifle AI research."
+                                        evaluationFactor="voice"
+                                        explanation="Output goes on to one-sidedly represent the topic in question. It reinforces confirmation bias by presenting information that are strictly in line with the biased prompt, i.e. with user's prior beliefs. Such outputs could be factually inaccurate as well."
+                                        severity="warning"
+                                        noUnderline
+                                      />{" "}The act aims to establish a legal framework for the development, deployment, and use of AI in the European Union, with a focus on promoting safety, transparency, and accountability.
                                     </p>
 
                                     <p className="text-gray-700 text-base leading-relaxed">
