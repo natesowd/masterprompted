@@ -743,7 +743,7 @@ export default function SpecificityResponse() {
                   <div className="bg-white rounded-lg rounded-t-none p-8 pt-6">
                    {!biasUnlocked ? (
                     <Button
-                      variant="secondary"
+                      variant="outline"
                       size="lg"
                       className="px-10 font-heading font-semibold rounded-full"
                       onClick={() => {
@@ -765,7 +765,7 @@ export default function SpecificityResponse() {
                     </Button>
                    ) : (
                     <Button
-                      variant="secondary"
+                      variant="outline"
                       size="lg"
                       className="px-10 font-heading font-semibold rounded-full"
                       onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
