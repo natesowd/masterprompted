@@ -75,46 +75,49 @@ export default function FeatureHighlight({
 
   // Compute tooltip position & connector line
   const DOT_R = 6;
-  const LINE_LEN = sideOffset - DOT_R;
   let tooltipStyle: React.CSSProperties = {};
   let dotCx: number, dotCy: number, lineX1: number, lineY1: number, lineX2: number, lineY2: number;
 
+  // The tooltip is placed at sideOffset + DOT_R from the rect edge.
+  // The line runs from the dot (at DOT_R from edge) to the tooltip card.
+  const tooltipGap = sideOffset + DOT_R;
+
   switch (side) {
     case "right":
-      dotCx = rect.right + DOT_R;
+      dotCx = rect.right + CUTOUT_PADDING + DOT_R;
       dotCy = rect.top + rect.height / 2;
       lineX1 = dotCx;
       lineY1 = dotCy;
-      lineX2 = dotCx + LINE_LEN;
+      lineX2 = rect.right + CUTOUT_PADDING + tooltipGap;
       lineY2 = dotCy;
-      tooltipStyle = { left: rect.right + sideOffset + DOT_R, top: rect.top + rect.height / 2, transform: "translateY(-50%)" };
+      tooltipStyle = { left: rect.right + CUTOUT_PADDING + tooltipGap, top: rect.top + rect.height / 2, transform: "translateY(-50%)" };
       break;
     case "left":
-      dotCx = rect.left - DOT_R;
+      dotCx = rect.left - CUTOUT_PADDING - DOT_R;
       dotCy = rect.top + rect.height / 2;
       lineX1 = dotCx;
       lineY1 = dotCy;
-      lineX2 = dotCx - LINE_LEN;
+      lineX2 = rect.left - CUTOUT_PADDING - tooltipGap;
       lineY2 = dotCy;
-      tooltipStyle = { right: window.innerWidth - rect.left + sideOffset + DOT_R, top: rect.top + rect.height / 2, transform: "translateY(-50%)" };
+      tooltipStyle = { right: window.innerWidth - rect.left + CUTOUT_PADDING + tooltipGap, top: rect.top + rect.height / 2, transform: "translateY(-50%)" };
       break;
     case "bottom":
       dotCx = rect.left + rect.width / 2;
-      dotCy = rect.bottom + DOT_R;
+      dotCy = rect.bottom + CUTOUT_PADDING + DOT_R;
       lineX1 = dotCx;
       lineY1 = dotCy;
       lineX2 = dotCx;
-      lineY2 = dotCy + LINE_LEN;
-      tooltipStyle = { left: rect.left + rect.width / 2, top: rect.bottom + sideOffset + DOT_R, transform: "translateX(-50%)" };
+      lineY2 = rect.bottom + CUTOUT_PADDING + tooltipGap;
+      tooltipStyle = { left: rect.left + rect.width / 2, top: rect.bottom + CUTOUT_PADDING + tooltipGap, transform: "translateX(-50%)" };
       break;
     case "top":
       dotCx = rect.left + rect.width / 2;
-      dotCy = rect.top - DOT_R;
+      dotCy = rect.top - CUTOUT_PADDING - DOT_R;
       lineX1 = dotCx;
       lineY1 = dotCy;
       lineX2 = dotCx;
-      lineY2 = dotCy - LINE_LEN;
-      tooltipStyle = { left: rect.left + rect.width / 2, bottom: window.innerHeight - rect.top + sideOffset + DOT_R, transform: "translateX(-50%)" };
+      lineY2 = rect.top - CUTOUT_PADDING - tooltipGap;
+      tooltipStyle = { left: rect.left + rect.width / 2, bottom: window.innerHeight - rect.top + CUTOUT_PADDING + tooltipGap, transform: "translateX(-50%)" };
       break;
   }
 
