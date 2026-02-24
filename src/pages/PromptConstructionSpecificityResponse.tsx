@@ -745,7 +745,7 @@ export default function SpecificityResponse() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="px-10 font-heading font-semibold rounded-full"
+                       className="px-10 font-heading font-semibold"
                       onClick={() => {
                         // Reset all parameters when unlocking bias
                         setSpecificity("");
@@ -767,7 +767,7 @@ export default function SpecificityResponse() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="px-10 font-heading font-semibold rounded-full"
+                      className="px-10 font-heading font-semibold"
                       onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
                     >
                       {t('components.breadcrumb.takeaways')}
