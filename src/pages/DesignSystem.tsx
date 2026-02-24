@@ -1,7 +1,23 @@
+import { useState } from "react";
 import Header from "@/components/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertCircle, Bell, Check, ChevronRight, Info, Mail, Search, Settings, Star, User } from "lucide-react";
 
 /**
  * Design System documentation page.
@@ -373,6 +389,291 @@ const DesignSystem = () => {
                       <span className="text-accent-foreground text-body-2">accent</span>
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+
+          <Separator />
+
+          {/* Component Gallery */}
+          <section className="space-y-6">
+            <h2 className="text-h3 font-heading text-foreground">Component Gallery</h2>
+
+            {/* Cards */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-h5 font-heading">Cards</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-body-1">Basic Card</CardTitle>
+                      <CardDescription>A simple card with description.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-body-2 text-muted-foreground">Card content goes here.</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-body-1">Action Card</CardTitle>
+                      <CardDescription>Card with a footer action.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-body-2 text-muted-foreground">Interactive card example.</p>
+                    </CardContent>
+                    <CardFooter>
+                      <Button size="sm">Action</Button>
+                    </CardFooter>
+                  </Card>
+                  <Card className="border-brand-tertiary-500">
+                    <CardHeader>
+                      <CardTitle className="text-body-1">Highlighted Card</CardTitle>
+                      <CardDescription>With a branded border.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex gap-2">
+                        <Badge>Tag 1</Badge>
+                        <Badge variant="secondary">Tag 2</Badge>
+                        <Badge variant="outline">Tag 3</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Badges */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-h5 font-heading">Badges</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-3 items-center">
+                  <Badge>Default</Badge>
+                  <Badge variant="secondary">Secondary</Badge>
+                  <Badge variant="outline">Outline</Badge>
+                  <Badge variant="destructive">Destructive</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Form Controls */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-h5 font-heading">Form Controls</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-input">Text Input</Label>
+                    <Input id="demo-input" placeholder="Enter text..." />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-search">With Icon</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input id="demo-search" placeholder="Search..." className="pl-9" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-textarea">Textarea</Label>
+                    <Textarea id="demo-textarea" placeholder="Write something..." rows={3} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Select</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="opt1">Option 1</SelectItem>
+                        <SelectItem value="opt2">Option 2</SelectItem>
+                        <SelectItem value="opt3">Option 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-4">
+                    <Label>Checkboxes</Label>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Checkbox id="c1" defaultChecked />
+                        <Label htmlFor="c1" className="font-normal">Checked</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Checkbox id="c2" />
+                        <Label htmlFor="c2" className="font-normal">Unchecked</Label>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <Label>Radio Group</Label>
+                    <RadioGroup defaultValue="r1">
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="r1" id="r1" />
+                        <Label htmlFor="r1" className="font-normal">Option A</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="r2" id="r2" />
+                        <Label htmlFor="r2" className="font-normal">Option B</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  <div className="space-y-4">
+                    <Label>Switch</Label>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Switch id="s1" defaultChecked />
+                        <Label htmlFor="s1" className="font-normal">Enabled</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch id="s2" />
+                        <Label htmlFor="s2" className="font-normal">Disabled</Label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <Label>Slider</Label>
+                  <Slider defaultValue={[50]} max={100} step={1} className="max-w-sm" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tabs */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-h5 font-heading">Tabs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="tab1" className="w-full">
+                  <TabsList>
+                    <TabsTrigger value="tab1">Overview</TabsTrigger>
+                    <TabsTrigger value="tab2">Details</TabsTrigger>
+                    <TabsTrigger value="tab3">Settings</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="tab1" className="p-4">
+                    <p className="text-body-2 text-muted-foreground">Overview content panel.</p>
+                  </TabsContent>
+                  <TabsContent value="tab2" className="p-4">
+                    <p className="text-body-2 text-muted-foreground">Details content panel.</p>
+                  </TabsContent>
+                  <TabsContent value="tab3" className="p-4">
+                    <p className="text-body-2 text-muted-foreground">Settings content panel.</p>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Accordion */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-h5 font-heading">Accordion</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="a1">
+                    <AccordionTrigger>What is this platform?</AccordionTrigger>
+                    <AccordionContent>
+                      An educational tool for media professionals to understand AI-generated content.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="a2">
+                    <AccordionTrigger>How does prompt construction work?</AccordionTrigger>
+                    <AccordionContent>
+                      It explores how bias, specificity, context, and style affect AI outputs.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="a3">
+                    <AccordionTrigger>Can I try it myself?</AccordionTrigger>
+                    <AccordionContent>
+                      Yes — the Prompt Playground lets you experiment freely.
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </CardContent>
+            </Card>
+
+            {/* Progress & Avatars & Tooltips */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-h5 font-heading">Feedback & Display</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Progress</Label>
+                  <Progress value={66} className="max-w-sm" />
+                  <p className="text-caption text-muted-foreground">66% complete</p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label>Avatars</Label>
+                  <div className="flex gap-3">
+                    <Avatar>
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <Avatar>
+                      <AvatarFallback className="bg-brand-secondary-500 text-foreground">AI</AvatarFallback>
+                    </Avatar>
+                    <Avatar>
+                      <AvatarFallback className="bg-brand-tertiary-500 text-white">MP</AvatarFallback>
+                    </Avatar>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label>Tooltips</Label>
+                  <div className="flex gap-3">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon"><Info className="h-4 w-4" /></Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Informational tooltip</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Settings</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon"><Bell className="h-4 w-4" /></Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Notifications</TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Icon Buttons */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-h5 font-heading">Icon Buttons</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-3">
+                  <Button size="icon"><Star className="h-4 w-4" /></Button>
+                  <Button size="icon" variant="outline"><Mail className="h-4 w-4" /></Button>
+                  <Button size="icon" variant="ghost"><User className="h-4 w-4" /></Button>
+                  <Button size="icon" variant="secondary"><Check className="h-4 w-4" /></Button>
+                  <Button variant="outline" className="gap-2"><ChevronRight className="h-4 w-4" /> Continue</Button>
+                  <Button variant="ghost" className="gap-2"><AlertCircle className="h-4 w-4" /> Warning</Button>
                 </div>
               </CardContent>
             </Card>
