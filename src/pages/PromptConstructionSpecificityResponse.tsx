@@ -443,7 +443,7 @@ export default function SpecificityResponse() {
                                       <TextFlag
                                         text="The EU AI Act, while comprehensive and stringent in its requirements for AI systems, does not necessarily stifle AI research."
                                         evaluationFactor="voice"
-                                        explanation="Output goes on to one-sidedly represent the topic in question. It reinforces confirmation bias by presenting information that are strictly in line with the biased prompt, i.e. with user's prior beliefs. Such outputs could be factually inaccurate as well."
+                                        explanation="Voice of an output generated from a questioning prompt is not so determined, answering the question not in a &quot;black-and-white&quot; manner, but taking counter-arguments into account. Such an output, written in an uncertain tone, might be taken with more consideration by the user."
                                         severity="warning"
                                       />{" "}The act aims to establish a legal framework for the development, deployment, and use of AI in the European Union, with a focus on promoting safety, transparency, and accountability.
                                     </p>
