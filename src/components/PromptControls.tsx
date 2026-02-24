@@ -57,7 +57,7 @@ function Parameter({
 
     return (
         <div
-            className={`my-3 ${!enabled && 'opacity-60 pointer-events-none'}`}
+            className={`my-3 rounded-lg px-2 py-1 transition-all ${!enabled ? 'opacity-30 pointer-events-none' : 'bg-background/60'}`}
         >
             <div className="flex items-center gap-1 mb-2">
                 <span className="text-sm font-semibold text-foreground font-heading">{parameterTitle}</span>
