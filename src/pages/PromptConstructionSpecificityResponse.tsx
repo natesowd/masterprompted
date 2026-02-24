@@ -745,7 +745,7 @@ export default function SpecificityResponse() {
                     <Button
                       variant="outline"
                       size="lg"
-                       className="px-10 font-heading font-semibold"
+                       className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                       onClick={() => {
                         // Reset all parameters when unlocking bias
                         setSpecificity("");
@@ -767,7 +767,7 @@ export default function SpecificityResponse() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="px-10 font-heading font-semibold"
+                      className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                       onClick={() => navigate("/module/prompt-construction/specificity/takeaways")}
                     >
                       {t('components.breadcrumb.takeaways')}
