@@ -376,7 +376,11 @@ export default function SpecificityResponse() {
                                     <div>
                                       <p className="text-base font-semibold text-gray-900 mb-2">1. Stringent requirements</p>
                                       <p className="text-gray-700 text-base leading-relaxed">
-                                        The act imposes strict requirements on the development, deployment, and use of AI systems within the European Union. These requirements may be difficult and time-consuming to meet, especially for researchers and startups with limited resources. This could lead to delays in research and development, as well as increased costs.
+                                        <TextFlag
+                                          text="The act imposes strict requirements on the development, deployment, and use of AI systems within the European Union."
+                                          evaluationFactor="bias"
+                                          explanation="Output goes on to one-sidedly represent the topic in question. It reinforces confirmation bias by presenting information that are strictly in line with the biased prompt, i.e. with user's prior beliefs. Such outputs could be factually inaccurate as well."
+                                        />{" "}These requirements may be difficult and time-consuming to meet, especially for researchers and startups with limited resources. This could lead to delays in research and development, as well as increased costs.
                                       </p>
                                     </div>
 
