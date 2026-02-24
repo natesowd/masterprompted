@@ -6,7 +6,7 @@ import type { Handler } from "@netlify/functions";
 const ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "https://masterprompted.lovable.app",
-    "https://prompted.eipcm.org",
+    "https://prompted-app.eipcm.org",
 ];
 
 const corsHeaders = (origin: string | undefined) => ({

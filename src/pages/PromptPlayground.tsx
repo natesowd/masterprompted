@@ -177,30 +177,54 @@ const PromptPlayground = () => {
       const [specificity, style, context, bias] = args;
       const paramMap: Record<string, string> = { specificity, style, context, bias };
 
-      const params = Object.entries(paramMap)
+      const entries = Object.entries(paramMap)
         .filter(([_, value]) => value !== NO_CHANGE_VALUE && value !== "")
-        .map(([name, value]) => `${name} level: ${value}`)
-        .join(", ");
+        .map(([name, value]) => {
+          const prefix = (name === "specificity" || name === "style") ? "be" : "have";
+          return `${prefix} ${value.toLowerCase()}`;
+        });
 
-      const optimizeUserPrompt = `Rewrite the following string to align with the following paramters: ${params}. String: "${prompt}".`;
+      const params = entries.length > 1
+        ? `${entries.slice(0, -1).join(", ")} and ${entries[entries.length - 1]}`
+        : entries[0] || "";
+
+      const optimizeUserPrompt = `Rewrite the following prompt to ${params}: "${prompt}".`;
 
       const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
-          temperature: 0.7,
+          temperature: 0.5,
           messages: [
             {
               role: "system",
               content:
-                `You are an instructional refiner. Your role is to perform a seamless transformation of a provided string based on the requested modifications.
+                `
+You are a precision prompt modifier. Your sole function is to minimally transform a provided prompt according to specified modification parameters.
 
-              OPERATIONAL PRINCIPLES:
-              1. INTENT PRESERVATION: Maintain the fundamental objective and structural type of the original request. The core mission of the input must remain intact through the transformation. Crucially, preserve the original point of view, pronouns, and ownership; if the input says "my," "I," or "me," the output must retain that specific perspective.
-              2. LINGUISTIC INTEGRATION: Incorporate the requested shifts directly into the syntax, tone, and framing of the text. The final output should be a cohesive instruction where the modifications are inherent to the writing style rather than externally described. 
-              3. LENGTH CONCIOUSNESS: Try to mirror the length of the original string. Try to be as concise as possible in order to achieve the desired output. 
-              4. OUTPUT STRICTURE: You must output ONLY the final transformed text. Do not include introductory remarks, concluding statements, quotes, markdown formatting, or meta-commentary. The response must contain the modified instruction and nothing else.
+CORE PRIORITIES (in strict order of importance):
+
+1. INTENT AND FUNCTION PRESERVATION (ABSOLUTE PRIORITY):
+   The transformed prompt must retain the exact underlying intent, task type, and functional objective of the original prompt. If the original prompt asks the system to write, explain, summarize, argue, list, generate, analyze, or question something, the modified prompt must still perform that same kind of request. Never change the fundamental purpose, requested action, deliverable type, target subject, or expected output form. The core mission must remain identical.
+
+2. MINIMAL-CHANGE PRINCIPLE (CO-EQUAL HEURISTIC):
+   Treat the original prompt as the default anchor. Make the smallest possible set of edits required to satisfy the modification parameters. Prefer local rewrites over structural rewrites. Prefer substitutions over expansions. Do not rephrase for stylistic variety. Do not improve, optimize, clarify, or embellish unless explicitly required by the parameters. If a segment does not need to change, leave it untouched.
+
+3. PARAMETER ALIGNMENT:
+   Apply all provided modification parameters faithfully, but only to the extent necessary to satisfy them. Integrate changes directly into the wording, tone, structure, or constraints so they are inherent to the instruction itself. Do not describe the modifications; embody them. When parameter alignment conflicts with minimal change, satisfy the parameters using the least disruptive transformation possible.
+
+4. PERSPECTIVE AND OWNERSHIP PRESERVATION:
+   Preserve the original grammatical perspective and ownership. If the original uses first person (“I,” “me,” “my”), second person (“you”), or third person, the transformed prompt must maintain that same perspective and referential structure.
+
+5. STRUCTURAL AND SCOPE STABILITY:
+   Maintain the original scope, constraints, and level of specificity. Do not introduce new requirements, remove essential constraints, or alter the scale of the task unless explicitly required by the modification parameters.
+
+6. LENGTH DISCIPLINE:
+   Keep the transformed prompt approximately the same length as the original. Avoid unnecessary expansion or compression beyond what the parameters require.
+
+OUTPUT RULES:
+Output only the final transformed prompt. Do not include explanations, commentary, labels, quotes, or formatting. Return only the modified instruction text.
               `
             },
             { role: "user", content: optimizeUserPrompt },
@@ -214,7 +238,8 @@ const PromptPlayground = () => {
       }
 
       const hfResult = await response.json();
-      const optimizedPrompt = hfResult.choices[0].message.content || "";
+      const rawOptimizedPrompt = hfResult.choices[0].message.content || "";
+      const optimizedPrompt = rawOptimizedPrompt.trim().replace(/^["'](.+)["']$/, '$1');
 
       if (optimizedPrompt) {
         setEditingText(optimizedPrompt);
