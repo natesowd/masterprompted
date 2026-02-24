@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -60,6 +60,7 @@ export default function SpecificityResponse() {
   const showGeneralOutput = appliedSpecificity === t("components.promptControls.specificity.left");
   const showBaseOutput = !appliedBias && !appliedContext && !appliedStyle && !appliedSpecificity;
   const [sentPrompt, setSentPrompt] = useState(inputPrompt);
+  const biasTextFlagRef = useRef<HTMLDivElement>(null);
 
   const handleApplyChanges = () => {
     setAppliedBias(bias);
@@ -68,6 +69,15 @@ export default function SpecificityResponse() {
     setAppliedSpecificity(specificity);
     setSentPrompt(inputPrompt);
   };
+
+  // Scroll to TextFlag area when bias output is shown
+  useEffect(() => {
+    if ((showBiasedOutput || showNoBiasOutput) && biasTextFlagRef.current) {
+      setTimeout(() => {
+        biasTextFlagRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [showBiasedOutput, showNoBiasOutput]);
 
   const handleParameterChange = (key: keyof Parameters, value: string) => {
     if (key === 'bias') setBias(value);
@@ -340,7 +350,7 @@ export default function SpecificityResponse() {
                                     Want to dive deeper into specific sectors like healthcare, education, or law enforcement? I can break those down too!
                                   </p>
 
-                                  <p className="text-gray-800 leading-relaxed text-lg">
+                                  <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-lg">
                                     <TextFlag
                                       text="The EU AI Act has the potential to stifle AI research"
                                       evaluationFactor="bias"
@@ -415,7 +425,7 @@ export default function SpecificityResponse() {
                                       Want to dive deeper into specific sectors like healthcare, education, or law enforcement? I can break those down too!
                                     </p>
 
-                                    <p className="text-gray-800 leading-relaxed text-lg">
+                                    <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-lg">
                                       <TextFlag
                                         text="The EU AI Act, while comprehensive and stringent in its requirements for AI systems, does not necessarily stifle AI research."
                                         evaluationFactor="voice"
