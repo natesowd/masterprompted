@@ -224,6 +224,7 @@ export default function PromptControls({
         <div className={cn("bg-surface-200 flex flex-col overflow-hidden [&_*]:!font-heading [&_textarea]:!font-['Manrope']", className)}>
             <div className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-1 min-h-0">
                 {/* Chatbox */}
+                <div id="prompt-controls-chatbox">
                 <Chatbox
                     value={chatValue}
                     onChange={onChatChange ?? (() => { })}
@@ -240,6 +241,7 @@ export default function PromptControls({
                     autoResize={readOnly}
                     className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
                 />
+                </div>
 
                 {/* Parameters area */}
                 <div className="flex-initial flex flex-col justify-end min-h-0 overflow-y-auto">

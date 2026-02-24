@@ -155,9 +155,7 @@ export default function SpecificityResponse() {
                 <div className="flex-1 flex flex-col">
                   {/* Article Content with scroll */}
                   <div className="bg-white rounded-lg rounded-b-none p-8 flex-1 flex flex-col">
-                    <div id="chat-prompt-area">
-                      <ChatPrompt text={sentPrompt} fileName="EU_AI_Act.pdf" />
-                    </div>
+                    <ChatPrompt text={sentPrompt} fileName="EU_AI_Act.pdf" />
                     <div className="max-h-[500px] overflow-y-auto flex-1">
                       {showGeneralOutput ?
                         // General content
@@ -791,10 +789,10 @@ export default function SpecificityResponse() {
     </FeatureHighlight>
 
     <FeatureHighlight
-      target="#chat-prompt-area"
+      target="#prompt-controls-chatbox"
       open={showBiasPromptHighlight}
       onClose={() => setShowBiasPromptHighlight(false)}
-      side="bottom"
+      side="right"
       sideOffset={24}
     >
       This prompt is written in a biased and a commanding way – will it result in a biased output?
