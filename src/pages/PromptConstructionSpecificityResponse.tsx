@@ -71,10 +71,6 @@ export default function SpecificityResponse() {
     setAppliedStyle(style);
     setAppliedSpecificity(specificity);
     setSentPrompt(inputPrompt);
-    // Show prompt highlight when "More Bias" is applied
-    if (bias === t("components.promptControls.bias.right")) {
-      setShowBiasPromptHighlight(true);
-    }
   };
 
   // Scroll to TextFlag area when bias output is shown
@@ -133,6 +129,9 @@ export default function SpecificityResponse() {
                     setStyle(key === 'style' ? value : "");
                     setContext(key === 'context' ? value : "");
                     setBias(key === 'bias' ? value : "");
+                    if (key === 'bias' && value === t("components.promptControls.bias.right")) {
+                      setShowBiasPromptHighlight(true);
+                    }
                   }}
                   onOptimize={handleApplyChanges}
                   readOnly={true}
