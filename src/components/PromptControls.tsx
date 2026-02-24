@@ -22,6 +22,8 @@ interface ParameterProps {
     currentValue: string;
     onParameterChange?: (key: keyof Parameters, value: string) => void;
     infoText?: string;
+    /** Hide the middle "Original" radio option, showing only left and right */
+    hideOriginal?: boolean;
 }
 
 function Parameter({
@@ -33,7 +35,8 @@ function Parameter({
     enabled = true,
     currentValue,
     onParameterChange,
-    infoText
+    infoText,
+    hideOriginal = false
 }: ParameterProps) {
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [pulseActive, setPulseActive] = useState(false);
@@ -96,24 +99,40 @@ function Parameter({
                 value={selectedValue}
                 onValueChange={handleValueChange}
                 orientation="horizontal"
-                className="relative flex w-full justify-between gap-0 py-1 px-2"
+                className={cn("relative flex w-full justify-between gap-0 py-1 px-2")}
             >
-                <div className="pointer-events-none absolute top-[14px] left-[calc(16.666%+14px)] w-[calc(33.333%-26px)] h-[2px] bg-surface-500" />
-                <div className="pointer-events-none absolute top-[14px] left-[calc(50%+12px)] w-[calc(33.333%-26px)] h-[2px] bg-surface-500" />
-                <div className="flex flex-1 flex-col items-center gap-1 w-1/3">
-                    <RadioGroupItem value={leftParameter} id={`${parameterTitle}-r1`} />
-                    <Label htmlFor={`${parameterTitle}-r1`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{leftParameter}</Label>
-                </div>
+                {hideOriginal ? (
+                    <>
+                        <div className="pointer-events-none absolute top-[14px] left-[calc(25%+14px)] w-[calc(50%-28px)] h-[2px] bg-surface-500" />
+                        <div className="flex flex-1 flex-col items-center gap-1 w-1/2">
+                            <RadioGroupItem value={leftParameter} id={`${parameterTitle}-r1`} />
+                            <Label htmlFor={`${parameterTitle}-r1`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{leftParameter}</Label>
+                        </div>
+                        <div className="flex flex-1 flex-col items-center gap-1 w-1/2">
+                            <RadioGroupItem value={rightParameter} id={`${parameterTitle}-r3`} />
+                            <Label htmlFor={`${parameterTitle}-r3`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{rightParameter}</Label>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="pointer-events-none absolute top-[14px] left-[calc(16.666%+14px)] w-[calc(33.333%-26px)] h-[2px] bg-surface-500" />
+                        <div className="pointer-events-none absolute top-[14px] left-[calc(50%+12px)] w-[calc(33.333%-26px)] h-[2px] bg-surface-500" />
+                        <div className="flex flex-1 flex-col items-center gap-1 w-1/3">
+                            <RadioGroupItem value={leftParameter} id={`${parameterTitle}-r1`} />
+                            <Label htmlFor={`${parameterTitle}-r1`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{leftParameter}</Label>
+                        </div>
 
-                <div className="flex flex-1 flex-col items-center gap-1 w-1/3">
-                    <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
-                    <Label htmlFor={`${parameterTitle}-r2`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{useLanguage().t('components.promptControls.original')}</Label>
-                </div>
+                        <div className="flex flex-1 flex-col items-center gap-1 w-1/3">
+                            <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
+                            <Label htmlFor={`${parameterTitle}-r2`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{useLanguage().t('components.promptControls.original')}</Label>
+                        </div>
 
-                <div className="flex flex-1 flex-col items-center gap-1 w-1/3">
-                    <RadioGroupItem value={rightParameter} id={`${parameterTitle}-r3`} />
-                    <Label htmlFor={`${parameterTitle}-r3`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{rightParameter}</Label>
-                </div>
+                        <div className="flex flex-1 flex-col items-center gap-1 w-1/3">
+                            <RadioGroupItem value={rightParameter} id={`${parameterTitle}-r3`} />
+                            <Label htmlFor={`${parameterTitle}-r3`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{rightParameter}</Label>
+                        </div>
+                    </>
+                )}
             </RadioGroup>
         </div>
     );
@@ -268,6 +287,7 @@ export default function PromptControls({
                             currentValue={parameters.bias}
                             onParameterChange={onParameterChange}
                             infoText={t('components.promptControls.bias.info')}
+                            hideOriginal
                         />
                     </div>
 

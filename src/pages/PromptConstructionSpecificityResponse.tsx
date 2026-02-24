@@ -390,88 +390,46 @@ export default function SpecificityResponse() {
                                   </p>
                                 </div> :
                                 showNoBiasOutput ?
-                                  // No Bias content
+                                  // Less Bias content
                                   <div className="space-y-4">
                                     <p className="text-gray-800 leading-relaxed text-lg">
-                                      The European Union's Artificial Intelligence Act (EU AI Act) is a regulatory framework aimed at ensuring the safe and responsible development of AI systems.
-                                      <TextFlag
-                                        text="While the Act&apos;s intentions are to promote trust and safety, some critics argue that it may stifle AI innovation."
-                                        evaluationFactor="voice"
-                                        explanation={t('components.textFlag.content.voice3')} />
-                                      Here&apos;s a summary of the concerns:
+                                      General Purpose AI (GPAI) Big foundational models—like the ones behind chatbots or image generators—come with their own rules. Developers have to:
+                                    </p>
+                                    <ul className="list-disc pl-6 text-gray-700 text-base leading-relaxed space-y-1">
+                                      <li>Provide clear documentation and usage guidelines</li>
+                                      <li>Summarize the datasets used for training</li>
+                                      <li>Follow EU copyright rules</li>
+                                    </ul>
+
+                                    <p className="text-gray-800 text-base leading-relaxed">
+                                      🚫 <span className="font-semibold">Banned Systems</span><br />
+                                      Some AI uses are off-limits completely—such as tools that exploit vulnerable people (like children or the elderly), or technologies that apply psychological manipulation to cause harm.
                                     </p>
 
-                                    <div>
-                                      <p className="text-base font-semibold text-gray-900 mb-2">Potential stifling effects:</p>
-                                      <div className="space-y-4">
-                                        <div>
-                                          <p className="text-base font-semibold text-gray-900 mb-2">1. Overly broad definitions</p>
-                                          <p className="text-gray-700 text-base leading-relaxed">
-                                            The Act&apos;s definitions of high-risk AI systems may be too broad, encompassing a wide range of applications, including those that are not inherently high-risk. This could lead to unnecessary regulatory burdens and stifling innovation in areas like healthcare, finance, or education.
-                                          </p>
-                                        </div>
+                                    <p className="text-gray-800 text-base leading-relaxed">
+                                      🌍 <span className="font-semibold">Bigger Picture</span><br />
+                                      This law isn&apos;t just about Europe. The EU wants it to set a global benchmark—much like the GDPR did for data privacy. It&apos;s all about fostering innovation while protecting people&apos;s rights, promoting fairness, and making sure AI works for everyone.
+                                    </p>
 
-                                        <div>
-                                          <p className="text-base font-semibold text-gray-900 mb-2">2. Stringent requirements</p>
-                                          <p className="text-gray-700 text-base leading-relaxed">
-                                            The Act imposes strict requirements on high-risk AI systems, including human oversight, transparency, and explainability. While these requirements are intended to ensure safety, they may be too onerous for some developers, particularly startups or small businesses, which may struggle to comply.
-                                          </p>
-                                        </div>
+                                    <p className="text-gray-700 text-base leading-relaxed">
+                                      Want to dive deeper into specific sectors like healthcare, education, or law enforcement? I can break those down too!
+                                    </p>
 
-                                        <div>
-                                          <p className="text-base font-semibold text-gray-900 mb-2">3. Unclear guidelines</p>
-                                          <p className="text-gray-700 text-base leading-relaxed">
-                                            The Act&apos;s guidelines for AI system development and deployment are still evolving, and some critics argue that they may be too vague or open to interpretation. This could lead to confusion and uncertainty among developers, hindering innovation.
-                                          </p>
-                                        </div>
+                                    <p className="text-gray-800 leading-relaxed text-lg">
+                                      The EU AI Act, while comprehensive and stringent in its requirements for AI systems, does not necessarily stifle AI research. The act aims to establish a legal framework for the development, deployment, and use of AI in the European Union, with a focus on promoting safety, transparency, and accountability.
+                                    </p>
 
-                                        <div>
-                                          <p className="text-base font-semibold text-gray-900 mb-2">4. Potential for regulatory overreach</p>
-                                          <p className="text-gray-700 text-base leading-relaxed">
-                                            The Act&apos;s scope may be too broad, potentially leading to regulatory overreach and stifling innovation in areas that are not directly related to high-risk AI systems.
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </div>
+                                    <p className="text-gray-700 text-base leading-relaxed">
+                                      However, some researchers and industry experts have raised concerns about the potential impact of the act on AI innovation and development. The strict requirements and potential limitations on certain types of AI systems could slow down research and development in those areas.
+                                    </p>
 
-                                    <div>
-                                      <p className="text-base font-semibold text-gray-900 mb-2">
-                                        <TextFlag
-                                          text="Counterarguments:"
-                                          evaluationFactor="relevance"
-                                          explanation={t('components.textFlag.content.counterarguments_explanation')} />
+                                    <p className="text-gray-700 text-base leading-relaxed">
+                                      That being said, the EU AI Act also includes provisions for exemptions and adaptations, which could help mitigate some of the potential negative effects on AI research. Additionally, the act is still in the process of being finalized, and there may be room for further adjustments and clarifications to address the concerns of the research community.
+                                    </p>
 
-                                      </p>
-                                      <div className="space-y-4">
-                                        <div>
-                                          <p className="text-base font-semibold text-gray-900 mb-2">1. Safety and trust</p>
-                                          <p className="text-gray-700 text-base leading-relaxed">
-                                            The EU AI Act is designed to promote safety and trust in AI systems, which is essential for their widespread adoption. By setting clear guidelines and requirements, the Act can help ensure that AI systems are developed and deployed responsibly.
-                                          </p>
-                                        </div>
-
-                                        <div>
-                                          <p className="text-base font-semibold text-gray-900 mb-2">2. Innovation-friendly provisions</p>
-                                          <p className="text-gray-700 text-base leading-relaxed">
-                                            The Act includes provisions aimed at supporting innovation, such as the creation of a European AI Innovation Hub and the promotion of research and development in AI.
-                                          </p>
-                                        </div>
-
-                                        <div>
-                                          <p className="text-base font-semibold text-gray-900 mb-2">3. Risk-based approach</p>
-                                          <p className="text-gray-700 text-base leading-relaxed">
-                                            The Act takes a risk-based approach to regulation, which means that developers are only subject to strict requirements if their AI systems pose a high risk to users or society.
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div>
-                                      <p className="text-base font-semibold text-gray-900 mb-2">Conclusion:</p>
-                                      <p className="text-gray-700 text-base leading-relaxed">
-                                        While the EU AI Act may have some potential stifling effects on AI innovation, these concerns are not universally accepted. The Act&apos;s proponents argue that it is necessary to ensure the safe and responsible development of AI systems, which is essential for their widespread adoption. The Act&apos;s provisions aimed at supporting innovation, such as the creation of a European AI Innovation Hub, may help mitigate any stifling effects. Ultimately, the impact of the EU AI Act on AI innovation will depend on how effectively it is implemented and enforced.
-                                      </p>
-                                    </div>
+                                    <p className="text-gray-700 text-base leading-relaxed">
+                                      In summary, while the EU AI Act may have some impact on AI research, it is not necessarily a complete stifling of innovation. The act&apos;s ultimate effect will depend on how it is implemented and enforced, as well as the flexibility provided for researchers and developers working in the field of AI.
+                                    </p>
                                   </div> :
                                   showWithBackgroundOutput ?
                                     // With Background content
