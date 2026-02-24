@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Info } from "lucide-react";
 import Chatbox from "./ChatBox";
 import { Parameters } from "@/pages/PromptPlayground";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const NO_CHANGE_VALUE = "no-change";
@@ -36,6 +36,17 @@ function Parameter({
     infoText
 }: ParameterProps) {
     const [tooltipOpen, setTooltipOpen] = useState(false);
+    const [pulseActive, setPulseActive] = useState(false);
+    const prevEnabledRef = useRef(enabled);
+
+    useEffect(() => {
+        if (enabled && !prevEnabledRef.current) {
+            setPulseActive(true);
+            const timer = setTimeout(() => setPulseActive(false), 600);
+            return () => clearTimeout(timer);
+        }
+        prevEnabledRef.current = enabled;
+    }, [enabled]);
 
     if (!showParameter) {
         return null;
@@ -57,7 +68,7 @@ function Parameter({
 
     return (
         <div
-            className={`my-3 rounded-lg px-2 py-1 transition-all ${!enabled ? 'opacity-30 pointer-events-none' : 'bg-background/60'}`}
+            className={`my-3 rounded-lg px-2 py-1 transition-all ${!enabled ? 'opacity-30 pointer-events-none' : 'bg-background/60'} ${pulseActive ? 'animate-pulse-once ring-2 ring-brand-tertiary-500/50' : ''}`}
         >
             <div className="flex items-center gap-1 mb-2">
                 <span className="text-sm font-semibold text-foreground font-heading">{parameterTitle}</span>
