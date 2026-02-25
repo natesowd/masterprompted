@@ -376,10 +376,15 @@ export function BranchDiagram({
 
         {/* Active word buttons */}
         <div
-          className="absolute left-0 right-0"
+          className="absolute"
           style={{
             top: getNodeY(0, options.length, level > 0 ? prevSelectedY : undefined) - nodeHeight / 2 - 4,
             bottom: containerHeight - getNodeY(options.length - 1, options.length, level > 0 ? prevSelectedY : undefined) - nodeHeight / 2 - 4,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'fit-content',
+            minWidth: 100,
+            padding: '0 4px',
           }}
           {...(isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {})}
         />
