@@ -32,7 +32,7 @@ export default function PromptConstructionSummarize() {
           
           {/* Add Document Card */}
           <Card 
-            className={`cursor-pointer transition-all duration-300 bg-card border border-border rounded-2xl shadow-lg ${
+            className={`cursor-pointer transition-all duration-300 bg-card border border-border rounded-2xl shadow-lg focus:outline-none focus-visible:outline-none ${
               isDocumentAttached 
                 ? 'border-primary bg-primary/5' 
                 : 'hover:border-muted-foreground'
