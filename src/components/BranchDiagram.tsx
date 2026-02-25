@@ -326,7 +326,6 @@ export function BranchDiagram({
         ref={(el) => { levelRefs.current[level] = el; }}
         className="relative"
         style={{ height: containerHeight, minWidth: 110 }}
-        {...(isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {})}
       >
         {/* Ghost elements - only at current frontier */}
         {level > 0 && isCurrentFrontier && (
@@ -376,6 +375,14 @@ export function BranchDiagram({
         )}
 
         {/* Active word buttons */}
+        <div
+          className="absolute left-0 right-0"
+          style={{
+            top: getNodeY(0, options.length, level > 0 ? prevSelectedY : undefined) - nodeHeight / 2 - 4,
+            bottom: containerHeight - getNodeY(options.length - 1, options.length, level > 0 ? prevSelectedY : undefined) - nodeHeight / 2 - 4,
+          }}
+          {...(isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {})}
+        />
         {options.map((option, idx) => {
           const isSelected = selections[level] === option.word;
           const isAnimated = animatingLevel === level && animatedWord === option.word;
