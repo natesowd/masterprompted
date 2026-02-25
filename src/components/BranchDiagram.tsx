@@ -510,9 +510,6 @@ export function BranchDiagram({
                 }
                 return words.join(" ");
               })()}
-              {isTerminal && hasUserSelected && (
-                <span className="px-1 rounded ml-1 bg-green-200 text-green-900">✓ Complete</span>
-              )}
               {!isTerminal && displayHeadline && hasUserSelected && (
                 <span className="text-muted-foreground/50">...</span>
               )}
@@ -583,27 +580,6 @@ export function BranchDiagram({
                 );
               })}
 
-              {/* Terminal indicator */}
-              {isTerminal && hasUserSelected && (
-                <div className="relative" style={{ height: containerHeight, minWidth: 200 }}>
-                  <svg className="absolute left-0 w-10" style={{ top: 0, height: containerHeight }} viewBox={`0 0 40 ${containerHeight}`} preserveAspectRatio="none">
-                    <path
-                      d={`M 0 ${getSelectedYAtLevel(activeDepth - 1)} L 40 ${getSelectedYAtLevel(activeDepth - 1)}`}
-                      fill="none"
-                      stroke="rgb(74 222 128)"
-                      strokeWidth={1.5}
-                    />
-                  </svg>
-                  <div
-                    className="absolute animate-fade-in"
-                    style={{ top: getSelectedYAtLevel(activeDepth - 1) - nodeHeight / 2, left: 40 }}
-                  >
-                    <p className="text-sm font-medium text-green-900 leading-relaxed px-4 py-2 rounded-lg border-2 border-green-400 bg-green-200 whitespace-nowrap">
-                      ✓ End of sequence
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
