@@ -369,8 +369,8 @@ export function computePathY(
       const baseExpanded = Math.max(55, 90 - d * 4);
       spacing = baseExpanded * (1 + (d - 1) * 0.15);
     } else {
-      // Unselected branches are compact
-      spacing = Math.max(10, 24 - d * 1.5);
+      // Unselected branches are very compact
+      spacing = Math.max(3, 10 - d * 1.2);
     }
 
     // Center children around current y
