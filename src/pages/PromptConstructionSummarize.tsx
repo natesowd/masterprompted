@@ -35,7 +35,7 @@ export default function PromptConstructionSummarize() {
             className={`cursor-pointer transition-all duration-300 bg-card border border-border rounded-2xl shadow-lg outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${
               isDocumentAttached 
                 ? 'border-primary bg-primary/5' 
-                : 'hover:border-muted-foreground'
+                : 'hover:border-border hover:shadow-md'
             }`}
             style={{
               position: 'absolute',
