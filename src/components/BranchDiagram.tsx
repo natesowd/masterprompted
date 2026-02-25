@@ -326,6 +326,7 @@ export function BranchDiagram({
         ref={(el) => { levelRefs.current[level] = el; }}
         className="relative"
         style={{ height: containerHeight, minWidth: 110 }}
+        {...(isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {})}
       >
         {/* Ghost elements - only at current frontier */}
         {level > 0 && isCurrentFrontier && (
@@ -420,6 +421,7 @@ export function BranchDiagram({
                         : isSelected ? "bg-green-200 text-green-800"
                           : "bg-muted text-muted-foreground"
                     )}
+                    {...(idx === 0 && isCurrentFrontier ? { "data-feature": "probability" } : {})}
                   >
                     {option.probability.toFixed(2)}
                   </span>

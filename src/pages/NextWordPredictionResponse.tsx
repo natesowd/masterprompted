@@ -9,6 +9,7 @@ import GuidanceTooltip from "@/components/GuidanceTooltip";
 import { BranchDiagram } from "@/components/BranchDiagram";
 import { TreeDiagram } from "@/components/TreeDiagram";
 import { FullBranchDiagram } from "@/components/FullBranchDiagram";
+import FeatureHighlight from "@/components/FeatureHighlight";
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -46,6 +47,7 @@ export default function HeadlineResponse() {
   const [viewMode, setViewMode] = useState<"dropdown" | "tree" | "branch" | "full">("tree");
   const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [highlightStep, setHighlightStep] = useState<0 | 1 | 2>(1);
 
   // Reset everything when component mounts (user navigates to page)
   useEffect(() => {
@@ -71,6 +73,7 @@ export default function HeadlineResponse() {
     setAnimatedThirdWord(null);
     setShowHighlightPulseThird(false);
     setViewMode("tree");
+    setHighlightStep(1);
     setEvaluationPanelOpen(false);
     setHasInteracted(false);
   }, []);
@@ -710,6 +713,30 @@ export default function HeadlineResponse() {
         </button>
       </div>
     </div>}
+
+      {/* Feature Highlight - Step 1: Word selections */}
+      <FeatureHighlight
+        target='[data-feature="word-options"]'
+        open={highlightStep === 1 && viewMode === "tree"}
+        onClose={() => setHighlightStep(2)}
+        side="right"
+        sideOffset={32}
+        closeLabel="Next"
+      >
+        Select from these words to see how an LLM might construct a headline — one word at a time. Each choice leads to a new set of options, just like a language model predicting the next token.
+      </FeatureHighlight>
+
+      {/* Feature Highlight - Step 2: Probability */}
+      <FeatureHighlight
+        target='[data-feature="probability"]'
+        open={highlightStep === 2 && viewMode === "tree"}
+        onClose={() => setHighlightStep(0)}
+        side="top"
+        sideOffset={32}
+        closeLabel="Got it"
+      >
+        This number is the <strong>probability</strong> — it shows how likely the LLM thinks this word should come next, based on all the text it was trained on. A higher probability means the model considers it a more natural continuation. Use these numbers to pick what the computer would most likely choose!
+      </FeatureHighlight>
 
     <ModuleNavigation previousRoute="/module/next-word-prediction/prompt" nextRoute={hasInteracted ? "/module/next-word-prediction/takeaways" : undefined} />
     <div className="mt-6 text-sm text-muted-foreground max-w-7xl mx-auto">
