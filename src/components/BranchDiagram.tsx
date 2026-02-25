@@ -548,7 +548,7 @@ export function BranchDiagram({
                     {renderConnector(level - 1, level)}
                     {renderLevel(level)}
 
-                    {isCurrentFrontier && (
+                    {isCurrentFrontier && options.length > 1 && (
                       <div
                         className="relative flex items-center justify-center"
                         style={{ height: containerHeight, width: 40 }}
