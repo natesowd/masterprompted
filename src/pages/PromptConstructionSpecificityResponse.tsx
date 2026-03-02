@@ -351,7 +351,7 @@ export default function SpecificityResponse() {
 
                                     <div className="space-y-4">
                                       <div>
-                                        <p className="text-base font-semibold text-gray-900 mb-2"><TextFlag text="1. Overly broad definitions" evaluationFactor="bias" explanation="Output goes on to one-sidedly represent the topic in question. It reinforces confirmation bias by presenting information that are strictly in line with the biased prompt, i.e. with user's prior beliefs. Such outputs could be factually inaccurate as well." noUnderline /></p>
+                                        <p className="text-base font-semibold text-gray-900 mb-2"><TextFlag text="1. Overly broad definitions" evaluationFactor="bias" explanation="Output goes on to one-sidedly represent the topic in question. It reinforces confirmation bias by presenting information that are strictly in line with the biased prompt, i.e. with user's prior beliefs. Such outputs could be factually inaccurate as well." /></p>
                                         <p className="text-gray-700 text-base leading-relaxed">
                                           The Act defines AI as any system that can &quot;perceive its environment and take actions&quot; or &quot;make decisions autonomously.&quot; This broad definition could capture many AI systems that are not necessarily &quot;autonomous&quot; or &quot;perceive their environment&quot; in the classical sense, potentially stifling innovation.
                                         </p>
