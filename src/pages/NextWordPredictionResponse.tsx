@@ -681,9 +681,8 @@ export default function HeadlineResponse() {
               {/* Takeaways Button - only show after user interaction */}
               {hasInteracted && (
                 <div className="mt-8 flex items-center gap-3">
-                  <Button variant="outline" size="lg" onClick={() => navigate(-1)} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
-                    <ArrowLeft className="-ml-2 !h-6 !w-6" />
-                    {t('components.breadcrumb.back') || 'Back'}
+                  <Button variant="outline" size="icon" onClick={() => navigate(-1)} className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                    <ArrowLeft className="!h-6 !w-6" />
                   </Button>
                   <Button variant="outline" size="lg" onClick={() => navigate("/module/next-word-prediction/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
                     {t('components.breadcrumb.takeaways')}
