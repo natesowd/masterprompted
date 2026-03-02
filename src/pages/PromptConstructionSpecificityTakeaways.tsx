@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
@@ -77,6 +77,13 @@ export default function PromptConstructionSpecificityTakeaways() {
           </div>
 
           <div className="mt-16 flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="h-12 w-12 rounded-full">
+              <ArrowLeft className="!h-6 !w-6" />
+            </Button>
             <Button
               variant="secondary"
               onClick={() => navigate("/playground")}
