@@ -107,12 +107,8 @@ export default function TextFlag({
             e.stopPropagation();
             setHoverCardOpen(!hoverCardOpen);
           }}
-          onPointerEnter={(e) => e.stopPropagation()}
-          onPointerLeave={(e) => e.stopPropagation()}
-          onMouseEnter={(e) => e.stopPropagation()}
-          onMouseLeave={(e) => e.stopPropagation()}
         >
-          <Icon className="inline-block h-3 w-3 text-destructive mr-1" style={{ verticalAlign: 'text-bottom' }} />
+          <Icon className="inline-block h-3 w-3 text-destructive align-middle mr-1" />
           {href ? (
             <a
               href={href}
