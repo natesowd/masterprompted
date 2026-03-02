@@ -769,6 +769,11 @@ export default function SpecificityResponse() {
                         setAppliedBias("");
                         setSentPrompt("Give me a summary of the main points in the AI Act.");
                         setBiasUnlocked(true);
+                        // Auto-select More Bias
+                        const moreBiasValue = t("components.promptControls.bias.right");
+                        setBias(moreBiasValue);
+                        setAppliedBias(moreBiasValue);
+                        setSentPrompt("Summarize how the EU AI Act stifles AI research.");
                         setShowBiasHighlight(true);
                       }}>
 
@@ -813,7 +818,7 @@ export default function SpecificityResponse() {
       onClose={() => setShowBiasHighlight(false)}
       side="right"
       sideOffset={24}
-      closeLabel="Compare Prompts">
+      closeLabel="Next">
 
       <strong>Confirmation Bias</strong>
       <p className="mt-2">Confirmation bias is the tendency to favour information that confirms our existing beliefs. A biased prompt – one that is worded to suggest a particular answer – can lead the model to generate a matching output. By appearing objective or authoritative, such outputs can reinforce our beliefs, strengthening confirmation bias.</p>
