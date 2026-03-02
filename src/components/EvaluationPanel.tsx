@@ -160,7 +160,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
                           <criterion.icon className="h-4 w-4 text-white" />
                         </span>
                       ) : (
-                        <span className="flex items-center justify-center h-7 w-7 rounded-full bg-muted-foreground/10">
+                        <span className="flex items-center justify-center h-7 w-7 rounded-full">
                           <criterion.icon className="h-4 w-4 text-muted-foreground" />
                         </span>
                       )}
