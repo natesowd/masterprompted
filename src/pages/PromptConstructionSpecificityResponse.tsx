@@ -751,13 +751,6 @@ export default function SpecificityResponse() {
 
                   {/* Navigation Button - Fixed at bottom */}
                   <div className="bg-white rounded-lg rounded-t-none p-8 pt-6 flex items-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
-                      onClick={() => navigate(-1)}>
-                      <ArrowLeft className="!h-6 !w-6" />
-                    </Button>
                    {!biasUnlocked ?
                     <Button
                       variant="outline"
