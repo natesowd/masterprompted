@@ -755,7 +755,7 @@ export default function SpecificityResponse() {
                       variant="outline"
                       size="icon"
                       className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
-                      onClick={() => navigate(-1)}>
+                      onClick={() => navigate("/module/prompt-construction")}>
                       <ArrowLeft className="!h-6 !w-6" />
                     </Button>
                    {!biasUnlocked ?
