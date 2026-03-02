@@ -355,10 +355,10 @@ export default function SpecificityResponse() {
                                     Some AI uses are off-limits completely—such as tools that exploit vulnerable people (like children or the elderly), or technologies that apply psychological manipulation to cause harm.
                                   </p>
 
-                                  <p className="text-gray-800 text-base leading-relaxed">
-                                    🌍 <span className="font-semibold">Bigger Picture</span><br />
-                                    This law isn&apos;t just about Europe. The EU wants it to set a global benchmark—much like the GDPR did for data privacy. It&apos;s all about fostering innovation while protecting people&apos;s rights, promoting fairness, and making sure AI works for everyone.
-                                  </p>
+                                  
+
+
+
 
                                   
 
