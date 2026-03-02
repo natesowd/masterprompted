@@ -34,6 +34,7 @@ export default function SpecificityResponse() {
   const [showLessBiasPromptHighlight, setShowLessBiasPromptHighlight] = useState(false);
   const [moreBiasPromptShown, setMoreBiasPromptShown] = useState(false);
   const [lessBiasPromptShown, setLessBiasPromptShown] = useState(false);
+  const [highlightsDisabled, setHighlightsDisabled] = useState(false);
 
 
   // Input prompt changes immediately
@@ -755,7 +756,27 @@ export default function SpecificityResponse() {
                       variant="outline"
                       size="icon"
                       className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
-                      onClick={() => navigate("/module/prompt-construction")}>
+                      onClick={() => {
+                        if (biasUnlocked) {
+                          // Go back to pre-bias state
+                          setBiasUnlocked(false);
+                          setBias("");
+                          setAppliedBias("");
+                          setContext("");
+                          setAppliedContext("");
+                          setStyle("");
+                          setAppliedStyle("");
+                          setSpecificity("");
+                          setAppliedSpecificity("");
+                          setSentPrompt("Give me a summary of the main points in the AI Act.");
+                          setShowBiasHighlight(false);
+                          setShowBiasPromptHighlight(false);
+                          setShowLessBiasPromptHighlight(false);
+                          setHighlightsDisabled(true);
+                        } else {
+                          navigate("/module/prompt-construction");
+                        }
+                      }}>
                       <ArrowLeft className="!h-6 !w-6" />
                     </Button>
                    {!biasUnlocked ?
@@ -778,7 +799,9 @@ export default function SpecificityResponse() {
                         setBias(moreBiasValue);
                         setAppliedBias(moreBiasValue);
                         setSentPrompt("Summarize how the EU AI Act stifles AI research.");
-                        setShowBiasHighlight(true);
+                        if (!highlightsDisabled) {
+                          setShowBiasHighlight(true);
+                        }
                       }}>
 
                       Next Step
