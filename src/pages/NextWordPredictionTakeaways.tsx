@@ -76,7 +76,10 @@ export default function Takeaways() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => navigate("/module/next-word-prediction/response")}
+              onClick={() => {
+                sessionStorage.setItem('nwp-skip-highlights', 'true');
+                navigate("/module/next-word-prediction/response");
+              }}
               className="h-12 w-12 rounded-full">
               <ArrowLeft className="!h-6 !w-6" />
             </Button>

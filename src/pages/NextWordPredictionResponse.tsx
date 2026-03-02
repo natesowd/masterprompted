@@ -73,7 +73,13 @@ export default function HeadlineResponse() {
     setAnimatedThirdWord(null);
     setShowHighlightPulseThird(false);
     setViewMode("tree");
-    setHighlightStep(1);
+    const skipHighlights = sessionStorage.getItem('nwp-skip-highlights');
+    if (skipHighlights) {
+      setHighlightStep(0);
+      sessionStorage.removeItem('nwp-skip-highlights');
+    } else {
+      setHighlightStep(1);
+    }
     setEvaluationPanelOpen(false);
     setHasInteracted(false);
   }, []);
