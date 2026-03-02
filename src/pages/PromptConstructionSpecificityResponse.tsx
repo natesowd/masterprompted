@@ -341,11 +341,6 @@ export default function SpecificityResponse() {
                       showBiasedOutput ?
                       // Biased content about EU AI Act stifling research
                       <div className="space-y-4">
-                                  <p className="text-gray-800 leading-relaxed text-base">
-                                    General Purpose AI (GPAI) Big foundational models—like the ones behind chatbots or image generators—come with their own rules. Developers have to:
-                                  </p>
-                                  
-
 
 
 
@@ -420,14 +415,8 @@ export default function SpecificityResponse() {
                       showNoBiasOutput ?
                       // Less Bias content
                       <div className="space-y-4">
-                                    <p className="text-gray-800 leading-relaxed text-base">
-                                      General Purpose AI (GPAI) Big foundational models—like the ones behind chatbots or image generators—come with their own rules. Developers have to:
-                                    </p>
-                                    <ul className="list-disc pl-6 text-gray-700 text-base leading-relaxed space-y-1">
-                                      
-                                      <li>Summarize the datasets used for training</li>
-                                      <li>Follow EU copyright rules</li>
-                                    </ul>
+
+
 
                                     <p className="text-gray-800 text-base leading-relaxed">
                                       🚫 <span className="font-semibold">Banned Systems</span><br />
