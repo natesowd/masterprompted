@@ -382,7 +382,16 @@ export default function SpecificityResponse() {
                                       <div>
                                         <p className="text-base font-semibold text-gray-900 mb-2">2. Restrictive liability provisions</p>
                                         <p className="text-gray-700 text-base leading-relaxed">
-                                          The Act proposes to hold AI developers liable for damages caused by their AI systems, even if the developer had no control over the system&apos;s actions. This could create a chilling effect on AI research.
+                                          <TextFlag
+                                            text="The Act proposes to hold AI developers liable for damages caused by their AI systems"
+                                            evaluationFactor="factual_accuracy"
+                                            explanation="These liability provisions are not contained in the AI Act itself; they are addressed by complementary proposals like the Product Liability Directive and the AI Liability Directive. Models sometimes conflate related legislative texts."
+                                          />, even if the developer had no control over the system&apos;s actions.{' '}
+                                          <TextFlag
+                                            text="This could create a chilling effect on AI research."
+                                            evaluationFactor="voice"
+                                            explanation="Notice how the output describes the effect as 'chilling'; emotive language like this can evoke strong emotional responses and lead readers to accept the biased viewpoint without critical analysis."
+                                          />
                                         </p>
                                       </div>
 
