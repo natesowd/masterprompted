@@ -133,7 +133,6 @@ export default function SpecificityResponse() {
                     setContext(key === 'context' ? value : "");
                     setBias(key === 'bias' ? value : "");
                     if (key === 'bias' && value === t("components.promptControls.bias.right") && !moreBiasPromptShown) {
-                      setShowBiasPromptHighlight(true);
                       setMoreBiasPromptShown(true);
                     }
                     if (key === 'bias' && value === t("components.promptControls.bias.left") && !lessBiasPromptShown) {
