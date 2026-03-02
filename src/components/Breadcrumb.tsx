@@ -1,11 +1,12 @@
-import { ChevronRight } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { ArrowLeft, ChevronRight } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 
 
 export default function Breadcrumb() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const pathSegments = location.pathname.split('/').filter(Boolean);
 
@@ -103,6 +104,13 @@ export default function Breadcrumb() {
 
   return (
     <nav className="flex items-center text-sm text-muted-foreground mb-5">
+      <button
+        onClick={() => navigate(-1)}
+        className="mr-3 p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+        aria-label="Go back"
+      >
+        <ArrowLeft className="h-4 w-4" />
+      </button>
       {breadcrumbItems.map((item, index) => (
         <div key={item.path} className="flex items-center">
           {index > 0 && <ChevronRight className="h-4 w-4 mx-2 text-muted-foreground/50" />}
