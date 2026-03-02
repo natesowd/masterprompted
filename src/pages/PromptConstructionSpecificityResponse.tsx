@@ -12,7 +12,7 @@ import TextFlag from "@/components/TextFlag";
 import SectionFlag from "@/components/SectionFlag";
 import ChatPrompt from "@/components/ChatPrompt";
 import FeatureHighlight from "@/components/FeatureHighlight";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -750,14 +750,21 @@ export default function SpecificityResponse() {
                   </div>
 
                   {/* Navigation Button - Fixed at bottom */}
-                  <div className="bg-white rounded-lg rounded-t-none p-8 pt-6">
+                  <div className="bg-white rounded-lg rounded-t-none p-8 pt-6 flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
+                      onClick={() => navigate(-1)}>
+                      <ArrowLeft className="-ml-2 !h-6 !w-6" />
+                      {t('components.breadcrumb.back') || 'Back'}
+                    </Button>
                    {!biasUnlocked ?
                     <Button
                       variant="outline"
                       size="lg"
                       className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                       onClick={() => {
-                        // Reset all parameters when unlocking bias
                         setSpecificity("");
                         setStyle("");
                         setContext("");
@@ -768,7 +775,6 @@ export default function SpecificityResponse() {
                         setAppliedBias("");
                         setSentPrompt("Give me a summary of the main points in the AI Act.");
                         setBiasUnlocked(true);
-                        // Auto-select More Bias
                         const moreBiasValue = t("components.promptControls.bias.right");
                         setBias(moreBiasValue);
                         setAppliedBias(moreBiasValue);
