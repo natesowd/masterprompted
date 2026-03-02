@@ -363,7 +363,7 @@ export default function SpecificityResponse() {
                                     <TextFlag
                             text="The EU AI Act has the potential to stifle AI research"
                             evaluationFactor="bias"
-                            explanation={t('components.textFlag.content.overly_broad_definitions')} />
+                            explanation="Output's voice mimics the certainty and the suggestiveness of a biased and commanding prompt, confirming the expressed belief. The unquestioning, certain tone could cause a false sense of output's trustworthiness. Some users called this confirmatory style of the output &quot;people pleasing&quot;." />
                                     {' '}in several ways:
                                   </p>
 
@@ -374,7 +374,7 @@ export default function SpecificityResponse() {
                                         <TextFlag
                                 text="The act imposes strict requirements on the development, deployment, and use of AI systems within the European Union."
                                 evaluationFactor="bias"
-                                explanation="Output's voice mimics the certainty and the suggestiveness of a biased and commanding prompt, confirming the expressed belief. The unquestioning, certain tone could cause a false sense of output's trustworthiness. Some users called this confirmatory style of the output &quot;people pleasing&quot;." />
+                                explanation={t('components.textFlag.content.overly_broad_definitions')} />
                               {" "}These requirements may be difficult and time-consuming to meet, especially for researchers and startups with limited resources. This could lead to delays in research and development, as well as increased costs.
                                       </p>
                                     </div>
