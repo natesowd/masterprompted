@@ -341,24 +341,6 @@ export default function SpecificityResponse() {
                       showBiasedOutput ?
                       // Biased content about EU AI Act stifling research
                       <div className="space-y-4">
-
-
-
-
-                                  
-
-
-
-
-                                  
-
-
-
-
-                                  
-
-
-
                                   <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-base">
                                     <TextFlag
                             text="The EU AI Act, a proposed regulation aimed at regulating artificial intelligence (AI) in the European Union, has been criticized for potentially stifling AI research."
