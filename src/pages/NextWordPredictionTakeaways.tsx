@@ -91,11 +91,11 @@ export default function Takeaways() {
               {t('nextWord.takeaways.nextTask')}
               <ArrowRight className="-mr-2 !h-6 !w-6" />
             </Button>
+            <div className="flex-1" />
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" className="rounded-full text-base font-heading font-semibold px-6 py-6">
-                  <Download className="h-4 w-4 mr-2" />
-                  {t('promptConstructionModule.takeaways.download')}
+                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full">
+                  <Download className="!h-5 !w-5" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-lg">
