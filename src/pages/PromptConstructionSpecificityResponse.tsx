@@ -815,7 +815,7 @@ export default function SpecificityResponse() {
     <FeatureHighlight
       target="#bias-parameter-control"
       open={showBiasHighlight}
-      onClose={() => setShowBiasHighlight(false)}
+      onClose={() => { setShowBiasHighlight(false); setShowBiasPromptHighlight(true); }}
       side="right"
       sideOffset={24}
       closeLabel="Next">
