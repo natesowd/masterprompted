@@ -374,7 +374,7 @@ export default function SpecificityResponse() {
                                         <TextFlag
                                 text="The act imposes strict requirements on the development, deployment, and use of AI systems within the European Union."
                                 evaluationFactor="bias"
-                                explanation="Output goes on to one-sidedly represent the topic in question. It reinforces confirmation bias by presenting information that are strictly in line with the biased prompt, i.e. with user's prior beliefs. Such outputs could be factually inaccurate as well." />
+                                explanation="Output's voice mimics the certainty and the suggestiveness of a biased and commanding prompt, confirming the expressed belief. The unquestioning, certain tone could cause a false sense of output's trustworthiness. Some users called this confirmatory style of the output &quot;people pleasing&quot;." />
                               {" "}These requirements may be difficult and time-consuming to meet, especially for researchers and startups with limited resources. This could lead to delays in research and development, as well as increased costs.
                                       </p>
                                     </div>
