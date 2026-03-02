@@ -361,15 +361,15 @@ export default function SpecificityResponse() {
                                         <p className="text-base font-semibold text-gray-900 mb-2">2. Restrictive liability provisions</p>
                                         <p className="text-gray-700 text-base leading-relaxed">
                                           <TextFlag
-                                            text="The Act proposes to hold AI developers liable for damages caused by their AI systems"
-                                            evaluationFactor="factual_accuracy"
-                                            explanation="These liability provisions are not contained in the AI Act itself; they are addressed by complementary proposals like the Product Liability Directive and the AI Liability Directive. Models sometimes conflate related legislative texts."
-                                          />, even if the developer had no control over the system&apos;s actions.{' '}
+                                text="The Act proposes to hold AI developers liable for damages caused by their AI systems"
+                                evaluationFactor="factual_accuracy"
+                                explanation="These liability provisions are not contained in the AI Act itself; they are addressed by complementary proposals like the Product Liability Directive and the AI Liability Directive. Models sometimes conflate related legislative texts." />
+                              , even if the developer had no control over the system&apos;s actions.{' '}
                                           <TextFlag
-                                            text="This could create a chilling effect on AI research."
-                                            evaluationFactor="voice"
-                                            explanation="Notice how the output describes the effect as 'chilling'; emotive language like this can evoke strong emotional responses and lead readers to accept the biased viewpoint without critical analysis."
-                                          />
+                                text="This could create a chilling effect on AI research."
+                                evaluationFactor="voice"
+                                explanation="Notice how the output describes the effect as 'chilling'; emotive language like this can evoke strong emotional responses and lead readers to accept the biased viewpoint without critical analysis." />
+                              
                                         </p>
                                       </div>
 
@@ -412,10 +412,10 @@ export default function SpecificityResponse() {
                                     <p ref={biasTextFlagRef} className="text-gray-800 leading-relaxed text-base">
                                       The European Union&apos;s Artificial Intelligence Act (EU AI Act) is a regulatory framework aimed at ensuring the safe and responsible development of AI systems.{' '}
                                       <TextFlag
-                                        text="While the Act's intentions are to promote trust and safety, some critics argue that it may stifle AI innovation."
-                                        evaluationFactor="voice"
-                                        explanation="This output attempts to portray both sides of the argument in order to provide a more complete, if not completely objective, picture on the opinions surrounding the EU AI Act."
-                                      />{' '}Here&apos;s a summary of the concerns:
+                            text="While the Act's intentions are to promote trust and safety, some critics argue that it may stifle AI innovation."
+                            evaluationFactor="voice"
+                            explanation="This output attempts to portray both sides of the argument in order to provide a more complete, if not completely objective, picture on the opinions surrounding the EU AI Act." />
+                          {' '}Here&apos;s a summary of the concerns:
                                     </p>
 
                                     <p className="text-base font-semibold text-gray-900">Potential stifling effects:</p>
@@ -842,13 +842,13 @@ export default function SpecificityResponse() {
     <FeatureHighlight
       target="#bias-parameter-control"
       open={showBiasHighlight}
-      onClose={() => { setShowBiasHighlight(false); setShowBiasPromptHighlight(true); }}
+      onClose={() => {setShowBiasHighlight(false);setShowBiasPromptHighlight(true);}}
       side="right"
       sideOffset={24}
       closeLabel="Next">
 
       <strong>Confirmation Bias</strong>
-      <p className="mt-2">Confirmation bias is the tendency to favour information that confirms our existing beliefs. A biased prompt – one that is worded to suggest a particular answer – can lead the model to generate a matching output. By appearing objective or authoritative, such outputs can reinforce our beliefs, strengthening confirmation bias.</p>
+      <p className="mt-2">Confirmation bias is the tendency to favour information that confirms our existing beliefs. A biased prompt – one that is worded to suggest a particular answer – can lead the model to propagating implicit bias. See how a biased prompt may reinforce biased ideas and how this can be prevent with a less biased one                                  </p>
     </FeatureHighlight>
 
     <FeatureHighlight
