@@ -32,7 +32,6 @@ import Takeaways from "./pages/NextWordPredictionTakeaways";
 import NotFound from "./pages/NotFound";
 import DesignSystem from "./pages/DesignSystem";
 import DesignSystemFab from "./components/DesignSystemFab";
-import BackButton from "./components/BackButton";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -43,7 +42,6 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <DesignSystemFab />
-            <BackButton />
             <Routes>
               {/* NAV BAR */}
               <Route path="/" element={<Landing />} />
