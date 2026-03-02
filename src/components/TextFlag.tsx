@@ -120,7 +120,7 @@ export default function TextFlag({
               {text}
             </a>
           ) : (
-            <span className="underline decoration-2 underline-offset-2 text-current">
+            <span className="underline decoration-2 underline-offset-2 decoration-destructive text-current">
               {text}
             </span>
           )}
