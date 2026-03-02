@@ -94,7 +94,7 @@ export default function Takeaways() {
             <div className="flex-1" />
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0">
+                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
                   <Download className="!h-5 !w-5" />
                 </Button>
               </DialogTrigger>
