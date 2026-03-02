@@ -38,9 +38,9 @@ export default function SpecificityResponse() {
 
   // Input prompt changes immediately
   const inputPrompt = bias === t("components.promptControls.bias.right") ?
-    "Summarize how the EU AI Act stifles AI research." :
+    "Tell me how the EU AI Act stifles AI research." :
     bias === t("components.promptControls.bias.left") ?
-      "Summarize whether the EU AI Act stifles AI research." :
+      "Does the EU AI Act stifle AI research?" :
       context === t("components.promptControls.context.right") ?
         "I'm researching recent regulations on artificial intelligence. Please give me a summary of the main points in the AI Act, focusing on its key rules and how it aims to regulate AI systems." :
         context === t("components.promptControls.context.left") ?
