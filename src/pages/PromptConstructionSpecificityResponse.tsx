@@ -753,11 +753,10 @@ export default function SpecificityResponse() {
                   <div className="bg-white rounded-lg rounded-t-none p-8 pt-6 flex items-center gap-3">
                     <Button
                       variant="outline"
-                      size="lg"
-                      className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
+                      size="icon"
+                      className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                       onClick={() => navigate(-1)}>
-                      <ArrowLeft className="-ml-2 !h-6 !w-6" />
-                      {t('components.breadcrumb.back') || 'Back'}
+                      <ArrowLeft className="!h-6 !w-6" />
                     </Button>
                    {!biasUnlocked ?
                     <Button
