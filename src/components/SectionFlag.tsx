@@ -120,11 +120,13 @@ export default function SectionFlag({
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <div className={cn(sectionFlagVariants({ severity, size }), className)}>
-          <div className={cn(iconBadgeVariants({ severity }))}>
-            <Icon className="h-4 w-4" />
+        <div className="pt-3 pr-3">
+          <div className={cn(sectionFlagVariants({ severity, size }), className)}>
+            <div className={cn(iconBadgeVariants({ severity }))}>
+              <Icon className="h-4 w-4" />
+            </div>
+            {children}
           </div>
-          {children}
         </div>
       </HoverCardTrigger>
       <HoverCardContent
