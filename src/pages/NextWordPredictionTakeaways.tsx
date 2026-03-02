@@ -76,7 +76,7 @@ export default function Takeaways() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/module/next-word-prediction")}
               className="h-12 w-12 rounded-full">
               <ArrowLeft className="!h-6 !w-6" />
             </Button>
