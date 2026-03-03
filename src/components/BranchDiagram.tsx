@@ -192,44 +192,52 @@ export function BranchDiagram({
   };
 
   // Auto-scroll to keep current frontier visible (horizontal + vertical)
+  const scrollToFrontier = () => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+    
+    const targetEl = levelRefs.current[unlockedLevel];
+    if (!targetEl) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const levelRect = targetEl.getBoundingClientRect();
+
+    // Horizontal: ensure the frontier level column is fully visible
+    const rightOverflow = levelRect.right - containerRect.right + 120;
+    if (rightOverflow > 0) {
+      container.scrollBy({ left: rightOverflow, behavior: 'smooth' });
+    }
+
+    // Vertical: center all option buttons in the viewport
+    const buttons = targetEl.querySelectorAll('button');
+    if (buttons.length > 1) {
+      let minTop = Infinity, maxBottom = -Infinity;
+      buttons.forEach(btn => {
+        const r = btn.getBoundingClientRect();
+        if (r.top < minTop) minTop = r.top;
+        if (r.bottom > maxBottom) maxBottom = r.bottom;
+      });
+      const buttonsCenterY = (minTop + maxBottom) / 2;
+      const containerCenterY = (containerRect.top + containerRect.bottom) / 2;
+      const diff = buttonsCenterY - containerCenterY;
+      if (Math.abs(diff) > 20) {
+        container.scrollTop += diff;
+      }
+    }
+  };
+
+  // Trigger on level/selection changes
   useEffect(() => {
-    if (unlockedLevel < 1 || !containerRef.current) return;
-    const timer = setTimeout(() => {
-      if (!containerRef.current) return;
-      const container = containerRef.current;
-      
-      // Use the current frontier level ref
-      const targetEl = levelRefs.current[unlockedLevel];
-      if (!targetEl) return;
-
-      const containerRect = container.getBoundingClientRect();
-      const levelRect = targetEl.getBoundingClientRect();
-
-      // Horizontal: ensure the frontier level column is fully visible with padding
-      const rightOverflow = levelRect.right - containerRect.right + 120;
-      if (rightOverflow > 0) {
-        container.scrollBy({ left: rightOverflow, behavior: 'smooth' });
-      }
-
-      // Vertical: find all option buttons in the frontier column and center them
-      const buttons = targetEl.querySelectorAll('button');
-      if (buttons.length > 0) {
-        let minTop = Infinity, maxBottom = -Infinity;
-        buttons.forEach(btn => {
-          const r = btn.getBoundingClientRect();
-          if (r.top < minTop) minTop = r.top;
-          if (r.bottom > maxBottom) maxBottom = r.bottom;
-        });
-        const buttonsCenterY = (minTop + maxBottom) / 2;
-        const containerCenterY = (containerRect.top + containerRect.bottom) / 2;
-        const diff = buttonsCenterY - containerCenterY;
-        if (Math.abs(diff) > 30) {
-          container.scrollBy({ top: diff, behavior: 'smooth' });
-        }
-      }
-    }, 50);
+    if (unlockedLevel < 1) return;
+    const timer = setTimeout(scrollToFrontier, 150);
     return () => clearTimeout(timer);
   }, [unlockedLevel, selections]);
+
+  // Also trigger on initial mount — retry a few times to handle popovers/tooltips
+  useEffect(() => {
+    const timers = [300, 600, 1000].map(delay => setTimeout(scrollToFrontier, delay));
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   // Play auto-select animation
   const playAnimation = (level: number) => {
@@ -265,8 +273,8 @@ export function BranchDiagram({
 
   // --- Layout constants ---
   const nodeHeight = 40;
-  const levelGap = 65;
-  const containerHeight = 480;
+  const levelGap = 36;
+  const containerHeight = 400;
 
   const getNodeY = (idx: number, count: number, centerY?: number) => {
     const totalHeight = count * nodeHeight + (count - 1) * levelGap;
@@ -320,12 +328,12 @@ export function BranchDiagram({
     const minRealY = Math.min(...realYPositions);
     const maxRealY = Math.max(...realYPositions);
 
-    const ghostChipHeight = 28;
-    const ghostGapToReal = 44;
-    const ghostGapToDots = 18;
-    const dotSizes = [6, 5];
-    const dotSpacing = 22;
-    const moreSpacing = 18;
+    const ghostChipHeight = 24;
+    const ghostGapToReal = 28;
+    const ghostGapToDots = 12;
+    const dotSizes = [5, 4];
+    const dotSpacing = 16;
+    const moreSpacing = 12;
 
     const topRealTop = minRealY - nodeHeight / 2;
     const bottomRealBottom = maxRealY + nodeHeight / 2;
@@ -563,7 +571,7 @@ export function BranchDiagram({
         </div>
 
         {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto overflow-y-auto scroll-smooth bg-card rounded-xl max-h-[70vh]">
+        <div ref={containerRef} className="overflow-x-auto overflow-y-auto scroll-smooth bg-card rounded-xl" style={{ maxHeight: 'calc(100vh - 420px)' }}>
           <div className="min-w-[1600px] p-6 pr-[320px]">
             <div className="flex items-start gap-1">
               {renderLevel(0)}

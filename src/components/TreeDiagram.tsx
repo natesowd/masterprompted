@@ -325,11 +325,11 @@ export function TreeDiagram({
 
         {/* Tree visualization */}
         <div className="flex flex-col gap-4">
-          <div className="bg-card rounded-xl overflow-hidden">
+          <div className="bg-card rounded-xl overflow-hidden" style={{ maxHeight: 'calc(100vh - 420px)' }}>
             <div
               className={cn(
                 "h-full",
-                currentLevel > 1 ? "overflow-x-auto overflow-y-auto" : "overflow-hidden"
+                "overflow-x-auto overflow-y-auto"
               )}
               ref={scrollContainerRef}>
 
