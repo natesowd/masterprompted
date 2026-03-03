@@ -191,7 +191,7 @@ export function BranchDiagram({
     onPathChange(newPath);
   };
 
-  // Auto-scroll to keep current frontier visible
+  // Auto-scroll to keep current frontier visible (horizontal + vertical)
   useEffect(() => {
     if (unlockedLevel < 1 || !containerRef.current) return;
     const timer = setTimeout(() => {
@@ -209,6 +209,23 @@ export function BranchDiagram({
       const rightOverflow = levelRect.right - containerRect.right + 120;
       if (rightOverflow > 0) {
         container.scrollBy({ left: rightOverflow, behavior: 'smooth' });
+      }
+
+      // Vertical: find all option buttons in the frontier column and center them
+      const buttons = targetEl.querySelectorAll('button');
+      if (buttons.length > 0) {
+        let minTop = Infinity, maxBottom = -Infinity;
+        buttons.forEach(btn => {
+          const r = btn.getBoundingClientRect();
+          if (r.top < minTop) minTop = r.top;
+          if (r.bottom > maxBottom) maxBottom = r.bottom;
+        });
+        const buttonsCenterY = (minTop + maxBottom) / 2;
+        const containerCenterY = (containerRect.top + containerRect.bottom) / 2;
+        const diff = buttonsCenterY - containerCenterY;
+        if (Math.abs(diff) > 30) {
+          container.scrollBy({ top: diff, behavior: 'smooth' });
+        }
       }
     }, 50);
     return () => clearTimeout(timer);
@@ -546,7 +563,7 @@ export function BranchDiagram({
         </div>
 
         {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto scroll-smooth bg-card rounded-xl">
+        <div ref={containerRef} className="overflow-x-auto overflow-y-auto scroll-smooth bg-card rounded-xl max-h-[70vh]">
           <div className="min-w-[1600px] p-6 pr-[320px]">
             <div className="flex items-start gap-1">
               {renderLevel(0)}
