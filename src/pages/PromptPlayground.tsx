@@ -177,18 +177,25 @@ const PromptPlayground = () => {
       const [specificity, style, context, bias] = args;
       const paramMap: Record<string, string> = { specificity, style, context, bias };
 
+      const beKeyword = pageLanguage === 'es' ? 'sea' : 'be';
+      const haveKeyword = pageLanguage === 'es' ? 'tenga' : 'have';
+      const andKeyword = pageLanguage === 'es' ? 'y' : 'and';
+
       const entries = Object.entries(paramMap)
         .filter(([_, value]) => value !== NO_CHANGE_VALUE && value !== "")
         .map(([name, value]) => {
-          const prefix = (name === "specificity" || name === "style") ? "be" : "have";
+          const prefix = (name === "specificity" || name === "style") ? beKeyword : haveKeyword;
           return `${prefix} ${value.toLowerCase()}`;
         });
 
       const params = entries.length > 1
-        ? `${entries.slice(0, -1).join(", ")} and ${entries[entries.length - 1]}`
+        ? `${entries.slice(0, -1).join(", ")} ${andKeyword} ${entries[entries.length - 1]}`
         : entries[0] || "";
 
-      const optimizeUserPrompt = `Rewrite the following prompt to ${params}: "${prompt}".`;
+      const userPromptTemplate = t('promptPlayground.optimization.userPrompt');
+      const optimizeUserPrompt = userPromptTemplate
+        .replace('{params}', params)
+        .replace('{prompt}', prompt);
 
       const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
@@ -199,33 +206,7 @@ const PromptPlayground = () => {
           messages: [
             {
               role: "system",
-              content:
-                `
-You are a precision prompt modifier. Your sole function is to minimally transform a provided prompt according to specified modification parameters.
-
-CORE PRIORITIES (in strict order of importance):
-
-1. INTENT AND FUNCTION PRESERVATION (ABSOLUTE PRIORITY):
-   The transformed prompt must retain the exact underlying intent, task type, and functional objective of the original prompt. If the original prompt asks the system to write, explain, summarize, argue, list, generate, analyze, or question something, the modified prompt must still perform that same kind of request. Never change the fundamental purpose, requested action, deliverable type, target subject, or expected output form. The core mission must remain identical.
-
-2. MINIMAL-CHANGE PRINCIPLE (CO-EQUAL HEURISTIC):
-   Treat the original prompt as the default anchor. Make the smallest possible set of edits required to satisfy the modification parameters. Prefer local rewrites over structural rewrites. Prefer substitutions over expansions. Do not rephrase for stylistic variety. Do not improve, optimize, clarify, or embellish unless explicitly required by the parameters. If a segment does not need to change, leave it untouched.
-
-3. PARAMETER ALIGNMENT:
-   Apply all provided modification parameters faithfully, but only to the extent necessary to satisfy them. Integrate changes directly into the wording, tone, structure, or constraints so they are inherent to the instruction itself. Do not describe the modifications; embody them. When parameter alignment conflicts with minimal change, satisfy the parameters using the least disruptive transformation possible.
-
-4. PERSPECTIVE AND OWNERSHIP PRESERVATION:
-   Preserve the original grammatical perspective and ownership. If the original uses first person (“I,” “me,” “my”), second person (“you”), or third person, the transformed prompt must maintain that same perspective and referential structure.
-
-5. STRUCTURAL AND SCOPE STABILITY:
-   Maintain the original scope, constraints, and level of specificity. Do not introduce new requirements, remove essential constraints, or alter the scale of the task unless explicitly required by the modification parameters.
-
-6. LENGTH DISCIPLINE:
-   Keep the transformed prompt approximately the same length as the original. Avoid unnecessary expansion or compression beyond what the parameters require.
-
-OUTPUT RULES:
-Output only the final transformed prompt. Do not include explanations, commentary, labels, quotes, or formatting. Return only the modified instruction text.
-              `
+              content: t('promptPlayground.optimization.systemPrompt')
             },
             { role: "user", content: optimizeUserPrompt },
           ],
