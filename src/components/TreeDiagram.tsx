@@ -207,29 +207,21 @@ export function TreeDiagram({
   // X position for a given level
   const levelX = (level: number) => leftPadding + level * stepX;
 
-  // Auto-scroll when currentLevel changes to keep all options visible
-  const prevLevelRef = useRef(currentLevel);
+  // Auto-scroll when currentLevel or selections change to keep options visible
   useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    if (currentLevel <= prevLevelRef.current && currentLevel > 1) {
-      prevLevelRef.current = currentLevel;
-      return;
-    }
-    prevLevelRef.current = currentLevel;
-
-    const timer = setTimeout(() => {
-      if (!scrollContainerRef.current) return;
+    const scrollToFrontier = (behavior: ScrollBehavior = "smooth") => {
       const cont = scrollContainerRef.current;
+      if (!cont) return;
       const containerWidth = cont.clientWidth;
       const containerHeight = cont.clientHeight;
 
       // Horizontal: ensure the current frontier options are visible
       const nextLevelXPos = levelX(currentLevel);
-      const targetLeft = Math.max(0, nextLevelXPos - containerWidth + 250);
+      const targetLeft = currentLevel <= 1 ? 0 : Math.max(0, nextLevelXPos - containerWidth + 250);
 
       // Vertical: center on all options at the frontier
       const options = currentLevel < maxDepth ? getOptionsForPath(currentPath) : [];
+      let targetTop: number;
       if (options.length > 0) {
         const optionYs = options.map(opt => {
           const hypotheticalPath = [...currentPath, opt.word];
@@ -238,16 +230,19 @@ export function TreeDiagram({
         const minY = Math.min(...optionYs);
         const maxY = Math.max(...optionYs);
         const centerY = (minY + maxY) / 2;
-        const targetTop = Math.max(0, centerY - viewBoxY - containerHeight / 2);
-        cont.scrollTo({ left: targetLeft, top: targetTop, behavior: "smooth" });
+        targetTop = Math.max(0, centerY - viewBoxY - containerHeight / 2);
       } else {
         const selectedY = computePathY(currentPath, currentPath.length - 1, selections, currentLevel, adjustedCenterY);
-        const targetTop = Math.max(0, selectedY - viewBoxY - containerHeight / 2);
-        cont.scrollTo({ left: targetLeft, top: targetTop, behavior: "smooth" });
+        targetTop = Math.max(0, selectedY - viewBoxY - containerHeight / 2);
       }
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [currentLevel, selections]);
+      cont.scrollTo({ left: targetLeft, top: targetTop, behavior });
+    };
+
+    // Use multiple timers to ensure DOM has settled
+    const t1 = setTimeout(() => scrollToFrontier("smooth"), 80);
+    const t2 = setTimeout(() => scrollToFrontier("smooth"), 300);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [currentLevel, selections, viewBoxY, adjustedCenterY]);
 
   // Build display headline
   const displayHeadline = currentPath.filter(Boolean).join(" ");
