@@ -2,3 +2,4 @@ TODO (order on priority)
 - richtext issues in prompt playground
 - fix sizing issues across the whole website
 - fix the middle radio prompt controls so they are alighned to a horizontal centre
+- change the alignement of the prompt controls to fit the prompt box with the journalistic evaluation while it is in panel mode ie. on smaller screens
