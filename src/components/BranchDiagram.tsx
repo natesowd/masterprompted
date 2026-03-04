@@ -10,8 +10,8 @@ import {
   getDefaultPath,
   getMaxDepth,
   createEmptySelections,
-  type PredictionNode,
-} from "@/data/predictionTreeData";
+  type PredictionNode } from
+"@/data/predictionTreeData";
 
 /**
  * BranchDiagram - Visualizes word prediction paths as a horizontal column-based diagram
@@ -27,7 +27,7 @@ interface WordTreeDiagramProps {
 export function BranchDiagram({
   selectedPath,
   onPathChange,
-  className,
+  className
 }: WordTreeDiagramProps) {
   const maxDepth = useMemo(() => getMaxDepth(), []);
   const defaultPath = useMemo(() => getDefaultPath(), []);
@@ -74,8 +74,8 @@ export function BranchDiagram({
   }>>([]);
 
   // Ghost tooltip hover state
-  const [ghostTooltip, setGhostTooltip] = useState<{ visible: boolean; x: number; y: number }>({
-    visible: false, x: 0, y: 0,
+  const [ghostTooltip, setGhostTooltip] = useState<{visible: boolean;x: number;y: number;}>({
+    visible: false, x: 0, y: 0
   });
 
   // Animation states
@@ -92,14 +92,14 @@ export function BranchDiagram({
   const currentPath = useMemo(() => {
     const path: string[] = [predictionTree.word];
     for (let i = 1; i < selections.length; i++) {
-      if (selections[i]) path.push(selections[i]!);
-      else break;
+      if (selections[i]) path.push(selections[i]!);else
+      break;
     }
     return path;
   }, [selections]);
 
   // Get options at a level based on current selections
-  const getOptionsAtLevel = (level: number): { word: string; probability: number }[] => {
+  const getOptionsAtLevel = (level: number): {word: string;probability: number;}[] => {
     if (level === 0) return [{ word: predictionTree.word, probability: 1 }];
     const pathToLevel = currentPath.slice(0, level);
     return getOptionsForPath(pathToLevel);
@@ -120,7 +120,7 @@ export function BranchDiagram({
     let node = predictionTree;
     const path = currentPath;
     for (let i = 1; i < path.length; i++) {
-      const child = node.children.find(c => c.word === path[i]);
+      const child = node.children.find((c) => c.word === path[i]);
       if (!child || child.children.length === 0) break;
       depth++;
       node = child;
@@ -155,7 +155,7 @@ export function BranchDiagram({
   // Handle word selection
   const handleWordClick = (level: number, word: string) => {
     if (!hasUserSelected) setHasUserSelected(true);
-    
+
     const newSelections = [...selections];
 
     // Save history
@@ -168,7 +168,7 @@ export function BranchDiagram({
       }
     }
     if (historyToAdd.length > 0) {
-      setSelectionHistory(prev => [...prev, ...historyToAdd]);
+      setSelectionHistory((prev) => [...prev, ...historyToAdd]);
     }
 
     // Clear from this level onwards
@@ -195,7 +195,7 @@ export function BranchDiagram({
   const scrollToFrontier = () => {
     if (!containerRef.current) return;
     const container = containerRef.current;
-    
+
     const targetEl = levelRefs.current[unlockedLevel];
     if (!targetEl) return;
 
@@ -211,8 +211,8 @@ export function BranchDiagram({
     // Vertical: center all option buttons in the viewport
     const buttons = targetEl.querySelectorAll('button');
     if (buttons.length > 1) {
-      let minTop = Infinity, maxBottom = -Infinity;
-      buttons.forEach(btn => {
+      let minTop = Infinity,maxBottom = -Infinity;
+      buttons.forEach((btn) => {
         const r = btn.getBoundingClientRect();
         if (r.top < minTop) minTop = r.top;
         if (r.bottom > maxBottom) maxBottom = r.bottom;
@@ -235,7 +235,7 @@ export function BranchDiagram({
 
   // Also trigger on initial mount — retry a few times to handle popovers/tooltips
   useEffect(() => {
-    const timers = [300, 600, 1000].map(delay => setTimeout(scrollToFrontier, delay));
+    const timers = [300, 600, 1000].map((delay) => setTimeout(scrollToFrontier, delay));
     return () => timers.forEach(clearTimeout);
   }, []);
 
@@ -287,7 +287,7 @@ export function BranchDiagram({
     const prevY = getSelectedYAtLevel(level - 1);
     const options = getOptionsAtLevel(level);
     const selectedWord = selections[level];
-    const idx = options.findIndex(o => o.word === selectedWord);
+    const idx = options.findIndex((o) => o.word === selectedWord);
     if (idx >= 0) return getNodeY(idx, options.length, prevY);
     return prevY;
   };
@@ -296,7 +296,7 @@ export function BranchDiagram({
   const buildDisplayHeadline = (): string => currentPath.filter(Boolean).join(" ");
 
   // Get ghost words at a level (lower-probability siblings not shown as main options)
-  const getGhostWordsAtLevel = (level: number): { word: string; prob: number }[] => {
+  const getGhostWordsAtLevel = (level: number): {word: string;prob: number;}[] => {
     if (level === 0) return [];
     const pathToLevel = currentPath.slice(0, level);
     const node = getNodeAtPath(pathToLevel);
@@ -306,7 +306,7 @@ export function BranchDiagram({
     // Main options are the ones returned by getOptionsForPath (which are all children sorted)
     // Ghost words would be shown if there were MORE candidates beyond what's displayed
     // Since we show all candidates, show a "+N more" to indicate real LLMs have thousands
-    return allChildren.slice(0, 2).map(c => ({ word: c.word, prob: c.prob }));
+    return allChildren.slice(0, 2).map((c) => ({ word: c.word, prob: c.prob }));
   };
 
   // --- Render functions ---
@@ -323,7 +323,7 @@ export function BranchDiagram({
 
     // Ghost data
     const realYPositions = options.map((_, idx) =>
-      getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined)
+    getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined)
     );
     const minRealY = Math.min(...realYPositions);
     const maxRealY = Math.max(...realYPositions);
@@ -342,70 +342,70 @@ export function BranchDiagram({
     const ghostBelowTop = bottomRealBottom + ghostGapToReal;
 
     const dotAboveTops = [
-      ghostAboveTop - ghostGapToDots - dotSizes[0],
-      ghostAboveTop - ghostGapToDots - dotSizes[0] - dotSpacing - dotSizes[1],
-    ];
+    ghostAboveTop - ghostGapToDots - dotSizes[0],
+    ghostAboveTop - ghostGapToDots - dotSizes[0] - dotSpacing - dotSizes[1]];
+
     const dotBelowTops = [
-      ghostBelowTop + ghostChipHeight + ghostGapToDots,
-      ghostBelowTop + ghostChipHeight + ghostGapToDots + dotSizes[0] + dotSpacing,
-    ];
+    ghostBelowTop + ghostChipHeight + ghostGapToDots,
+    ghostBelowTop + ghostChipHeight + ghostGapToDots + dotSizes[0] + dotSpacing];
+
     const moreTop = dotBelowTops[1] + dotSizes[1] + moreSpacing;
     const moreCount = level > 0 ? 30 + level * 7 : 0;
 
     return (
       <div
         key={level}
-        ref={(el) => { levelRefs.current[level] = el; }}
+        ref={(el) => {levelRefs.current[level] = el;}}
         className="relative"
         style={{ height: containerHeight, minWidth: 110 }}
-        {...(isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {})}
-      >
+        {...isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {}}>
+        
         {/* Ghost elements - only at current frontier */}
-        {level > 0 && isCurrentFrontier && (
-          <div
-            className="cursor-default"
-            style={{ position: "absolute", top: 0, left: 0, right: 0, height: containerHeight, pointerEvents: "none" }}
-          >
+        {level > 0 && isCurrentFrontier &&
+        <div
+          className="cursor-default"
+          style={{ position: "absolute", top: 0, left: 0, right: 0, height: containerHeight, pointerEvents: "none" }}>
+          
             <div
-              onMouseEnter={(e) => setGhostTooltip({ visible: true, x: e.clientX, y: e.clientY })}
-              onMouseMove={(e) => setGhostTooltip({ visible: true, x: e.clientX, y: e.clientY })}
-              onMouseLeave={() => setGhostTooltip({ visible: false, x: 0, y: 0 })}
-              style={{ position: "absolute", top: dotAboveTops[1] - 8, left: -10, right: -10, height: (moreTop - dotAboveTops[1]) + 60, pointerEvents: "auto" }}
-            />
+            onMouseEnter={(e) => setGhostTooltip({ visible: true, x: e.clientX, y: e.clientY })}
+            onMouseMove={(e) => setGhostTooltip({ visible: true, x: e.clientX, y: e.clientY })}
+            onMouseLeave={() => setGhostTooltip({ visible: false, x: 0, y: 0 })}
+            style={{ position: "absolute", top: dotAboveTops[1] - 8, left: -10, right: -10, height: moreTop - dotAboveTops[1] + 60, pointerEvents: "auto" }} />
+          
 
             {/* Dots above */}
-            {dotAboveTops.map((top, idx) => (
-              <div key={`dot-above-${level}-${idx}`} style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)" }}>
+            {dotAboveTops.map((top, idx) =>
+          <div key={`dot-above-${level}-${idx}`} style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)" }}>
                 <div
-                  className="rounded-full bg-muted-foreground transition-opacity duration-200"
-                  style={{ width: dotSizes[idx], height: dotSizes[idx], opacity: ghostTooltip.visible ? 0.5 : Math.max(0.08, 0.26 - idx * 0.1) }}
-                />
+              className="rounded-full bg-muted-foreground transition-opacity duration-200"
+              style={{ width: dotSizes[idx], height: dotSizes[idx], opacity: ghostTooltip.visible ? 0.5 : Math.max(0.08, 0.26 - idx * 0.1) }} />
+            
               </div>
-            ))}
+          )}
 
             {/* Dots below */}
-            {dotBelowTops.map((top, idx) => (
-              <div key={`dot-below-${level}-${idx}`} style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)" }}>
+            {dotBelowTops.map((top, idx) =>
+          <div key={`dot-below-${level}-${idx}`} style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)" }}>
                 <div
-                  className="rounded-full bg-muted-foreground transition-opacity duration-200"
-                  style={{ width: dotSizes[idx], height: dotSizes[idx], opacity: ghostTooltip.visible ? 0.5 : Math.max(0.08, 0.26 - idx * 0.1) }}
-                />
+              className="rounded-full bg-muted-foreground transition-opacity duration-200"
+              style={{ width: dotSizes[idx], height: dotSizes[idx], opacity: ghostTooltip.visible ? 0.5 : Math.max(0.08, 0.26 - idx * 0.1) }} />
+            
               </div>
-            ))}
+          )}
 
             {/* "+N more" badge */}
             <div style={{ position: "absolute", top: moreTop, left: "50%", transform: "translateX(-50%)" }}>
               <div className="flex flex-col items-center gap-1">
                 <div
-                  className="text-[10px] whitespace-nowrap transition-all duration-200"
-                  style={{ color: ghostTooltip.visible ? "hsl(var(--muted-foreground) / 0.8)" : "hsl(var(--muted-foreground) / 0.5)" }}
-                >
+                className="text-[10px] whitespace-nowrap transition-all duration-200"
+                style={{ color: ghostTooltip.visible ? "hsl(var(--muted-foreground) / 0.8)" : "hsl(var(--muted-foreground) / 0.5)" }}>
+                
                   +{moreCount} more
                 </div>
               </div>
             </div>
           </div>
-        )}
+        }
 
         {/* Active word buttons */}
         <div
@@ -417,10 +417,10 @@ export function BranchDiagram({
             transform: 'translateX(-50%)',
             width: 'fit-content',
             minWidth: 100,
-            padding: '0 4px',
+            padding: '0 4px'
           }}
-          {...(isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {})}
-        />
+          {...isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {}} />
+        
         {options.map((option, idx) => {
           const isSelected = selections[level] === option.word;
           const isAnimated = animatingLevel === level && animatedWord === option.word;
@@ -429,14 +429,14 @@ export function BranchDiagram({
 
           return (
             <div key={option.word} style={{ position: 'absolute', top: nodeY - nodeHeight / 2, left: 0, right: 0 }}>
-              {showSelectionMessage && isPulsing && (
-                <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
+              {showSelectionMessage && isPulsing &&
+              <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
                     Highest: {selectedProbability !== null ? (selectedProbability * 100).toFixed(0) : 0}%
                   </div>
                 </div>
-              )}
+              }
 
               <button
                 onClickCapture={() => canSelect && handleWordClick(level, option.word)}
@@ -446,37 +446,37 @@ export function BranchDiagram({
                 className={cn(
                   "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
                   "min-w-[100px] h-11",
-                  level === 0
-                    ? "bg-primary text-primary-foreground border-primary cursor-default"
-                    : isSelected
-                      ? "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer"
-                      : canSelect
-                        ? "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
-                        : "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
+                  level === 0 ?
+                  "bg-primary text-primary-foreground border-primary cursor-default" :
+                  isSelected ?
+                  "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" :
+                  canSelect ?
+                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" :
+                  "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                   isAnimated && !isPulsing && "border-primary bg-primary/10",
                   isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
-                )}
-              >
+                )}>
+                
                 {option.word}
-                {level > 0 && (
-                  <span
-                    className={cn(
-                      "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
-                      isPulsing ? "bg-primary text-primary-foreground"
-                        : isSelected ? "bg-green-200 text-green-800"
-                          : "bg-muted text-muted-foreground"
-                    )}
-                    {...(idx === 0 && isCurrentFrontier ? { "data-feature": "probability" } : {})}
-                  >
+                {level > 0 &&
+                <span
+                  className={cn(
+                    "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
+                    isPulsing ? "bg-primary text-primary-foreground" :
+                    isSelected ? "bg-green-200 text-green-800" :
+                    "bg-muted text-muted-foreground"
+                  )}
+                  {...idx === 0 && isCurrentFrontier ? { "data-feature": "probability" } : {}}>
+                  
                     {option.probability.toFixed(2)}
                   </span>
-                )}
+                }
               </button>
-            </div>
-          );
+            </div>);
+
         })}
-      </div>
-    );
+      </div>);
+
   };
 
   // Render connector lines between levels
@@ -503,13 +503,13 @@ export function BranchDiagram({
                 fill="none"
                 stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
                 strokeWidth={isSelected ? 1.5 : 0.75}
-                strokeOpacity={isSelected ? 1 : 0.3}
-              />
-            );
+                strokeOpacity={isSelected ? 1 : 0.3} />);
+
+
           })}
         </svg>
-      </div>
-    );
+      </div>);
+
   };
 
   const displayHeadline = buildDisplayHeadline();
@@ -534,14 +534,14 @@ export function BranchDiagram({
                 if (!hasUserSelected && isInteractive) {
                   return (
                     <>
-                      {defaultPath.map((word, idx) => (
-                        <span key={idx}>
+                      {defaultPath.map((word, idx) =>
+                      <span key={idx}>
                           {idx > 0 && " "}
                           <span className={cn(idx === 0 ? "" : "text-muted-foreground/50")}>{word}</span>
                         </span>
-                      ))}
-                    </>
-                  );
+                      )}
+                    </>);
+
                 }
 
                 const words = (displayHeadline || predictionTree.word).split(" ");
@@ -552,26 +552,26 @@ export function BranchDiagram({
                     <>
                       {prefix && <>{prefix} </>}
                       <span className="bg-green-200 text-green-900 px-1 rounded">{lastWord}</span>
-                    </>
-                  );
+                    </>);
+
                 }
                 return words.join(" ");
               })()}
-              {!isTerminal && displayHeadline && hasUserSelected && (
-                <span className="text-muted-foreground/50">...</span>
-              )}
+              {!isTerminal && displayHeadline && hasUserSelected &&
+              <span className="text-muted-foreground/50">...</span>
+              }
             </p>
           </div>
-          {isInteractive && unlockedLevel > 1 && (
-            <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0">
+          {isInteractive && unlockedLevel > 1 &&
+          <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0">
               <RotateCcw className="h-3 w-3" />
               Reset
             </Button>
-          )}
+          }
         </div>
 
         {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto overflow-y-auto scroll-smooth bg-card rounded-xl" style={{ maxHeight: 'calc(100vh - 420px)' }}>
+        <div ref={containerRef} className="overflow-x-auto overflow-y-auto scroll-smooth bg-card rounded-xl py-[20px]" style={{ maxHeight: 'calc(100vh - 420px)' }}>
           <div className="min-w-[1600px] p-6 pr-[320px]">
             <div className="flex items-start gap-1">
               {renderLevel(0)}
@@ -582,7 +582,7 @@ export function BranchDiagram({
                 const prevSelectedY = level > 0 ? getSelectedYAtLevel(level - 1) : containerHeight / 2;
 
                 const optionYPositions = options.map((_, idx) =>
-                  getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined)
+                getNodeY(idx, options.length, level > 0 ? prevSelectedY : undefined)
                 );
                 const minY = Math.min(...optionYPositions);
                 const maxY = Math.max(...optionYPositions);
@@ -593,25 +593,25 @@ export function BranchDiagram({
                     {renderConnector(level - 1, level)}
                     {renderLevel(level)}
 
-                    {isCurrentFrontier && options.length > 1 && (
-                      <div
-                        className="relative flex items-center justify-center"
-                        style={{ height: containerHeight, width: 40 }}
-                      >
+                    {isCurrentFrontier && options.length > 1 &&
+                    <div
+                      className="relative flex items-center justify-center"
+                      style={{ height: containerHeight, width: 40 }}>
+                      
                         <div className="absolute" style={{ top: centerY - 14 }}>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <button
-                                  onClick={() => playAnimation(level)}
-                                  disabled={animatingLevel !== null}
-                                  className={cn(
-                                    "p-1.5 rounded-md transition-all duration-200",
-                                    animatingLevel === level
-                                      ? "bg-primary/20 text-primary animate-pulse"
-                                      : "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary"
-                                  )}
-                                >
+                                onClick={() => playAnimation(level)}
+                                disabled={animatingLevel !== null}
+                                className={cn(
+                                  "p-1.5 rounded-md transition-all duration-200",
+                                  animatingLevel === level ?
+                                  "bg-primary/20 text-primary animate-pulse" :
+                                  "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary"
+                                )}>
+                                
                                   <Monitor className="h-4 w-4" />
                                 </button>
                               </TooltipTrigger>
@@ -622,9 +622,9 @@ export function BranchDiagram({
                           </TooltipProvider>
                         </div>
                       </div>
-                    )}
-                  </React.Fragment>
-                );
+                    }
+                  </React.Fragment>);
+
               })}
 
             </div>
@@ -633,25 +633,25 @@ export function BranchDiagram({
       </div>
 
       {/* Start your own overlay */}
-      {isIntroComplete && !isInteractive && (
-        <div className="absolute left-0 right-0 top-24 flex justify-center animate-fade-in z-10">
+      {isIntroComplete && !isInteractive &&
+      <div className="absolute left-0 right-0 top-24 flex justify-center animate-fade-in z-10">
           <Button onClick={handleStartOwn} className="gap-2">
             <RotateCcw className="h-4 w-4" />
             Start Your Own Headline
           </Button>
         </div>
-      )}
+      }
 
       {/* Ghost tooltip */}
-      {ghostTooltip.visible && (
-        <div className="fixed z-50 pointer-events-none animate-fade-in" style={{ left: ghostTooltip.x + 16, top: ghostTooltip.y + 16 }}>
+      {ghostTooltip.visible &&
+      <div className="fixed z-50 pointer-events-none animate-fade-in" style={{ left: ghostTooltip.x + 16, top: ghostTooltip.y + 16 }}>
           <div className="bg-card border border-border shadow-lg rounded-lg px-4 py-3 max-w-[280px]">
             <p className="text-sm text-foreground leading-relaxed">
               At each step, the LLM evaluates <strong>thousands of possible next tokens</strong> and assigns a probability to each one. Only the top candidates are shown here.
             </p>
           </div>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
