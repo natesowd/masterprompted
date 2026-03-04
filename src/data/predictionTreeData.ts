@@ -14,10 +14,8 @@ export interface PredictionNode {
   endProb: number;
 }
 
-const capitalize = (w: string) => w.length > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w;
-
 const n = (word: string, prob: number, children: PredictionNode[] = [], endProb = 0): PredictionNode =>
-  ({ word: capitalize(word), prob, children, endProb });
+  ({ word, prob, children, endProb });
 
 export const predictionTree: PredictionNode = n("European Union", 1, [
   // ═══════════════════════════════════════════════════════════
