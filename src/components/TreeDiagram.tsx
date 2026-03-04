@@ -480,12 +480,12 @@ export function TreeDiagram({
                                 className={cn(
                                   "relative px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap h-11",
                                   opt.word === END_TOKEN ?
-                                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[80px]" :
+                                  "bg-muted border-border hover:border-primary/50 hover:bg-accent cursor-pointer min-w-[70px]" :
                                   "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[100px]",
                                   isAnimated && "border-primary bg-primary/10"
                                 )}>
 
-                                {opt.word === END_TOKEN ? <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span> : opt.word}
+                                {opt.word === END_TOKEN ? "End sentence" : opt.word}
                                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
                                   {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
                                 </span>

@@ -426,10 +426,10 @@ export function BranchDiagram({
                   "h-11",
                   option.word === END_TOKEN ?
                   (isSelected ?
-                    "bg-muted border-border text-foreground shadow-md scale-105 cursor-pointer min-w-[80px]" :
+                    "bg-muted border-border text-foreground shadow-md scale-105 cursor-pointer min-w-[70px]" :
                     canSelect ?
-                    "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[80px]" :
-                    "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed min-w-[80px]") :
+                    "bg-muted border-border hover:border-primary/50 hover:bg-accent cursor-pointer min-w-[70px]" :
+                    "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed min-w-[70px]") :
                   level === 0 ?
                   "bg-primary text-primary-foreground border-primary cursor-default" :
                   isSelected ?
@@ -441,7 +441,7 @@ export function BranchDiagram({
                   isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                 )}>
                 
-                {option.word === END_TOKEN ? <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span> : option.word}
+                {option.word === END_TOKEN ? "End sentence" : option.word}
                 {level > 0 &&
                 <span
                   className={cn(
