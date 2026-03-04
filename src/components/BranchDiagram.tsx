@@ -373,35 +373,12 @@ export function BranchDiagram({
             style={{ position: "absolute", top: dotAboveTops[1] - 8, left: -10, right: -10, height: moreTop - dotAboveTops[1] + 60, pointerEvents: "auto" }} />
           
 
-            {/* Dots above */}
-            {dotAboveTops.map((top, idx) =>
-          <div key={`dot-above-${level}-${idx}`} style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)" }}>
-                <div
-              className="rounded-full bg-muted-foreground transition-opacity duration-200"
-              style={{ width: dotSizes[idx], height: dotSizes[idx], opacity: ghostTooltip.visible ? 0.5 : Math.max(0.08, 0.26 - idx * 0.1) }} />
-            
-              </div>
-          )}
-
-            {/* Dots below */}
-            {dotBelowTops.map((top, idx) =>
-          <div key={`dot-below-${level}-${idx}`} style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)" }}>
-                <div
-              className="rounded-full bg-muted-foreground transition-opacity duration-200"
-              style={{ width: dotSizes[idx], height: dotSizes[idx], opacity: ghostTooltip.visible ? 0.5 : Math.max(0.08, 0.26 - idx * 0.1) }} />
-            
-              </div>
-          )}
-
-            {/* "+N more" badge */}
-            <div style={{ position: "absolute", top: moreTop, left: "50%", transform: "translateX(-50%)" }}>
-              <div className="flex flex-col items-center gap-1">
-                <div
-                className="text-[10px] whitespace-nowrap transition-all duration-200"
-                style={{ color: ghostTooltip.visible ? "hsl(var(--muted-foreground) / 0.8)" : "hsl(var(--muted-foreground) / 0.5)" }}>
-                
-                  +{moreCount} more
-                </div>
+            {/* Ellipsis below */}
+            <div style={{ position: "absolute", top: ghostBelowTop, left: "50%", transform: "translateX(-50%)" }}>
+              <div
+                className="text-base font-medium tracking-widest transition-opacity duration-200"
+                style={{ color: ghostTooltip.visible ? "hsl(var(--muted-foreground) / 0.8)" : "hsl(var(--muted-foreground) / 0.4)" }}>
+                …
               </div>
             </div>
           </div>
