@@ -514,8 +514,8 @@ export function TreeDiagram({
                                     onClickCapture={() => handleWordClick(currentLevel, opt.word)}
                                     disabled={isAnimating}
                                     className={cn(
-                                      "relative px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap h-11",
-                                      "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[100px]",
+                                     "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap h-11 w-fit",
+                                      "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer",
                                       isAnimated && "border-primary bg-primary/10"
                                     )}>
 
