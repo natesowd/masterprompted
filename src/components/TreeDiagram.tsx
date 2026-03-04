@@ -416,7 +416,7 @@ export function TreeDiagram({
                           className="text-[10px] font-medium pointer-events-none select-none"
                           fill={isLatestSelection ? "hsl(142 76% 36%)" : "hsl(var(--muted-foreground))"}>
 
-                            {probability.toFixed(2)}
+                            {probability < 0.005 ? '<.01' : probability.toFixed(2)}
                           </text>
                         }
                         <rect
@@ -483,7 +483,7 @@ export function TreeDiagram({
 
                                 {opt.word}
                                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
-                                  {opt.probability.toFixed(2)}
+                                  {opt.probability < 0.005 ? '<.01' : opt.probability.toFixed(2)}
                                 </span>
                               </button>
                             </div>

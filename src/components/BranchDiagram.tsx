@@ -445,7 +445,7 @@ export function BranchDiagram({
                   )}
                   {...idx === 0 && isCurrentFrontier ? { "data-feature": "probability" } : {}}>
                   
-                    {option.probability.toFixed(2)}
+                    {option.probability < 0.005 ? '<.01' : option.probability.toFixed(2)}
                   </span>
                 }
               </button>
