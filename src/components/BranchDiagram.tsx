@@ -487,7 +487,7 @@ export function BranchDiagram({
                 fill="none"
                 stroke={isSelected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
                 strokeWidth={isSelected ? 1.5 : 0.75}
-                strokeOpacity={isSelected ? 1 : 0.3} />);
+                strokeOpacity={isSelected ? 1 : 0.6} />);
 
 
           })}
