@@ -459,13 +459,13 @@ export function TreeDiagram({
                       return (
                         <g key={`option-${idx}`}>
                           {opt.word === END_TOKEN ? (
-                            /* Terminus circle for END_TOKEN */
+                            /* Terminus dot connected to branch */
                             <g
                               onClick={() => !isAnimating && handleWordClick(currentLevel, opt.word)}
                               className="cursor-pointer">
                               <text
                                 x={x}
-                                y={optY - 18}
+                                y={optY - 14}
                                 textAnchor="middle"
                                 className="text-[10px] font-medium pointer-events-none select-none"
                                 fill="hsl(var(--muted-foreground))">
@@ -474,16 +474,10 @@ export function TreeDiagram({
                               <circle
                                 cx={x}
                                 cy={optY}
-                                r={6}
+                                r={5}
                                 fill="hsl(var(--muted-foreground))"
-                                opacity={0.5}
-                                className="transition-all duration-200 hover:opacity-80" />
-                              <circle
-                                cx={x}
-                                cy={optY}
-                                r={3}
-                                fill="hsl(var(--muted-foreground))"
-                                opacity={0.8} />
+                                opacity={0.4}
+                                className="transition-all duration-200 hover:opacity-70" />
                             </g>
                           ) : (
                             <>

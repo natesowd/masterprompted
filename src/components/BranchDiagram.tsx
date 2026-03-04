@@ -417,7 +417,7 @@ export function BranchDiagram({
               }
 
               {option.word === END_TOKEN ? (
-                /* Terminus dot for END_TOKEN */
+                /* Terminus dot */
                 <div
                   className={cn(
                     "relative flex flex-col items-center gap-1 cursor-pointer",
@@ -433,12 +433,10 @@ export function BranchDiagram({
                     </span>
                   }
                   <div className={cn(
-                    "w-3 h-3 rounded-full bg-muted-foreground/50 transition-all duration-200",
-                    isSelected && "bg-muted-foreground/80 scale-125",
-                    canSelect && "hover:bg-muted-foreground/70"
-                  )}>
-                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                  </div>
+                    "w-2.5 h-2.5 rounded-full bg-muted-foreground/40 transition-all duration-200",
+                    isSelected && "bg-muted-foreground/70 scale-125",
+                    canSelect && "hover:bg-muted-foreground/60"
+                  )} />
                 </div>
               ) : (
               <>
