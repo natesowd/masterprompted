@@ -392,7 +392,7 @@ export default function HeadlineResponse() {
           <div className="max-w-4xl mx-auto">
             {/* Original Prompt */}
             <div className="mb-8">
-              <ChatPrompt text="Write a headline for a long form journalistic article about ai ethics agreement reached across the eu" fileName="EU_AI_Act.pdf" />
+              <ChatPrompt text="Write a 7-word headline for a long form journalistic article about AI ethics agreement reached across the EU." fileName="EU_AI_Act.pdf" />
             </div>
 
             {/* AI Response */}

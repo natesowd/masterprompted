@@ -115,7 +115,7 @@ const translations = {
         continue: 'Continue'
       },
       prompt: {
-        input: 'Write a headline for a long form journalistic article about ai ethics agreement reached across the eu',
+        input: 'Write a 7-word headline for a long form journalistic article about AI ethics agreement reached across the EU.',
         popoverSubmit: "Click here to submit your prompt and see the AI's response!"
       },
       response: {
@@ -452,7 +452,7 @@ Output only the final transformed prompt. Do not include explanations, commentar
         continue: 'Continuar'
       },
       prompt: {
-        input: 'Write a headline for a long form journalistic article about ai ethics agreement reached across the eu',
+        input: 'Write a 7-word headline for a long form journalistic article about AI ethics agreement reached across the EU.',
         popoverSubmit: "Haz clic aquí para enviar tu prompt y ver la respuesta de la IA"
       },
       response: {
