@@ -416,31 +416,60 @@ export function BranchDiagram({
                 </div>
               }
 
+              {option.word === END_TOKEN ? (
+                /* Terminus dot for END_TOKEN */
+                <div
+                  className={cn(
+                    "relative flex flex-col items-center gap-1 cursor-pointer",
+                    !canSelect && "opacity-40 cursor-not-allowed"
+                  )}
+                  onClick={() => canSelect && handleWordClick(level, option.word)}>
+                  {level > 0 &&
+                    <span className={cn(
+                      "text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
+                      isSelected ? "bg-green-200 text-green-800" : "bg-muted text-muted-foreground"
+                    )}>
+                      {option.probability < 0.005 ? '<.01' : option.probability >= 0.995 ? '>.99' : option.probability.toFixed(2)}
+                    </span>
+                  }
+                  <div className={cn(
+                    "w-3 h-3 rounded-full bg-muted-foreground/50 transition-all duration-200",
+                    isSelected && "bg-muted-foreground/80 scale-125",
+                    canSelect && "hover:bg-muted-foreground/70"
+                  )}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                </div>
+              ) : (
+              <>
+              {showSelectionMessage && isPulsing &&
+              <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
+                    Highest: {selectedProbability !== null ? (selectedProbability * 100).toFixed(0) : 0}%
+                  </div>
+                </div>
+              }
+
               <button
                 onClickCapture={() => canSelect && handleWordClick(level, option.word)}
                 disabled={!canSelect}
                 data-word={option.word}
                 data-selected={isSelected ? "true" : "false"}
                 className={cn(
-                  "relative py-2 rounded-lg transition-all duration-200 border whitespace-nowrap",
-                  option.word === END_TOKEN ?
-                  (isSelected ?
-                    "bg-muted/60 border-dashed border-muted-foreground/40 text-muted-foreground shadow-md scale-105 cursor-pointer min-w-[60px] h-8 px-2.5 text-[11px] font-mono" :
-                    canSelect ?
-                    "bg-muted/60 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted cursor-pointer min-w-[60px] h-8 px-2.5 text-[11px] font-mono text-muted-foreground" :
-                    "bg-muted/30 border-dashed border-muted/50 text-muted-foreground/40 cursor-not-allowed min-w-[60px] h-8 px-2.5 text-[11px] font-mono") :
+                  "relative px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap h-11",
                   level === 0 ?
-                  "bg-primary text-primary-foreground border-primary cursor-default h-11 px-2 text-sm font-medium" :
+                  "bg-primary text-primary-foreground border-primary cursor-default" :
                   isSelected ?
-                  "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer h-11 px-2 text-sm font-medium" :
+                  "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" :
                   canSelect ?
-                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer h-11 px-2 text-sm font-medium" :
-                  "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed h-11 px-2 text-sm font-medium",
+                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" :
+                  "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                   isAnimated && !isPulsing && "border-primary bg-primary/10",
                   isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                 )}>
                 
-                {option.word === END_TOKEN ? <span className="flex items-center gap-1 tracking-tight">⏎ EOS</span> : option.word}
+                {option.word}
                 {level > 0 &&
                 <span
                   className={cn(
@@ -455,6 +484,8 @@ export function BranchDiagram({
                   </span>
                 }
               </button>
+              </>
+              )}
             </div>);
 
         })}
