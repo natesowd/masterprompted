@@ -422,14 +422,14 @@ export function BranchDiagram({
                 data-word={option.word}
                 data-selected={isSelected ? "true" : "false"}
                 className={cn(
-                  "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
-                  "min-w-[100px] h-11",
+                  "relative px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap",
+                  "h-11",
                   option.word === END_TOKEN ?
                   (isSelected ?
-                    "bg-red-50 border-red-400 text-red-800 shadow-md scale-105 cursor-pointer border-dashed" :
+                    "bg-muted border-border text-foreground shadow-md scale-105 cursor-pointer min-w-[80px]" :
                     canSelect ?
-                    "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
-                    "bg-muted/50 border-muted border-dashed text-muted-foreground/60 cursor-not-allowed") :
+                    "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[80px]" :
+                    "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed min-w-[80px]") :
                   level === 0 ?
                   "bg-primary text-primary-foreground border-primary cursor-default" :
                   isSelected ?
