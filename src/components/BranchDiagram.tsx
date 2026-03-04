@@ -414,12 +414,8 @@ export function BranchDiagram({
 
           return (
             <div key={option.word} style={{ position: 'absolute', top: nodeY - nodeHeight / 2, left: 0, right: 0 }}>
-              {showSelectionMessage && isPulsing &&
+              {false &&
               <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
-                    Highest: {selectedProbability !== null ? (selectedProbability * 100).toFixed(0) : 0}%
-                  </div>
                 </div>
               }
 
