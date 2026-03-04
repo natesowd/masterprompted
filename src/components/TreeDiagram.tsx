@@ -458,40 +458,69 @@ export function TreeDiagram({
 
                       return (
                         <g key={`option-${idx}`}>
-                          {/* Background occluder */}
-                          <rect
-                            x={x - buttonWidth / 2 - 6}
-                            y={optY - buttonHeight / 2 - foreignObjectPadTop - 6}
-                            width={buttonWidth + 12}
-                            height={buttonHeight + foreignObjectPadTop + 12}
-                            rx={12}
-                            fill="hsl(var(--background))" />
+                          {opt.word === END_TOKEN ? (
+                            /* Terminus circle for END_TOKEN */
+                            <g
+                              onClick={() => !isAnimating && handleWordClick(currentLevel, opt.word)}
+                              className="cursor-pointer">
+                              <text
+                                x={x}
+                                y={optY - 18}
+                                textAnchor="middle"
+                                className="text-[10px] font-medium pointer-events-none select-none"
+                                fill="hsl(var(--muted-foreground))">
+                                {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
+                              </text>
+                              <circle
+                                cx={x}
+                                cy={optY}
+                                r={6}
+                                fill="hsl(var(--muted-foreground))"
+                                opacity={0.5}
+                                className="transition-all duration-200 hover:opacity-80" />
+                              <circle
+                                cx={x}
+                                cy={optY}
+                                r={3}
+                                fill="hsl(var(--muted-foreground))"
+                                opacity={0.8} />
+                            </g>
+                          ) : (
+                            <>
+                              {/* Background occluder */}
+                              <rect
+                                x={x - buttonWidth / 2 - 6}
+                                y={optY - buttonHeight / 2 - foreignObjectPadTop - 6}
+                                width={buttonWidth + 12}
+                                height={buttonHeight + foreignObjectPadTop + 12}
+                                rx={12}
+                                fill="hsl(var(--background))" />
 
-                          <foreignObject
-                            x={x - buttonWidth / 2}
-                            y={optY - buttonHeight / 2 - foreignObjectPadTop}
-                            width={buttonWidth}
-                            height={buttonHeight + foreignObjectPadTop}>
+                              <foreignObject
+                                x={x - buttonWidth / 2}
+                                y={optY - buttonHeight / 2 - foreignObjectPadTop}
+                                width={buttonWidth}
+                                height={buttonHeight + foreignObjectPadTop}>
 
-                            <div className="flex justify-center h-full items-end pb-0">
-                              <button
-                                onClickCapture={() => handleWordClick(currentLevel, opt.word)}
-                                disabled={isAnimating}
-                                className={cn(
-                                  "relative py-2 rounded-lg transition-all duration-200 border whitespace-nowrap",
-                                  opt.word === END_TOKEN ?
-                                  "bg-muted/60 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted cursor-pointer min-w-[60px] h-8 px-2.5 text-[11px] font-mono text-muted-foreground" :
-                                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[100px] h-11 px-2 text-sm font-medium",
-                                  isAnimated && "border-primary bg-primary/10"
-                                )}>
+                                <div className="flex justify-center h-full items-end pb-0">
+                                  <button
+                                    onClickCapture={() => handleWordClick(currentLevel, opt.word)}
+                                    disabled={isAnimating}
+                                    className={cn(
+                                      "relative px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap h-11",
+                                      "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[100px]",
+                                      isAnimated && "border-primary bg-primary/10"
+                                    )}>
 
-                                {opt.word === END_TOKEN ? <span className="flex items-center gap-1 tracking-tight">⏎ EOS</span> : opt.word}
-                                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
-                                  {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
-                                </span>
-                              </button>
-                            </div>
-                          </foreignObject>
+                                    {opt.word}
+                                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
+                                      {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
+                                    </span>
+                                  </button>
+                                </div>
+                              </foreignObject>
+                            </>
+                          )}
                         </g>);
 
                     });
