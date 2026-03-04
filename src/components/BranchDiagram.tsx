@@ -419,7 +419,7 @@ export function BranchDiagram({
               {option.word === END_TOKEN ? (
                 <div
                   className="inline-flex flex-col items-center cursor-pointer w-auto"
-                  style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
+                  style={{ position: 'absolute', left: 0 }}
                   onClick={() => canSelect && handleWordClick(level, option.word)}>
                   <span className="text-[10px] mb-1 text-muted-foreground">
                     {option.probability < 0.005 ? '<.01' : option.probability >= 0.995 ? '>.99' : option.probability.toFixed(2)}
