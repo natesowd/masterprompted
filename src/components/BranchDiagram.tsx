@@ -422,26 +422,25 @@ export function BranchDiagram({
                 data-word={option.word}
                 data-selected={isSelected ? "true" : "false"}
                 className={cn(
-                  "relative px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap",
-                  "h-11",
+                  "relative py-2 rounded-lg transition-all duration-200 border whitespace-nowrap",
                   option.word === END_TOKEN ?
                   (isSelected ?
-                    "bg-muted border-border text-foreground shadow-md scale-105 cursor-pointer min-w-[70px]" :
+                    "bg-muted/60 border-dashed border-muted-foreground/40 text-muted-foreground shadow-md scale-105 cursor-pointer min-w-[60px] h-8 px-2.5 text-[11px] font-mono" :
                     canSelect ?
-                    "bg-muted border-border hover:border-primary/50 hover:bg-accent cursor-pointer min-w-[70px]" :
-                    "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed min-w-[70px]") :
+                    "bg-muted/60 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted cursor-pointer min-w-[60px] h-8 px-2.5 text-[11px] font-mono text-muted-foreground" :
+                    "bg-muted/30 border-dashed border-muted/50 text-muted-foreground/40 cursor-not-allowed min-w-[60px] h-8 px-2.5 text-[11px] font-mono") :
                   level === 0 ?
-                  "bg-primary text-primary-foreground border-primary cursor-default" :
+                  "bg-primary text-primary-foreground border-primary cursor-default h-11 px-2 text-sm font-medium" :
                   isSelected ?
-                  "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" :
+                  "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer h-11 px-2 text-sm font-medium" :
                   canSelect ?
-                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" :
-                  "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
+                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer h-11 px-2 text-sm font-medium" :
+                  "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed h-11 px-2 text-sm font-medium",
                   isAnimated && !isPulsing && "border-primary bg-primary/10",
                   isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                 )}>
                 
-                {option.word === END_TOKEN ? "End sentence" : option.word}
+                {option.word === END_TOKEN ? <span className="flex items-center gap-1 tracking-tight">⏎ EOS</span> : option.word}
                 {level > 0 &&
                 <span
                   className={cn(

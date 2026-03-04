@@ -478,14 +478,14 @@ export function TreeDiagram({
                                 onClickCapture={() => handleWordClick(currentLevel, opt.word)}
                                 disabled={isAnimating}
                                 className={cn(
-                                  "relative px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 border whitespace-nowrap h-11",
+                                  "relative py-2 rounded-lg transition-all duration-200 border whitespace-nowrap",
                                   opt.word === END_TOKEN ?
-                                  "bg-muted border-border hover:border-primary/50 hover:bg-accent cursor-pointer min-w-[70px]" :
-                                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[100px]",
+                                  "bg-muted/60 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted cursor-pointer min-w-[60px] h-8 px-2.5 text-[11px] font-mono text-muted-foreground" :
+                                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer min-w-[100px] h-11 px-2 text-sm font-medium",
                                   isAnimated && "border-primary bg-primary/10"
                                 )}>
 
-                                {opt.word === END_TOKEN ? "End sentence" : opt.word}
+                                {opt.word === END_TOKEN ? <span className="flex items-center gap-1 tracking-tight">⏎ EOS</span> : opt.word}
                                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
                                   {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
                                 </span>
