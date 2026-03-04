@@ -11,6 +11,7 @@ import {
   getAllLeafPaths,
   createEmptySelections,
   computePathY,
+  END_TOKEN,
   type PredictionNode } from
 "@/data/predictionTreeData";
 
@@ -85,7 +86,7 @@ export function TreeDiagram({
 
   // Current node at end of selected path
   const currentNode = useMemo(() => getNodeAtPath(currentPath), [currentPath]);
-  const isTerminal = currentNode ? currentNode.children.length === 0 : false;
+  const isTerminal = currentNode ? currentNode.children.length === 0 : currentPath[currentPath.length - 1] === END_TOKEN;
 
   // Get options at each level based on current selections
   const getOptionsAtLevel = (level: number): {word: string;probability: number;}[] => {
@@ -245,7 +246,7 @@ export function TreeDiagram({
   }, [currentLevel, selections, viewBoxY, adjustedCenterY]);
 
   // Build display headline
-  const displayHeadline = currentPath.filter(Boolean).join(" ");
+  const displayHeadline = currentPath.filter(w => w && w !== END_TOKEN).join(" ");
 
   // Get the selected path's Y at a given level
   const getSelectedPathY = (level: number): number => {
@@ -298,7 +299,8 @@ export function TreeDiagram({
                     </>);
 
                 }
-                return words.join(" ");
+                const endsWithPeriod = currentPath[currentPath.length - 1] === END_TOKEN;
+                return words.join(" ") + (endsWithPeriod ? "." : "");
               })()}
               {!isTerminal && displayHeadline && hasUserSelected &&
               <span className="text-muted-foreground/50">...</span>
@@ -477,11 +479,13 @@ export function TreeDiagram({
                                 disabled={isAnimating}
                                 className={cn(
                                   "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap min-w-[100px] h-11",
+                                  opt.word === END_TOKEN ?
+                                  "bg-amber-50 border-amber-200 hover:border-amber-400 hover:bg-amber-100 cursor-pointer italic text-amber-700" :
                                   "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer",
                                   isAnimated && "border-primary bg-primary/10"
                                 )}>
 
-                                {opt.word}
+                                {opt.word === END_TOKEN ? "End ." : opt.word}
                                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
                                   {opt.probability < 0.005 ? '<.01' : opt.probability.toFixed(2)}
                                 </span>

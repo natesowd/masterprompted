@@ -10,6 +10,7 @@ import {
   getDefaultPath,
   getMaxDepth,
   createEmptySelections,
+  END_TOKEN,
   type PredictionNode } from
 "@/data/predictionTreeData";
 
@@ -107,7 +108,7 @@ export function BranchDiagram({
 
   // Check if the current path has reached a terminal node (can show end-of-sequence)
   const currentNode = useMemo(() => getNodeAtPath(currentPath), [currentPath]);
-  const isTerminal = currentNode ? currentNode.children.length === 0 : false;
+  const isTerminal = currentNode ? currentNode.children.length === 0 : currentPath[currentPath.length - 1] === END_TOKEN;
   const canEnd = currentNode ? currentNode.endProb > 0 : false;
 
   // Compute the active depth (how many levels are currently filled)
@@ -423,6 +424,12 @@ export function BranchDiagram({
                 className={cn(
                   "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
                   "min-w-[100px] h-11",
+                  option.word === END_TOKEN ?
+                  (isSelected ?
+                    "bg-amber-100 border-amber-400 text-amber-900 shadow-md scale-105 cursor-pointer italic" :
+                    canSelect ?
+                    "bg-amber-50 border-amber-200 hover:border-amber-400 hover:bg-amber-100 cursor-pointer italic text-amber-700" :
+                    "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed italic") :
                   level === 0 ?
                   "bg-primary text-primary-foreground border-primary cursor-default" :
                   isSelected ?
@@ -434,7 +441,7 @@ export function BranchDiagram({
                   isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                 )}>
                 
-                {option.word}
+                {option.word === END_TOKEN ? "End ." : option.word}
                 {level > 0 &&
                 <span
                   className={cn(

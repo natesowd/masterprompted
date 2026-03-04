@@ -1679,13 +1679,22 @@ export function getNodeAtPath(path: string[]): PredictionNode | null {
   return node;
 }
 
-/** Get selectable options (children) for a node at the given path */
+/** Sentinel word used to represent end-of-sentence probability */
+export const END_TOKEN = ".";
+
+/** Get selectable options (children) for a node at the given path.
+ *  If the node has endProb > 0, a synthetic "." option is included. */
 export function getOptionsForPath(path: string[]): { word: string; probability: number }[] {
   const node = getNodeAtPath(path);
   if (!node) return [];
-  return node.children
+  const options = node.children
     .map(c => ({ word: c.word, probability: c.prob }))
     .sort((a, b) => b.probability - a.probability);
+  if (node.endProb > 0) {
+    options.push({ word: END_TOKEN, probability: node.endProb });
+    options.sort((a, b) => b.probability - a.probability);
+  }
+  return options;
 }
 
 /** Check if path has reached a terminal node (no more children) */
@@ -1750,8 +1759,21 @@ export function computePathY(
     const word = pathWords[d];
     if (!word) break;
 
-    const siblings = node.children;
-    const childIndex = siblings.findIndex(c => c.word === word);
+    // Build effective siblings list including synthetic end token if applicable
+    const realSiblings = node.children;
+    const hasEnd = node.endProb > 0;
+    const effectiveSiblingCount = realSiblings.length + (hasEnd ? 1 : 0);
+
+    let childIndex = realSiblings.findIndex(c => c.word === word);
+    const isEndToken = word === END_TOKEN;
+    if (isEndToken && hasEnd) {
+      // End token sorts by probability — find its position among all options
+      const allOptions = [
+        ...realSiblings.map(c => ({ word: c.word, prob: c.prob })),
+        { word: END_TOKEN, prob: node.endProb }
+      ].sort((a, b) => b.prob - a.prob);
+      childIndex = allOptions.findIndex(o => o.word === END_TOKEN);
+    }
     if (childIndex < 0) break;
 
     let pathMatchesSelection = true;
@@ -1772,10 +1794,11 @@ export function computePathY(
       spacing = Math.max(8, 18 - d * 1.5);
     }
 
-    const offset = (childIndex - (siblings.length - 1) / 2) * spacing;
+    const offset = (childIndex - (effectiveSiblingCount - 1) / 2) * spacing;
     y += offset;
 
-    node = siblings[childIndex];
+    if (isEndToken) break; // No further children
+    node = realSiblings[childIndex];
   }
 
   return y;
