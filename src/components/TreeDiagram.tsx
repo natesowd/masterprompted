@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Sparkles } from "lucide-react";
+import { RotateCcw } from "lucide-react";
+import starIcon from "@/assets/star.png";
 import {
   predictionTree,
   getNodeAtPath,
@@ -530,7 +531,7 @@ export function TreeDiagram({
                           )}
                           title="Watch LLM select highest probability">
 
-                          <Sparkles className={cn("h-4 w-4 text-muted-foreground", isAnimating && "text-primary animate-pulse")} />
+                          <img src={starIcon} alt="AI" className={cn("h-4 w-4", isAnimating && "animate-pulse")} />
                         </button>
                       </foreignObject>);
 
