@@ -152,7 +152,7 @@ export default function HeadlineResponse() {
         sideOffset={32}
         closeLabel="Next"
       >
-        <strong>European Union</strong> is the fixed starting point for the headline. The greyed-out words show one possible completion — your job is to build your own by selecting words below.
+        This is a potential headline. <strong>European Union</strong> is the fixed starting point, and the greyed-out words show one possible completion.
       </FeatureHighlight>
 
       {/* Feature Highlight - Step 2: Word selections */}
