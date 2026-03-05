@@ -515,7 +515,7 @@ export function BranchDiagram({
     <div className={cn("relative", className)}>
       <div className={cn("transition-all duration-500", isIntroComplete && !isInteractive && "opacity-25 blur-sm pointer-events-none")}>
         {/* Current headline display */}
-        <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 mb-4">
+        <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 mb-4" data-feature="headline-preview">
           <div className="min-w-0 flex-1">
             <p className="text-xl font-medium text-foreground">
               {(() => {
