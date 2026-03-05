@@ -261,7 +261,7 @@ export function BranchDiagram({
         let sampled = options[options.length - 1];
         for (const opt of options) {
           rand -= opt.probability;
-          if (rand <= 0) { sampled = opt; break; }
+          if (rand <= 0) {sampled = opt;break;}
         }
         setAnimatedWord(sampled.word);
         setSelectedProbability(sampled.probability);
@@ -384,8 +384,8 @@ export function BranchDiagram({
             {/* Ellipsis below */}
             <div style={{ position: "absolute", top: ghostBelowTop, left: "50%", transform: "translateX(-50%)" }}>
               <div
-                className="text-base font-medium tracking-widest transition-opacity duration-200"
-                style={{ color: ghostTooltip.visible ? "hsl(var(--muted-foreground) / 0.8)" : "hsl(var(--muted-foreground) / 0.4)" }}>
+              className="text-base font-medium tracking-widest transition-opacity duration-200"
+              style={{ color: ghostTooltip.visible ? "hsl(var(--muted-foreground) / 0.8)" : "hsl(var(--muted-foreground) / 0.4)" }}>
                 …
               </div>
             </div>
@@ -428,11 +428,11 @@ export function BranchDiagram({
                   "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
                   "min-w-[100px] h-11",
                   option.word === END_TOKEN ?
-                  (isSelected ?
-                    "bg-red-50 border-red-400 text-red-800 shadow-md scale-105 cursor-pointer border-dashed" :
-                    canSelect ?
-                    "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
-                    "bg-muted/50 border-muted border-dashed text-muted-foreground/60 cursor-not-allowed") :
+                  isSelected ?
+                  "bg-red-50 border-red-400 text-red-800 shadow-md scale-105 cursor-pointer border-dashed" :
+                  canSelect ?
+                  "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
+                  "bg-muted/50 border-muted border-dashed text-muted-foreground/60 cursor-not-allowed" :
                   level === 0 ?
                   "bg-primary text-primary-foreground border-primary cursor-default" :
                   isSelected ?
@@ -603,7 +603,7 @@ export function BranchDiagram({
                                 </button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>See what word the LLM would be likely to select</p>
+                                <p>LLMs use a sampling-based method of selection, meaning that the corresponding probability a word has is the likelihood of being selected. See what the model would select from these options.                                                                </p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
