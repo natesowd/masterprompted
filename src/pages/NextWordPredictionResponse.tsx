@@ -25,7 +25,7 @@ export default function HeadlineResponse() {
   const [viewMode, setViewMode] = useState<"tree" | "branch">("tree");
   const [evaluationPanelOpen, setEvaluationPanelOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [highlightStep, setHighlightStep] = useState<0 | 1 | 2>(1);
+  const [highlightStep, setHighlightStep] = useState<0 | 1 | 2 | 3>(1);
 
   // Reset everything when component mounts
   useEffect(() => {
@@ -143,11 +143,23 @@ export default function HeadlineResponse() {
         </div>
       </main>
 
-      {/* Feature Highlight - Step 1: Word selections */}
+      {/* Feature Highlight - Step 1: Headline preview */}
       <FeatureHighlight
-        target='[data-feature="word-options"]'
+        target='[data-feature="headline-preview"]'
         open={highlightStep === 1 && viewMode === "tree"}
         onClose={() => setHighlightStep(2)}
+        side="bottom"
+        sideOffset={32}
+        closeLabel="Next"
+      >
+        <strong>European Union</strong> is the fixed starting point for the headline. The greyed-out words show one possible completion — your job is to build your own by selecting words below.
+      </FeatureHighlight>
+
+      {/* Feature Highlight - Step 2: Word selections */}
+      <FeatureHighlight
+        target='[data-feature="word-options"]'
+        open={highlightStep === 2 && viewMode === "tree"}
+        onClose={() => setHighlightStep(3)}
         side="right"
         sideOffset={32}
         closeLabel="Next"
@@ -155,10 +167,10 @@ export default function HeadlineResponse() {
         Select from these words to see how an LLM might construct a headline — one word at a time. Each choice leads to a new set of options, just like a language model predicting the next token.
       </FeatureHighlight>
 
-      {/* Feature Highlight - Step 2: Probability */}
+      {/* Feature Highlight - Step 3: Probability */}
       <FeatureHighlight
         target='[data-feature="probability"]'
-        open={highlightStep === 2 && viewMode === "tree"}
+        open={highlightStep === 3 && viewMode === "tree"}
         onClose={() => setHighlightStep(0)}
         side="top"
         sideOffset={32}
