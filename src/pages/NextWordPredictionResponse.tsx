@@ -86,17 +86,13 @@ export default function HeadlineResponse() {
 
               {/* AI Response */}
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-muted-foreground text-body-1">
-                    Here is a possible headline for a long-form journalistic article about an AI ethics agreement reached across the EU:
-                  </p>
-
+                <div className="flex items-center justify-end">
                   {/* View Toggle Group */}
                   <ToggleGroup
                     type="single"
                     value={viewMode}
                     onValueChange={(value) => value && setViewMode(value as typeof viewMode)}
-                    className="ml-4 shrink-0"
+                    className="shrink-0"
                   >
                     <ToggleGroupItem value="tree" aria-label="Branch View" className="gap-1.5 text-xs">
                       <GitBranch className="h-3.5 w-3.5" />
