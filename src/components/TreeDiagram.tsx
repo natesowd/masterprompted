@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Monitor } from "lucide-react";
+import { RotateCcw, Sparkles } from "lucide-react";
 import {
   predictionTree,
   getNodeAtPath,
@@ -530,7 +530,7 @@ export function TreeDiagram({
                           )}
                           title="Watch LLM select highest probability">
 
-                          <Monitor className={cn("h-4 w-4 text-muted-foreground", isAnimating && "text-primary animate-pulse")} />
+                          <Sparkles className={cn("h-4 w-4 text-muted-foreground", isAnimating && "text-primary animate-pulse")} />
                         </button>
                       </foreignObject>);
 
