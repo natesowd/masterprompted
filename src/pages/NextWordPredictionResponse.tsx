@@ -86,36 +86,39 @@ export default function HeadlineResponse() {
 
               {/* AI Response */}
               <div className="space-y-6">
-                <div className="flex items-center justify-end">
-                  {/* View Toggle Group */}
-                  <ToggleGroup
-                    type="single"
-                    value={viewMode}
-                    onValueChange={(value) => value && setViewMode(value as typeof viewMode)}
-                    className="shrink-0"
-                  >
-                    <ToggleGroupItem value="tree" aria-label="Branch View" className="gap-1.5 text-xs">
-                      <GitBranch className="h-3.5 w-3.5" />
-                      Branch
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="branch" aria-label="Tree View" className="gap-1.5 text-xs">
-                      <GitBranch className="h-3.5 w-3.5 rotate-90" />
-                      Tree
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </div>
+                {(() => {
+                  const viewToggle = (
+                    <ToggleGroup
+                      type="single"
+                      value={viewMode}
+                      onValueChange={(value) => value && setViewMode(value as typeof viewMode)}
+                      className="shrink-0"
+                    >
+                      <ToggleGroupItem value="tree" aria-label="Branch View" className="gap-1.5 text-xs">
+                        <GitBranch className="h-3.5 w-3.5" />
+                        Branch
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="branch" aria-label="Tree View" className="gap-1.5 text-xs">
+                        <GitBranch className="h-3.5 w-3.5 rotate-90" />
+                        Tree
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  );
 
-                {viewMode === "tree" ? (
-                  <BranchDiagram
-                    selectedPath={currentSentence}
-                    onPathChange={handlePathChange}
-                  />
-                ) : (
-                  <TreeDiagram
-                    selectedPath={currentSentence}
-                    onPathChange={handlePathChange}
-                  />
-                )}
+                  return viewMode === "tree" ? (
+                    <BranchDiagram
+                      selectedPath={currentSentence}
+                      onPathChange={handlePathChange}
+                      headerRight={viewToggle}
+                    />
+                  ) : (
+                    <TreeDiagram
+                      selectedPath={currentSentence}
+                      onPathChange={handlePathChange}
+                      headerRight={viewToggle}
+                    />
+                  );
+                })()}
 
                 {/* Takeaways Button - only show after user interaction */}
                 {hasInteracted && (

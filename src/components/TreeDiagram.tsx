@@ -26,12 +26,14 @@ interface TreeDiagramProps {
   selectedPath: string[];
   onPathChange: (path: string[]) => void;
   className?: string;
+  headerRight?: React.ReactNode;
 }
 
 export function TreeDiagram({
   selectedPath,
   onPathChange,
-  className
+  className,
+  headerRight
 }: TreeDiagramProps) {
   const maxDepth = useMemo(() => getMaxDepth(), []);
   const defaultPathWords = useMemo(() => getDefaultPath(), []);
@@ -315,17 +317,19 @@ export function TreeDiagram({
               }
             </p>
           </div>
-          {isInteractive && currentLevel > 1 &&
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0">
-
-              <RotateCcw className="h-3 w-3" />
-              Reset
-            </Button>
-          }
+          <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+            {isInteractive && currentLevel > 1 &&
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="h-7 text-xs gap-1.5">
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </Button>
+            }
+            {headerRight}
+          </div>
         </div>
 
         {/* Tree visualization */}
