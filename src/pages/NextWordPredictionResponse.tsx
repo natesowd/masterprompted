@@ -152,7 +152,7 @@ export default function HeadlineResponse() {
         sideOffset={32}
         closeLabel="Next"
       >
-        This is a potential headline. <strong>European Union</strong> is the fixed starting point, and the greyed-out words show one possible completion.
+        This is a headline that an LLM might output. <strong>European Union</strong> is the fixed starting point, and the greyed-out words show one possible completion.
       </FeatureHighlight>
 
       {/* Feature Highlight - Step 2: Word selections */}
