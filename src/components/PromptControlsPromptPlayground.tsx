@@ -220,19 +220,7 @@ export default function PromptControls({
 
                 {/* Parameters area */}
                 <div className="flex-initial flex flex-col justify-end min-h-0 overflow-y-auto">
-                    <div className="flex items-center gap-1.5 mt-2 mb-1">
-                        <h3 className="font-bold text-foreground text-lg">{t('components.promptControls.title')}</h3>
-                        <TooltipProvider>
-                            <Tooltip delayDuration={300}>
-                                <TooltipTrigger asChild>
-                                    <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
-                                </TooltipTrigger>
-                                <TooltipContent side="top" align="start" sideOffset={6} className="max-w-xs">
-                                    {t('components.promptControls.titleInfo')}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
+                    <h3 className="font-bold text-foreground text-lg mt-2 mb-1">{t('components.promptControls.title')}</h3>
                     <div id='parameters' className="relative overflow-auto">
                         <Parameter
                             parameterTitle={t('components.promptControls.specificity.title')}
