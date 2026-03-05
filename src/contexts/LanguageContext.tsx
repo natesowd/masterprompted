@@ -287,6 +287,7 @@ Output only the final transformed prompt. Do not include explanations, commentar
       },
       promptControls: {
         title: 'Prompt Controls',
+        titleInfo: 'Adjust these parameters to optimise your prompt before sending it to the LLM. Each control modifies the wording and structure of your prompt to influence the AI\'s response — for example, making it more specific, changing the tone, adding context, or reducing bias.',
         original: 'Original',
         specificity: {
           title: 'Specificity',
@@ -624,6 +625,7 @@ Envíe solo la indicación transformada final. No incluya explicaciones, comenta
       },
       promptControls: {
         title: 'Controles de prompt',
+        titleInfo: 'Ajusta estos parámetros para optimizar tu prompt antes de enviarlo al LLM. Cada control modifica la redacción y estructura de tu prompt para influir en la respuesta de la IA — por ejemplo, haciéndolo más específico, cambiando el tono, agregando contexto o reduciendo el sesgo.',
         original: 'Original',
         specificity: {
           title: 'Especificidad',
