@@ -24,12 +24,14 @@ interface WordTreeDiagramProps {
   selectedPath: string[];
   onPathChange: (path: string[]) => void;
   className?: string;
+  headerRight?: React.ReactNode;
 }
 
 export function BranchDiagram({
   selectedPath,
   onPathChange,
-  className
+  className,
+  headerRight
 }: WordTreeDiagramProps) {
   const maxDepth = useMemo(() => getMaxDepth(), []);
   const defaultPath = useMemo(() => getDefaultPath(), []);
@@ -550,12 +552,15 @@ export function BranchDiagram({
               }
             </p>
           </div>
-          {isInteractive && unlockedLevel > 1 &&
-          <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1.5 ml-4 flex-shrink-0">
-              <RotateCcw className="h-3 w-3" />
-              Reset
-            </Button>
-          }
+          <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+            {isInteractive && unlockedLevel > 1 &&
+            <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1.5">
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </Button>
+            }
+            {headerRight}
+          </div>
         </div>
 
         {/* Scrollable tree container */}
