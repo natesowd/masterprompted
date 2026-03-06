@@ -7,6 +7,7 @@ import { BranchDiagram } from "@/components/BranchDiagram";
 import { TreeDiagram } from "@/components/TreeDiagram";
 import FeatureHighlight from "@/components/FeatureHighlight";
 import React, { useState, useEffect, useMemo } from "react";
+import { useEvaluation } from "@/contexts/EvaluationContext";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
