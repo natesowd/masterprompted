@@ -195,10 +195,8 @@ export default function HeadlineResponse() {
       </FeatureHighlight>
 
       <ModuleNavigation previousRoute="/module/next-word-prediction/prompt" nextRoute={hasInteracted ? "/module/next-word-prediction/takeaways" : undefined} />
-      <div className="mt-6 text-sm text-muted-foreground max-w-7xl mx-auto">
-        LLMs have been used in the following places:<br />
-        The creation of prompt output examples in the Guided Exploration<br />
-        LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
+      <div className="px-6 py-3 text-[10px] leading-snug text-muted-foreground/70 text-left">
+        LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
       </div>
     </div>
   );
