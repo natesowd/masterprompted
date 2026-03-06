@@ -437,8 +437,11 @@ export function BranchDiagram({
               }
 
               <button
-                onClickCapture={() => canSelect && handleWordClick(level, option.word)}
-                disabled={!canSelect}
+                onClickCapture={() => {
+                  if (level === 0 && hasUserSelected) { handleReset(); return; }
+                  if (canSelect) handleWordClick(level, option.word);
+                }}
+                disabled={level === 0 ? !hasUserSelected : !canSelect}
                 data-word={option.word}
                 data-selected={isSelected ? "true" : "false"}
                 className={cn(
@@ -451,7 +454,7 @@ export function BranchDiagram({
                   "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
                   "bg-muted/50 border-muted border-dashed text-muted-foreground/60 cursor-not-allowed" :
                   level === 0 ?
-                  "bg-primary text-primary-foreground border-primary cursor-default" :
+                  (hasUserSelected ? "bg-primary text-primary-foreground border-primary cursor-pointer hover:opacity-80" : "bg-primary text-primary-foreground border-primary cursor-default") :
                   isSelected ?
                   "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" :
                   canSelect ?
