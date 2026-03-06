@@ -414,61 +414,77 @@ export function BranchDiagram({
                 </div>
               }
 
-              <button
-                onClickCapture={() => {
-                  if (level === 0 && hasUserSelected) { handleReset(); return; }
-                  if (canSelect) handleWordClick(level, option.word);
-                }}
-                disabled={level === 0 ? !hasUserSelected : !canSelect}
-                data-word={option.word}
-                data-selected={isSelected ? "true" : "false"}
-                className={cn(
-                  "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
-                  "min-w-[100px] h-11",
-                  option.word === END_TOKEN ?
-                  isSelected ?
-                  "bg-red-50 border-red-400 text-red-800 shadow-md scale-105 cursor-pointer border-dashed" :
-                  canSelect ?
-                  "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
-                  "bg-muted/50 border-muted border-dashed text-muted-foreground/60 cursor-not-allowed" :
-                  option.word === "Robotic" ?
-                  isSelected ?
-                  "bg-destructive/15 border-destructive text-destructive shadow-md scale-105 cursor-pointer" :
-                  canSelect ?
-                  "bg-destructive/10 border-destructive/60 hover:border-destructive hover:bg-destructive/20 cursor-pointer text-destructive" :
-                  "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed" :
-                  level === 0 ?
-                  (hasUserSelected ? "bg-primary text-primary-foreground border-primary cursor-pointer hover:opacity-80" : "bg-primary text-primary-foreground border-primary cursor-default") :
-                  isSelected ?
-                  "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" :
-                  canSelect ?
-                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" :
-                  "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
-                  isAnimated && !isPulsing && "border-primary bg-primary/10",
-                  isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
-                )}>
-                
-                {option.word === END_TOKEN ? (
-                  <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span>
-                ) : option.word === "Robotic" ? (
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <span className="flex items-center gap-1 cursor-help" onClick={(e) => e.stopPropagation()}>
+              {option.word === "Robotic" ? (
+                <HoverCard openDelay={100} closeDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      onClickCapture={() => {
+                        if (level === 0 && hasUserSelected) { handleReset(); return; }
+                        if (canSelect) handleWordClick(level, option.word);
+                      }}
+                      disabled={level === 0 ? !hasUserSelected : !canSelect}
+                      data-word={option.word}
+                      data-selected={isSelected ? "true" : "false"}
+                      className={cn(
+                        "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
+                        "min-w-[100px] h-11",
+                        isSelected ?
+                        "bg-destructive/15 border-destructive text-destructive shadow-md scale-105 cursor-pointer" :
+                        canSelect ?
+                        "bg-destructive/10 border-destructive/60 hover:border-destructive hover:bg-destructive/20 cursor-pointer text-destructive" :
+                        "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
+                        isAnimated && !isPulsing && "border-primary bg-primary/10",
+                        isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
+                      )}>
+                      <span className="flex items-center gap-1">
                         <ListChecks className="h-3 w-3 flex-shrink-0" />
                         {option.word}
                       </span>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-64 bg-card border-destructive/20 shadow-lg rounded-lg p-3 z-50" sideOffset={5}>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
-                          <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
-                        </div>
-                        <p className="text-xs text-foreground leading-relaxed text-left">The word robotic is not associated with the EU AI Act and is not AI. Therefore, it would be inappropriate and misleading to use this term in this headline.</p>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-64 bg-card border-destructive/20 shadow-lg rounded-lg p-3 z-50" sideOffset={5}>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
+                        <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
                       </div>
-                    </HoverCardContent>
-                  </HoverCard>
-                ) : option.word}
+                      <p className="text-xs text-foreground leading-relaxed text-left break-words whitespace-normal">The word robotic is not associated with the EU AI Act and is not AI. Therefore, it would be inappropriate and misleading to use this term in this headline.</p>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              ) : (
+                <button
+                  onClickCapture={() => {
+                    if (level === 0 && hasUserSelected) { handleReset(); return; }
+                    if (canSelect) handleWordClick(level, option.word);
+                  }}
+                  disabled={level === 0 ? !hasUserSelected : !canSelect}
+                  data-word={option.word}
+                  data-selected={isSelected ? "true" : "false"}
+                  className={cn(
+                    "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
+                    "min-w-[100px] h-11",
+                    option.word === END_TOKEN ?
+                    isSelected ?
+                    "bg-red-50 border-red-400 text-red-800 shadow-md scale-105 cursor-pointer border-dashed" :
+                    canSelect ?
+                    "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
+                    "bg-muted/50 border-muted border-dashed text-muted-foreground/60 cursor-not-allowed" :
+                    level === 0 ?
+                    (hasUserSelected ? "bg-primary text-primary-foreground border-primary cursor-pointer hover:opacity-80" : "bg-primary text-primary-foreground border-primary cursor-default") :
+                    isSelected ?
+                    "bg-green-200 border-green-400 text-green-900 shadow-md scale-105 cursor-pointer" :
+                    canSelect ?
+                    "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer" :
+                    "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
+                    isAnimated && !isPulsing && "border-primary bg-primary/10",
+                    isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
+                  )}>
+                  {option.word === END_TOKEN ? (
+                    <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span>
+                  ) : option.word}
+                </button>
+              )}
                 {level > 0 &&
                 <span
                   className={cn(
