@@ -228,9 +228,9 @@ export function TreeDiagram({
       const containerWidth = cont.clientWidth;
       const containerHeight = cont.clientHeight;
 
-      // Horizontal: center the current frontier level in the visible area
-      const nextLevelXPos = levelX(currentLevel);
-      const targetLeft = currentLevel <= 1 ? 0 : Math.max(0, nextLevelXPos - containerWidth / 2);
+      // Horizontal: center the current frontier level (or root) in the visible area
+      const nextLevelXPos = levelX(Math.max(0, currentLevel - 1));
+      const targetLeft = Math.max(0, nextLevelXPos - containerWidth / 2 + 80);
 
       // Vertical: center the current selection point, considering frontier options
       const options = currentLevel < maxDepth ? getOptionsForPath(currentPath) : [];
@@ -355,11 +355,11 @@ export function TreeDiagram({
               )}
               ref={scrollContainerRef}>
 
-              <div className={cn("p-6 py-0 px-0", currentLevel > 1 ? "min-w-[600px]" : "")}>
+              <div className={cn("p-6 py-0 px-0", "min-w-[600px]")}>
                 <svg
                   style={{
                     height: svgHeight,
-                    width: currentLevel <= 1 ? '100%' : svgWidth,
+                    width: svgWidth,
                     maxHeight: undefined
                   }}
                   width={svgWidth}
