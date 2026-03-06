@@ -385,29 +385,6 @@ export function BranchDiagram({
         className="relative"
         style={{ height: containerHeight, minWidth: 110 }}>
         
-        {/* Ghost elements - only at current frontier */}
-        {level > 0 && isCurrentFrontier &&
-        <div
-          className="cursor-default"
-          style={{ position: "absolute", top: 0, left: 0, right: 0, height: containerHeight, pointerEvents: "none" }}>
-          
-            <div
-            onMouseEnter={(e) => setGhostTooltip({ visible: true, x: e.clientX, y: e.clientY })}
-            onMouseMove={(e) => setGhostTooltip({ visible: true, x: e.clientX, y: e.clientY })}
-            onMouseLeave={() => setGhostTooltip({ visible: false, x: 0, y: 0 })}
-            style={{ position: "absolute", top: dotAboveTops[1] - 8, left: -10, right: -10, height: moreTop - dotAboveTops[1] + 60, pointerEvents: "auto" }} />
-          
-
-            {/* Ellipsis below */}
-            <div style={{ position: "absolute", top: ghostBelowTop, left: "50%", transform: "translateX(-50%)" }}>
-              <div
-              className="text-base font-semibold tracking-[0.25em] transition-all duration-200 cursor-pointer"
-              style={{ color: ghostTooltip.visible ? "#149870" : "hsl(var(--muted-foreground) / 0.5)" }}>
-                •••
-              </div>
-            </div>
-          </div>
-        }
 
         {/* Wrapper for word-options feature highlight */}
         <div
@@ -692,16 +669,6 @@ export function BranchDiagram({
         </div>
       }
 
-      {/* Ghost tooltip */}
-      {ghostTooltip.visible &&
-      <div className="fixed z-50 pointer-events-none animate-fade-in" style={{ left: ghostTooltip.x + 16, top: ghostTooltip.y + 16 }}>
-          <div className="bg-brand-tertiary-500 shadow-lg rounded-lg px-4 py-3 max-w-[280px]">
-            <p className="text-sm text-white leading-relaxed">
-              At each step, the LLM evaluates <strong>thousands of possible next tokens</strong> and assigns a probability to each one. Only the top candidates are shown here.
-            </p>
-          </div>
-        </div>
-      }
     </div>);
 
 }
