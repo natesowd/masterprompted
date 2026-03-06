@@ -67,7 +67,7 @@ export default function HeadlineResponse() {
     const hasFlaggedWord = normalizedSentence.some(w => FLAGGED_WORDS.includes(w));
     const hasRobotic = normalizedSentence.includes("robotic");
 
-    console.log('[EvalPanel Debug]', { currentSentence, hasInteracted, hasFlaggedWord, hasRobotic, hasEvaluationBeenOpened, evaluationPanelOpen });
+    
 
     if (hasFlaggedWord && !hasEvaluationBeenOpened) {
       setEvaluationPanelOpen(true);
