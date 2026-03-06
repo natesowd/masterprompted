@@ -62,17 +62,18 @@ export default function HeadlineResponse() {
   // Watch for flagged words to expand evaluation panel (only first time) and register factors
   useEffect(() => {
     if (!hasInteracted) return;
-    const foundFlags = currentSentence.filter(word => {
-      if (!word) return false;
-      return FLAGGED_WORDS.includes(word.toLowerCase().replace(/[,.]$/g, ''));
-    });
+    
+    const normalizedSentence = currentSentence.map(w => w?.toLowerCase().replace(/[,.]$/g, '') ?? '');
+    const hasFlaggedWord = normalizedSentence.some(w => FLAGGED_WORDS.includes(w));
+    const hasRobotic = normalizedSentence.includes("robotic");
 
-    if (foundFlags.length > 0 && !hasEvaluationBeenOpened) {
+    console.log('[EvalPanel Debug]', { currentSentence, hasInteracted, hasFlaggedWord, hasRobotic, hasEvaluationBeenOpened, evaluationPanelOpen });
+
+    if (hasFlaggedWord && !hasEvaluationBeenOpened) {
       setEvaluationPanelOpen(true);
       setHasEvaluationBeenOpened(true);
     }
 
-    const hasRobotic = foundFlags.some(w => w.toLowerCase().replace(/[,.]$/g, '') === "robotic");
     if (hasRobotic) {
       registerFactor("factual_accuracy");
     }
