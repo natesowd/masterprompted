@@ -414,9 +414,13 @@ export function TreeDiagram({
                     if (!word) return null;
                     const x = levelX(level);
                     const y = getSelectedPathY(level);
-                    const isClickable = level > 0;
+                    const isClickable = level > 0 || (level === 0 && hasUserSelected);
 
                     const handleWordClickOnTree = () => {
+                      if (level === 0) {
+                        handleReset();
+                        return;
+                      }
                       if (!isClickable) return;
                       const newSelections = [...selections];
                       for (let i = level; i < newSelections.length; i++) {
