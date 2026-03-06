@@ -482,8 +482,7 @@ export function BranchDiagram({
                   </HoverCardContent>
                 </HoverCard>
                 );
-              })()
-              ) : (
+              })() : (
                 <button
                   onClickCapture={() => {
                     if (level === 0 && hasUserSelected) { handleReset(); return; }
