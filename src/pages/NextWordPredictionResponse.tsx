@@ -72,13 +72,14 @@ export default function HeadlineResponse() {
     const allVisibleWords = [...normalizedSentence, ...visibleWords];
     const hasFlaggedWord = allVisibleWords.some(w => FLAGGED_WORDS.includes(w));
     const hasRobotic = normalizedSentence.includes("robotic");
+    const hasTreaty = normalizedSentence.includes("treaty");
 
     if (hasFlaggedWord && !hasEvaluationBeenOpened) {
       setEvaluationPanelOpen(true);
       setHasEvaluationBeenOpened(true);
     }
 
-    if (hasRobotic) {
+    if (hasRobotic || hasTreaty) {
       registerFactor("factual_accuracy");
     }
     return () => {
