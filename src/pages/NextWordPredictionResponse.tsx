@@ -79,7 +79,7 @@ export default function HeadlineResponse() {
       setHasEvaluationBeenOpened(true);
     }
 
-    if (hasRobotic || hasTreaty) {
+    if (hasFlaggedWord) {
       registerFactor("factual_accuracy");
     }
     return () => {
