@@ -229,7 +229,8 @@ export function BranchDiagram({
     }
     
     const containerVisibleHeight = container.clientHeight;
-    const targetScrollTop = centerTarget - containerVisibleHeight / 2;
+    // Offset upward by 40px so the diagram group sits slightly above vertical center
+    const targetScrollTop = centerTarget - containerVisibleHeight / 2 + 40;
     container.scrollTo({ left: targetScrollLeft, top: Math.max(0, targetScrollTop), behavior: 'smooth' });
   };
 
@@ -245,7 +246,8 @@ export function BranchDiagram({
     if (containerRef.current) {
       const container = containerRef.current;
       const visibleHeight = container.clientHeight;
-      const initialScrollTop = containerHeight / 2 - visibleHeight / 2;
+      // Offset upward by 40px to match desired initial position
+      const initialScrollTop = containerHeight / 2 - visibleHeight / 2 + 40;
       container.scrollTo({ left: 0, top: Math.max(0, initialScrollTop), behavior: 'instant' as ScrollBehavior });
     }
   }, []);
