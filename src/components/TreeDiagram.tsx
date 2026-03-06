@@ -462,7 +462,7 @@ export function TreeDiagram({
                             {probability < 0.005 ? '<.01' : probability >= 0.995 ? '>.99' : probability.toFixed(2)}
                           </text>
                         }
-                        {word !== "Robotic" && (
+                        {!isFlaggedWord(word) && (
                           <rect
                             x={x - wordWidth / 2}
                             y={y - rectHeight / 2}
