@@ -658,7 +658,7 @@ export function BranchDiagram({
                         <div className="space-y-1.5">
                           <p className="text-sm font-semibold text-foreground">Headline complete!</p>
                           <p className="text-xs text-muted-foreground leading-relaxed">
-                            You have just explored one of the headlines an LLM may have generated using probabilities, and potentially leaving room for bias and/factual inaccuracies.
+                            You have just explored one of the headlines an LLM may have generated using probabilities, potentially leaving room for bias and/factual inaccuracies.
                           </p>
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             Try another headline to see what more can be noticed!
