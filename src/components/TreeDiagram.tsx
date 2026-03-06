@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 import { FourPointStar } from "@/components/FourPointStar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   predictionTree,
   getNodeAtPath,
@@ -528,34 +529,44 @@ export function TreeDiagram({
                     });
                   })()}
 
-                  {/* Auto-select button between word options */}
+                  {/* Auto-select button to the right of word options */}
                   {currentOptions.length >= 2 && isInteractive && (() => {
                     const x = levelX(currentLevel);
                     const option1Y = getOptionY(currentOptions[0].word);
-                    const option2Y = getOptionY(currentOptions[currentOptions.length - 1].word);
-                    const centerY = (option1Y + option2Y) / 2;
-                    const buttonSize = 32;
+                    const optionLastY = getOptionY(currentOptions[currentOptions.length - 1].word);
+                    const centerY = (option1Y + optionLastY) / 2;
+                    const buttonSize = 40;
+                    const offsetX = 70; // to the right of the word buttons
 
                     return (
                       <foreignObject
-                        x={x - buttonSize / 2}
+                        x={x + offsetX}
                         y={centerY - buttonSize / 2}
-                        width={buttonSize}
+                        width={200}
                         height={buttonSize}
                         style={{ overflow: 'visible' }}>
 
-                        <button
-                          onClick={() => !isAnimating && playAnimation()}
-                          disabled={isAnimating}
-                          className={cn(
-                            "w-8 h-8 rounded-md flex items-center justify-center",
-                            "bg-muted hover:bg-accent transition-all duration-200 cursor-pointer",
-                            isAnimating && "opacity-50 pointer-events-none"
-                          )}
-                          title="Watch LLM select highest probability">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => !isAnimating && playAnimation()}
+                                disabled={isAnimating}
+                                className={cn(
+                                  "p-1.5 rounded-md transition-all duration-200",
+                                  isAnimating ?
+                                  "bg-primary/20 text-primary opacity-50 pointer-events-none" :
+                                  "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary cursor-pointer"
+                                )}>
 
-                          <FourPointStar className="h-4 w-4" />
-                        </button>
+                                <FourPointStar className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>LLMs use a sampling-based method of selection, meaning that the corresponding probability a word has is the likelihood of being selected. See what the model would select from these options.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </foreignObject>);
 
                   })()}
