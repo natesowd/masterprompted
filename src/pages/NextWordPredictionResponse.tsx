@@ -68,85 +68,93 @@ export default function HeadlineResponse() {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background overflow-x-hidden flex flex-col">
       <Header />
 
-      <main className="container mx-auto px-6 py-3 max-w-7xl">
-        <div className="mb-3">
-          <Breadcrumb />
-        </div>
+      <main className="flex-1 flex flex-col">
+        <div className="flex-1 flex justify-center">
+          <div className="flex flex-col">
+            {/* Breadcrumb */}
+            <div className="pt-6 pb-3 px-6">
+              <Breadcrumb />
+            </div>
 
-        <div className="flex items-start">
-          <div className="min-w-0">
-            <div className="max-w-4xl mx-auto">
-              {/* Original Prompt */}
-              <div className="mb-8">
-                <ChatPrompt text="Write a 7-word headline for a long form journalistic article about AI ethics agreement reached across the EU." fileName="EU_AI_Act.pdf" />
-              </div>
-
-              {/* AI Response */}
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <ToggleGroup
-                    type="single"
-                    value={viewMode}
-                    onValueChange={(value) => value && setViewMode(value as typeof viewMode)}
-                    className="shrink-0"
-                  >
-                    <ToggleGroupItem value="tree" aria-label="Branch View" className="gap-1.5 text-xs">
-                      <GitBranch className="h-3.5 w-3.5" />
-                      Branch
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="branch" aria-label="Tree View" className="gap-1.5 text-xs">
-                      <GitBranch className="h-3.5 w-3.5 rotate-90" />
-                      Tree
-                    </ToggleGroupItem>
-                  </ToggleGroup>
+            {/* Two column layout: Middle + Evaluation */}
+            <div className="flex flex-1 items-start px-6">
+              {/* Middle column - fixed width to match prompt controls pages */}
+              <div className="w-[700px] flex-shrink-0">
+                {/* Original Prompt */}
+                <div className="mb-8">
+                  <ChatPrompt text="Write a 7-word headline for a long form journalistic article about AI ethics agreement reached across the EU." fileName="EU_AI_Act.pdf" />
                 </div>
 
-                {viewMode === "tree" ? (
-                  <BranchDiagram
-                    selectedPath={currentSentence}
-                    onPathChange={handlePathChange}
-                  />
-                ) : (
-                  <TreeDiagram
-                    selectedPath={currentSentence}
-                    onPathChange={handlePathChange}
-                  />
-                )}
+                {/* AI Response */}
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <ToggleGroup
+                      type="single"
+                      value={viewMode}
+                      onValueChange={(value) => value && setViewMode(value as typeof viewMode)}
+                      className="shrink-0"
+                    >
+                      <ToggleGroupItem value="tree" aria-label="Branch View" className="gap-1.5 text-xs">
+                        <GitBranch className="h-3.5 w-3.5" />
+                        Branch
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="branch" aria-label="Tree View" className="gap-1.5 text-xs">
+                        <GitBranch className="h-3.5 w-3.5 rotate-90" />
+                        Tree
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
 
-                {/* Takeaways Button - only show after user interaction */}
-                {hasInteracted && (
-                  <div className="mt-8 flex items-center gap-3">
-                    <Button variant="outline" size="icon" onClick={() => navigate("/module/next-word-prediction")} className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
-                      <ArrowLeft className="!h-6 !w-6" />
-                    </Button>
-                    <Button variant="outline" size="lg" onClick={() => navigate("/module/next-word-prediction/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
-                      {t('components.breadcrumb.takeaways')}
-                      <ArrowRight className="-mr-2 !h-6 !w-6" />
-                    </Button>
+                  {viewMode === "tree" ? (
+                    <BranchDiagram
+                      selectedPath={currentSentence}
+                      onPathChange={handlePathChange}
+                    />
+                  ) : (
+                    <TreeDiagram
+                      selectedPath={currentSentence}
+                      onPathChange={handlePathChange}
+                    />
+                  )}
+
+                  {/* Takeaways Button - only show after user interaction */}
+                  {hasInteracted && (
+                    <div className="mt-8 flex items-center gap-3">
+                      <Button variant="outline" size="icon" onClick={() => navigate("/module/next-word-prediction")} className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                        <ArrowLeft className="!h-6 !w-6" />
+                      </Button>
+                      <Button variant="outline" size="lg" onClick={() => navigate("/module/next-word-prediction/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                        {t('components.breadcrumb.takeaways')}
+                        <ArrowRight className="-mr-2 !h-6 !w-6" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Evaluation trigger or panel */}
+              <div className="flex-shrink-0 ml-6">
+                {!evaluationPanelOpen ? (
+                  <div className="pt-2">
+                    <button
+                      aria-label="Open evaluation panel"
+                      className="p-2 rounded-full hover:bg-muted/50"
+                      onClick={() => setEvaluationPanelOpen(true)}
+                    >
+                      <ListChecks className="h-5 w-5 text-muted-foreground" />
+                    </button>
+                  </div>
+                ) : (
+                  <div data-evaluation-panel>
+                    <EvaluationPanel initialIsOpen={true} canClose={true} onClose={() => setEvaluationPanelOpen(false)} />
                   </div>
                 )}
               </div>
             </div>
           </div>
-          {/* Evaluation trigger or panel */}
-          {!evaluationPanelOpen ? (
-            <div className="flex-shrink-0 pt-2">
-              <button
-                aria-label="Open evaluation panel"
-                className="p-2 rounded-full hover:bg-muted/50"
-                onClick={() => setEvaluationPanelOpen(true)}
-              >
-                <ListChecks className="h-5 w-5 text-muted-foreground" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex-shrink-0" data-evaluation-panel>
-              <EvaluationPanel initialIsOpen={true} canClose={true} onClose={() => setEvaluationPanelOpen(false)} />
-            </div>
-          )}
         </div>
       </main>
 
