@@ -15,6 +15,7 @@ import {
   END_TOKEN,
   type PredictionNode } from
 "@/data/predictionTreeData";
+import { isFlaggedWord, getFlaggedConfig } from "@/data/flaggedWords";
 
 /**
  * BranchDiagram - Visualizes word prediction paths as a horizontal column-based diagram
@@ -414,7 +415,7 @@ export function BranchDiagram({
                 </div>
               }
 
-              {option.word === "Robotic" ? (
+              {isFlaggedWord(option.word) ? (
                 <HoverCard openDelay={100} closeDelay={200}>
                   <HoverCardTrigger asChild>
                     <button
@@ -459,7 +460,7 @@ export function BranchDiagram({
                         <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
                         <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
                       </div>
-                      <p className="text-xs text-foreground leading-relaxed text-left break-words whitespace-normal">The word robotic is not associated with the EU AI Act and is not AI. Therefore, it would be inappropriate and misleading to use this term in this headline.</p>
+                      <p className="text-xs text-foreground leading-relaxed text-left break-words whitespace-normal">{getFlaggedConfig(option.word)?.tooltip}</p>
                     </div>
                   </HoverCardContent>
                 </HoverCard>
