@@ -56,9 +56,6 @@ export default function HeadlineResponse() {
 
   const { registerFactor, deregisterFactor } = useEvaluation();
 
-  // Flagged words list
-  const FLAGGED_WORDS = ["robotic", "charter", "treaty", "nationwide", "nationally"];
-
   // Watch for flagged words (selected OR visible as options) to expand evaluation panel
   useEffect(() => {
     if (!hasInteracted) return;
@@ -70,20 +67,31 @@ export default function HeadlineResponse() {
     const visibleWords = visibleOptions.map(o => o.word.toLowerCase());
     
     const allVisibleWords = [...normalizedSentence, ...visibleWords];
-    const hasFlaggedWord = allVisibleWords.some(w => FLAGGED_WORDS.includes(w));
-    const hasRobotic = normalizedSentence.includes("robotic");
-    const hasTreaty = normalizedSentence.includes("treaty");
+    
+    // Check which factors are active based on visible flagged words
+    const activeFactors = new Set<string>();
+    for (const w of allVisibleWords) {
+      // Find matching key in FLAGGED_WORDS_MAP (case-insensitive)
+      const key = Object.keys(FLAGGED_WORDS_MAP).find(k => k.toLowerCase() === w);
+      if (key) {
+        activeFactors.add(FLAGGED_WORDS_MAP[key].evaluationFactor);
+      }
+    }
+
+    const hasFlaggedWord = activeFactors.size > 0;
 
     if (hasFlaggedWord && !hasEvaluationBeenOpened) {
       setEvaluationPanelOpen(true);
       setHasEvaluationBeenOpened(true);
     }
 
-    if (hasFlaggedWord) {
-      registerFactor("factual_accuracy");
+    for (const factor of activeFactors) {
+      registerFactor(factor);
     }
     return () => {
-      deregisterFactor("factual_accuracy");
+      for (const factor of activeFactors) {
+        deregisterFactor(factor);
+      }
     };
   }, [currentSentence, hasInteracted]);
 

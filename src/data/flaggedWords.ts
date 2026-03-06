@@ -37,3 +37,8 @@ export function isFlaggedWord(word: string): boolean {
 export function getFlaggedConfig(word: string): FlaggedWordConfig | undefined {
   return FLAGGED_WORDS_MAP[word];
 }
+
+export const FACTOR_META: Record<FlaggedEvaluationFactor, { label: string; colorClass: string; hslColor: string }> = {
+  factual_accuracy: { label: "Factual Accuracy", colorClass: "destructive", hslColor: "hsl(var(--destructive))" },
+  relevance: { label: "Relevance", colorClass: "yellow-600", hslColor: "hsl(45 93% 47%)" },
+};
