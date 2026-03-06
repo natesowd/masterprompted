@@ -646,20 +646,26 @@ export function BranchDiagram({
 
               {/* Inline completion note next to final word */}
               {isTerminal && hasUserSelected && (() => {
-                const finalLevel = unlockedLevel;
-                const finalY = getSelectedYAtLevel(finalLevel);
+                const finalY = getSelectedYAtLevel(unlockedLevel);
                 return (
-                  <div className="relative" style={{ height: containerHeight, minWidth: 280 }}>
+                  <div className="relative" style={{ height: containerHeight, minWidth: 300 }}>
                     <div
-                      className="absolute left-4 flex items-center gap-2 bg-brand-tertiary-500/10 border border-brand-tertiary-500/30 rounded-lg px-3 py-2 animate-fade-in whitespace-nowrap"
-                      style={{ top: finalY - 20, width: 'max-content' }}
+                      className="absolute left-8 animate-fade-in"
+                      style={{ top: finalY, transform: 'translateY(-50%)', width: 240 }}
                     >
-                      <CheckCircle2 className="h-4 w-4 text-brand-tertiary-500 flex-shrink-0" />
-                      <span className="text-xs text-foreground font-medium">Headline complete!</span>
-                      <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10 ml-1">
-                        <RotateCcw className="h-3 w-3" />
-                        Reset
-                      </Button>
+                      <div className="flex flex-col items-center text-center gap-3">
+                        <CheckCircle2 className="h-6 w-6 text-brand-tertiary-500" />
+                        <div className="space-y-1.5">
+                          <p className="text-sm font-semibold text-foreground">Headline complete!</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Each word was chosen based on probability — this is how LLMs generate text, one token at a time. Different choices lead to entirely different outputs.
+                          </p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5 text-xs h-8 mt-1">
+                          <RotateCcw className="h-3 w-3" />
+                          Try a different headline
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 );
