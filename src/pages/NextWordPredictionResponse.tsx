@@ -51,17 +51,28 @@ export default function HeadlineResponse() {
     setHasInteracted(false);
   }, [viewMode]);
 
-  // Watch for "Charter" word to expand evaluation panel
+  const { registerFactor, deregisterFactor } = useEvaluation();
+
+  // Watch for flagged words to expand evaluation panel and register factors
   useEffect(() => {
     if (!hasInteracted) return;
-    const hasFlaggedWord = currentSentence.some(word => {
+    const hasRobotic = currentSentence.some(word => {
       if (!word) return false;
-      const normalized = word.toLowerCase().replace(/[,.]$/g, '');
-      return normalized === "charter" || normalized === "robotic";
+      return word.toLowerCase().replace(/[,.]$/g, '') === "robotic";
     });
-    if (hasFlaggedWord) {
+    const hasCharter = currentSentence.some(word => {
+      if (!word) return false;
+      return word.toLowerCase().replace(/[,.]$/g, '') === "charter";
+    });
+    if (hasRobotic || hasCharter) {
       setEvaluationPanelOpen(true);
     }
+    if (hasRobotic) {
+      registerFactor("factual_accuracy");
+    }
+    return () => {
+      deregisterFactor("factual_accuracy");
+    };
   }, [currentSentence, hasInteracted]);
 
   const handlePathChange = (path: string[]) => {
