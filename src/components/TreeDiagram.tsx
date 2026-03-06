@@ -293,7 +293,7 @@ export function TreeDiagram({
         {/* Current headline header */}
         <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3">
           <div className="flex-1 min-w-0">
-            <p className="text-xl font-medium text-foreground" data-feature="headline-preview">
+            <p className="text-xl font-medium text-foreground"><span data-feature="headline-preview" className="inline">
               {(() => {
                 const rootClickProps = isInteractive && currentLevel > 1 ? {
                   onClick: handleReset,
@@ -338,7 +338,7 @@ export function TreeDiagram({
               {!isTerminal && displayHeadline && hasUserSelected &&
               <span className="text-muted-foreground/50">...</span>
               }
-            </p>
+              </span></p>
           </div>
           <div className="flex items-center gap-2 ml-4 flex-shrink-0">
             {isInteractive && currentLevel > 1 &&

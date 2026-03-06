@@ -381,8 +381,7 @@ export function BranchDiagram({
         key={level}
         ref={(el) => {levelRefs.current[level] = el;}}
         className="relative"
-        style={{ height: containerHeight, minWidth: 110 }}
-        {...isCurrentFrontier && level === 1 ? { "data-feature": "word-options" } : {}}>
+        style={{ height: containerHeight, minWidth: 110 }}>
         
         {/* Ghost elements - only at current frontier */}
         {level > 0 && isCurrentFrontier &&
@@ -408,12 +407,12 @@ export function BranchDiagram({
           </div>
         }
 
-        {/* Active word buttons */}
+        {/* Wrapper for word-options feature highlight */}
         <div
           className="absolute"
           style={{
-            top: getNodeY(0, options.length, level > 0 ? prevSelectedY : undefined) - nodeHeight / 2 - 4,
-            bottom: containerHeight - getNodeY(options.length - 1, options.length, level > 0 ? prevSelectedY : undefined) - nodeHeight / 2 - 4,
+            top: getNodeY(0, options.length, level > 0 ? prevSelectedY : undefined) - nodeHeight / 2 - 18,
+            height: (getNodeY(options.length - 1, options.length, level > 0 ? prevSelectedY : undefined) - getNodeY(0, options.length, level > 0 ? prevSelectedY : undefined)) + nodeHeight + 36,
             left: '50%',
             transform: 'translateX(-50%)',
             width: 'fit-content',
@@ -532,7 +531,7 @@ export function BranchDiagram({
         {/* Current headline display */}
         <div className="flex items-center justify-between bg-card rounded-lg px-4 py-3 mb-4">
           <div className="min-w-0 flex-1">
-            <p className="text-xl font-medium text-foreground" data-feature="headline-preview">
+            <p className="text-xl font-medium text-foreground"><span data-feature="headline-preview" className="inline">
               {(() => {
                 const rootClickProps = isInteractive && unlockedLevel > 1 ? {
                   onClick: handleReset,
@@ -573,7 +572,7 @@ export function BranchDiagram({
               {!isTerminal && displayHeadline && hasUserSelected &&
               <span className="text-muted-foreground/50">...</span>
               }
-            </p>
+              </span></p>
           </div>
           <div className="flex items-center gap-2 ml-4 flex-shrink-0">
             {isInteractive && unlockedLevel > 1 &&
