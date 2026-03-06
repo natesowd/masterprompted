@@ -393,6 +393,9 @@ export function TreeDiagram({
                       return `C ${cpX} ${prev.y} ${cpX} ${p.y} ${p.x} ${p.y}`;
                     }).join(" ");
 
+                    // Hide non-matching branches once user has made a selection
+                    if (!isMatching && hasUserSelected) return null;
+
                     return (
                       <path
                         key={pathIndex}
