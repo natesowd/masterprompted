@@ -10,7 +10,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, GitBranch } from "lucide-react";
+import { ArrowLeft, ArrowRight, GitBranch, ListChecks } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { predictionTree, getDefaultPath } from "@/data/predictionTreeData";
@@ -86,7 +86,7 @@ export default function HeadlineResponse() {
 
               {/* AI Response */}
               <div className="space-y-4">
-                <div className="flex items-center">
+                <div className="flex items-center justify-between">
                   <ToggleGroup
                     type="single"
                     value={viewMode}
@@ -102,6 +102,15 @@ export default function HeadlineResponse() {
                       Tree
                     </ToggleGroupItem>
                   </ToggleGroup>
+                  {!evaluationPanelOpen && (
+                    <button
+                      aria-label="Open evaluation panel"
+                      className="p-2 rounded-full hover:bg-muted/50"
+                      onClick={() => setEvaluationPanelOpen(true)}
+                    >
+                      <ListChecks className="h-5 w-5 text-muted-foreground" />
+                    </button>
+                  )}
                 </div>
 
                 {viewMode === "tree" ? (
@@ -132,9 +141,11 @@ export default function HeadlineResponse() {
             </div>
           </div>
           {/* Evaluation panel */}
-          <div className="flex-shrink-0" data-evaluation-panel>
-            <EvaluationPanel initialIsOpen={evaluationPanelOpen} canClose={true} />
-          </div>
+          {evaluationPanelOpen && (
+            <div className="flex-shrink-0" data-evaluation-panel>
+              <EvaluationPanel initialIsOpen={true} canClose={true} onClose={() => setEvaluationPanelOpen(false)} />
+            </div>
+          )}
         </div>
       </main>
 
