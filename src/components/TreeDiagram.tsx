@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef, useEffect, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
@@ -220,44 +220,54 @@ export function TreeDiagram({
   // X position for a given level
   const levelX = (level: number) => leftPadding + level * stepX;
 
-  // Auto-scroll when currentLevel or selections change to keep options visible
+  // Center the diagram on mount and on selection changes
+  const scrollToCenter = (behavior: ScrollBehavior = "smooth") => {
+    const cont = scrollContainerRef.current;
+    if (!cont) return;
+    const visibleWidth = cont.clientWidth;
+    const visibleHeight = cont.clientHeight;
+
+    // Horizontal: center the frontier level
+    const frontierX = levelX(Math.max(0, currentLevel - 1));
+    const targetLeft = Math.max(0, frontierX - visibleWidth / 2 + 80);
+
+    // Vertical: center on the midpoint of root + frontier options
+    const options = currentLevel < maxDepth ? getOptionsForPath(currentPath) : [];
+    const selectedY = computePathY(currentPath, currentPath.length - 1, selections, currentLevel, adjustedCenterY);
+    let centerY: number;
+    if (options.length > 0) {
+      const optionYs = options.map(opt => {
+        const hypotheticalPath = [...currentPath, opt.word];
+        return computePathY(hypotheticalPath, currentLevel, selections, currentLevel, adjustedCenterY);
+      });
+      const minOptY = Math.min(...optionYs);
+      const maxOptY = Math.max(...optionYs);
+      centerY = (selectedY + (minOptY + maxOptY) / 2) / 2;
+    } else {
+      centerY = selectedY;
+    }
+    // Convert SVG coordinate to scroll position
+    const targetTop = Math.max(0, centerY - viewBoxY - visibleHeight / 2);
+    cont.scrollTo({ left: targetLeft, top: targetTop, behavior });
+  };
+
+  // Immediate centering on mount (before paint)
+  useLayoutEffect(() => {
+    scrollToCenter("instant" as ScrollBehavior);
+  }, []);
+
+  // Re-center on selection/level changes
   useEffect(() => {
-    const scrollToFrontier = (behavior: ScrollBehavior = "smooth") => {
-      const cont = scrollContainerRef.current;
-      if (!cont) return;
-      const containerWidth = cont.clientWidth;
-      const containerHeight = cont.clientHeight;
-
-      // Horizontal: center the current frontier level (or root) in the visible area
-      const nextLevelXPos = levelX(Math.max(0, currentLevel - 1));
-      const targetLeft = Math.max(0, nextLevelXPos - containerWidth / 2 + 80);
-
-      // Vertical: center the current selection point, considering frontier options
-      const options = currentLevel < maxDepth ? getOptionsForPath(currentPath) : [];
-      const selectedY = computePathY(currentPath, currentPath.length - 1, selections, currentLevel, adjustedCenterY);
-      let centerY: number;
-      if (options.length > 0) {
-        const optionYs = options.map(opt => {
-          const hypotheticalPath = [...currentPath, opt.word];
-          return computePathY(hypotheticalPath, currentLevel, selections, currentLevel, adjustedCenterY);
-        });
-        const minOptY = Math.min(...optionYs);
-        const maxOptY = Math.max(...optionYs);
-        // Center between the selected node and the midpoint of options
-        centerY = (selectedY + (minOptY + maxOptY) / 2) / 2;
-      } else {
-        centerY = selectedY;
-      }
-      const targetTop = Math.max(0, centerY - viewBoxY - containerHeight / 2);
-      cont.scrollTo({ left: targetLeft, top: targetTop, behavior });
-    };
-
-    // Initial mount: instant scroll, then smooth retry
-    const t0 = setTimeout(() => scrollToFrontier("instant" as ScrollBehavior), 0);
-    const t1 = setTimeout(() => scrollToFrontier("smooth"), 80);
-    const t2 = setTimeout(() => scrollToFrontier("smooth"), 300);
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
+    const t1 = setTimeout(() => scrollToCenter("smooth"), 80);
+    const t2 = setTimeout(() => scrollToCenter("smooth"), 300);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [currentLevel, selections, viewBoxY, adjustedCenterY]);
+
+  // Extra retries on mount for late-rendering elements
+  useEffect(() => {
+    const timers = [50, 200, 500].map(d => setTimeout(() => scrollToCenter("instant" as ScrollBehavior), d));
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   // Build display headline
   const displayHeadline = currentPath.filter(w => w && w !== END_TOKEN).join(" ");

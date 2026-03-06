@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef, useEffect, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
 import { FourPointStar } from "@/components/FourPointStar";
@@ -240,16 +240,19 @@ export function BranchDiagram({
     return () => clearTimeout(timer);
   }, [unlockedLevel, selections]);
 
-  // Also trigger on initial mount — center immediately (instant) then smooth retries
-  useEffect(() => {
+  // Immediate centering on mount (before paint)
+  useLayoutEffect(() => {
     if (containerRef.current) {
       const container = containerRef.current;
       const visibleHeight = container.clientHeight;
       const initialScrollTop = containerHeight / 2 - visibleHeight / 2;
       container.scrollTo({ left: 0, top: Math.max(0, initialScrollTop), behavior: 'instant' as ScrollBehavior });
     }
-    // Retry with smooth to handle late-rendering elements
-    const timers = [100, 400].map((delay) => setTimeout(scrollToFrontier, delay));
+  }, []);
+
+  // Extra retries on mount for late-rendering elements
+  useEffect(() => {
+    const timers = [50, 200, 500].map(d => setTimeout(scrollToFrontier, d));
     return () => timers.forEach(clearTimeout);
   }, []);
 
