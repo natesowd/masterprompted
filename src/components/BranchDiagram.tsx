@@ -577,7 +577,7 @@ export function BranchDiagram({
               </span></p>
           </div>
           <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-            {isInteractive && unlockedLevel > 1 &&
+            {isInteractive && unlockedLevel > 1 && !(isTerminal && hasUserSelected) &&
             <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs gap-1.5">
                 <RotateCcw className="h-3 w-3" />
                 Reset
@@ -666,7 +666,7 @@ export function BranchDiagram({
                         </div>
                         <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5 text-xs h-8 mt-1">
                           <RotateCcw className="h-3 w-3" />
-                          Try a different headline
+                          New headline
                         </Button>
                       </div>
                     </div>
