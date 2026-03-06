@@ -564,26 +564,55 @@ export function TreeDiagram({
                             height={buttonHeight + foreignObjectPadTop}>
 
                             <div className="flex justify-center h-full items-end pb-0">
-                              <button
-                                onClickCapture={() => handleWordClick(currentLevel, opt.word)}
-                                disabled={isAnimating}
-                                className={cn(
-                                  "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap min-w-[100px] h-11",
-                                  opt.word === END_TOKEN ?
-                                  "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
-                                  opt.word === "Robotic" ?
-                                  "bg-destructive/10 border-destructive/60 hover:border-destructive hover:bg-destructive/20 cursor-pointer text-destructive" :
-                                  "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer",
-                                  isAnimated && "border-primary bg-primary/10"
-                                )}>
-
-                                {opt.word === END_TOKEN ? (
-                                  <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span>
-                                ) : opt.word}
-                                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
-                                  {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
-                                </span>
-                              </button>
+                              {opt.word === "Robotic" ? (
+                                <HoverCard openDelay={100} closeDelay={200}>
+                                  <HoverCardTrigger asChild>
+                                    <button
+                                      onClickCapture={() => handleWordClick(currentLevel, opt.word)}
+                                      disabled={isAnimating}
+                                      className={cn(
+                                        "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap min-w-[100px] h-11",
+                                        "bg-destructive/10 border-destructive/60 hover:border-destructive hover:bg-destructive/20 cursor-pointer text-destructive",
+                                        isAnimated && "border-primary bg-primary/10"
+                                      )}>
+                                      <span className="flex items-center gap-1">
+                                        <ListChecks className="h-3 w-3 flex-shrink-0" />
+                                        {opt.word}
+                                      </span>
+                                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
+                                        {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
+                                      </span>
+                                    </button>
+                                  </HoverCardTrigger>
+                                  <HoverCardContent className="w-64 bg-card border-destructive/20 shadow-lg rounded-lg p-3 z-50" sideOffset={5}>
+                                    <div className="space-y-2">
+                                      <div className="flex items-center gap-2">
+                                        <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
+                                        <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
+                                      </div>
+                                      <p className="text-xs text-foreground leading-relaxed text-left break-words whitespace-normal">The word robotic is not associated with the EU AI Act and is not AI. Therefore, it would be inappropriate and misleading to use this term in this headline.</p>
+                                    </div>
+                                  </HoverCardContent>
+                                </HoverCard>
+                              ) : (
+                                <button
+                                  onClickCapture={() => handleWordClick(currentLevel, opt.word)}
+                                  disabled={isAnimating}
+                                  className={cn(
+                                    "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap min-w-[100px] h-11",
+                                    opt.word === END_TOKEN ?
+                                    "bg-red-50/60 border-red-300 border-dashed hover:border-red-400 hover:bg-red-100 cursor-pointer text-red-600" :
+                                    "bg-card border-border hover:border-primary/50 hover:bg-muted cursor-pointer",
+                                    isAnimated && "border-primary bg-primary/10"
+                                  )}>
+                                  {opt.word === END_TOKEN ? (
+                                    <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span>
+                                  ) : opt.word}
+                                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
+                                    {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
+                                  </span>
+                                </button>
+                              )}
                             </div>
                           </foreignObject>
                         </g>);
