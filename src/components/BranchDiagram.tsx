@@ -638,8 +638,8 @@ export function BranchDiagram({
       {/* Ghost tooltip */}
       {ghostTooltip.visible &&
       <div className="fixed z-50 pointer-events-none animate-fade-in" style={{ left: ghostTooltip.x + 16, top: ghostTooltip.y + 16 }}>
-          <div className="bg-card border border-border shadow-lg rounded-lg px-4 py-3 max-w-[280px]">
-            <p className="text-sm text-foreground leading-relaxed">
+          <div className="bg-brand-tertiary-500 shadow-lg rounded-lg px-4 py-3 max-w-[280px]">
+            <p className="text-sm text-white leading-relaxed">
               At each step, the LLM evaluates <strong>thousands of possible next tokens</strong> and assigns a probability to each one. Only the top candidates are shown here.
             </p>
           </div>
