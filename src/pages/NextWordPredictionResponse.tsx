@@ -77,7 +77,7 @@ export default function HeadlineResponse() {
         </div>
 
         <div className="flex items-start">
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0">
             <div className="max-w-4xl mx-auto">
               {/* Original Prompt */}
               <div className="mb-8">
