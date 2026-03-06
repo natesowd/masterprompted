@@ -197,7 +197,6 @@ export function TreeDiagram({
   };
 
   // Find Y range across all paths to determine SVG height
-  // Add extra top/bottom padding so the selected path can always be centered
   const { svgMinY, svgMaxY, svgHeight, adjustedCenterY } = useMemo(() => {
     let minY = svgCenterY;
     let maxY = svgCenterY;
@@ -208,9 +207,8 @@ export function TreeDiagram({
         if (y > maxY) maxY = y;
       }
     }
-    // Use generous padding so selections near edges can still be centered
-    const padding = 200;
-    const height = Math.max(600, maxY - minY + padding * 2);
+    const padding = 60;
+    const height = Math.max(400, maxY - minY + padding * 2);
     return { svgMinY: minY - padding, svgMaxY: maxY + padding, svgHeight: height, adjustedCenterY: svgCenterY };
   }, [allLeafPaths, selections, currentLevel]);
 
@@ -220,7 +218,7 @@ export function TreeDiagram({
   // X position for a given level
   const levelX = (level: number) => leftPadding + level * stepX;
 
-  // Center the diagram on mount and on selection changes
+  // Auto-center: scroll the active frontier into view
   const scrollToCenter = (behavior: ScrollBehavior = "smooth") => {
     const cont = scrollContainerRef.current;
     if (!cont) return;
@@ -229,9 +227,11 @@ export function TreeDiagram({
 
     // Horizontal: center the frontier level
     const frontierX = levelX(Math.max(0, currentLevel - 1));
-    const targetLeft = Math.max(0, frontierX - visibleWidth / 2 + 80);
+    // Map SVG X coordinate to scroll position: SVG viewBox starts at x=0, so scroll pixel = frontierX * (scrollWidth / svgWidth)
+    const scaleX = cont.scrollWidth / svgWidth;
+    const targetLeft = Math.max(0, frontierX * scaleX - visibleWidth / 2 + 80 * scaleX);
 
-    // Vertical: center on the midpoint of root + frontier options
+    // Vertical: center on the selected path's frontier position
     const options = currentLevel < maxDepth ? getOptionsForPath(currentPath) : [];
     const selectedY = computePathY(currentPath, currentPath.length - 1, selections, currentLevel, adjustedCenterY);
     let centerY: number;
@@ -246,12 +246,14 @@ export function TreeDiagram({
     } else {
       centerY = selectedY;
     }
-    // Convert SVG coordinate to scroll position
-    const targetTop = Math.max(0, centerY - viewBoxY - visibleHeight / 2);
+    // Map SVG Y coordinate to scroll position
+    const scaleY = cont.scrollHeight / svgHeight;
+    const targetTop = Math.max(0, (centerY - viewBoxY) * scaleY - visibleHeight / 2);
+
     cont.scrollTo({ left: targetLeft, top: targetTop, behavior });
   };
 
-  // Immediate centering on mount (before paint)
+  // Immediate centering on mount
   useLayoutEffect(() => {
     scrollToCenter("instant" as ScrollBehavior);
   }, []);
@@ -263,7 +265,7 @@ export function TreeDiagram({
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [currentLevel, selections, viewBoxY, adjustedCenterY]);
 
-  // Extra retries on mount for late-rendering elements
+  // Extra retries on mount
   useEffect(() => {
     const timers = [50, 200, 500].map(d => setTimeout(() => scrollToCenter("instant" as ScrollBehavior), d));
     return () => timers.forEach(clearTimeout);
@@ -357,25 +359,19 @@ export function TreeDiagram({
 
         {/* Tree visualization */}
         <div className="flex flex-col gap-4">
-          <div className="bg-card rounded-xl overflow-hidden" style={{ maxHeight: 'calc(100vh - 420px)' }}>
+          <div className="bg-card rounded-xl overflow-hidden" style={{ maxHeight: 'calc(100vh - 320px)' }}>
             <div
-              className={cn(
-                "h-full",
-                "overflow-x-auto overflow-y-auto"
-              )}
-              ref={scrollContainerRef}>
+              className="overflow-auto"
+              ref={scrollContainerRef}
+              style={{ maxHeight: 'calc(100vh - 320px)' }}>
 
-              <div className={cn("p-6 py-0 px-0", "min-w-[600px]")}>
+              <div className="px-0 py-0 min-w-[600px]">
                 <svg
-                  style={{
-                    height: svgHeight,
-                    width: svgWidth,
-                    maxHeight: undefined
-                  }}
                   width={svgWidth}
                   height={svgHeight}
                   viewBox={`0 ${viewBoxY} ${svgWidth} ${svgHeight}`}
-                  preserveAspectRatio="xMidYMid meet" className="my-[10px] py-0">
+                  preserveAspectRatio="xMidYMid meet"
+                  className="block">
 
                   {/* Draw all leaf paths as branch lines */}
                   {allLeafPaths.map((leafPath, pathIndex) => {
