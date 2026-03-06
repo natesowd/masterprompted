@@ -76,9 +76,8 @@ export default function HeadlineResponse() {
           <Breadcrumb />
         </div>
 
-        <div className="flex items-start">
-          <div className="flex-1 min-w-0">
-            <div className="max-w-4xl mx-auto">
+        <div className="relative">
+          <div className="max-w-4xl mx-auto">
               {/* Original Prompt */}
               <div className="mb-8">
                 <ChatPrompt text="Write a 7-word headline for a long form journalistic article about AI ethics agreement reached across the EU." fileName="EU_AI_Act.pdf" />
@@ -86,7 +85,7 @@ export default function HeadlineResponse() {
 
               {/* AI Response */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
                   <ToggleGroup
                     type="single"
                     value={viewMode}
@@ -138,11 +137,11 @@ export default function HeadlineResponse() {
                   </div>
                 )}
               </div>
-            </div>
           </div>
-          {/* Evaluation panel */}
+
+          {/* Evaluation panel - absolutely positioned to the right, outside the centered column */}
           {evaluationPanelOpen && (
-            <div className="flex-shrink-0" data-evaluation-panel>
+            <div className="absolute top-0 right-0" data-evaluation-panel>
               <EvaluationPanel initialIsOpen={true} canClose={true} onClose={() => setEvaluationPanelOpen(false)} />
             </div>
           )}
