@@ -397,11 +397,6 @@ const PromptPlayground = () => {
           }}
         />
       )}
-      <div className="mt-6 text-sm text-muted-foreground max-w-7xl mx-auto">
-        LLMs have been used in the following places:<br />
-        The creation of prompt optimizations and generated outputs in the Prompt Playground<br />
-        LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
-      </div>
     </div>
   );
 };
