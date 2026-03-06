@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, GitBranch, ListChecks } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { predictionTree, getDefaultPath } from "@/data/predictionTreeData";
+import { predictionTree, getDefaultPath, getOptionsForPath } from "@/data/predictionTreeData";
 
 export default function HeadlineResponse() {
   const navigate = useNavigate();
@@ -59,15 +59,19 @@ export default function HeadlineResponse() {
   // Flagged words list
   const FLAGGED_WORDS = ["robotic", "charter"];
 
-  // Watch for flagged words to expand evaluation panel (only first time) and register factors
+  // Watch for flagged words (selected OR visible as options) to expand evaluation panel
   useEffect(() => {
     if (!hasInteracted) return;
     
     const normalizedSentence = currentSentence.map(w => w?.toLowerCase().replace(/[,.]$/g, '') ?? '');
-    const hasFlaggedWord = normalizedSentence.some(w => FLAGGED_WORDS.includes(w));
-    const hasRobotic = normalizedSentence.includes("robotic");
-
     
+    // Also check visible options at current frontier
+    const visibleOptions = getOptionsForPath(currentSentence);
+    const visibleWords = visibleOptions.map(o => o.word.toLowerCase());
+    
+    const allVisibleWords = [...normalizedSentence, ...visibleWords];
+    const hasFlaggedWord = allVisibleWords.some(w => FLAGGED_WORDS.includes(w));
+    const hasRobotic = normalizedSentence.includes("robotic");
 
     if (hasFlaggedWord && !hasEvaluationBeenOpened) {
       setEvaluationPanelOpen(true);
