@@ -415,7 +415,24 @@ export function BranchDiagram({
                 </div>
               }
 
-              {isFlaggedWord(option.word) ? (
+              {isFlaggedWord(option.word) ? (() => {
+                const flagConfig = getFlaggedConfig(option.word)!;
+                const meta = FACTOR_META[flagConfig.evaluationFactor];
+                const isRelevance = flagConfig.evaluationFactor === "relevance";
+                const FlagIcon = isRelevance ? Target : ListChecks;
+                const borderColor = isRelevance ? "border-yellow-500" : "border-destructive";
+                const bgColor = isRelevance ? "bg-yellow-50" : "bg-destructive/10";
+                const bgSelectedColor = isRelevance ? "bg-yellow-100" : "bg-destructive/15";
+                const textColor = isRelevance ? "text-yellow-700" : "text-destructive";
+                const hoverBg = isRelevance ? "hover:bg-yellow-100" : "hover:bg-destructive/20";
+                const hoverBorder = isRelevance ? "hover:border-yellow-600" : "hover:border-destructive";
+                const borderMuted = isRelevance ? "border-yellow-400" : "border-destructive/60";
+                const probBg = isRelevance ? "bg-yellow-100 text-yellow-700" : "bg-destructive/20 text-destructive";
+                const hoverCardBorder = isRelevance ? "border-yellow-300" : "border-destructive/20";
+                const iconColor = isRelevance ? "text-yellow-600" : "text-destructive";
+                const titleColor = isRelevance ? "text-yellow-700" : "text-destructive";
+
+                return (
                 <HoverCard openDelay={100} closeDelay={200}>
                   <HoverCardTrigger asChild>
                     <button
@@ -430,22 +447,22 @@ export function BranchDiagram({
                         "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 whitespace-nowrap",
                         "min-w-[100px] h-11",
                         isSelected ?
-                        "bg-destructive/15 border-destructive text-destructive shadow-md scale-105 cursor-pointer" :
+                        `${bgSelectedColor} ${borderColor} ${textColor} shadow-md scale-105 cursor-pointer` :
                         canSelect ?
-                        "bg-destructive/10 border-destructive/60 hover:border-destructive hover:bg-destructive/20 cursor-pointer text-destructive" :
+                        `${bgColor} ${borderMuted} ${hoverBorder} ${hoverBg} cursor-pointer ${textColor}` :
                         "bg-muted/50 border-muted text-muted-foreground/60 cursor-not-allowed",
                         isAnimated && !isPulsing && "border-primary bg-primary/10",
                         isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                       )}>
                       <span className="flex items-center gap-1">
-                        <ListChecks className="h-3 w-3 flex-shrink-0" />
+                        <FlagIcon className={cn("h-3 w-3 flex-shrink-0", textColor)} />
                         {option.word}
                       </span>
                       {level > 0 &&
                         <span className={cn(
                           "absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap",
                           isPulsing ? "bg-primary text-primary-foreground" :
-                          isSelected ? "bg-destructive/20 text-destructive" :
+                          isSelected ? probBg :
                           "bg-muted text-muted-foreground"
                         )}
                         {...idx === 0 && isCurrentFrontier ? { "data-feature": "probability" } : {}}>
@@ -454,16 +471,18 @@ export function BranchDiagram({
                       }
                     </button>
                   </HoverCardTrigger>
-                  <HoverCardContent className="w-64 bg-card border-destructive/20 shadow-lg rounded-lg p-3 z-50" sideOffset={5}>
+                  <HoverCardContent className={cn("w-64 bg-card shadow-lg rounded-lg p-3 z-50", hoverCardBorder)} sideOffset={5}>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
-                        <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
+                        <FlagIcon className={cn("h-4 w-4 flex-shrink-0", iconColor)} />
+                        <h4 className={cn("font-semibold text-sm", titleColor)}>{meta.label}</h4>
                       </div>
-                      <p className="text-xs text-foreground leading-relaxed text-left break-words whitespace-normal">{getFlaggedConfig(option.word)?.tooltip}</p>
+                      <p className="text-xs text-foreground leading-relaxed text-left break-words whitespace-normal">{flagConfig.tooltip}</p>
                     </div>
                   </HoverCardContent>
                 </HoverCard>
+                );
+              })()
               ) : (
                 <button
                   onClickCapture={() => {
