@@ -9,6 +9,12 @@ export const FLAGGED_WORDS_MAP: Record<string, FlaggedWordConfig> = {
   "Treaty": {
     tooltip: "The EU AI Act is not a treaty, and saying so would be incorrect. This is an example of how LLMs can hallucinate and create factual inaccuracies.",
   },
+  "Nationwide": {
+    tooltip: "The EU AI Act is an international regulation, not a national one. Using 'nationwide' would be factually inaccurate as it implies a single country's scope.",
+  },
+  "Nationally": {
+    tooltip: "The EU AI Act is an international regulation, not a national one. Using 'nationally' would be factually inaccurate as it implies a single country's scope.",
+  },
 };
 
 export const FLAGGED_WORDS_LIST = Object.keys(FLAGGED_WORDS_MAP).map(w => w.toLowerCase());
