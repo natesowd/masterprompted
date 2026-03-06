@@ -252,10 +252,11 @@ export function TreeDiagram({
       cont.scrollTo({ left: targetLeft, top: targetTop, behavior });
     };
 
-    // Use multiple timers to ensure DOM has settled
+    // Initial mount: instant scroll, then smooth retry
+    const t0 = setTimeout(() => scrollToFrontier("instant" as ScrollBehavior), 0);
     const t1 = setTimeout(() => scrollToFrontier("smooth"), 80);
     const t2 = setTimeout(() => scrollToFrontier("smooth"), 300);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
   }, [currentLevel, selections, viewBoxY, adjustedCenterY]);
 
   // Build display headline

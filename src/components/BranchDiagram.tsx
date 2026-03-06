@@ -240,16 +240,16 @@ export function BranchDiagram({
     return () => clearTimeout(timer);
   }, [unlockedLevel, selections]);
 
-  // Also trigger on initial mount — center on root immediately then retry
+  // Also trigger on initial mount — center immediately (instant) then smooth retries
   useEffect(() => {
-    // On mount, immediately center vertically on the root (containerHeight/2)
     if (containerRef.current) {
       const container = containerRef.current;
       const visibleHeight = container.clientHeight;
       const initialScrollTop = containerHeight / 2 - visibleHeight / 2;
-      container.scrollTop = Math.max(0, initialScrollTop);
+      container.scrollTo({ left: 0, top: Math.max(0, initialScrollTop), behavior: 'instant' as ScrollBehavior });
     }
-    const timers = [300, 600, 1000].map((delay) => setTimeout(scrollToFrontier, delay));
+    // Retry with smooth to handle late-rendering elements
+    const timers = [100, 400].map((delay) => setTimeout(scrollToFrontier, delay));
     return () => timers.forEach(clearTimeout);
   }, []);
 
