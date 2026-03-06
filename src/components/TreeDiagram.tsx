@@ -17,6 +17,7 @@ import {
   END_TOKEN,
   type PredictionNode } from
 "@/data/predictionTreeData";
+import { isFlaggedWord, getFlaggedConfig } from "@/data/flaggedWords";
 
 /**
  * TreeDiagram - Shows all possible sentence branches,

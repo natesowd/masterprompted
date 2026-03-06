@@ -15,6 +15,7 @@ import {
   END_TOKEN,
   type PredictionNode } from
 "@/data/predictionTreeData";
+import { isFlaggedWord, getFlaggedConfig } from "@/data/flaggedWords";
 
 /**
  * BranchDiagram - Visualizes word prediction paths as a horizontal column-based diagram

@@ -57,7 +57,7 @@ export default function HeadlineResponse() {
   const { registerFactor, deregisterFactor } = useEvaluation();
 
   // Flagged words list
-  const FLAGGED_WORDS = ["robotic", "charter"];
+  const FLAGGED_WORDS = ["robotic", "charter", "treaty"];
 
   // Watch for flagged words (selected OR visible as options) to expand evaluation panel
   useEffect(() => {
