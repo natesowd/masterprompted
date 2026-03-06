@@ -7,6 +7,7 @@ import { BranchDiagram } from "@/components/BranchDiagram";
 import { TreeDiagram } from "@/components/TreeDiagram";
 import FeatureHighlight from "@/components/FeatureHighlight";
 import React, { useState, useEffect, useMemo } from "react";
+import { useEvaluation } from "@/contexts/EvaluationContext";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -50,16 +51,28 @@ export default function HeadlineResponse() {
     setHasInteracted(false);
   }, [viewMode]);
 
-  // Watch for "Charter" word to expand evaluation panel
+  const { registerFactor, deregisterFactor } = useEvaluation();
+
+  // Watch for flagged words to expand evaluation panel and register factors
   useEffect(() => {
     if (!hasInteracted) return;
+    const hasRobotic = currentSentence.some(word => {
+      if (!word) return false;
+      return word.toLowerCase().replace(/[,.]$/g, '') === "robotic";
+    });
     const hasCharter = currentSentence.some(word => {
       if (!word) return false;
       return word.toLowerCase().replace(/[,.]$/g, '') === "charter";
     });
-    if (hasCharter) {
+    if (hasRobotic || hasCharter) {
       setEvaluationPanelOpen(true);
     }
+    if (hasRobotic) {
+      registerFactor("factual_accuracy");
+    }
+    return () => {
+      deregisterFactor("factual_accuracy");
+    };
   }, [currentSentence, hasInteracted]);
 
   const handlePathChange = (path: string[]) => {
