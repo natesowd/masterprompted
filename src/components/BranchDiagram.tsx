@@ -206,23 +206,20 @@ export function BranchDiagram({
     const containerRect = container.getBoundingClientRect();
     const levelRect = targetEl.getBoundingClientRect();
 
-    // Horizontal: ensure the frontier level column is fully visible
-    const rightOverflow = levelRect.right - containerRect.right + 120;
-    if (rightOverflow > 0) {
-      container.scrollBy({ left: rightOverflow, behavior: 'smooth' });
-    }
+    // Horizontal: center the frontier level in the visible area
+    const containerWidth = container.clientWidth;
+    const levelLeft = levelRect.left - containerRect.left + container.scrollLeft;
+    const levelCenter = levelLeft + levelRect.width / 2;
+    const targetScrollLeft = Math.max(0, levelCenter - containerWidth / 2);
 
     // Vertical: center the current selection's Y position in the viewport
-    // Find the Y center of the latest selected level's options (or the selected node)
     const latestSelectedLevel = Math.max(0, unlockedLevel - 1);
     const selectedY = getSelectedYAtLevel(latestSelectedLevel);
     
-    // Also consider the frontier options to compute a good center point
     const frontierButtons = targetEl.querySelectorAll('button');
     let centerTarget = selectedY;
     
     if (frontierButtons.length > 1) {
-      // Use the midpoint of frontier options
       const frontierOptions = getOptionsAtLevel(unlockedLevel);
       const prevY = getSelectedYAtLevel(unlockedLevel - 1);
       const frontierYs = frontierOptions.map((_, idx) => getNodeY(idx, frontierOptions.length, prevY));
@@ -231,10 +228,9 @@ export function BranchDiagram({
       centerTarget = (minFrontierY + maxFrontierY) / 2;
     }
     
-    // Scroll so that centerTarget is in the middle of the visible area
     const containerVisibleHeight = container.clientHeight;
     const targetScrollTop = centerTarget - containerVisibleHeight / 2;
-    container.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
+    container.scrollTo({ left: targetScrollLeft, top: Math.max(0, targetScrollTop), behavior: 'smooth' });
   };
 
   // Trigger on level/selection changes

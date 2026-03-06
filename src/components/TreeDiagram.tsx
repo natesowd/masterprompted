@@ -228,9 +228,9 @@ export function TreeDiagram({
       const containerWidth = cont.clientWidth;
       const containerHeight = cont.clientHeight;
 
-      // Horizontal: ensure the current frontier options are visible
+      // Horizontal: center the current frontier level in the visible area
       const nextLevelXPos = levelX(currentLevel);
-      const targetLeft = currentLevel <= 1 ? 0 : Math.max(0, nextLevelXPos - containerWidth + 250);
+      const targetLeft = currentLevel <= 1 ? 0 : Math.max(0, nextLevelXPos - containerWidth / 2);
 
       // Vertical: center the current selection point, considering frontier options
       const options = currentLevel < maxDepth ? getOptionsForPath(currentPath) : [];
