@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
-import { RotateCcw, CheckCircle2 } from "lucide-react";
+import { RotateCcw, CheckCircle2, ListChecks } from "lucide-react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { FourPointStar } from "@/components/FourPointStar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -441,7 +442,27 @@ export function BranchDiagram({
                   isPulsing && "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
                 )}>
                 
-                {option.word === END_TOKEN ? <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span> : option.word}
+                {option.word === END_TOKEN ? (
+                  <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span>
+                ) : option.word === "Robotic" ? (
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <span className="flex items-center gap-1 underline decoration-destructive decoration-2 underline-offset-2 cursor-help" onClick={(e) => e.stopPropagation()}>
+                        <ListChecks className="h-3 w-3 text-destructive flex-shrink-0" />
+                        {option.word}
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-72 bg-card border-destructive/20 shadow-lg rounded-lg p-3 z-50" sideOffset={5}>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
+                          <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
+                        </div>
+                        <p className="text-sm text-foreground leading-relaxed text-left">The word robotic is not associated with the EU AI Act and is not AI. Therefore, it would be inappropriate and misleading to use this term in this headline.</p>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                ) : option.word}
                 {level > 0 &&
                 <span
                   className={cn(
