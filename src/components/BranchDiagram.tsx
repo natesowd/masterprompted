@@ -658,7 +658,10 @@ export function BranchDiagram({
                         <div className="space-y-1.5">
                           <p className="text-sm font-semibold text-foreground">Headline complete!</p>
                           <p className="text-xs text-muted-foreground leading-relaxed">
-                            Each word was chosen based on probability — this is how LLMs generate text, one token at a time. Different choices lead to entirely different outputs.
+                            You have just explored one of the headlines an LLM may have generated using probabilities, and potentially leaving room for bias and/factual inaccuracies.
+                          </p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Try another headline to see what more can be noticed!
                           </p>
                         </div>
                         <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5 text-xs h-8 mt-1">
