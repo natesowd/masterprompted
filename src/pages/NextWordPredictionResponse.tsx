@@ -163,7 +163,7 @@ export default function HeadlineResponse() {
         sideOffset={32}
         closeLabel="Next"
       >
-        Select from these words to see how an LLM might construct a headline — one word at a time. Each choice leads to a new set of options, just like a language model predicting the next token.
+        Select from these words to see how an LLM might construct a headline. Each choice leads to a new set of options, just like a language model predicting the next token.
       </FeatureHighlight>
 
       {/* Feature Highlight - Step 3: Probability */}
