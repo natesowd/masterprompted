@@ -829,7 +829,7 @@ export default function SpecificityResponse() {
 
               {/* LLM Disclaimer */}
               <div className="mt-6 text-sm text-muted-foreground max-w-[1100px] w-full">
-                LLMs have been used in the following places:<br />
+                LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)<br />
                 The creation of prompt output examples in the Guided Exploration<br />
                 LLMs used include: Mistral, Claude, Chat GPT & Llama 3.1 8B (open source)
               </div>
