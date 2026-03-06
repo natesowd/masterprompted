@@ -300,7 +300,7 @@ export function BranchDiagram({
   // --- Layout constants ---
   const nodeHeight = 40;
   const levelGap = 36;
-  const containerHeight = 800;
+  const containerHeight = 1000;
 
   const getNodeY = (idx: number, count: number, centerY?: number) => {
     const totalHeight = count * nodeHeight + (count - 1) * levelGap;
