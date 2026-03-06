@@ -107,9 +107,7 @@ export function TreeDiagram({
 
   // Check if a leaf path matches current selections
   const leafPathMatchesSelections = (leafWords: string[]): boolean => {
-    // Only hide branches that diverged at previous levels (not the current one)
-    // so alternatives remain visible until the next selection
-    for (let i = 0; i < currentLevel - 1 && i < leafWords.length; i++) {
+    for (let i = 0; i < currentLevel && i < leafWords.length; i++) {
       if (selections[i] && leafWords[i] !== selections[i]) return false;
     }
     return true;
