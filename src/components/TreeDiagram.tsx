@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useRef, useEffect, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ListChecks } from "lucide-react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { FourPointStar } from "@/components/FourPointStar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
@@ -471,16 +472,41 @@ export function TreeDiagram({
                           strokeWidth={2}
                           className={cn("transition-all duration-200", isClickable && "cursor-pointer")} />
 
-                        <text
-                          x={x}
-                          y={y + 5}
-                          textAnchor="middle"
-                          className="text-[12px] font-semibold pointer-events-none select-none"
-                          fill={level === 0 ? "hsl(var(--primary-foreground))" : "hsl(142 76% 20%)"}>
-
-                          {word}
-                        </text>
-                      </g>);
+                        {word === "Robotic" ? (
+                          <foreignObject
+                            x={x - wordWidth / 2}
+                            y={y - rectHeight / 2}
+                            width={wordWidth}
+                            height={rectHeight}
+                            style={{ overflow: 'visible' }}>
+                            <HoverCard>
+                              <HoverCardTrigger asChild>
+                                <div className="flex items-center justify-center gap-1 h-full cursor-help">
+                                  <ListChecks className="h-3 w-3 text-destructive flex-shrink-0" />
+                                  <span className="text-[12px] font-semibold underline decoration-destructive decoration-2 underline-offset-2" style={{ color: "hsl(142 76% 20%)" }}>{word}</span>
+                                </div>
+                              </HoverCardTrigger>
+                              <HoverCardContent className="w-72 bg-card border-destructive/20 shadow-lg rounded-lg p-3 z-50" sideOffset={5}>
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
+                                    <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
+                                    <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
+                                  </div>
+                                  <p className="text-sm text-foreground leading-relaxed text-left">The word robotic is not associated with the EU AI Act and is not AI. Therefore, it would be inappropriate and misleading to use this term in this headline.</p>
+                                </div>
+                              </HoverCardContent>
+                            </HoverCard>
+                          </foreignObject>
+                        ) : (
+                          <text
+                            x={x}
+                            y={y + 5}
+                            textAnchor="middle"
+                            className="text-[12px] font-semibold pointer-events-none select-none"
+                            fill={level === 0 ? "hsl(var(--primary-foreground))" : "hsl(142 76% 20%)"}>
+                            {word}
+                          </text>
+                        )}
 
                   })}
 
@@ -524,7 +550,27 @@ export function TreeDiagram({
                                   isAnimated && "border-primary bg-primary/10"
                                 )}>
 
-                                {opt.word === END_TOKEN ? <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span> : opt.word}
+                                {opt.word === END_TOKEN ? (
+                                  <span className="flex items-center gap-1.5"><span className="text-[10px]">■</span> End sentence</span>
+                                ) : opt.word === "Robotic" ? (
+                                  <HoverCard>
+                                    <HoverCardTrigger asChild>
+                                      <span className="flex items-center gap-1 underline decoration-destructive decoration-2 underline-offset-2 cursor-help" onClick={(e) => e.stopPropagation()}>
+                                        <ListChecks className="h-3 w-3 text-destructive flex-shrink-0" />
+                                        {opt.word}
+                                      </span>
+                                    </HoverCardTrigger>
+                                    <HoverCardContent className="w-72 bg-card border-destructive/20 shadow-lg rounded-lg p-3 z-50" sideOffset={5}>
+                                      <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                          <ListChecks className="h-4 w-4 text-destructive flex-shrink-0" />
+                                          <h4 className="font-semibold text-destructive text-sm">Factual Accuracy</h4>
+                                        </div>
+                                        <p className="text-sm text-foreground leading-relaxed text-left">The word robotic is not associated with the EU AI Act and is not AI. Therefore, it would be inappropriate and misleading to use this term in this headline.</p>
+                                      </div>
+                                    </HoverCardContent>
+                                  </HoverCard>
+                                ) : opt.word}
                                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap bg-muted text-muted-foreground">
                                   {opt.probability < 0.005 ? '<.01' : opt.probability >= 0.995 ? '>.99' : opt.probability.toFixed(2)}
                                 </span>
