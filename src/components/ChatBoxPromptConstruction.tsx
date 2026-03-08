@@ -214,18 +214,7 @@ const Chatbox = ({
 
   const UploadFile = () =>
     <div className="flex items-center gap-2 w-full">
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept="application/pdf"
-        className="hidden"
-        onChange={(e) => {
-          if (e.target.files && onUploadFiles) {
-            onUploadFiles(e.target.files);
-          }
-          e.target.value = "";
-        }} />
+
 
       <Button
         variant="ghost"
@@ -249,7 +238,8 @@ const Chatbox = ({
               <button
                 type="button"
                 className="ml-0.5 text-[10px] leading-none text-muted-foreground/80 hover:text-foreground"
-                onClick={() => onRemoveFile?.(index)}
+              // Boilerplate for future remove endpoint; currently no-op
+              // onClick={() => onRemoveFile?.(index)}
               >
                 x
               </button>

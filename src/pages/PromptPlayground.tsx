@@ -32,10 +32,11 @@ export type Thread = {
   evaluations?: VersionEvaluation[];
 };
 
-type AttachedFile = {
+export type ParsedFile = {
   name: string;
+  content: string;
+  size: number;
   isUploading?: boolean;
-  // id?: string; // reserved for future backend IDs
 };
 const PromptPlayground = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -56,6 +57,8 @@ const PromptPlayground = () => {
   const [showControlPanelPopover, setShowControlPanelPopover] = useState<boolean>(false);
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
+  const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
+  const CONTEXT_WINDOW_LIMIT = 512000;
 
   // Track current page language (forwarded from Header -> LanguageSwitcher)
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
@@ -102,17 +105,26 @@ const PromptPlayground = () => {
 
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
+      const payload = {
+        model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+        temperature: 0.7,
+        stream: true,
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          ...uploadedFiles.map(file => ({
+            role: "user" as const,
+            content: `Context from uploaded PDF "${file.name}":\n\n${file.content}`
+          })),
+          { role: "user", content: promptText },
+        ],
+      };
+
+      console.log("Submitting to LLM with streaming payload:", payload);
+
       const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
-          temperature: 0.7,
-          messages: [
-            { role: "system", content: "You are a helpful assistant." },
-            { role: "user", content: promptText },
-          ],
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -120,34 +132,52 @@ const PromptPlayground = () => {
         throw new Error(`answer request failed: ${response.status} - ${errorText}`);
       }
 
-      const hfResult = await response.json();
-      const answer = hfResult.choices[0].message.content || "";
-      const data: { answer: string } = { answer };
+      if (!response.body) {
+        throw new Error("No response body for streaming");
+      }
 
-      // Update answer in state
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedAnswer = "";
+
+      // Initialize the version in the thread
       setThreads(prev => {
         const copy = [...prev];
         const thread = copy[threadIndex];
         if (!thread?.versions[versionIndex]) return prev;
-        const versions = thread.versions.map((version, idx) =>
-          idx === versionIndex ? { ...version, answer: data.answer } : version
-        );
 
-        // Initialize evaluation entry as loading and disable showEvaluation
+        const versions = [...thread.versions];
+        versions[versionIndex] = { ...versions[versionIndex], answer: "" };
+
         const evaluations = [...(thread.evaluations || [])];
         evaluations[versionIndex] = { loading: true, error: false, data: null };
 
-        copy[threadIndex] = {
-          ...thread,
-          versions,
-          evaluations,
-          showEvaluation: false, // Auto-disable while loading
-        };
+        copy[threadIndex] = { ...thread, versions, evaluations, showEvaluation: false };
         return copy;
       });
 
-      // Trigger disinformation check
-      const evaluationResult = await checkDisinformation(data.answer);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        accumulatedAnswer += decoder.decode(value, { stream: true });
+
+        // Update UI with partial answer
+        setThreads(prev => {
+          const copy = [...prev];
+          const thread = copy[threadIndex];
+          if (!thread?.versions[versionIndex]) return prev;
+
+          const versions = [...thread.versions];
+          versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
+
+          copy[threadIndex] = { ...thread, versions };
+          return copy;
+        });
+      }
+
+      // Trigger disinformation check once final answer is complete
+      const evaluationResult = await checkDisinformation(accumulatedAnswer);
 
       // Update evaluation state
       setThreads(prev => {
@@ -166,7 +196,7 @@ const PromptPlayground = () => {
         return copy;
       });
     },
-    []
+    [uploadedFiles]
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, ...args: string[]) => {
@@ -232,6 +262,51 @@ const PromptPlayground = () => {
     } catch (err) { console.error("handlePromptOptimize failed:", err); }
     setWaitingForOptimization(false);
   }, [pageLanguage]);
+
+  const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
+    const fileList = Array.from(files);
+    const pdfs = fileList.filter(f => f.type === 'application/pdf');
+
+    if (pdfs.length === 0) return;
+
+    const { extractTextFromPDF } = await import('@/lib/pdfParser');
+
+    console.log(`Starting upload/parse for ${pdfs.length} PDF(s)`);
+    let cumulativeNewSize = 0;
+
+    for (const file of pdfs) {
+      console.log(`Parsing file: ${file.name}`);
+      setUploadedFiles(prev => [...prev, { name: file.name, content: '', size: 0, isUploading: true }]);
+
+      try {
+        const text = await extractTextFromPDF(file);
+        console.log(`Successfully parsed ${file.name}, extracted ${text.length} characters.`);
+
+        const existingSize = uploadedFiles.reduce((acc, f) => acc + f.content.length, 0);
+
+        if (existingSize + cumulativeNewSize + text.length > CONTEXT_WINDOW_LIMIT) {
+          alert(`File "${file.name}" exceeds the 512k context window limit.`);
+          setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
+          continue;
+        }
+
+        cumulativeNewSize += text.length;
+
+        setUploadedFiles(prev => prev.map(f =>
+          (f.name === file.name && f.isUploading)
+            ? { name: file.name, content: text, size: text.length, isUploading: false }
+            : f
+        ));
+      } catch (err) {
+        console.error(`Failed to parse PDF ${file.name}:`, err);
+        setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
+      }
+    }
+  }, [uploadedFiles]);
+
+  const handleRemoveFile = useCallback((index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  }, []);
 
   useEffect(() => {
     if (!currentPrompt.trim() && !editingText.trim()) return;
@@ -369,8 +444,9 @@ const PromptPlayground = () => {
                 enableStyle,
                 chatAnimationKey: optimizePulse,
                 waitingforOptimization,
-                files: [],
-                onUploadFiles: () => { }
+                files: uploadedFiles,
+                onUploadFiles: handleUploadFiles,
+                onRemoveFile: handleRemoveFile
               }} />
             </div>
           </div>

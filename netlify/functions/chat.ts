@@ -1,68 +1,104 @@
 import { InferenceClient } from "@huggingface/inference";
-import type { Handler } from "@netlify/functions";
 
-// Allow requests from your Apache-hosted site.
-// Add any other origins you need (e.g. localhost for local dev).
 const ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "https://masterprompted.lovable.app",
     "https://prompted-app.eipcm.org",
 ];
 
-const corsHeaders = (origin: string | undefined) => ({
-    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin ?? "")
-        ? (origin as string)
+const getCorsHeaders = (origin: string | null) => ({
+    "Access-Control-Allow-Origin": (origin && ALLOWED_ORIGINS.includes(origin))
+        ? origin
         : ALLOWED_ORIGINS[0],
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
 });
 
-const handler: Handler = async (event) => {
-    const origin = event.headers["origin"];
+export default async (req: Request) => {
+    const origin = req.headers.get("origin");
 
     // Handle CORS preflight
-    if (event.httpMethod === "OPTIONS") {
-        return { statusCode: 204, headers: corsHeaders(origin), body: "" };
+    if (req.method === "OPTIONS") {
+        return new Response(null, {
+            status: 204,
+            headers: getCorsHeaders(origin),
+        });
     }
 
-    if (event.httpMethod !== "POST") {
-        return { statusCode: 405, headers: corsHeaders(origin), body: "Method Not Allowed" };
+    if (req.method !== "POST") {
+        return new Response("Method Not Allowed", {
+            status: 405,
+            headers: getCorsHeaders(origin),
+        });
     }
 
     try {
-        const { messages, model, temperature } = JSON.parse(event.body ?? "{}");
+        const bodyContent = await req.json();
+        const { messages, model, temperature, stream } = bodyContent;
 
         if (!messages || !Array.isArray(messages)) {
-            return {
-                statusCode: 400,
-                headers: { ...corsHeaders(origin), "Content-Type": "application/json" },
-                body: JSON.stringify({ error: "messages array is required" }),
-            };
+            return new Response(JSON.stringify({ error: "messages array is required" }), {
+                status: 400,
+                headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" },
+            });
         }
 
-        // HF_TOKEN lives only in the Netlify dashboard — never sent to the browser
-        const client = new InferenceClient(process.env.HF_TOKEN);
+        const hfToken = process.env.HF_TOKEN;
+        const client = new InferenceClient(hfToken);
 
-        const completion = await client.chatCompletion({
-            model: model ?? "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
-            messages,
-            temperature: temperature ?? 0.7,
-        });
+        if (stream) {
+            // HF Inference Streaming
+            const streamResponse = client.chatCompletionStream({
+                model: model ?? "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+                messages,
+                temperature: temperature ?? 0.7,
+                max_tokens: 2048,
+            });
 
-        return {
-            statusCode: 200,
-            headers: { ...corsHeaders(origin), "Content-Type": "application/json" },
-            body: JSON.stringify(completion),
-        };
+            // Standard ReadableStream for V2 Netlify Functions
+            const encoder = new TextEncoder();
+            const readableStream = new ReadableStream({
+                async start(controller) {
+                    try {
+                        for await (const chunk of streamResponse) {
+                            if (chunk.choices && chunk.choices[0].delta.content) {
+                                controller.enqueue(encoder.encode(chunk.choices[0].delta.content));
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Stream error:", err);
+                    } finally {
+                        controller.close();
+                    }
+                },
+            });
+
+            return new Response(readableStream, {
+                headers: {
+                    ...getCorsHeaders(origin),
+                    "Content-Type": "text/plain; charset=utf-8",
+                },
+            });
+        } else {
+            const completion = await client.chatCompletion({
+                model: model ?? "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+                messages,
+                temperature: temperature ?? 0.7,
+            });
+
+            return new Response(JSON.stringify(completion), {
+                headers: {
+                    ...getCorsHeaders(origin),
+                    "Content-Type": "application/json",
+                },
+            });
+        }
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Unknown error";
-        console.error("HF proxy error:", message);
-        return {
-            statusCode: 500,
-            headers: { ...corsHeaders(origin), "Content-Type": "application/json" },
-            body: JSON.stringify({ error: message }),
-        };
+        console.error("HF proxy error caught:", message);
+        return new Response(JSON.stringify({ error: message }), {
+            status: 500,
+            headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" },
+        });
     }
 };
-
-export { handler };
