@@ -185,7 +185,15 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
             ))}
           </div>
           </>
-        ) : null}
+        ) : (
+          <button
+            aria-label={t('components.evaluationPanel.title')}
+            className="p-2 rounded-full hover:bg-muted/50"
+            onClick={() => setIsPanelOpen(true)}
+          >
+            <ListChecks className="h-6 w-6 text-muted-foreground" />
+          </button>
+        )}
       </div>
     </div>
   );
