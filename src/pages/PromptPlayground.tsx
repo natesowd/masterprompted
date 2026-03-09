@@ -537,7 +537,7 @@ const PromptPlayground = () => {
                 }} />
               </div>
             </div>
-            <div className="flex-initial flex flex-col px-6 py-4 items-start">
+            <div className="flex-1 flex flex-col px-6 py-4 items-center">
               <ChatBody
                 threads={threads}
                 onPrevVersion={handlePrevVersion}
