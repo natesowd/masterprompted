@@ -72,8 +72,8 @@ function applyInlineFormatting(raw: string, diff: boolean): string {
     // Italics: *text* and _text_
     html = html.replace(/(^|\W)\*(?!\s)(.+?)(?!\s)\*(?=\W|$)/gs, "$1<em>$2</em>");
     html = html.replace(/(^|\W)_(?!\s)(.+?)(?!\s)_(?=\W|$)/gs, "$1<em>$2</em>");
-    // Error highlight: [[ERROR: text]]
-    html = html.replace(/\[\[ERROR:\s*(.+?)\s*\]\]/gs, '<span class="text-red-500 font-bold bg-red-50 px-1 py-0.5 rounded border border-red-200">$1</span>');
+    // Error highlight: [ERROR: text] or [[ERROR: text]]
+    html = html.replace(/\[{1,2}ERROR:\s*(.+?)\s*\]{1,2}/gs, '<span class="text-red-500 font-bold bg-red-50 px-1 py-0.5 rounded border border-red-200">$1</span>');
   }
 
   html = html.replace(/\n/g, "<br/>");

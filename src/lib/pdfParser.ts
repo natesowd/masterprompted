@@ -1,12 +1,8 @@
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-// Set up the worker
-// @ts-ignore
-import pdfjsWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
-
-if (pdfjsWorker) {
-    pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-}
+// Setup workers using a CDN to avoid local resolution issues and source map 404s in production
+const PDFJS_VERSION = '5.5.207';
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.mjs`;
 
 // Polyfill for ReadableStream.prototype.values which is required by pdfjs-dist 5.x 
 // but might be missing in some browser versions (e.g. Safari < 17).
