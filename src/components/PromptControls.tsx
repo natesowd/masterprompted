@@ -309,7 +309,9 @@ export default function PromptControls({
                             {t('components.promptControls.sendOptimizedPrompt')}
                         </Button>
                     </div>
-                </div>
+                    <p className="text-[10px] leading-snug text-muted-foreground/70 text-left pt-2">
+                        LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+                    </p>
             </div>
         </div>
     );
