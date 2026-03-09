@@ -173,13 +173,21 @@ const PromptPlayground = () => {
         }
       });
 
-      const monitoredStream = response.body.pipeThrough(monitor);
-      const reader = monitoredStream.getReader();
+      let monitoredStream = response.body.pipeThrough(monitor);
+      let reader = monitoredStream.getReader();
+      let chunkCount = 0;
+
+      console.info("Stream reading started...");
 
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+
+          chunkCount++;
+          if (chunkCount % 50 === 0) {
+            console.log(`Still generating... (received ${chunkCount} text chunks, ~${accumulatedAnswer.length} chars)`);
+          }
 
           accumulatedAnswer += decoder.decode(value, { stream: true });
 

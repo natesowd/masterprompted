@@ -86,15 +86,17 @@ export default async (req: Request) => {
                                 tokensSent++;
                             }
                         }
+                        controller.close();
                     } catch (err: any) {
                         if (err.name === 'AbortError') {
                             console.error(`Stream Aborted: Silent kill detected at ${tokensSent} tokens.`);
+                            controller.error(err);
                         } else {
                             console.error("Stream error:", err);
+                            controller.error(err);
                         }
                     } finally {
                         clearTimeout(timeoutId);
-                        controller.close();
                     }
                 },
             });
