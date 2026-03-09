@@ -509,44 +509,42 @@ const PromptPlayground = () => {
     <div className="min-h-screen max-h-screen bg-background flex flex-col">
       <Header onLanguageChange={setPageLanguage} />
       <main className="flex-1 flex flex-col">
-        <div className="flex-1 flex justify-center">
-          <div className="flex flex-1 h-[calc(100vh-4rem)]">
-            <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center">
-              <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
-                <PromptControls {...{
-                  parameters,
-                  onParameterChange: handleParameterChange,
-                  onReset: handleReset,
-                  onOptimize: handleOptimizeSubmit,
-                  onUndo: handleUndo,
-                  chatValue: editingText,
-                  onChatChange: handleInputChange,
-                  onChatSubmit: handleChatSubmit,
-                  chatSubmitButtonId: "prompt-playground-submit",
-                  disableSend,
-                  disableOptimize,
-                  enableBias,
-                  enableSpecificity,
-                  enableContext,
-                  enableStyle,
-                  chatAnimationKey: optimizePulse,
-                  waitingforOptimization,
-                  files: uploadedFiles,
-                  onUploadFiles: handleUploadFiles,
-                  onRemoveFile: handleRemoveFile
-                }} />
-              </div>
+        <div className="flex flex-1 h-[calc(100vh-4rem)]">
+          <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center">
+            <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
+              <PromptControls {...{
+                parameters,
+                onParameterChange: handleParameterChange,
+                onReset: handleReset,
+                onOptimize: handleOptimizeSubmit,
+                onUndo: handleUndo,
+                chatValue: editingText,
+                onChatChange: handleInputChange,
+                onChatSubmit: handleChatSubmit,
+                chatSubmitButtonId: "prompt-playground-submit",
+                disableSend,
+                disableOptimize,
+                enableBias,
+                enableSpecificity,
+                enableContext,
+                enableStyle,
+                chatAnimationKey: optimizePulse,
+                waitingforOptimization,
+                files: uploadedFiles,
+                onUploadFiles: handleUploadFiles,
+                onRemoveFile: handleRemoveFile
+              }} />
             </div>
-            <div className="flex-1 flex flex-col px-6 py-4 items-center">
-              <ChatBody
-                threads={threads}
-                onPrevVersion={handlePrevVersion}
-                onNextVersion={handleNextVersion}
-                onToggleThreadDiff={handleThreadDiffToggle}
-                onToggleThreadEvaluation={handleThreadEvaluationToggle}
-                onRequestControlPanelHelp={() => setShowControlPanelPopover(true)}
-              />
-            </div>
+          </div>
+          <div className="flex-1 flex flex-col px-6 py-4 items-center">
+            <ChatBody
+              threads={threads}
+              onPrevVersion={handlePrevVersion}
+              onNextVersion={handleNextVersion}
+              onToggleThreadDiff={handleThreadDiffToggle}
+              onToggleThreadEvaluation={handleThreadEvaluationToggle}
+              onRequestControlPanelHelp={() => setShowControlPanelPopover(true)}
+            />
           </div>
         </div>
       </main>
