@@ -132,77 +132,52 @@ const ChatAnswer = ({
   }, [diffResult, showDiff, onUpdateCommentPosition, scrollContainerRef, inlineCommentIds]);
 
   const renderDiff = () => {
-    // Group diffResult into paragraphs to match standard block rendering
-    const paragraphs: DiffPart[][] = [[]];
-    let currentParagraphIndex = 0;
-
-    diffResult.forEach((part) => {
-      if (part.value.includes('\n\n')) {
-        const splits = part.value.split(/\n\s*\n/);
-        splits.forEach((split, i) => {
-          if (split.trim()) {
-            paragraphs[currentParagraphIndex].push({ ...part, value: split });
-          }
-          if (i < splits.length - 1) {
-            currentParagraphIndex++;
-            paragraphs[currentParagraphIndex] = [];
-          }
-        });
-      } else {
-        paragraphs[currentParagraphIndex].push(part);
-      }
-    });
-
     return (
-      <div className="whitespace-pre-wrap break-words">
-        {paragraphs.map((paraParts, pIndex) => (
-          <p key={pIndex}>
-            {paraParts.map((part, index) => {
-              if (part.added) {
-                return (
-                  <span key={index} className={cn(diffPartVariants({ type: "added" }))}>
-                    <RichText text={part.value} inline diff={true} />
-                  </span>
-                );
-              } else if (part.removed) {
-                const commentId = `comment-${threadIndex}-${currentIndex}-${pIndex}-${index}`;
-                const isInline = inlineCommentIds.has(commentId);
+      <>
+        {diffResult.map((part, index) => {
+          if (part.added) {
+            return (
+              <span key={index} className={cn(diffPartVariants({ type: "added" }))}>
+                <RichText text={part.value} inline diff={true} />
+              </span>
+            );
+          } else if (part.removed) {
+            const commentId = `comment-${threadIndex}-${currentIndex}-${index}`;
+            const isInline = inlineCommentIds.has(commentId);
 
-                if (isInline) {
-                  return (
-                    <span
-                      key={index}
-                      ref={(el) => markerRefs.current.set(commentId, el)}
-                      onClick={() => onCommentClick(commentId)}
-                      className={cn(diffPartVariants({ type: "removed" }), "cursor-pointer")}
-                      aria-label="Hide removed text"
-                    >
-                      <RichText text={part.value} inline diff={true} />
-                    </span>
-                  );
-                }
+            if (isInline) {
+              return (
+                <span
+                  key={index}
+                  ref={(el) => markerRefs.current.set(commentId, el)}
+                  onClick={() => onCommentClick(commentId)}
+                  className={cn(diffPartVariants({ type: "removed" }), "cursor-pointer")}
+                  aria-label="Hide removed text"
+                >
+                  <RichText text={part.value} inline diff={true} />
+                </span>
+              );
+            }
 
-                return (
-                  <button
-                    key={index}
-                    ref={(el) => markerRefs.current.set(commentId, el as HTMLElement)}
-                    onClick={() => onCommentClick(commentId)}
-                    onMouseEnter={() => onHoverComment(commentId)}
-                    onMouseLeave={() => onHoverComment(null)}
-                    id={commentId}
-                    className={cn(diffPartVariants({ type: "removedButton" }))}
-                    aria-label="Show removed text"
-                  >
-                    <Minus className="h-3.5 w-3.5" />
-                  </button>
-                );
-              } else {
-                return <RichText key={index} text={part.value} inline diff={true} />;
-              }
-            })}
-          </p>
-        ))}
-      </div>
+            return (
+              <button
+                key={index}
+                ref={(el) => markerRefs.current.set(commentId, el as HTMLElement)}
+                onClick={() => onCommentClick(commentId)}
+                onMouseEnter={() => onHoverComment(commentId)}
+                onMouseLeave={() => onHoverComment(null)}
+                id={commentId}
+                className={cn(diffPartVariants({ type: "removedButton" }))}
+                aria-label="Show removed text"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+            );
+          } else {
+            return <RichText key={index} text={part.value} inline diff={true} />;
+          }
+        })}
+      </>
     );
   };
 
@@ -212,8 +187,8 @@ const ChatAnswer = ({
 
   // Render text with evaluation flags
   const renderEvaluation = () => {
-    if (!currentEvaluation?.data) return <RichText text={formattedText} prose={false} />;
-    return <div className="whitespace-pre-wrap break-words">{renderTextWithFlags(formattedText, currentEvaluation.data)}</div>;
+    if (!currentEvaluation?.data) return <RichText text={formattedText} />;
+    return renderTextWithFlags(formattedText, currentEvaluation.data);
   };
 
   return (
@@ -225,7 +200,7 @@ const ChatAnswer = ({
               id={`show-diff-${threadIndex}`}
               checked={showDiff}
               onCheckedChange={onToggleDiff}
-              disabled={!canShowDiff}
+              disabled={!canShowDiff || showEvaluation}
             />
             <Label
               htmlFor={`show-diff-${threadIndex}`}
@@ -245,7 +220,7 @@ const ChatAnswer = ({
               id={`show-evaluation-${threadIndex}`}
               checked={showEvaluation}
               onCheckedChange={onToggleEvaluation}
-              disabled={evaluationDisabled}
+              disabled={evaluationDisabled || showDiff}
             />
             <Label htmlFor={`show-evaluation-${threadIndex}`} className="text-sm text-muted-foreground flex items-center gap-1">
               {t('components.chatAnswer.showEvaluation')}
@@ -272,7 +247,7 @@ const ChatAnswer = ({
         ) : showDiff && canShowDiff ? (
           renderDiff()
         ) : (
-          <RichText text={formattedText} prose={false} />
+          <RichText text={formattedText} />
         )}
       </div>
     </div>

@@ -69,11 +69,7 @@ const PromptPlayground = () => {
       if (!next[threadIndex]) {
         return prev;
       }
-      next[threadIndex] = {
-        ...next[threadIndex],
-        showDiff: checked,
-        showEvaluation: checked ? false : next[threadIndex].showEvaluation
-      };
+      next[threadIndex] = { ...next[threadIndex], showDiff: checked };
       return next;
     });
   }, []);
@@ -84,11 +80,7 @@ const PromptPlayground = () => {
       if (!next[threadIndex]) {
         return prev;
       }
-      next[threadIndex] = {
-        ...next[threadIndex],
-        showEvaluation: checked,
-        showDiff: checked ? false : next[threadIndex].showDiff
-      };
+      next[threadIndex] = { ...next[threadIndex], showEvaluation: checked };
       return next;
     });
   }, []);

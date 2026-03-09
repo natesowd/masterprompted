@@ -21,7 +21,7 @@ const richTextVariants = cva(
   {
     variants: {
       mode: {
-        block: "whitespace-pre-wrap break-words",
+        block: "prose max-w-none whitespace-pre-wrap break-words",
         inline: "inline whitespace-pre-wrap break-words"
       },
       variant: {
@@ -46,17 +46,12 @@ type RichTextProps = VariantProps<typeof richTextVariants> & {
   inline?: boolean;
   /** Disable markdown formatting (for diff views) */
   diff?: boolean;
-  /** Whether to apply 'prose' class (typography styles). Defaults to true. */
-  prose?: boolean;
-  /** Whether to apply 'max-w-none' class. Defaults to true. */
-  maxWNone?: boolean;
 };
 
 /**
  * Escapes HTML to prevent injection
  */
 function escapeHtml(input: string): string {
-  if (!input) return "";
   return input
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -68,8 +63,7 @@ function escapeHtml(input: string): string {
 /**
  * Handles inline markdown formatting like **bold** and *italics*
  */
-function applyInlineFormatting(raw: string, diff: boolean, isInline: boolean = false): string {
-  if (!raw) return "";
+function applyInlineFormatting(raw: string, diff: boolean): string {
   // Convert tabs to spaces and escape HTML
   const expanded = raw.replace(/\t/g, "    ");
   let html = escapeHtml(expanded);
@@ -92,31 +86,23 @@ function applyInlineFormatting(raw: string, diff: boolean, isInline: boolean = f
     html = html.replace(/\[\[ERROR:\s*(.+?)\s*\]\](?!\])/gs, '<span class="text-red-500 font-bold bg-red-50 px-1 py-0.5 rounded border border-red-200">$1</span>');
   }
 
-  // Handle Indentation and Lists (Block indents) - skip if specifically in inline mode
-  const processedLines = !isInline ? html.split('\n').map(line => {
+  // Handle Indentation and Lists (Block indents)
+  const lines = html.split('\n');
+  const processedLines = lines.map(line => {
     if (diff) return line;
 
-    // Match leading whitespace, optional list marker (*, -, 1.), and content
-    // This allows us to treat the marker as part of the text, while the whitespace defines the "gutter"
-    const match = line.match(/^(\s*)([\*\-]|(?:\d+\.))?(\s*)(.*)$/);
-
-    // We process the line into a block if it has leading whitespace OR a marker
-    if (match && (match[1] || match[2])) {
-      const leadingWhitespace = match[1];
-      const marker = match[2] || "";
-      const spaceAfterMarker = match[3] || "";
-      const content = match[4] || "";
-
-      // Calculate indentation based ONLY on leading whitespace (Marker is NOT included in calculation)
-      const indentCount = leadingWhitespace.replace(/\t/g, "    ").length;
-
-      // Use negative text-indent strategy for consistent wrapping
-      // This matches the logic in evaluationRenderer.tsx for perfect unification
-      return `<span style="display: block; padding-left: ${indentCount}ch; text-indent: -${indentCount}ch;">${line}</span>`;
+    // Matches any line starting with spaces followed by content
+    const indentMatch = line.match(/^( +)(.+)$/);
+    if (indentMatch) {
+      const indentation = indentMatch[1].length;
+      const content = indentMatch[2];
+      // Use display: block with padding-left to ensure wrapped lines are flush
+      // Using 'ch' unit ensures we match the width of the characters fairly well
+      return `<span style="display: block; padding-left: ${indentation}ch;">${content}</span>`;
     }
 
     return line;
-  }) : html.split('\n');
+  });
 
   // Rejoin lines. Block elements (display: block) manage their own line breaks.
   let finalHtml = "";
@@ -125,7 +111,7 @@ function applyInlineFormatting(raw: string, diff: boolean, isInline: boolean = f
     if (i < processedLines.length - 1) {
       // Only add <br/> if both the current and next line are plain text (no block wrapper)
       const isCurrentBlock = processedLines[i].startsWith('<span style="display: block');
-      const isNextBlock = processedLines[i + 1] && processedLines[i + 1].startsWith('<span style="display: block');
+      const isNextBlock = processedLines[i + 1].startsWith('<span style="display: block');
       if (!isCurrentBlock && !isNextBlock) {
         finalHtml += "<br/>";
       }
@@ -139,7 +125,6 @@ function applyInlineFormatting(raw: string, diff: boolean, isInline: boolean = f
  * Handles block-level rendering (paragraphs and line breaks)
  */
 function renderBlockText(input: string, diff: boolean): string {
-  if (!input) return "";
   // Split into paragraphs by one or more empty lines
   const paragraphs = input.split(/\n\s*\n/);
   return paragraphs
@@ -147,7 +132,7 @@ function renderBlockText(input: string, diff: boolean): string {
       // Don't render empty paragraphs
       if (!paragraph.trim()) return '';
       // Apply inline formatting (which already handles internal newlines)
-      const formatted = applyInlineFormatting(paragraph, diff, false);
+      const formatted = applyInlineFormatting(paragraph, diff);
       return `<p>${formatted}</p>`;
     })
     .join("");
@@ -158,8 +143,6 @@ const RichText: React.FC<RichTextProps> = ({
   className,
   inline = false,
   diff = false,
-  prose = true,
-  maxWNone = true,
   mode,
   variant
 }) => {
@@ -167,16 +150,11 @@ const RichText: React.FC<RichTextProps> = ({
   const Component = inline ? 'span' : 'div';
 
   // Choose the correct rendering function based on the 'inline' prop
-  const html = inline ? applyInlineFormatting(text, diff, true) : renderBlockText(text, diff);
+  const html = inline ? applyInlineFormatting(text, diff) : renderBlockText(text, diff);
 
   return (
     <Component
-      className={cn(
-        richTextVariants({ mode: inline ? "inline" : "block", variant }),
-        !inline && prose && "prose",
-        !inline && maxWNone && "max-w-none",
-        className
-      )}
+      className={cn(richTextVariants({ mode: inline ? "inline" : "block", variant }), className)}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
