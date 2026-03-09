@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Thread } from "@/pages/PromptPlayground";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
 
-type RemovedComment = {id: string;value: string;};
+type RemovedComment = { id: string; value: string };
 
 const isElementInView = (container: HTMLElement, target: HTMLElement): boolean => {
   const containerRect = container.getBoundingClientRect();
@@ -27,15 +27,15 @@ const ChatBody = memo(function ChatBody({
   onNextVersion,
   onToggleThreadDiff,
   onToggleThreadEvaluation,
-  onRequestControlPanelHelp
-
-
-
-
-
-
-
-}: {threads: Thread[];onPrevVersion: (threadIndex: number) => void;onNextVersion: (threadIndex: number) => void;onToggleThreadDiff: (threadIndex: number, checked: boolean) => void;onToggleThreadEvaluation: (threadIndex: number, checked: boolean) => void;onRequestControlPanelHelp: () => void;}) {
+  onRequestControlPanelHelp,
+}: {
+  threads: Thread[];
+  onPrevVersion: (threadIndex: number) => void;
+  onNextVersion: (threadIndex: number) => void;
+  onToggleThreadDiff: (threadIndex: number, checked: boolean) => void;
+  onToggleThreadEvaluation: (threadIndex: number, checked: boolean) => void;
+  onRequestControlPanelHelp: () => void;
+}) {
   const { t } = useLanguage();
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -62,7 +62,7 @@ const ChatBody = memo(function ChatBody({
         if (part.removed) {
           comments.push({
             id: `comment-${threadIndex}-${thread.currentIndex}-${index}`,
-            value: part.value
+            value: part.value,
           });
         }
       });
@@ -71,11 +71,11 @@ const ChatBody = memo(function ChatBody({
   }, [threads]);
 
   useEffect(() => {
-    setInlineCommentIds((prev) => {
-      const activeIds = new Set(activeComments.map((comment) => comment.id));
+    setInlineCommentIds(prev => {
+      const activeIds = new Set(activeComments.map(comment => comment.id));
       let removed = false;
       const next = new Set<string>();
-      prev.forEach((id) => {
+      prev.forEach(id => {
         if (activeIds.has(id)) {
           next.add(id);
         } else {
@@ -90,8 +90,8 @@ const ChatBody = memo(function ChatBody({
   }, [activeComments]);
 
   useEffect(() => {
-    setCommentPositions((prev) => {
-      const activeIds = new Set(activeComments.map((comment) => comment.id));
+    setCommentPositions(prev => {
+      const activeIds = new Set(activeComments.map(comment => comment.id));
       let removed = false;
       const next: Record<string, number> = {};
       Object.entries(prev).forEach(([id, position]) => {
@@ -189,7 +189,7 @@ const ChatBody = memo(function ChatBody({
 
   const handleUpdateCommentPosition = useCallback((id: string, top: number) => {
     requestAnimationFrame(() => {
-      setCommentPositions((prev) => {
+      setCommentPositions(prev => {
         const normalizedTop = Math.round(top);
         if (prev[id] === normalizedTop) return prev;
         return { ...prev, [id]: normalizedTop };
@@ -198,7 +198,7 @@ const ChatBody = memo(function ChatBody({
   }, []);
 
   const handleCommentClick = useCallback((id: string) => {
-    setInlineCommentIds((prev) => {
+    setInlineCommentIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -238,7 +238,7 @@ const ChatBody = memo(function ChatBody({
 
         sidebarRef.current.scrollTo({
           top: targetScrollTop,
-          behavior: "smooth"
+          behavior: "smooth",
         });
       }
     } else {
@@ -253,85 +253,85 @@ const ChatBody = memo(function ChatBody({
       <div className="flex h-full">
         <div className="flex-1 min-w-0 flex flex-col h-full relative">
           <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
+            <div className="mt-6 space-y-4">
+              {threads.length === 0 && (
+                <div className="space-y-4 select-none pointer-events-none">
+                  {/* Faint prompt placeholder */}
+                  <div className="flex justify-end">
+                    <div className="w-3/4 border-2 border-dashed border-muted-foreground/15 rounded-2xl p-6">
+                      <div className="h-3 w-2/3 rounded bg-muted-foreground/8 mb-3" />
+                      <div className="h-3 w-1/2 rounded bg-muted-foreground/8" />
+                    </div>
+                  </div>
+                  {/* Faint answer placeholder */}
+                  <div className="flex justify-start">
+                    <div className="w-full border-2 border-dashed border-muted-foreground/15 rounded-2xl p-6">
+                      <div className="h-3 w-full rounded bg-muted-foreground/8 mb-3" />
+                      <div className="h-3 w-5/6 rounded bg-muted-foreground/8 mb-3" />
+                      <div className="h-3 w-4/6 rounded bg-muted-foreground/8 mb-3" />
+                      <div className="h-3 w-3/4 rounded bg-muted-foreground/8" />
+                    </div>
+                  </div>
+                </div>
+              )}
+              {threads.map((thread, threadIndex) => {
+                const current = thread.versions[thread.currentIndex];
+                return (
+                  <div key={threadIndex} id={`thread-${threadIndex}`}>
+                    <ChatPrompt
+                      text={current.prompt}
+                      parameters={current.parameters}
+                      versionIndex={thread.currentIndex}
+                      versionCount={thread.versions.length}
+                      onPrevVersion={() => onPrevVersion(threadIndex)}
+                      onNextVersion={() => onNextVersion(threadIndex)}
+                    />
+                    {!current.answer && (
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-[500px]" />
+                        <Skeleton className="h-4 w-[300px]" />
+                      </div>
+                    )}
+                    {current.answer && (
+                      <ChatAnswer
+                        text={current.answer}
+                        answerArray={thread.versions.map(v => v.answer ?? "")}
+                        currentIndex={thread.currentIndex}
+                        threadIndex={threadIndex}
+                        showDiff={Boolean(thread.showDiff)}
+                        onToggleDiff={checked => onToggleThreadDiff(threadIndex, checked)}
+                        showEvaluation={Boolean(thread.showEvaluation)}
+                        onToggleEvaluation={checked => onToggleThreadEvaluation(threadIndex, checked)}
+                        currentEvaluation={thread.evaluations?.[thread.currentIndex]}
+                        onHoverComment={handleHoverComment}
+                        scrollContainerRef={chatContainerRef}
+                        onUpdateCommentPosition={handleUpdateCommentPosition}
+                        inlineCommentIds={inlineCommentIds}
+                        onCommentClick={handleCommentClick}
+                        toggleDiffHelp={handleToggleDiffHelp}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
             {/* Spacer to allow scrolling the last item to the top */}
             <div className="h-[60vh] flex-none" />
           </div>
         </div>
         <div className="flex-none w-[calc(18rem+2.5rem)] h-full flex">
           <div id="removed-text-sidebar" className="flex-1 h-full overflow-y-hidden" ref={sidebarRef}>
-            {activeComments.length > 0 &&
-            <RemovedTextSidebar
-              comments={activeComments}
-              positions={commentPositions}
-              onHover={handleHoverComment}
-              inlineCommentIds={inlineCommentIds}
-              onCommentClick={handleCommentClick}
-              // Pass the tracked height to the sidebar
-              minHeight={chatHeight} />
-
-            }
+            {activeComments.length > 0 && (
+              <RemovedTextSidebar
+                comments={activeComments}
+                positions={commentPositions}
+                onHover={handleHoverComment}
+                inlineCommentIds={inlineCommentIds}
+                onCommentClick={handleCommentClick}
+                // Pass the tracked height to the sidebar
+                minHeight={chatHeight}
+              />
+            )}
           </div>
           <div className="w-[2.5rem] flex-none flex flex-col items-end gap-4 relative">
             <button className="p-2 rounded-full hover:bg-muted/50" onClick={onRequestControlPanelHelp}>
@@ -341,49 +341,49 @@ const ChatBody = memo(function ChatBody({
           </div>
         </div>
       </div>
-      {showDiffPopover &&
-      <PopoverSeries
-        steps={[
-        { id: "diff-hint", trigger: `#show-diff-switch`, content: t("components.popoverSeries.diff.step1") },
-        {
-          id: "diff-hint-2",
-          trigger: "#chat-body",
-          content:
-          <span>
+      {showDiffPopover && (
+        <PopoverSeries
+          steps={[
+            { id: "diff-hint", trigger: `#show-diff-switch`, content: t("components.popoverSeries.diff.step1") },
+            {
+              id: "diff-hint-2",
+              trigger: "#chat-body",
+              content: (
+                <span>
                   <span className="bg-green-200 text-green-900 px-1.5 py-0.5 rounded-md">
                     {t("components.popoverSeries.diff.greenText")}
                   </span>
                   {` ${t("components.popoverSeries.diff.addedNote")} `}
                   <button
-              className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors"
-              aria-label={t("components.popoverSeries.diff.showRemovedAria")}>
-              
+                    className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors"
+                    aria-label={t("components.popoverSeries.diff.showRemovedAria")}
+                  >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
                   {` ${t("components.popoverSeries.diff.removedNote")}`}
                 </span>
-
-        },
-        {
-          id: "controls-hint",
-          trigger: "#removed-text-sidebar",
-          side: "left",
-          content:
-          <span>
+              ),
+            },
+            {
+              id: "controls-hint",
+              trigger: "#removed-text-sidebar",
+              side: "left",
+              content: (
+                <span>
                   <span className="text-red-900 line-through px-1.5 py-0.5 rounded-md border border-red-200">
                     {t("components.popoverSeries.diff.removedTextLabel")}
                   </span>
                   {` ${t("components.popoverSeries.diff.removedTextNote")}`}
                 </span>
-
-        }]
-        }
-        initialStep={0}
-        onClose={() => setShowDiffPopover(false)} />
-
-      }
-    </div>);
-
+              ),
+            },
+          ]}
+          initialStep={0}
+          onClose={() => setShowDiffPopover(false)}
+        />
+      )}
+    </div>
+  );
 });
 
 export default ChatBody;
