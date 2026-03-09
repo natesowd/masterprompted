@@ -255,7 +255,7 @@ const ChatBody = memo(function ChatBody({
       <div className="flex h-full">
         <div className="flex-1 min-w-0 flex flex-col h-full relative">
           <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
-            <div className="mt-6 space-y-4 2xl:max-w-[1100px]">
+            <div className="mt-6 space-y-4 2xl:max-w-[700px]">
               {threads.length === 0 && (
                 <div className="space-y-4 select-none pointer-events-none opacity-40">
                   {/* Faint prompt placeholder */}
