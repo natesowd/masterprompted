@@ -510,8 +510,8 @@ const PromptPlayground = () => {
       <Header onLanguageChange={setPageLanguage} />
       <main className="container mx-auto px-6 py-4">
         <div className="flex gap-8 h-[calc(100vh-8rem)]">
-          <div className="flex-none h-full">
-            <div className="sticky top-4 h-[calc(100vh-8rem)]">
+          <div className="flex-none">
+            <div className="sticky top-4">
               <PromptControls {...{
                 parameters,
                 onParameterChange: handleParameterChange,
