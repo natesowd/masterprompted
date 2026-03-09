@@ -170,7 +170,7 @@ export default function HeadlineResponse() {
               </div>
 
               {/* Evaluation trigger or panel */}
-              <div className="flex-shrink-0 ml-6 2xl:absolute 2xl:left-[724px] 2xl:top-0 2xl:ml-0">
+              <div className="flex-shrink-0 ml-6 2xl:absolute 2xl:left-[884px] 2xl:top-0 2xl:ml-0">
                 {!evaluationPanelOpen ? (
                   <div className="pt-2">
                     <button
