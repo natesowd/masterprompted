@@ -26,64 +26,62 @@ export function renderTextWithFlags(
   spans: DisinformationSpan[]
 ): React.ReactNode[] {
   if (!spans.length) {
-    return [<RichText key="text" text={text} inline />];
+    return [<RichText key="text" text={text} />];
   }
 
-  // Sort spans by start position
-  const sortedSpans = [...spans].sort((a, b) => a.start - b.start);
+  // Split into paragraphs to maintain consistent formatting with RichText
+  const paragraphStrings = text.split(/\n\s*\n/);
+  let currentGlobalPos = 0;
 
-  // Build segments array
-  const segments: TextSegment[] = [];
-  let currentPos = 0;
-
-  for (const span of sortedSpans) {
-    // Skip invalid spans
-    if (span.start < currentPos || span.end > text.length || span.start >= span.end) {
-      continue;
+  return paragraphStrings.map((paragraph, pIndex) => {
+    if (!paragraph.trim()) {
+      currentGlobalPos += paragraph.length + 2; // +2 for potentially \n\n
+      return null;
     }
 
-    // Add plain text before this span
-    if (span.start > currentPos) {
-      segments.push({
-        type: "text",
-        content: text.slice(currentPos, span.start),
-      });
+    const pStart = text.indexOf(paragraph, currentGlobalPos);
+    const pEnd = pStart + paragraph.length;
+    currentGlobalPos = pEnd;
+
+    // Filter and adjust spans for this paragraph
+    const pSpans = spans
+      .filter(s => s.start >= pStart && s.end <= pEnd)
+      .map(s => ({ ...s, start: s.start - pStart, end: s.end - pStart }));
+
+    const sortedSpans = [...pSpans].sort((a, b) => a.start - b.start);
+    const segments: TextSegment[] = [];
+    let pPos = 0;
+
+    for (const span of sortedSpans) {
+      if (span.start > pPos) {
+        segments.push({ type: "text", content: paragraph.slice(pPos, span.start) });
+      }
+      segments.push({ type: "flag", content: paragraph.slice(span.start, span.end), span });
+      pPos = span.end;
     }
-
-    // Add the flagged segment
-    segments.push({
-      type: "flag",
-      content: text.slice(span.start, span.end),
-      span,
-    });
-
-    currentPos = span.end;
-  }
-
-  // Add remaining text after last span
-  if (currentPos < text.length) {
-    segments.push({
-      type: "text",
-      content: text.slice(currentPos),
-    });
-  }
-
-  // Render segments to React nodes
-  return segments.map((segment, index) => {
-    if (segment.type === "text") {
-      return <RichText key={index} text={segment.content} inline />;
+    if (pPos < paragraph.length) {
+      segments.push({ type: "text", content: paragraph.slice(pPos) });
     }
-
-    const explanation = getFallacyExplanation(segment.span!.value);
 
     return (
-      <TextFlag
-        key={index}
-        text={segment.content}
-        evaluationFactor="factual_accuracy"
-        explanation={explanation}
-        severity="error"
-      />
+      <p key={pIndex}>
+        {segments.map((segment, sIndex) => {
+          if (segment.type === "text") {
+            return <RichText key={sIndex} text={segment.content} inline />;
+          }
+
+          const explanation = getFallacyExplanation(segment.span!.value);
+          return (
+            <TextFlag
+              key={sIndex}
+              text={segment.content}
+              evaluationFactor="factual_accuracy"
+              explanation={explanation}
+              severity="error"
+            />
+          );
+        })}
+      </p>
     );
-  });
+  }).filter(Boolean);
 }
