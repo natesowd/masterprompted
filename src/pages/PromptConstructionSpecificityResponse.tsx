@@ -831,9 +831,6 @@ export default function SpecificityResponse() {
         </div>
       </div>
     </main>
-    <div className="fixed bottom-3 left-3 text-[13px] leading-snug text-muted-foreground/70 text-left z-10">
-      LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
-    </div>
 
     <FeatureHighlight
       target="#bias-parameter-control"
