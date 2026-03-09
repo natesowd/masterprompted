@@ -255,21 +255,21 @@ const ChatBody = memo(function ChatBody({
           <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
             <div className="mt-6 space-y-4">
               {threads.length === 0 && (
-                <div className="space-y-4 select-none pointer-events-none">
+                <div className="space-y-4 select-none pointer-events-none opacity-40">
                   {/* Faint prompt placeholder */}
                   <div className="flex justify-end">
-                    <div className="w-3/4 rounded-2xl p-6">
-                      <div className="h-3 w-2/3 rounded bg-muted-foreground/8 mb-3" />
-                      <div className="h-3 w-1/2 rounded bg-muted-foreground/8" />
+                    <div className="bg-muted p-5 max-w-[80%] mx-2" style={{ borderRadius: '20px' }}>
+                      <p className="text-foreground leading-relaxed text-sm italic">
+                        {t('components.chatBody.promptPlaceholder')}
+                      </p>
                     </div>
                   </div>
                   {/* Faint answer placeholder */}
                   <div className="flex justify-start">
                     <div className="w-full rounded-2xl p-6">
-                      <div className="h-3 w-full rounded bg-muted-foreground/8 mb-3" />
-                      <div className="h-3 w-5/6 rounded bg-muted-foreground/8 mb-3" />
-                      <div className="h-3 w-4/6 rounded bg-muted-foreground/8 mb-3" />
-                      <div className="h-3 w-3/4 rounded bg-muted-foreground/8" />
+                      <p className="text-foreground leading-relaxed text-sm italic">
+                        {t('components.chatBody.outputPlaceholder')}
+                      </p>
                     </div>
                   </div>
                 </div>

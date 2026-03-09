@@ -349,6 +349,10 @@ Output only the final transformed prompt. Do not include explanations, commentar
         removed: 'Removed Text',
         showEvaluation: 'Show Evaluation',
       },
+      chatBody: {
+        promptPlaceholder: 'Your prompt will appear here...',
+        outputPlaceholder: 'The AI-generated response will appear here...',
+      },
       textFlag: {
         type: {
           factual_accuracy: "Factual Accuracy",
@@ -673,6 +677,10 @@ Envíe solo la indicación transformada final. No incluya explicaciones, comenta
         added: 'añadido',
         removed: 'eliminado',
         showEvaluation: 'Mostrar evaluación',
+      },
+      chatBody: {
+        promptPlaceholder: 'Tu consulta aparecerá aquí...',
+        outputPlaceholder: 'La respuesta generada por IA aparecerá aquí...',
       },
       popoverSeries: {
         previous: 'Anterior',
