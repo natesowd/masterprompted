@@ -638,7 +638,7 @@ export function BranchDiagram({
         </div>
 
         {/* Scrollable tree container */}
-        <div ref={containerRef} className="overflow-x-auto overflow-y-auto scroll-smooth scrollbar-auto-hide bg-card rounded-xl py-[20px]" style={{ maxHeight: 'calc(100vh - 420px)' }}>
+        <div ref={containerRef} className="overflow-x-auto overflow-y-auto scroll-smooth scrollbar-auto-hide bg-card rounded-xl py-[20px]" style={{ maxHeight: 'calc(100vh - 480px)' }}>
           <div className="min-w-[1600px] p-6 pr-[320px]">
             <div className="flex items-start gap-1">
               {renderLevel(0)}

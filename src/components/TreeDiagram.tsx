@@ -362,11 +362,11 @@ export function TreeDiagram({
 
         {/* Tree visualization */}
         <div className="flex flex-col gap-4">
-          <div className="bg-card rounded-xl overflow-hidden" style={{ maxHeight: 'calc(100vh - 320px)' }}>
+          <div className="bg-card rounded-xl overflow-hidden" style={{ maxHeight: 'calc(100vh - 380px)' }}>
             <div
               className="overflow-auto scrollbar-auto-hide"
               ref={scrollContainerRef}
-              style={{ maxHeight: 'calc(100vh - 320px)' }}>
+              style={{ maxHeight: 'calc(100vh - 380px)' }}>
 
               <div className="px-0 py-0 min-w-[600px]">
                 <svg
