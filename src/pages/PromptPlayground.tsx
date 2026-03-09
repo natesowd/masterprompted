@@ -23,7 +23,7 @@ export type VersionEvaluation = {
   data: DisinformationSpan[] | null;
 };
 
-export type ThreadVersion = {prompt: string;answer?: string;parameters?: Parameters;};
+export type ThreadVersion = { prompt: string; answer?: string; parameters?: Parameters };
 export type Thread = {
   versions: ThreadVersion[];
   currentIndex: number;
@@ -64,7 +64,7 @@ const PromptPlayground = () => {
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
 
   const handleThreadDiffToggle = useCallback((threadIndex: number, checked: boolean) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const next = [...prev];
       if (!next[threadIndex]) {
         return prev;
@@ -79,7 +79,7 @@ const PromptPlayground = () => {
   }, []);
 
   const handleThreadEvaluationToggle = useCallback((threadIndex: number, checked: boolean) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const next = [...prev];
       if (!next[threadIndex]) {
         return prev;
@@ -97,11 +97,11 @@ const PromptPlayground = () => {
     try {
       const seen = localStorage.getItem(LOCALSTORAGE_POPKEY);
       if (!seen) setShowControlPanelPopover(true);
-    } catch (e) {setShowControlPanelPopover(false);}
+    } catch (e) { setShowControlPanelPopover(false); }
   }, []);
 
   const handleParameterChange = (paramKey: keyof Parameters, value: string) => {
-    setParameters((prev) => ({ ...prev, [paramKey]: value }));
+    setParameters(prev => ({ ...prev, [paramKey]: value }));
   };
 
   const handleReset = () => {
@@ -119,13 +119,13 @@ const PromptPlayground = () => {
         temperature: 0.7,
         stream: true,
         messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        ...uploadedFiles.map((file) => ({
-          role: "user" as const,
-          content: `Context from uploaded PDF "${file.name}":\n\n${file.content}`
-        })),
-        { role: "user", content: promptText }]
-
+          { role: "system", content: "You are a helpful assistant." },
+          ...uploadedFiles.map(file => ({
+            role: "user" as const,
+            content: `Context from uploaded PDF "${file.name}":\n\n${file.content}`
+          })),
+          { role: "user", content: promptText },
+        ],
       };
 
       // Payload size verification (6MB limit)
@@ -146,7 +146,7 @@ const PromptPlayground = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-          signal: controller.signal
+          signal: controller.signal,
         });
 
         if (!response.ok) {
@@ -163,7 +163,7 @@ const PromptPlayground = () => {
         let isStreamComplete = false;
 
         // Initialize the version in the thread
-        setThreads((prev) => {
+        setThreads(prev => {
           const copy = [...prev];
           const thread = copy[threadIndex];
           if (!thread?.versions[versionIndex]) return prev;
@@ -207,7 +207,7 @@ const PromptPlayground = () => {
             accumulatedAnswer += decoder.decode(value, { stream: true });
 
             // Update UI with partial answer
-            setThreads((prev) => {
+            setThreads(prev => {
               const copy = [...prev];
               const thread = copy[threadIndex];
               if (!thread?.versions[versionIndex]) return prev;
@@ -233,7 +233,7 @@ const PromptPlayground = () => {
             accumulatedAnswer += `\n\n[[ERROR: [PARTIAL_RESULT - ${timeoutFlag}]]]`;
 
             // Final UI update with partial flag
-            setThreads((prev) => {
+            setThreads(prev => {
               const copy = [...prev];
               const thread = copy[threadIndex];
               if (!thread?.versions[versionIndex]) return prev;
@@ -249,7 +249,7 @@ const PromptPlayground = () => {
         const evaluationResult = await checkDisinformation(accumulatedAnswer);
 
         // Update evaluation state
-        setThreads((prev) => {
+        setThreads(prev => {
           const copy = [...prev];
           const thread = copy[threadIndex];
           if (!thread?.evaluations) return prev;
@@ -258,7 +258,7 @@ const PromptPlayground = () => {
           evaluations[versionIndex] = {
             loading: false,
             error: evaluationResult === null,
-            data: evaluationResult
+            data: evaluationResult,
           };
 
           copy[threadIndex] = { ...thread, evaluations };
@@ -266,13 +266,13 @@ const PromptPlayground = () => {
         });
       } catch (err: any) {
         clearTimeout(timeoutId);
-        const errorMessage = err.name === 'AbortError' ?
-        "[[ERROR: [REQUEST_TIMEOUT - Connection took too long to establish]]]" :
-        `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`;
+        const errorMessage = err.name === 'AbortError'
+          ? "[[ERROR: [REQUEST_TIMEOUT - Connection took too long to establish]]]"
+          : `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`;
 
         console.error("Fetch level error:", err);
 
-        setThreads((prev) => {
+        setThreads(prev => {
           const copy = [...prev];
           const thread = copy[threadIndex];
           if (!thread?.versions[versionIndex]) return prev;
@@ -283,13 +283,13 @@ const PromptPlayground = () => {
         });
 
         if (err.name !== 'AbortError') {
-
-
-
-
-
           // throw err; // Don't throw for generic connection failures to keep UI stable
-        }}}, [uploadedFiles]);
+        }
+      }
+    },
+    [uploadedFiles]
+  );
+
   const handlePromptOptimize = useCallback(async (prompt: string, ...args: string[]) => {
     if (!prompt.trim()) return;
     setWaitingForOptimization(true);
@@ -302,21 +302,21 @@ const PromptPlayground = () => {
       const haveKeyword = pageLanguage === 'es' ? 'tenga' : 'have';
       const andKeyword = pageLanguage === 'es' ? 'y' : 'and';
 
-      const entries = Object.entries(paramMap).
-      filter(([_, value]) => value !== NO_CHANGE_VALUE && value !== "").
-      map(([name, value]) => {
-        const prefix = name === "specificity" || name === "style" ? beKeyword : haveKeyword;
-        return `${prefix} ${value.toLowerCase()}`;
-      });
+      const entries = Object.entries(paramMap)
+        .filter(([_, value]) => value !== NO_CHANGE_VALUE && value !== "")
+        .map(([name, value]) => {
+          const prefix = (name === "specificity" || name === "style") ? beKeyword : haveKeyword;
+          return `${prefix} ${value.toLowerCase()}`;
+        });
 
-      const params = entries.length > 1 ?
-      `${entries.slice(0, -1).join(", ")} ${andKeyword} ${entries[entries.length - 1]}` :
-      entries[0] || "";
+      const params = entries.length > 1
+        ? `${entries.slice(0, -1).join(", ")} ${andKeyword} ${entries[entries.length - 1]}`
+        : entries[0] || "";
 
       const userPromptTemplate = t('promptPlayground.optimization.userPrompt');
-      const optimizeUserPrompt = userPromptTemplate.
-      replace('{params}', params).
-      replace('{prompt}', prompt);
+      const optimizeUserPrompt = userPromptTemplate
+        .replace('{params}', params)
+        .replace('{prompt}', prompt);
 
       const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
@@ -325,13 +325,13 @@ const PromptPlayground = () => {
           model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
           temperature: 0.5,
           messages: [
-          {
-            role: "system",
-            content: t('promptPlayground.optimization.systemPrompt')
-          },
-          { role: "user", content: optimizeUserPrompt }]
-
-        })
+            {
+              role: "system",
+              content: t('promptPlayground.optimization.systemPrompt')
+            },
+            { role: "user", content: optimizeUserPrompt },
+          ],
+        }),
       });
 
       if (!response.ok) {
@@ -346,17 +346,17 @@ const PromptPlayground = () => {
       if (optimizedPrompt) {
         setEditingText(optimizedPrompt);
         setDisableOptimize(false);
-        setOptimizePulse((prev) => prev + 1);
+        setOptimizePulse(prev => prev + 1);
       } else {
         throw new Error("handlePromptOptimize: optimized_prompt missing or empty");
       }
-    } catch (err) {console.error("handlePromptOptimize failed:", err);}
+    } catch (err) { console.error("handlePromptOptimize failed:", err); }
     setWaitingForOptimization(false);
   }, [pageLanguage]);
 
   const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
     const fileList = Array.from(files);
-    const pdfs = fileList.filter((f) => f.type === 'application/pdf');
+    const pdfs = fileList.filter(f => f.type === 'application/pdf');
 
     if (pdfs.length === 0) return;
 
@@ -367,7 +367,7 @@ const PromptPlayground = () => {
 
     for (const file of pdfs) {
       console.log(`Parsing file: ${file.name}`);
-      setUploadedFiles((prev) => [...prev, { name: file.name, content: '', size: 0, isUploading: true }]);
+      setUploadedFiles(prev => [...prev, { name: file.name, content: '', size: 0, isUploading: true }]);
 
       try {
         const text = await extractTextFromPDF(file);
@@ -380,40 +380,40 @@ const PromptPlayground = () => {
 
         if (currentTotalWords + cumulativeNewSize + newFileWordCount > CONTEXT_WINDOW_LIMIT_WORDS) {
           alert(`File "${file.name}" exceeds the ${CONTEXT_WINDOW_LIMIT_WORDS} word context window limit.`);
-          setUploadedFiles((prev) => prev.filter((f) => f.name !== file.name || f.isUploading !== true));
+          setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
           continue;
         }
 
         cumulativeNewSize += newFileWordCount;
 
-        setUploadedFiles((prev) => prev.map((f) =>
-        f.name === file.name && f.isUploading ?
-        { name: file.name, content: text, size: text.length, isUploading: false } :
-        f
+        setUploadedFiles(prev => prev.map(f =>
+          (f.name === file.name && f.isUploading)
+            ? { name: file.name, content: text, size: text.length, isUploading: false }
+            : f
         ));
       } catch (err) {
         console.error(`Failed to parse PDF ${file.name}:`, err);
-        setUploadedFiles((prev) => prev.filter((f) => f.name !== file.name || f.isUploading !== true));
+        setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
       }
     }
   }, [uploadedFiles]);
 
   const handleRemoveFile = useCallback((index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   }, []);
 
   useEffect(() => {
     if (!currentPrompt.trim() && !editingText.trim()) return;
-    if (Object.values(parameters).every((p) => p === "")) {
+    if (Object.values(parameters).every(p => p === "")) {
       if (!fullReset) {
         setEditingText(currentPrompt);
         setDisableOptimize(true);
-        setOptimizePulse((prev) => prev + 1);
+        setOptimizePulse(prev => prev + 1);
       }
       setFullReset(false);
       return;
     }
-    if (Object.values(parameters).some((p) => p !== "")) {
+    if (Object.values(parameters).some(p => p !== "")) {
       setDisableSend(true);
       const promptToOptimize = currentPrompt.trim() ? currentPrompt : editingText;
       if (promptToOptimize) {
@@ -431,7 +431,7 @@ const PromptPlayground = () => {
 
   const createNewThreadAndFetch = async (submittedText: string) => {
     const newThreadIndex = threads.length;
-    setThreads((prev) => [...prev, { versions: [{ prompt: submittedText }], currentIndex: 0, showDiff: false }]);
+    setThreads(prev => [...prev, { versions: [{ prompt: submittedText }], currentIndex: 0, showDiff: false }]);
     await submitAnswerForThreadVersion(newThreadIndex, 0, submittedText);
   };
 
@@ -441,7 +441,7 @@ const PromptPlayground = () => {
     const lastVersionPrompt = threads[threadIndex].versions.at(-1)?.prompt;
     if (promptText !== lastVersionPrompt) {
       const newVersionIndex = threads[threadIndex].versions.length;
-      setThreads((prev) => {
+      setThreads(prev => {
         const copy = [...prev];
         const targetThread = copy[threadIndex];
         if (!targetThread) {
@@ -450,7 +450,7 @@ const PromptPlayground = () => {
         copy[threadIndex] = {
           ...targetThread,
           versions: [...targetThread.versions, { prompt: promptText, answer: undefined, parameters }],
-          currentIndex: newVersionIndex
+          currentIndex: newVersionIndex,
         };
         return copy;
       });
@@ -466,7 +466,7 @@ const PromptPlayground = () => {
     setDisableSend(true);
     setDisableOptimize(true);
     setHasManualEdit(false);
-    setEnableSpecificity(true);setEnableBias(true);setEnableContext(true);setEnableStyle(true);
+    setEnableSpecificity(true); setEnableBias(true); setEnableContext(true); setEnableStyle(true);
     if (threads.length === 0 || hasManualEdit) {
       await createNewThreadAndFetch(submittedText);
     } else {
@@ -474,8 +474,8 @@ const PromptPlayground = () => {
     }
   };
 
-  const handleChatSubmit = (submittedText: string) => {void handleSubmit(submittedText, true);};
-  const handleOptimizeSubmit = async () => {if (editingText.trim()) {void handleSubmit(editingText, false);}};
+  const handleChatSubmit = (submittedText: string) => { void handleSubmit(submittedText, true); };
+  const handleOptimizeSubmit = async () => { if (editingText.trim()) { void handleSubmit(editingText, false); } };
   const handleInputChange = (input: string) => {
     setHasManualEdit(true);
     handleReset();
@@ -484,30 +484,30 @@ const PromptPlayground = () => {
     const isEmpty = !input.trim();
     setDisableSend(isEmpty);
     setDisableOptimize(true);
-    setEnableSpecificity(false);setEnableBias(false);setEnableContext(false);setEnableStyle(false);
+    setEnableSpecificity(false); setEnableBias(false); setEnableContext(false); setEnableStyle(false);
   };
 
   const handlePrevVersion = useCallback((threadIndex: number) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const copy = [...prev];
       const thread = copy[threadIndex];
       if (!thread) return prev;
       copy[threadIndex] = {
         ...thread,
-        currentIndex: Math.max(0, thread.currentIndex - 1)
+        currentIndex: Math.max(0, thread.currentIndex - 1),
       };
       return copy;
     });
   }, []);
 
   const handleNextVersion = useCallback((threadIndex: number) => {
-    setThreads((prev) => {
+    setThreads(prev => {
       const copy = [...prev];
       const thread = copy[threadIndex];
       if (!thread) return prev;
       copy[threadIndex] = {
         ...thread,
-        currentIndex: Math.min(thread.versions.length - 1, thread.currentIndex + 1)
+        currentIndex: Math.min(thread.versions.length - 1, thread.currentIndex + 1),
       };
       return copy;
     });
@@ -516,10 +516,10 @@ const PromptPlayground = () => {
   return (
     <div className="min-h-screen max-h-screen bg-background">
       <Header onLanguageChange={setPageLanguage} />
-      <main className="container mx-auto px-0 py-0">
+      <main className="container mx-auto px-6 py-4">
         <div className="flex gap-8 h-[calc(100vh-8rem)]">
-          <div className="min-w-[317px] 2xl:min-w-[346px]">
-            <div className="sticky top-4">
+          <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center">
+            <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
               <PromptControls {...{
                 parameters,
                 onParameterChange: handleParameterChange,
@@ -550,25 +550,25 @@ const PromptPlayground = () => {
             onNextVersion={handleNextVersion}
             onToggleThreadDiff={handleThreadDiffToggle}
             onToggleThreadEvaluation={handleThreadEvaluationToggle}
-            onRequestControlPanelHelp={() => setShowControlPanelPopover(true)} />
-          
+            onRequestControlPanelHelp={() => setShowControlPanelPopover(true)}
+          />
         </div>
       </main>
-      {showControlPanelPopover &&
-      <PopoverSeries
-        steps={[
-        { id: "submit-hint", trigger: "#chatbox", content: t('components.popoverSeries.promptPlayground.submitHint') },
-        { id: "controls-hint", trigger: "#parameters", content: t('components.popoverSeries.promptPlayground.controlsHint') }]
-        }
-        initialStep={0}
-        onClose={() => {
-          try {localStorage.setItem(LOCALSTORAGE_POPKEY, "true");} catch (e) {/* ignore */}
-          setShowControlPanelPopover(false);
-        }} />
-
-      }
-    </div>);
-
+      {showControlPanelPopover && (
+        <PopoverSeries
+          steps={[
+            { id: "submit-hint", trigger: "#chatbox", content: t('components.popoverSeries.promptPlayground.submitHint') },
+            { id: "controls-hint", trigger: "#parameters", content: t('components.popoverSeries.promptPlayground.controlsHint') }
+          ]}
+          initialStep={0}
+          onClose={() => {
+            try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ }
+            setShowControlPanelPopover(false);
+          }}
+        />
+      )}
+    </div>
+  );
 };
 
 export default PromptPlayground;
