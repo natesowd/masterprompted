@@ -110,10 +110,9 @@ function applyInlineFormatting(raw: string, diff: boolean, isInline: boolean = f
       // Calculate indentation based ONLY on leading whitespace (Marker is NOT included in calculation)
       const indentCount = leadingWhitespace.replace(/\t/g, "    ").length;
 
-      // Combine marker and content to be rendered inside the indented block
-      const fullContent = marker + spaceAfterMarker + content;
-
-      return `<span style="display: block; padding-left: ${indentCount}ch;">${fullContent}</span>`;
+      // Use negative text-indent strategy for consistent wrapping
+      // This matches the logic in evaluationRenderer.tsx for perfect unification
+      return `<span style="display: block; padding-left: ${indentCount}ch; text-indent: -${indentCount}ch;">${line}</span>`;
     }
 
     return line;

@@ -57,6 +57,12 @@ export function renderTextWithFlags(
       }))
       .sort((a, b) => a.start - b.start);
 
+    // Identify indentation for consistent alignment
+    const indentMatch = content.match(/^(\s*)([\*\-]|(?:\d+\.))?(\s*)/);
+    const leadingWhitespace = indentMatch ? indentMatch[1] : "";
+    const indentCount = (leadingWhitespace || "").replace(/\t/g, "    ").length;
+    const hasStructure = indentMatch && (indentMatch[1] || indentMatch[2]);
+
     // Build segments for this paragraph
     const segments: TextSegment[] = [];
     let lastPos = 0;
@@ -90,8 +96,12 @@ export function renderTextWithFlags(
       });
     }
 
+    const wrapperStyle = hasStructure
+      ? { display: 'block', paddingLeft: `${indentCount}ch`, textIndent: `-${indentCount}ch` }
+      : undefined;
+
     return (
-      <p key={index}>
+      <p key={index} style={wrapperStyle}>
         {segments.map((segment, sIndex) => {
           if (segment.type === "text") {
             return <RichText key={sIndex} text={segment.content} inline />;
