@@ -26,64 +26,99 @@ export function renderTextWithFlags(
   spans: DisinformationSpan[]
 ): React.ReactNode[] {
   if (!spans.length) {
-    return [<RichText key="text" text={text} inline />];
+    return [<RichText key="text" text={text} />];
   }
 
-  // Sort spans by start position
-  const sortedSpans = [...spans].sort((a, b) => a.start - b.start);
+  // Split into paragraphs to maintain consistent formatting with RichText
+  // We use a regex split that preserves enough info to track global positions
+  const paragraphMatches = text.split(/(\n\s*\n)/);
+  let globalOffset = 0;
 
-  // Build segments array
-  const segments: TextSegment[] = [];
-  let currentPos = 0;
+  return paragraphMatches.map((content, index) => {
+    const pStart = globalOffset;
+    const pEnd = globalOffset + content.length;
+    globalOffset = pEnd;
 
-  for (const span of sortedSpans) {
-    // Skip invalid spans
-    if (span.start < currentPos || span.end > text.length || span.start >= span.end) {
-      continue;
+    // Is this a separator between paragraphs?
+    if (content.match(/^\n\s*\n$/)) {
+      return null; // The <p> tags below will handle spacing; separators aren't rendered directly
     }
 
-    // Add plain text before this span
-    if (span.start > currentPos) {
+    if (!content.trim()) return null;
+
+    // Identify spans that intersect with this paragraph
+    const intersectingSpans = spans
+      .filter(s => s.start < pEnd && s.end > pStart)
+      .map(s => ({
+        ...s,
+        // Clip to paragraph bounds and convert to local offset
+        start: Math.max(0, s.start - pStart),
+        end: Math.min(content.length, s.end - pStart)
+      }))
+      .sort((a, b) => a.start - b.start);
+
+    // Identify indentation for consistent alignment
+    const indentMatch = content.match(/^(\s*)([\*\-]|(?:\d+\.))?(\s*)/);
+    const leadingWhitespace = indentMatch ? indentMatch[1] : "";
+    const indentCount = (leadingWhitespace || "").replace(/\t/g, "    ").length;
+    const hasStructure = indentMatch && (indentMatch[1] || indentMatch[2]);
+
+    // Build segments for this paragraph
+    const segments: TextSegment[] = [];
+    let lastPos = 0;
+
+    for (const span of intersectingSpans) {
+      // Add plain text before the span
+      if (span.start > lastPos) {
+        segments.push({
+          type: "text",
+          content: content.slice(lastPos, span.start),
+        });
+      }
+
+      // Add the flagged segment (handle overlapping/clipping)
+      const actualStart = Math.max(lastPos, span.start);
+      if (span.end > actualStart) {
+        segments.push({
+          type: "flag",
+          content: content.slice(actualStart, span.end),
+          span,
+        });
+        lastPos = span.end;
+      }
+    }
+
+    // Add remaining text after last span
+    if (lastPos < content.length) {
       segments.push({
         type: "text",
-        content: text.slice(currentPos, span.start),
+        content: content.slice(lastPos),
       });
     }
 
-    // Add the flagged segment
-    segments.push({
-      type: "flag",
-      content: text.slice(span.start, span.end),
-      span,
-    });
-
-    currentPos = span.end;
-  }
-
-  // Add remaining text after last span
-  if (currentPos < text.length) {
-    segments.push({
-      type: "text",
-      content: text.slice(currentPos),
-    });
-  }
-
-  // Render segments to React nodes
-  return segments.map((segment, index) => {
-    if (segment.type === "text") {
-      return <RichText key={index} text={segment.content} inline />;
-    }
-
-    const explanation = getFallacyExplanation(segment.span!.value);
+    const wrapperStyle = hasStructure
+      ? { display: 'block', paddingLeft: `${indentCount}ch`, textIndent: `-${indentCount}ch` }
+      : undefined;
 
     return (
-      <TextFlag
-        key={index}
-        text={segment.content}
-        evaluationFactor="factual_accuracy"
-        explanation={explanation}
-        severity="error"
-      />
+      <p key={index} style={wrapperStyle}>
+        {segments.map((segment, sIndex) => {
+          if (segment.type === "text") {
+            return <RichText key={sIndex} text={segment.content} inline />;
+          }
+
+          const explanation = getFallacyExplanation(segment.span!.value);
+          return (
+            <TextFlag
+              key={sIndex}
+              text={segment.content}
+              evaluationFactor="factual_accuracy"
+              explanation={explanation}
+              severity="error"
+            />
+          );
+        })}
+      </p>
     );
-  });
+  }).filter(Boolean);
 }
