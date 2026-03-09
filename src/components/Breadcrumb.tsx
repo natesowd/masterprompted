@@ -5,6 +5,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 
 export default function Breadcrumb() {
+  // TODO: Re-enable breadcrumbs when ready
+  const SHOW_BREADCRUMBS = false;
   const location = useLocation();
   const { t } = useLanguage();
   const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -100,6 +102,8 @@ export default function Breadcrumb() {
       });
     }
   }
+
+  if (!SHOW_BREADCRUMBS) return null;
 
   return (
     <nav className="flex items-center text-sm text-muted-foreground mb-5">
