@@ -364,7 +364,7 @@ export function TreeDiagram({
         <div className="flex flex-col gap-4">
           <div className="bg-card rounded-xl overflow-hidden" style={{ maxHeight: 'calc(100vh - 320px)' }}>
             <div
-              className="overflow-auto"
+              className="overflow-auto scrollbar-auto-hide"
               ref={scrollContainerRef}
               style={{ maxHeight: 'calc(100vh - 320px)' }}>
 
