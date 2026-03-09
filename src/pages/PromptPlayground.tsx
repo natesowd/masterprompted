@@ -58,7 +58,7 @@ const PromptPlayground = () => {
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
-  const CONTEXT_WINDOW_LIMIT_WORDS = 90000;
+  const CONTEXT_WINDOW_LIMIT_WORDS = 150000;
 
   // Track current page language (forwarded from Header -> LanguageSwitcher)
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
@@ -106,7 +106,8 @@ const PromptPlayground = () => {
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
       const payload = {
-        model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+        // model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+        model: "Qwen/Qwen3-Coder-30B-A3B-Instruct:fastest",
         temperature: 0.7,
         stream: true,
         messages: [
@@ -126,123 +127,157 @@ const PromptPlayground = () => {
         return;
       }
 
-      console.log("Submitting to LLM with streaming payload:", payload);
-
-      const response = await fetch(NETLIFY_CHAT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`answer request failed: ${response.status} - ${errorText}`);
-      }
-
-      if (!response.body) {
-        throw new Error("No response body for streaming");
-      }
-
-      const decoder = new TextDecoder();
-      let accumulatedAnswer = "";
-      let isStreamComplete = false;
-
-      // Initialize the version in the thread
-      setThreads(prev => {
-        const copy = [...prev];
-        const thread = copy[threadIndex];
-        if (!thread?.versions[versionIndex]) return prev;
-
-        const versions = [...thread.versions];
-        versions[versionIndex] = { ...versions[versionIndex], answer: "" };
-
-        const evaluations = [...(thread.evaluations || [])];
-        evaluations[versionIndex] = { loading: true, error: false, data: null };
-
-        copy[threadIndex] = { ...thread, versions, evaluations, showEvaluation: false };
-        return copy;
-      });
-
-      // Integrity Monitor: TransformStream to track chunks and completion
-      const monitor = new TransformStream({
-        transform(chunk, controller) {
-          controller.enqueue(chunk);
-        },
-        flush() {
-          isStreamComplete = true;
-        }
-      });
-
-      let monitoredStream = response.body.pipeThrough(monitor);
-      let reader = monitoredStream.getReader();
-      let chunkCount = 0;
-
-      console.info("Stream reading started...");
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.warn("Client-side timeout: Aborting request after 25s.");
+        controller.abort();
+      }, 25000);
 
       try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        const response = await fetch(NETLIFY_CHAT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
 
-          chunkCount++;
-          if (chunkCount % 50 === 0) {
-            console.log(`Still generating... (received ${chunkCount} text chunks, ~${accumulatedAnswer.length} chars)`);
-          }
-
-          accumulatedAnswer += decoder.decode(value, { stream: true });
-
-          // Update UI with partial answer
-          setThreads(prev => {
-            const copy = [...prev];
-            const thread = copy[threadIndex];
-            if (!thread?.versions[versionIndex]) return prev;
-
-            const versions = [...thread.versions];
-            versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
-
-            copy[threadIndex] = { ...thread, versions };
-            return copy;
-          });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`answer request failed: ${response.status} - ${errorText}`);
         }
-      } catch (err) {
-        console.error("IncompleteStreamError: Stream interrupted unexpectedly.", err);
-      } finally {
-        if (!isStreamComplete) {
-          console.warn("Stream terminated without reaching flush. Flagging as partial.");
-          accumulatedAnswer += "\n\n[PARTIAL_RESULT - Connection Interrupted]";
 
-          // Final UI update with partial flag
-          setThreads(prev => {
-            const copy = [...prev];
-            const thread = copy[threadIndex];
-            if (!thread?.versions[versionIndex]) return prev;
-            const versions = [...thread.versions];
-            versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
-            copy[threadIndex] = { ...thread, versions };
-            return copy;
-          });
+        if (!response.body) {
+          throw new Error("No response body for streaming");
+        }
+
+        const decoder = new TextDecoder();
+        let accumulatedAnswer = "";
+        let isStreamComplete = false;
+
+        // Initialize the version in the thread
+        setThreads(prev => {
+          const copy = [...prev];
+          const thread = copy[threadIndex];
+          if (!thread?.versions[versionIndex]) return prev;
+
+          const versions = [...thread.versions];
+          versions[versionIndex] = { ...versions[versionIndex], answer: "" };
+
+          const evaluations = [...(thread.evaluations || [])];
+          evaluations[versionIndex] = { loading: true, error: false, data: null };
+
+          copy[threadIndex] = { ...thread, versions, evaluations, showEvaluation: false };
+          return copy;
+        });
+
+        // Integrity Monitor: TransformStream to track chunks and completion
+        const monitor = new TransformStream({
+          transform(chunk, controller) {
+            controller.enqueue(chunk);
+          },
+          flush() {
+            isStreamComplete = true;
+          }
+        });
+
+        const monitoredStream = response.body.pipeThrough(monitor);
+        const reader = monitoredStream.getReader();
+        let chunkCount = 0;
+
+        console.info("Stream reading started...");
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            chunkCount++;
+            if (chunkCount % 50 === 0) {
+              console.log(`Still generating... (received ${chunkCount} text chunks, ~${accumulatedAnswer.length} chars)`);
+            }
+
+            accumulatedAnswer += decoder.decode(value, { stream: true });
+
+            // Update UI with partial answer
+            setThreads(prev => {
+              const copy = [...prev];
+              const thread = copy[threadIndex];
+              if (!thread?.versions[versionIndex]) return prev;
+
+              const versions = [...thread.versions];
+              versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
+
+              copy[threadIndex] = { ...thread, versions };
+              return copy;
+            });
+          }
+        } catch (err: any) {
+          if (err.name === 'AbortError') {
+            console.error("IncompleteStreamError: Request aborted due to 25s timeout.");
+          } else {
+            console.error("IncompleteStreamError: Stream interrupted unexpectedly.", err);
+          }
+        } finally {
+          clearTimeout(timeoutId);
+          if (!isStreamComplete) {
+            const timeoutFlag = controller.signal.aborted ? "Timeout" : "Connection Interrupted";
+            console.warn(`Stream terminated without reaching flush. Flagging as partial (${timeoutFlag}).`);
+            accumulatedAnswer += `\n\n[[ERROR: [PARTIAL_RESULT - ${timeoutFlag}]]]`;
+
+            // Final UI update with partial flag
+            setThreads(prev => {
+              const copy = [...prev];
+              const thread = copy[threadIndex];
+              if (!thread?.versions[versionIndex]) return prev;
+              const versions = [...thread.versions];
+              versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
+              copy[threadIndex] = { ...thread, versions };
+              return copy;
+            });
+          }
+        }
+
+        // Trigger disinformation check once final answer is complete
+        const evaluationResult = await checkDisinformation(accumulatedAnswer);
+
+        // Update evaluation state
+        setThreads(prev => {
+          const copy = [...prev];
+          const thread = copy[threadIndex];
+          if (!thread?.evaluations) return prev;
+
+          const evaluations = [...thread.evaluations];
+          evaluations[versionIndex] = {
+            loading: false,
+            error: evaluationResult === null,
+            data: evaluationResult,
+          };
+
+          copy[threadIndex] = { ...thread, evaluations };
+          return copy;
+        });
+      } catch (err: any) {
+        clearTimeout(timeoutId);
+        const errorMessage = err.name === 'AbortError'
+          ? "[ERROR: [REQUEST_TIMEOUT - Connection took too long to establish]]"
+          : `[ERROR: [CONNECTION_FAILED - ${err.message}]]`;
+
+        console.error("Fetch level error:", err);
+
+        setThreads(prev => {
+          const copy = [...prev];
+          const thread = copy[threadIndex];
+          if (!thread?.versions[versionIndex]) return prev;
+          const versions = [...thread.versions];
+          versions[versionIndex] = { ...versions[versionIndex], answer: errorMessage };
+          copy[threadIndex] = { ...thread, versions };
+          return copy;
+        });
+
+        if (err.name !== 'AbortError') {
+          // throw err; // Don't throw for generic connection failures to keep UI stable
         }
       }
-
-      // Trigger disinformation check once final answer is complete
-      const evaluationResult = await checkDisinformation(accumulatedAnswer);
-
-      // Update evaluation state
-      setThreads(prev => {
-        const copy = [...prev];
-        const thread = copy[threadIndex];
-        if (!thread?.evaluations) return prev;
-
-        const evaluations = [...thread.evaluations];
-        evaluations[versionIndex] = {
-          loading: false,
-          error: evaluationResult === null,
-          data: evaluationResult,
-        };
-
-        copy[threadIndex] = { ...thread, evaluations };
-        return copy;
-      });
     },
     [uploadedFiles]
   );

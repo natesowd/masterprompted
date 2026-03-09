@@ -70,7 +70,7 @@ export default async (req: Request) => {
                 model: model ?? "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
                 messages,
                 temperature: temperature ?? 0.7,
-                max_tokens: 2048,
+                max_tokens: 1024,
             }, {
                 signal: abortController.signal
             });

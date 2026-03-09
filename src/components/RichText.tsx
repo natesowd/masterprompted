@@ -65,13 +65,15 @@ function escapeHtml(input: string): string {
  */
 function applyInlineFormatting(raw: string, diff: boolean): string {
   let html = escapeHtml(raw);
-  
+
   if (!diff) {
     // Bold: **text**
     html = html.replace(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>");
     // Italics: *text* and _text_
     html = html.replace(/(^|\W)\*(?!\s)(.+?)(?!\s)\*(?=\W|$)/gs, "$1<em>$2</em>");
     html = html.replace(/(^|\W)_(?!\s)(.+?)(?!\s)_(?=\W|$)/gs, "$1<em>$2</em>");
+    // Error highlight: [[ERROR: text]]
+    html = html.replace(/\[\[ERROR:\s*(.+?)\s*\]\]/gs, '<span class="text-red-500 font-bold bg-red-50 px-1 py-0.5 rounded border border-red-200">$1</span>');
   }
 
   html = html.replace(/\n/g, "<br/>");
@@ -95,13 +97,13 @@ function renderBlockText(input: string, diff: boolean): string {
     .join("");
 }
 
-const RichText: React.FC<RichTextProps> = ({ 
-  text, 
-  className, 
-  inline = false, 
+const RichText: React.FC<RichTextProps> = ({
+  text,
+  className,
+  inline = false,
   diff = false,
   mode,
-  variant 
+  variant
 }) => {
   // Use a <span> for inline mode, otherwise use a <div> fragment
   const Component = inline ? 'span' : 'div';
