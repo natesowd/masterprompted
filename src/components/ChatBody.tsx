@@ -7,6 +7,8 @@ import { CircleQuestionMark, Minus } from "lucide-react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Thread } from "@/pages/PromptPlayground";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
 
@@ -253,7 +255,7 @@ const ChatBody = memo(function ChatBody({
       <div className="flex h-full">
         <div className="flex-1 min-w-0 flex flex-col h-full relative">
           <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-4 2xl:max-w-[1100px]">
               {threads.length === 0 && (
                 <div className="space-y-4 select-none pointer-events-none opacity-40">
                   {/* Faint prompt placeholder */}
@@ -264,9 +266,25 @@ const ChatBody = memo(function ChatBody({
                       </p>
                     </div>
                   </div>
-                  {/* Faint answer placeholder */}
-                  <div className="flex justify-start">
-                    <div className="w-full rounded-2xl p-6">
+                  {/* Faint answer placeholder with toggles and line */}
+                  <div className="mb-20 w-full">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center space-x-2">
+                          <Switch disabled />
+                          <Label className="text-sm text-muted-foreground opacity-50">
+                            {t('components.chatAnswer.showChanges')}
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Switch disabled />
+                          <Label className="text-sm text-muted-foreground opacity-50">
+                            {t('components.chatAnswer.showEvaluation')}
+                          </Label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="prose max-w-none">
                       <p className="text-foreground leading-relaxed text-sm italic">
                         {t('components.chatBody.outputPlaceholder')}
                       </p>
