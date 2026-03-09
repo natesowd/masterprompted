@@ -102,17 +102,11 @@ function applyInlineFormatting(raw: string, diff: boolean, isInline: boolean = f
 
     // We process the line into a block if it has leading whitespace OR a marker
     if (match && (match[1] || match[2])) {
-      const leadingWhitespace = match[1];
-      const marker = match[2] || "";
-      const spaceAfterMarker = match[3] || "";
+      const gutter = match[1] + (match[2] || "") + (match[3] || "");
       const content = match[4] || "";
 
-      // Calculate indentation based ONLY on leading whitespace (Marker is NOT included in calculation)
-      const indentCount = leadingWhitespace.replace(/\t/g, "    ").length;
-
-      // Use negative text-indent strategy for consistent wrapping
-      // This matches the logic in evaluationRenderer.tsx for perfect unification
-      return `<span style="display: block; padding-left: ${indentCount}ch; text-indent: -${indentCount}ch;">${line}</span>`;
+      // Use flexbox strategy for perfect "flush" alignment across different fonts
+      return `<span style="display: flex; align-items: flex-start;"><span style="white-space: pre; flex-shrink: 0;">${gutter}</span><span>${content}</span></span>`;
     }
 
     return line;
