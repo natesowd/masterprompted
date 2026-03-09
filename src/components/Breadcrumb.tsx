@@ -103,6 +103,8 @@ export default function Breadcrumb() {
     }
   }
 
+  if (!SHOW_BREADCRUMBS) return null;
+
   return (
     <nav className="flex items-center text-sm text-muted-foreground mb-5">
       {breadcrumbItems.map((item, index) => (
