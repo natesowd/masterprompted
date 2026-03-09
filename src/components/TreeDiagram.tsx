@@ -692,6 +692,28 @@ export function TreeDiagram({
         </div>
       </div>
 
+      {/* Headline completion note */}
+      {isTerminal && hasUserSelected && (
+        <div className="flex justify-center animate-fade-in py-4">
+          <div className="flex flex-col items-center text-center gap-3 max-w-[280px]">
+            <CheckCircle2 className="h-6 w-6 text-brand-tertiary-500" />
+            <div className="space-y-1.5">
+              <p className="text-sm font-semibold text-foreground">Headline complete!</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                You have just explored one of the headlines an LLM may have generated using probabilities, potentially leaving room for bias and/or factual inaccuracies.
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Try another headline to see what more can be noticed!
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5 text-xs h-8 mt-1">
+              <RotateCcw className="h-3 w-3" />
+              New headline
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Start your own overlay */}
       {isIntroComplete && !isInteractive &&
       <div className="absolute left-0 right-0 top-24 flex justify-center animate-fade-in z-10">
