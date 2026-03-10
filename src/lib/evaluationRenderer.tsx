@@ -44,22 +44,26 @@ export function renderTextWithFlags(
     if (content.match(/^\n\s*\n$/)) return null;
     if (!content.trim()) return null;
 
-    // Identify spans for this paragraph
+    // Extract gutter (indents/markers) and actual content
+    // We strictly require a space after markers like * and - to avoid splitting markdown bold/italic triples
+    const gutterMatch = content.match(/^(\s*)(?:([*\-]|(?:\d+\.))(?=\s|$))?(\s*)/);
+    const gutter = gutterMatch ? gutterMatch[0] : "";
+    const gutterLen = gutter.length;
+    const actualText = content.slice(gutterLen);
+
+    // Identify spans for this paragraph, adjusted relative to actualText
     const intersectingSpans = spans
       .filter(s => s.start < pEnd && s.end > pStart)
       .map(s => ({
         ...s,
-        start: Math.max(0, s.start - pStart),
-        end: Math.min(content.length, s.end - pStart)
+        start: Math.max(0, s.start - pStart - gutterLen),
+        end: Math.min(actualText.length, s.end - pStart - gutterLen)
       }))
+      .filter(s => s.start < s.end)
       .sort((a, b) => b.start - a.start); // Sort descending to inject markers safely
 
-    // Identify gutter for flex alignment
-    const indentMatch = content.match(/^(\s*)([\*\-]|(?:\d+\.))?(\s*)/);
-    const gutter = indentMatch ? indentMatch[0] : "";
-
     // Create marked text for rich evaluation rendering
-    let markedContent = content;
+    let markedContent = actualText;
     intersectingSpans.forEach((span, i) => {
       // Use unique markers that won't be matched by RichText regexes
       markedContent =
@@ -70,10 +74,7 @@ export function renderTextWithFlags(
         markedContent.slice(span.start);
     });
 
-    // Apply RichText formatting to the whole (marked) content
-    // We use RichText as a helper to get formatted segments
-    // Since we are in block mode (p tags), we render individual lines
-    // But we need to bypass RichText's own block/indention for the marker-parsed string
+    // Apply RichText formatting to the content (bypassing block structural transforms)
     const htmlWithMarkers = applyInlineFormatting(markedContent, false, true);
 
     // Parse the HTML by markers

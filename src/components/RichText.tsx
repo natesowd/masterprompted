@@ -97,8 +97,9 @@ export function applyInlineFormatting(raw: string, diff: boolean, isInline: bool
     if (diff) return line;
 
     // Match leading whitespace, optional list marker (*, -, 1.), and content
-    // This allows us to treat the marker as part of the text, while the whitespace defines the "gutter"
-    const match = line.match(/^(\s*)([\*\-]|(?:\d+\.))?(\s*)(.*)$/);
+    // We require the marker to be followed by a space or end-of-line to avoid 
+    // peeling off the first asterisk of markdown triples (like ***bold***)
+    const match = line.match(/^(\s*)(?:([*\-]|(?:\d+\.))(?=\s|$))?(\s*)(.*)$/);
 
     // We process the line into a block if it has leading whitespace OR a marker
     if (match && (match[1] || match[2])) {
