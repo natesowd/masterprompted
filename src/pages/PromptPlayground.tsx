@@ -58,7 +58,7 @@ const PromptPlayground = () => {
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
-  const CONTEXT_WINDOW_LIMIT_TOKENS = 128000;
+  const CONTEXT_WINDOW_LIMIT_TOKENS = 125000;
 
   // Track current page language (forwarded from Header -> LanguageSwitcher)
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
