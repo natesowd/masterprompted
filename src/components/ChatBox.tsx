@@ -281,7 +281,7 @@ const Chatbox = ({
 
       {/* Submit button - positioned in top right */}
       {!hideSubmitButton &&
-        <div className="absolute top-2 right-2 z-10">
+        <div className="absolute top-3 right-3 z-10">
           <SubmitButton onClick={handleSubmit} id={submitButtonId} disableSend={disableSend} />
         </div>
       }
@@ -289,7 +289,7 @@ const Chatbox = ({
       {!waitingforOptimization &&
         <Textarea
           placeholder="Type your message here..."
-          className={cn("border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 py-2 mt-2 mb-2 pr-12 leading-relaxed text-card-foreground font-['Manrope'] text-md resize-none mx-0 px-[16px]",
+          className={cn("border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 py-2 mt-2 mb-2 pl-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-md resize-none mx-0",
 
             autoResize ? "h-auto overflow-hidden" : "flex-1 h-full min-h-0 overflow-y-auto"
           )}
@@ -311,7 +311,7 @@ const Chatbox = ({
       }
       {waitingforOptimization &&
         <div
-          className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-6 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] flex-1 h-full min-h-[140px] resize-none overflow-y-auto">
+          className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] flex-1 h-full min-h-[140px] resize-none overflow-y-auto">
           <Skeleton className="mt-2 h-4 w-[180px]" />
           <Skeleton className="mt-2 h-4 w-[150px]" />
         </div>

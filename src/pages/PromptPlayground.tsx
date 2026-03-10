@@ -48,6 +48,7 @@ const PromptPlayground = () => {
   const [editingText, setEditingText] = useState<string>("");
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
   const [hasManualEdit, setHasManualEdit] = useState<boolean>(false);
+  const [isEmpty, setIsEmpty] = useState<boolean>(true);
   const [enableBias, setEnableBias] = useState<boolean>(false);
   const [enableSpecificity, setEnableSpecificity] = useState<boolean>(false);
   const [enableStyle, setEnableStyle] = useState<boolean>(false);
@@ -199,9 +200,9 @@ const PromptPlayground = () => {
             if (done) break;
 
             chunkCount++;
-            if (chunkCount % 50 === 0) {
-              console.log(`Still generating... (received ${chunkCount} text chunks, ~${accumulatedAnswer.length} chars)`);
-            }
+            // if (chunkCount % 50 === 0) {
+            //   console.log(`Still generating... (received ${chunkCount} text chunks, ~${accumulatedAnswer.length} chars)`);
+            // }
 
             accumulatedAnswer += decoder.decode(value, { stream: true });
 
@@ -406,12 +407,17 @@ const PromptPlayground = () => {
             ? { name: file.name, content: text, size: text.length, isUploading: false }
             : f
         ));
+
+        setHasManualEdit(true);
+        // console.log(isEmpty);
+        setDisableSend(isEmpty);
+
       } catch (err) {
         console.error(`Failed to parse PDF ${file.name}:`, err);
         setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
       }
     }
-  }, [uploadedFiles]);
+  }, [uploadedFiles, isEmpty]);
 
   const handleRemoveFile = useCallback((index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
@@ -442,6 +448,9 @@ const PromptPlayground = () => {
     setCurrentPrompt(previousPrompt);
     setEditingText(previousPrompt);
     setPreviousPrompt("");
+    const empty = !previousPrompt.trim();
+    setIsEmpty(empty);
+    setDisableSend(empty);
   };
 
   const createNewThreadAndFetch = async (submittedText: string) => {
@@ -496,8 +505,9 @@ const PromptPlayground = () => {
     handleReset();
     setEditingText(input);
     setCurrentPrompt(input);
-    const isEmpty = !input.trim();
-    setDisableSend(isEmpty);
+    const empty = !input.trim();
+    setIsEmpty(empty);
+    setDisableSend(empty);
     setDisableOptimize(true);
     setEnableSpecificity(false); setEnableBias(false); setEnableContext(false); setEnableStyle(false);
   };
