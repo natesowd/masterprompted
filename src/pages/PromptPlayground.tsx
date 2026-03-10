@@ -58,7 +58,7 @@ const PromptPlayground = () => {
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
-  const CONTEXT_WINDOW_LIMIT_WORDS = 150000;
+  const CONTEXT_WINDOW_LIMIT_WORDS = 60000;
 
   // Track current page language (forwarded from Header -> LanguageSwitcher)
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
@@ -114,8 +114,8 @@ const PromptPlayground = () => {
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
       const payload = {
-        // model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
-        model: "Qwen/Qwen3-Coder-30B-A3B-Instruct:fastest",
+        model: "meta-llama/Llama-3.1-8B-Instruct:fastest",
+        // model: "Qwen/Qwen3-Coder-30B-A3B-Instruct:fastest",
         temperature: 0.7,
         stream: true,
         messages: [
@@ -376,9 +376,13 @@ const PromptPlayground = () => {
         const countWords = (str: string) => str.trim().split(/\s+/).filter(Boolean).length;
         const newFileWordCount = countWords(text);
         console.log(`Word count for "${file.name}": ${newFileWordCount} words.`);
-        const currentTotalWords = uploadedFiles.reduce((acc, f) => acc + countWords(f.content), 0);
+        const currentFilesWords = uploadedFiles
+          .filter(f => !f.isUploading)
+          .reduce((acc, f) => acc + countWords(f.content), 0);
 
-        if (currentTotalWords + cumulativeNewSize + newFileWordCount > CONTEXT_WINDOW_LIMIT_WORDS) {
+        const totalBatchWordsProcessed = cumulativeNewSize + newFileWordCount;
+
+        if (currentFilesWords + totalBatchWordsProcessed > CONTEXT_WINDOW_LIMIT_WORDS) {
           alert(`File "${file.name}" exceeds the ${CONTEXT_WINDOW_LIMIT_WORDS} word context window limit.`);
           setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
           continue;
