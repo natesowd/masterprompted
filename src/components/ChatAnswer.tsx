@@ -209,6 +209,7 @@ const ChatAnswer = ({
   // Determine if evaluation toggle should be disabled
   const evaluationDisabled = !currentEvaluation || currentEvaluation.loading || currentEvaluation.error || !currentEvaluation.data;
   const evaluationLoading = currentEvaluation?.loading ?? false;
+  const evaluationClean = currentEvaluation && !currentEvaluation.loading && !currentEvaluation.error && currentEvaluation.data && currentEvaluation.data.length === 0;
 
   // Render text with evaluation flags
   const renderEvaluation = () => {
@@ -251,6 +252,11 @@ const ChatAnswer = ({
               {t('components.chatAnswer.showEvaluation')}
               {evaluationLoading && <Loader2 className="h-3 w-3 animate-spin" />}
             </Label>
+            {evaluationClean && (
+              <span className="ml-1 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-medium">
+                Nothing detected at this moment
+              </span>
+            )}
           </div>
         </div>
 
