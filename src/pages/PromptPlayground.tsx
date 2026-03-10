@@ -58,7 +58,7 @@ const PromptPlayground = () => {
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
-  const CONTEXT_WINDOW_LIMIT_WORDS = 60000;
+  const CONTEXT_WINDOW_LIMIT_TOKENS = 128000;
 
   // Track current page language (forwarded from Header -> LanguageSwitcher)
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
@@ -178,7 +178,6 @@ const PromptPlayground = () => {
           return copy;
         });
 
-        // Integrity Monitor: TransformStream to track chunks and completion
         const monitor = new TransformStream({
           transform(chunk, controller) {
             controller.enqueue(chunk);
@@ -206,33 +205,38 @@ const PromptPlayground = () => {
 
             accumulatedAnswer += decoder.decode(value, { stream: true });
 
-            // Update UI with partial answer
             setThreads(prev => {
               const copy = [...prev];
               const thread = copy[threadIndex];
               if (!thread?.versions[versionIndex]) return prev;
-
               const versions = [...thread.versions];
               versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
-
               copy[threadIndex] = { ...thread, versions };
               return copy;
             });
           }
         } catch (err: any) {
           if (err.name === 'AbortError') {
-            console.error("IncompleteStreamError: Request aborted due to 25s timeout.");
+            const timeoutMsg = `\n\n[[ERROR: [TIMEOUT - Generator stopped after 25s]]]`;
+            accumulatedAnswer += timeoutMsg;
+            console.error("Stream aborted due to 25s timeout.");
           } else {
-            console.error("IncompleteStreamError: Stream interrupted unexpectedly.", err);
+            console.error("Stream interrupted unexpectedly.", err);
           }
         } finally {
           clearTimeout(timeoutId);
-          if (!isStreamComplete) {
+          // If the stream was interrupted OR it never received content, show an error
+          if (!isStreamComplete || !accumulatedAnswer) {
             const timeoutFlag = controller.signal.aborted ? "Timeout" : "Connection Interrupted";
-            console.warn(`Stream terminated without reaching flush. Flagging as partial (${timeoutFlag}).`);
-            accumulatedAnswer += `\n\n[[ERROR: [PARTIAL_RESULT - ${timeoutFlag}]]]`;
+            const emptyFlag = !accumulatedAnswer ? "Empty Response / API Error" : null;
+            const finalFlag = emptyFlag || timeoutFlag;
 
-            // Final UI update with partial flag
+            const errorMarker = `\n\n[[ERROR: [PARTIAL_RESULT - ${finalFlag}]]]`;
+
+            if (!accumulatedAnswer.includes("[ERROR:")) {
+              accumulatedAnswer += errorMarker;
+            }
+
             setThreads(prev => {
               const copy = [...prev];
               const thread = copy[threadIndex];
@@ -245,46 +249,54 @@ const PromptPlayground = () => {
           }
         }
 
-        // Trigger disinformation check once final answer is complete
-        const evaluationResult = await checkDisinformation(accumulatedAnswer);
+        // Trigger disinformation check
+        let evaluationResult = null;
+        try {
+          evaluationResult = await checkDisinformation(accumulatedAnswer);
+        } catch (evalErr) {
+          console.error("Evaluation failed but answer is visible:", evalErr);
+        }
 
-        // Update evaluation state
         setThreads(prev => {
           const copy = [...prev];
           const thread = copy[threadIndex];
           if (!thread?.evaluations) return prev;
-
           const evaluations = [...thread.evaluations];
           evaluations[versionIndex] = {
             loading: false,
             error: evaluationResult === null,
             data: evaluationResult,
           };
-
           copy[threadIndex] = { ...thread, evaluations };
           return copy;
         });
+
       } catch (err: any) {
         clearTimeout(timeoutId);
         const errorMessage = err.name === 'AbortError'
           ? "[[ERROR: [REQUEST_TIMEOUT - Connection took too long to establish]]]"
           : `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`;
 
-        console.error("Fetch level error:", err);
+        console.error("Outer catch error:", err);
 
         setThreads(prev => {
           const copy = [...prev];
           const thread = copy[threadIndex];
           if (!thread?.versions[versionIndex]) return prev;
+
           const versions = [...thread.versions];
-          versions[versionIndex] = { ...versions[versionIndex], answer: errorMessage };
-          copy[threadIndex] = { ...thread, versions };
+          if (!versions[versionIndex].answer || versions[versionIndex].answer.length < 5) {
+            versions[versionIndex] = { ...versions[versionIndex], answer: errorMessage };
+          }
+
+          const evaluations = [...(thread.evaluations || [])];
+          evaluations[versionIndex] = { loading: false, error: true, data: null };
+
+          copy[threadIndex] = { ...thread, versions, evaluations };
           return copy;
         });
-
-        if (err.name !== 'AbortError') {
-          // throw err; // Don't throw for generic connection failures to keep UI stable
-        }
+      } finally {
+        clearTimeout(timeoutId);
       }
     },
     [uploadedFiles]
@@ -363,7 +375,7 @@ const PromptPlayground = () => {
     const { extractTextFromPDF } = await import('@/lib/pdfParser');
 
     console.log(`Starting upload/parse for ${pdfs.length} PDF(s)`);
-    let cumulativeNewSize = 0;
+    let cumulativeNewTokens = 0;
 
     for (const file of pdfs) {
       console.log(`Parsing file: ${file.name}`);
@@ -373,22 +385,21 @@ const PromptPlayground = () => {
         const text = await extractTextFromPDF(file);
         console.log(`Successfully parsed ${file.name}, extracted ${text.length} characters.`);
 
-        const countWords = (str: string) => str.trim().split(/\s+/).filter(Boolean).length;
-        const newFileWordCount = countWords(text);
-        console.log(`Word count for "${file.name}": ${newFileWordCount} words.`);
-        const currentFilesWords = uploadedFiles
+        const newFileTokens = Math.ceil(text.length / 3.5);
+        console.log(`Estimated tokens for "${file.name}": ${newFileTokens} (Chars: ${text.length}).`);
+        const currentFilesTokens = uploadedFiles
           .filter(f => !f.isUploading)
-          .reduce((acc, f) => acc + countWords(f.content), 0);
+          .reduce((acc, f) => acc + Math.ceil(f.content.length / 3.5), 0);
 
-        const totalBatchWordsProcessed = cumulativeNewSize + newFileWordCount;
+        const totalBatchTokensProcessed = cumulativeNewTokens + newFileTokens;
 
-        if (currentFilesWords + totalBatchWordsProcessed > CONTEXT_WINDOW_LIMIT_WORDS) {
-          alert(`File "${file.name}" exceeds the ${CONTEXT_WINDOW_LIMIT_WORDS} word context window limit.`);
+        if (currentFilesTokens + totalBatchTokensProcessed > CONTEXT_WINDOW_LIMIT_TOKENS) {
+          alert(`File "${file.name}" exceeds the ${CONTEXT_WINDOW_LIMIT_TOKENS} token context window limit.`);
           setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
           continue;
         }
 
-        cumulativeNewSize += newFileWordCount;
+        cumulativeNewTokens += newFileTokens;
 
         setUploadedFiles(prev => prev.map(f =>
           (f.name === file.name && f.isUploading)

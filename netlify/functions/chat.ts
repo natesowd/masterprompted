@@ -70,17 +70,44 @@ export default async (req: Request) => {
                 model: model ?? "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
                 messages,
                 temperature: temperature ?? 0.7,
-                max_tokens: 1024,
+                max_tokens: 2048,
             }, {
                 signal: abortController.signal
             });
 
-            // Standard ReadableStream for V2 Netlify Functions
+            // "Prime" the stream: attempt to get the first chunk to catch early errors (like context logic failures)
+            const iterator = streamResponse[Symbol.asyncIterator]();
+            let firstChunk: any = null;
+            try {
+                const firstResult = await iterator.next();
+                if (firstResult.done) {
+                    return new Response(null, {
+                        status: 204, // No content
+                        headers: getCorsHeaders(origin),
+                    });
+                }
+                firstChunk = firstResult.value;
+            } catch (err: any) {
+                clearTimeout(timeoutId);
+                console.error("HF client failed prime check:", err.message);
+                return new Response(JSON.stringify({ error: err.message || "HF API Error during stream initialization" }), {
+                    status: 400,
+                    headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" },
+                });
+            }
+
             const encoder = new TextEncoder();
             const readableStream = new ReadableStream({
                 async start(controller) {
                     try {
-                        for await (const chunk of streamResponse) {
+                        // Enqueue the first chunk we already took
+                        if (firstChunk?.choices?.[0]?.delta?.content) {
+                            controller.enqueue(encoder.encode(firstChunk.choices[0].delta.content));
+                            tokensSent++;
+                        }
+
+                        // Continue with the rest of the stream
+                        for await (const chunk of { [Symbol.asyncIterator]: () => iterator } as any) {
                             if (chunk.choices && chunk.choices[0].delta.content) {
                                 controller.enqueue(encoder.encode(chunk.choices[0].delta.content));
                                 tokensSent++;
@@ -92,7 +119,7 @@ export default async (req: Request) => {
                             console.error(`Stream Aborted: Silent kill detected at ${tokensSent} tokens.`);
                             controller.error(err);
                         } else {
-                            console.error("Stream error:", err);
+                            console.error("Stream error depth:", err);
                             controller.error(err);
                         }
                     } finally {
@@ -107,7 +134,8 @@ export default async (req: Request) => {
                     "Content-Type": "text/plain; charset=utf-8",
                 },
             });
-        } else {
+        }
+        else {
             // Non-streaming with observability
             const completion = await client.chatCompletion({
                 model: model ?? "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",

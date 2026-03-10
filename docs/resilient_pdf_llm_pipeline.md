@@ -8,10 +8,10 @@
     - If `textContent.items.length < 5` OR `totalChars < 50`, trigger OCR fallback (Future).
 
 ## 2. Map-Reduce Summarization Architecture
-**Objective:** Process 32k+ words across Netlify (26s) and HF/OVH limits.
+**Objective:** Process 128k+ tokens across Netlify (26s) and HF/OVH limits.
 - **Current State:** Single-pass streaming implemented. Chunking/Map-Reduce planned for very large documents.
 - **Chunking Module:** 
-    - Split text into segments of ~3,000 words (~4,000 tokens) at paragraph boundaries.
+    - Split text into segments of ~4,000 tokens at paragraph boundaries.
 
 ## 3. Streaming & Timeout Observability
 **Objective:** Monitor and log "Silent Kills" in the Netlify -> HF -> OVH chain.
