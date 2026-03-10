@@ -252,7 +252,7 @@ const ChatAnswer = ({
               {t('components.chatAnswer.showEvaluation')}
               {evaluationLoading && <Loader2 className="h-3 w-3 animate-spin" />}
             </Label>
-            {evaluationClean && showEvaluation && (
+            {showEvaluation && evaluationClean && (
               <span className="ml-1 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-medium">
                 Nothing detected at this moment
               </span>
