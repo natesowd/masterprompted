@@ -60,7 +60,14 @@ export async function checkDisinformation(text: string): Promise<DisinformationS
       return null;
     }
 
-    const data: DisinformationResponse = await response.json();
+    const responseText = await response.text();
+
+    // The API returns a plain-text message when no fallacies are found
+    if (responseText.includes("no fallacies")) {
+      return [];
+    }
+
+    const data: DisinformationResponse = JSON.parse(responseText);
 
     // Extract all spans from all signals named "FALLACY"
     const fallacySpans = data.signals
