@@ -1,7 +1,10 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "netlify/functions"
+
+[[edge_functions]]
+  path = "/api/chat"
+  function = "chat"
 
 [dev]
   command = "npm run dev"

@@ -8,7 +8,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBody";
 import { checkDisinformation, DisinformationSpan } from "@/services/disinformationApi";
 const NO_CHANGE_VALUE = "no-change";
-const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/.netlify/functions/chat";
+const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? "/api/chat"
+  : "https://luxury-blini-3336bb.netlify.app/api/chat";
 
 export type Parameters = {
   specificity: string;
@@ -188,9 +190,9 @@ const PromptPlayground = () => {
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.warn("Client-side timeout: Aborting request after 25s.");
+        console.warn("Client-side timeout: Aborting request after 120s.");
         controller.abort();
-      }, 25000);
+      }, 120000);
 
       try {
         const response = await fetch(NETLIFY_CHAT_URL, {
@@ -268,9 +270,9 @@ const PromptPlayground = () => {
           }
         } catch (err: any) {
           if (err.name === 'AbortError') {
-            const timeoutMsg = `\n\n[[ERROR: [TIMEOUT - Generator stopped after 25s]]]`;
+            const timeoutMsg = `\n\n[[ERROR: [TIMEOUT - Generator stopped after 120s]]]`;
             accumulatedAnswer += timeoutMsg;
-            console.error("Stream aborted due to 25s timeout.");
+            console.error("Stream aborted due to 120s timeout.");
           } else {
             console.error("Stream interrupted unexpectedly.", err);
           }
