@@ -89,7 +89,7 @@ export default function PromptConstructionSpecificityTakeaways() {
               onClick={() => navigate("/module/system-parameters")}
               className="font-heading font-semibold text-base px-10 py-6 rounded-full"
             >
-              {t('promptConstructionModule.takeaways.promptPlayground')}
+              Next Task
               <ArrowRight className="ml-2 !h-6 !w-6" />
             </Button>
             <div className="flex-1" />
