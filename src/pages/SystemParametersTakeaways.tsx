@@ -118,7 +118,7 @@ export default function SystemParametersTakeaways() {
       </main>
       <ModuleNavigation
         previousRoute="/module/system-parameters/roles"
-        nextRoute="/modules"
+        nextRoute="/module/multiple-sources"
       />
     </div>
   );
