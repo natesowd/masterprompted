@@ -188,7 +188,7 @@ export default function PromptControls({
     const { t } = useLanguage();
     const [titlePopoverOpen, setTitlePopoverOpen] = useState(false);
     const [walkthroughOpen, setWalkthroughOpen] = useState(false);
-    const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
+    const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         const handleMetaLinkClick = (e: MouseEvent) => {
