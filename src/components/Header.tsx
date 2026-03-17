@@ -55,13 +55,13 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
     title: t('modules.promptConstruction'),
     path: "/module/prompt-construction",
     completed: false
+  },
+  {
+    title: "System Parameters",
+    path: "/module/system-parameters",
+    completed: false
   }
   // Hidden modules - uncomment to restore:
-  // { 
-  //   title: "System Parameters", 
-  //   path: "/module/system-parameters",
-  //   completed: false
-  // },
   // { 
   //   title: "Multiple Sources", 
   //   path: "/module/multiple-sources",

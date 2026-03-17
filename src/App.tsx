@@ -24,6 +24,7 @@ import Bias from "./pages/PrompConstructionBias";
 import SystemParameters from "./pages/SystemParameters";
 import SystemParametersTemperature from "./pages/SystemParametersTemperature";
 import SystemParametersRoles from "./pages/SystemParametersRoles";
+import SystemParametersTakeaways from "./pages/SystemParametersTakeaways";
 import MultipleSources from "./pages/MultipleSources";
 import LLMTraining from "./pages/LLMTraining";
 import PromptPlayground from "./pages/PromptPlayground";
@@ -79,6 +80,7 @@ const App = () => (
               <Route path="/module/system-parameters" element={<SystemParameters />} />
               <Route path="/module/system-parameters/temperature" element={<SystemParametersTemperature />} />
               <Route path="/module/system-parameters/roles" element={<SystemParametersRoles />} />
+              <Route path="/module/system-parameters/takeaways" element={<SystemParametersTakeaways />} />
               <Route path="/module/multiple-sources" element={<MultipleSources />} />
               <Route path="/module/llm-training" element={<LLMTraining />} />
               <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
