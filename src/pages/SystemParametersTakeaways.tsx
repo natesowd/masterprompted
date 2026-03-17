@@ -76,7 +76,7 @@ export default function SystemParametersTakeaways() {
               onClick={() => navigate("/module/multiple-sources")}
               className="font-heading font-semibold text-base px-10 py-6 rounded-full"
             >
-              Continue
+              Next Task
               <ArrowRight className="-mr-2 !h-6 !w-6" />
             </Button>
             <div className="flex-1" />
