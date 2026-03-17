@@ -2,15 +2,16 @@
 
 import Header from "@/components/Header";
 import PromptControls from "@/components/PromptControlsPromptPlayground.tsx";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBody";
 import { checkDisinformation, DisinformationSpan } from "@/services/disinformationApi";
 const NO_CHANGE_VALUE = "no-change";
-const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "/api/chat"
-  : "https://luxury-blini-3336bb.netlify.app/api/chat";
+// const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+//   ? "/api/chat"
+//   : "https://luxury-blini-3336bb.netlify.app/api/chat";
+const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
 
 export type Parameters = {
   specificity: string;
@@ -60,6 +61,7 @@ const PromptPlayground = () => {
   const [showControlPanelPopover, setShowControlPanelPopover] = useState<boolean>(false);
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
+  const optimizeAbortControllerRef = useRef<AbortController | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
   const CONTEXT_WINDOW_LIMIT_TOKENS = 125000;
 
@@ -167,7 +169,7 @@ const PromptPlayground = () => {
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
       const payload = {
-        model: "meta-llama/Llama-3.1-8B-Instruct:fastest",
+        model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
         // model: "Qwen/Qwen3-Coder-30B-A3B-Instruct:fastest",
         temperature: 0.7,
         stream: true,
@@ -355,12 +357,19 @@ const PromptPlayground = () => {
     [uploadedFiles]
   );
 
-  const handlePromptOptimize = useCallback(async (prompt: string, ...args: string[]) => {
+  const handlePromptOptimize = useCallback(async (prompt: string, specificity: string, style: string, context: string, bias: string) => {
     if (!prompt.trim()) return;
+
+    // Abort previous optimization request to free up concurrent slots
+    if (optimizeAbortControllerRef.current) {
+      optimizeAbortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    optimizeAbortControllerRef.current = controller;
+
     setWaitingForOptimization(true);
     setPreviousPrompt(prompt);
     try {
-      const [specificity, style, context, bias] = args;
       const paramMap: Record<string, string> = { specificity, style, context, bias };
 
       const beKeyword = pageLanguage === 'es' ? 'sea' : 'be';
@@ -397,6 +406,7 @@ const PromptPlayground = () => {
             { role: "user", content: optimizeUserPrompt },
           ],
         }),
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -415,8 +425,18 @@ const PromptPlayground = () => {
       } else {
         throw new Error("handlePromptOptimize: optimized_prompt missing or empty");
       }
-    } catch (err) { console.error("handlePromptOptimize failed:", err); }
-    setWaitingForOptimization(false);
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.log("Optimization request aborted (likely newer request started).");
+        return;
+      }
+      console.error("handlePromptOptimize failed:", err);
+    } finally {
+      // Only clear waiting state if this was the latest request
+      if (optimizeAbortControllerRef.current === controller) {
+        setWaitingForOptimization(false);
+      }
+    }
   }, [pageLanguage]);
 
   const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
