@@ -123,7 +123,7 @@ export default function SystemParametersTemperature() {
               </div>
 
               {/* Right column - Evaluation panel */}
-              <div className="flex-shrink-0 ml-6 2xl:absolute 2xl:left-[884px] 2xl:top-0 2xl:ml-0">
+              <div className="flex-shrink-0 ml-6">
                 <EvaluationPanel initialIsOpen={true} canClose={true} />
               </div>
             </div>
