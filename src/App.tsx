@@ -78,6 +78,7 @@ const App = () => (
               {/* UNIMPLEMENTED */}
               <Route path="/module/system-parameters" element={<SystemParameters />} />
               <Route path="/module/system-parameters/temperature" element={<SystemParametersTemperature />} />
+              <Route path="/module/system-parameters/roles" element={<SystemParametersRoles />} />
               <Route path="/module/multiple-sources" element={<MultipleSources />} />
               <Route path="/module/llm-training" element={<LLMTraining />} />
               <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />

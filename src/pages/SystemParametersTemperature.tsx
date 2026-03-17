@@ -110,15 +110,24 @@ export default function SystemParametersTemperature() {
                   ))}
                 </div>
 
-                {/* Next button */}
-                <div className="mt-8 mb-12">
+                {/* Navigation buttons */}
+                <div className="mt-8 mb-12 flex items-center gap-3">
                   <Button
                     variant="outline"
-                    onClick={() => navigate("/module/system-parameters/roles")}
-                    className="px-8 py-6 font-heading font-semibold text-base rounded-full border-primary text-primary hover:bg-primary/10"
+                    size="icon"
+                    onClick={() => navigate("/module/system-parameters")}
+                    className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                   >
-                    Next (Roles)
-                    <ArrowRight className="ml-2 !h-5 !w-5" />
+                    <ArrowLeft className="!h-6 !w-6" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => navigate("/module/system-parameters/roles")}
+                    className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
+                  >
+                    Continue
+                    <ArrowRight className="-mr-2 !h-6 !w-6" />
                   </Button>
                 </div>
               </div>
