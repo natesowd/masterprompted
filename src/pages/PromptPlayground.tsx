@@ -534,7 +534,7 @@ const PromptPlayground = () => {
   const submitAnswerForLatestVersion = async (promptText: string) => {
     if (threads.length === 0) return;
     const threadIndex = threads.length - 1;
-    const lastVersionPrompt = threads[threadIndex].versions.at(-1)?.prompt;
+    const lastVersionPrompt = threads[threadIndex].versions[threads[threadIndex].versions.length - 1]?.prompt;
     if (promptText !== lastVersionPrompt) {
       const newVersionIndex = threads[threadIndex].versions.length;
       setThreads(prev => {
