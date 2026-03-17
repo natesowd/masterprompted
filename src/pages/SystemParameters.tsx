@@ -12,8 +12,7 @@ export default function SystemParameters() {
   const { t } = useLanguage();
 
   const handleContinue = () => {
-    // TODO: navigate to first exercise when implemented
-    navigate("/modules");
+    navigate("/module/system-parameters/temperature");
   };
 
   return (
