@@ -60,13 +60,13 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
     title: "System Parameters",
     path: "/module/system-parameters",
     completed: false
+  },
+  {
+    title: "Multiple Documents",
+    path: "/module/multiple-sources",
+    completed: false
   }
   // Hidden modules - uncomment to restore:
-  // { 
-  //   title: "Multiple Sources", 
-  //   path: "/module/multiple-sources",
-  //   completed: false
-  // },
   // { 
   //   title: "LLM Training", 
   //   path: "/module/llm-training",

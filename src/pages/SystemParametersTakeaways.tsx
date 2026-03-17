@@ -73,10 +73,10 @@ export default function SystemParametersTakeaways() {
             </Button>
             <Button
               variant="secondary"
-              onClick={() => navigate("/modules")}
+              onClick={() => navigate("/module/multiple-sources")}
               className="font-heading font-semibold text-base px-10 py-6 rounded-full"
             >
-              Continue
+              Next Task
               <ArrowRight className="-mr-2 !h-6 !w-6" />
             </Button>
             <div className="flex-1" />
@@ -118,7 +118,7 @@ export default function SystemParametersTakeaways() {
       </main>
       <ModuleNavigation
         previousRoute="/module/system-parameters/roles"
-        nextRoute="/modules"
+        nextRoute="/module/multiple-sources"
       />
     </div>
   );
