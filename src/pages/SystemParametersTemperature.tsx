@@ -5,20 +5,23 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import ModuleNavigation from "@/components/ModuleNavigation";
+import ChatPrompt from "@/components/ChatPrompt";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { ArrowRight, Info } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const PROMPT_TEXT = "Summarize who bears the main obligations under the EU AI Act and what responsibilities apply to deployers of high-risk AI systems.";
+
 const TEMPERATURE_STEPS = [0.0, 0.2, 0.5, 0.8, 1.0];
 
 const TEMPERATURE_OUTPUTS: Record<number, string> = {
-  0.0: "Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.\n\nUser Responsibilities: Users (deployers) of high-risk AI systems have certain obligations, though less than providers.",
-  0.2: "Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.\n\nUser Responsibilities: Users (deployers) of high-risk AI systems have certain obligations, though less than providers.",
-  0.5: "Provider Duties: Most regulatory requirements target the developers of high-risk AI, even those based outside the EU whose products operate within its borders.\n\nUser Duties: Deployers of high-risk AI bear a lighter but still meaningful set of compliance requirements.",
-  0.8: "Developer Accountability: The heaviest compliance burden rests with those who build high-risk AI systems — a rule that extends extraterritorially to non-EU providers serving the European market.\n\nDeployer Responsibilities: Organizations using high-risk AI face their own regulatory expectations, though these are proportionally less demanding than those imposed on developers.",
-  1.0: "Architects of Risk: The EU AI Act places its most exacting demands on the creators of high-risk artificial intelligence — casting a wide jurisdictional net that ensnares even non-European developers whose systems touch EU soil.\n\nThe User's Burden: Those who deploy high-risk AI inherit a lighter, though far from trivial, tapestry of obligations — a regulatory acknowledgment that the act of wielding powerful technology carries its own weight of responsibility.",
+  0.0: "Under the EU AI Act, providers — meaning developers — of high-risk AI systems bear the majority of obligations. This includes providers based outside the EU if their systems are used within the EU. Their duties include risk management, data governance, technical documentation, transparency, and human oversight.\n\nDeployers of high-risk AI systems also have responsibilities, though fewer than providers. These include using systems in accordance with instructions, monitoring operations, and conducting data protection impact assessments where required.",
+  0.2: "Under the EU AI Act, providers — meaning developers — of high-risk AI systems bear the majority of obligations. This includes providers based outside the EU if their systems are used within the EU. Their duties include risk management, data governance, technical documentation, transparency, and human oversight.\n\nDeployers of high-risk AI systems also have responsibilities, though fewer than providers. These include using systems in accordance with instructions, monitoring operations, and conducting data protection impact assessments where required.",
+  0.5: "The EU AI Act places its heaviest regulatory burden on the developers of high-risk AI — a category broad enough to reach beyond European borders to any provider whose products operate within the bloc. Their obligations span risk assessment, data quality, record-keeping, and ensuring meaningful human control.\n\nOrganizations that deploy high-risk AI face a lighter but still significant set of duties: following usage instructions, maintaining oversight of system behavior, and ensuring compliance with fundamental rights protections.",
+  0.8: "At the heart of the EU AI Act sits a clear principle: those who build high-risk AI must answer for it. Providers carry the lion's share of compliance demands — from rigorous risk assessments to transparency requirements — and this burden extends extraterritorially, pulling non-EU developers into the regulatory fold whenever their systems touch European lives.\n\nDeployers, meanwhile, occupy a distinct but meaningful position in the accountability chain. While their obligations are proportionally lighter, they are expected to exercise vigilance: monitoring AI behavior in practice, respecting fundamental rights, and ensuring that real-world use aligns with the system's intended purpose.",
+  1.0: "The EU AI Act constructs an intricate hierarchy of responsibility, placing its most exacting demands on the architects of high-risk AI. Providers — whether headquartered in Brussels or Bangalore — must navigate a labyrinth of obligations: risk management frameworks, meticulous data governance, transparency protocols, and the ever-present imperative of human oversight. The Act's jurisdictional reach is deliberately expansive, ensnaring any developer whose algorithmic creation sets foot on European soil.\n\nFor deployers, the regulatory landscape is less demanding but far from inconsequential. Theirs is a role defined by vigilance and contextual responsibility — ensuring that these powerful tools are wielded within their intended boundaries, that fundamental rights remain undisturbed, and that the gap between intended design and lived experience is continuously monitored.",
 };
 
 export default function SystemParametersTemperature() {
@@ -100,8 +103,14 @@ export default function SystemParametersTemperature() {
                 </div>
               </div>
 
-              {/* Middle column - Output text */}
+              {/* Middle column - Prompt + Output text */}
               <div className="w-[860px] flex-shrink-0">
+                {/* Prompt bubble */}
+                <ChatPrompt
+                  text={PROMPT_TEXT}
+                  fileName="EU_AI_Act.pdf"
+                />
+
                 <div className="min-h-[400px] pt-4">
                   {TEMPERATURE_OUTPUTS[temperature].split('\n\n').map((paragraph, i) => (
                     <p key={i} className="text-xl leading-relaxed text-muted-foreground/60 mb-8">

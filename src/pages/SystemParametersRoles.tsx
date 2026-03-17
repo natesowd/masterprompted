@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import ModuleNavigation from "@/components/ModuleNavigation";
+import ChatPrompt from "@/components/ChatPrompt";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -12,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import roleDefaultImg from "@/assets/role-default.png";
 import roleJournalistImg from "@/assets/role-journalist.png";
 import roleNovelistImg from "@/assets/role-novelist.png";
+
+const PROMPT_TEXT = "Summarize who bears the main obligations under the EU AI Act and what responsibilities apply to deployers of high-risk AI systems.";
 
 const ROLES = [
   {
@@ -33,7 +36,7 @@ const ROLES = [
 
 const ROLE_OUTPUTS: Record<string, string> = {
   default:
-    "Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.\n\nUser Responsibilities: Users (deployers) of high-risk AI systems have certain obligations, though less than providers.",
+    "Under the EU AI Act, providers — meaning developers — of high-risk AI systems bear the majority of obligations. This includes providers based outside the EU if their systems are used within the EU. Their duties include risk management, data governance, technical documentation, transparency, and human oversight.\n\nDeployers of high-risk AI systems also have responsibilities, though fewer than providers. These include using systems in accordance with instructions, monitoring operations, and conducting data protection impact assessments where required.",
   journalist:
     "Investigation reveals regulatory gap: While the EU AI Act imposes the heaviest compliance burden on providers of high-risk AI systems — including extraterritorial reach to non-EU developers — enforcement mechanisms remain largely untested. Sources within the European Commission confirm that resource allocation for oversight bodies is still under negotiation.\n\nDeployer accountability under scrutiny: Organizations deploying high-risk AI face their own set of obligations, but whistleblowers warn that the lighter requirements create a potential loophole for responsibility-shifting from developers to end-users.",
   novelist:
@@ -104,8 +107,14 @@ export default function SystemParametersRoles() {
                 </RadioGroup>
               </div>
 
-              {/* Middle column - Output text */}
+              {/* Middle column - Prompt + Output text */}
               <div className="w-[860px] flex-shrink-0">
+                {/* Prompt bubble */}
+                <ChatPrompt
+                  text={PROMPT_TEXT}
+                  fileName="EU_AI_Act.pdf"
+                />
+
                 <div className="min-h-[400px] pt-4">
                   {ROLE_OUTPUTS[selectedRole].split("\n\n").map((paragraph, i) => (
                     <p
@@ -121,12 +130,11 @@ export default function SystemParametersRoles() {
                 <div className="mt-8 mb-12 flex items-center gap-3">
                   <Button
                     variant="outline"
-                    size="lg"
+                    size="icon"
                     onClick={() => navigate("/module/system-parameters/temperature")}
-                    className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
+                    className="h-12 w-12 border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                   >
-                    <ArrowLeft className="-ml-2 !h-6 !w-6" />
-                    Temperature
+                    <ArrowLeft className="!h-6 !w-6" />
                   </Button>
                   <Button
                     variant="outline"
