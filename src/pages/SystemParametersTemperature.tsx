@@ -12,7 +12,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { ArrowRight, Info } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const PROMPT_TEXT = "Summarize who bears the main obligations under the EU AI Act and what responsibilities apply to deployers of high-risk AI systems.";
+const PROMPT_TEXT = "Draft a lead paragraph for a news article about how EU member states are preparing to enforce the AI Act's requirements on high-risk AI systems.";
 
 const TEMPERATURE_STEPS = [0.0, 0.2, 0.5, 0.8, 1.0];
 
