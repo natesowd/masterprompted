@@ -13,7 +13,7 @@
  * ```
  */
 
-import { ListChecks, Target, Mic, Scale, Copy, ChevronDown, ChevronRight } from "lucide-react";
+import { ListChecks, Target, Mic, Scale, Copy, ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
