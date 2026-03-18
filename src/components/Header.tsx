@@ -65,13 +65,12 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
     title: "Multiple Documents",
     path: "/module/multiple-sources",
     completed: false
+  },
+  {
+    title: "LLM Training",
+    path: "/module/llm-training",
+    completed: false
   }
-  // Hidden modules - uncomment to restore:
-  // { 
-  //   title: "LLM Training", 
-  //   path: "/module/llm-training",
-  //   completed: false
-  // }
   ];
 
   const isActive = (path: string) => {
