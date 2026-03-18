@@ -145,7 +145,7 @@ export default function LLMTrainingFewShot() {
                     <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <p className="text-xl text-foreground leading-relaxed">
-                          {(selectedOption === "off" ? RESPONSE_OFF : RESPONSE_ON).map((part, i) =>
+                          {(selectedOption === "on" ? RESPONSE_OFF : RESPONSE_ON).map((part, i) =>
                             part.flagged ? (
                               <TextFlag
                                 key={`${selectedOption}-${i}`}
