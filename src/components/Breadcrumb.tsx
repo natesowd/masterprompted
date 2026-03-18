@@ -30,6 +30,7 @@ export default function Breadcrumb() {
     "/module/llm-training": "LLM Training",
     "/module/llm-training/supervised": "Supervised Learning",
     "/module/llm-training/few-shot": "Few-shot prompting",
+    "/module/llm-training/takeaways": "Takeaways",
     "/module/next-word-prediction": "Next Word Prediction",
     "/next-word-prediction": "Next Word Prediction",
     "/takeaways": t('components.breadcrumb.takeaways')
