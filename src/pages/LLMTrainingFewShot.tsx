@@ -17,22 +17,33 @@ const EXAMPLE_LEDE = {
   lede: "Conservative Karol Nawrocki, who was backed by US President Donald Trump, won a narrow victory over his pro-EU rival, delivering a blow to Prime Minister Donald Tusk's government. DW has more",
 };
 
-const RESPONSE_TEXT_PARTS = [
+type ResponsePart = {
+  text: string;
+  flagged: boolean;
+  factor?: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
+  explanation?: string;
+};
+
+const RESPONSE_OFF: ResponsePart[] = [
   { text: "The European Union's flagship AI Act, hailed as a ", flagged: false },
   {
     text: "world-first",
     flagged: true,
-    factor: "voice" as const,
+    factor: "voice",
     explanation: "The phrase 'world-first' uses promotional language that may overstate the uniqueness of this regulation. A more neutral description would be appropriate for journalistic writing.",
   },
   { text: " in regulating artificial intelligence, is facing mounting scrutiny as fresh allegations surface linking the legislation's final text to aggressive corporate lobbying and opaque political bargaining—raising concerns ", flagged: false },
   {
     text: "about transparency and accountability at the heart of Brussels",
     flagged: true,
-    factor: "voice" as const,
+    factor: "voice",
     explanation: "This phrasing uses dramatic, editorial language ('at the heart of Brussels') that may not align with DW's neutral reporting voice. Consider more measured wording.",
   },
   { text: ".", flagged: false },
+];
+
+const RESPONSE_ON: ResponsePart[] = [
+  { text: "The European Union has finalized its AI Act, the first comprehensive legal framework for artificial intelligence. The regulation introduces a risk-based system that bans certain AI practices outright while imposing strict requirements on high-risk applications in areas such as law enforcement, migration, and critical infrastructure.", flagged: false },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -97,26 +108,28 @@ export default function LLMTrainingFewShot() {
                   </button>
                 </div>
 
-                {/* Example Lede Used */}
-                <div>
-                  <h3 className="text-base font-heading font-bold text-foreground mb-3">
-                    Example Lede Used
-                  </h3>
-                  <div className="space-y-2">
-                    <div>
-                      <span className="text-sm font-semibold text-foreground block">Title</span>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {EXAMPLE_LEDE.title}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-foreground block">Lede</span>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {EXAMPLE_LEDE.lede}
-                      </p>
+                {/* Example Lede Used - only when examples are on */}
+                {selectedOption === "on" && (
+                  <div>
+                    <h3 className="text-base font-heading font-bold text-foreground mb-3">
+                      Example Lede Used
+                    </h3>
+                    <div className="space-y-2">
+                      <div>
+                        <span className="text-sm font-semibold text-foreground block">Title</span>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {EXAMPLE_LEDE.title}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-foreground block">Lede</span>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {EXAMPLE_LEDE.lede}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* ── Center content ── */}
@@ -132,16 +145,16 @@ export default function LLMTrainingFewShot() {
                     <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <p className="text-xl text-foreground leading-relaxed">
-                          {RESPONSE_TEXT_PARTS.map((part, i) =>
+                          {(selectedOption === "off" ? RESPONSE_OFF : RESPONSE_ON).map((part, i) =>
                             part.flagged ? (
                               <TextFlag
-                                key={i}
+                                key={`${selectedOption}-${i}`}
                                 text={part.text}
                                 evaluationFactor={part.factor!}
                                 explanation={part.explanation!}
                               />
                             ) : (
-                              <span key={i}>{part.text}</span>
+                              <span key={`${selectedOption}-${i}`}>{part.text}</span>
                             )
                           )}
                         </p>
