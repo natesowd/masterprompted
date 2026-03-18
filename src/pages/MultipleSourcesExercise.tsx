@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -14,50 +14,99 @@ import { cn } from "@/lib/utils";
 
 interface DocumentItem {
   id: string;
-  icon: "research" | "ethics" | "article";
   date: string;
   title: string;
   source: string;
 }
 
+interface Snippet {
+  title: string;
+  paragraphs: string[];
+}
+
 const DOCUMENTS: DocumentItem[] = [
   {
     id: "doc-1",
-    icon: "research",
     date: "June 2024",
     title: "Trusted Journalism in the Age of Generative AI",
     source: "Research Paper",
   },
   {
     id: "doc-2",
-    icon: "ethics",
-    date: "Date",
+    date: "March 2024",
     title: "AI Ethics Guides for Media Organizations",
-    source: "Source",
+    source: "Ethics Board Report",
   },
   {
     id: "doc-3",
-    icon: "article",
-    date: "Date",
+    date: "January 2025",
     title: "What is Deutsche Welle's approach to generative AI?",
-    source: "Deutsche Welle …",
+    source: "Deutsche Welle",
   },
 ];
 
-const SNIPPETS = [
-  {
-    title: 'Trusted Journalism in the Age of Generative AI":',
-    paragraphs: [
-      "An ethical approach to using AI in the media is called for. First, media organisations need an AI strategy and to focus on what the technology can contribute to delivering public service value.",
-      "Organisations should also use their power and influence when purchasing products, lobbying for regulation, and getting involved in copyright and data protection debates.",
-      "It is imperative for every company to regularly scrutinise the products they use for biases and stereotypes to avoid the amplification of harm.",
-    ],
-  },
-];
+/* Per-document retrieved snippets (RAG) */
+const SNIPPETS_BY_DOC: Record<string, Snippet[]> = {
+  "doc-1": [
+    {
+      title: "Trusted Journalism in the Age of Generative AI:",
+      paragraphs: [
+        "An ethical approach to using AI in the media is called for. First, media organisations need an AI strategy and to focus on what the technology can contribute to delivering public service value.",
+        "Organisations should also use their power and influence when purchasing products, lobbying for regulation, and getting involved in copyright and data protection debates.",
+        "It is imperative for every company to regularly scrutinise the products they use for biases and stereotypes to avoid the amplification of harm.",
+      ],
+    },
+  ],
+  "doc-2": [
+    {
+      title: "AI Ethics Guides for Media Organizations:",
+      paragraphs: [
+        "Media organisations must establish clear governance frameworks for AI use, including editorial oversight mechanisms and accountability structures.",
+        "Transparency with audiences about AI-generated or AI-assisted content is a fundamental ethical obligation for news organizations.",
+      ],
+    },
+  ],
+  "doc-3": [
+    {
+      title: "Deutsche Welle's approach to generative AI:",
+      paragraphs: [
+        "DW uses AI tools to support journalists but maintains that final editorial decisions must always rest with human editors.",
+        "The organization has developed internal guidelines that require labelling of AI-assisted content and prohibit fully automated publishing without human review.",
+      ],
+    },
+  ],
+};
 
-const RESPONSE_TEXT = `Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.
+/* Per-document-combination responses (simulated RAG output) */
+const RESPONSES: Record<string, string> = {
+  "doc-1": `Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.
 
-User Responsibilities: Users (deployers) of high-risk AI systems have certain obligations, though less than providers.`;
+Media organisations need an AI strategy focused on public service value. They should scrutinise AI products for biases and stereotypes to prevent harm amplification.`,
+
+  "doc-2": `AI Ethics in Media: Media organisations must establish clear governance frameworks for AI use, including editorial oversight and accountability structures.
+
+Transparency with audiences about AI-generated content is a fundamental ethical obligation. Organizations should implement labelling systems and disclosure policies.`,
+
+  "doc-3": `Deutsche Welle's AI Approach: DW uses AI tools to support journalists while maintaining that final editorial decisions rest with human editors.
+
+Internal guidelines require labelling of AI-assisted content and prohibit fully automated publishing without human review.`,
+
+  "doc-1,doc-2": `Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.
+
+User Responsibilities: Users (deployers) of high-risk AI systems have certain obligations, though less than providers. Media organisations must establish governance frameworks including editorial oversight and accountability, while scrutinising AI products for biases.`,
+
+  "doc-1,doc-3": `Trusted Journalism & DW's Approach: Media organisations need an AI strategy focused on public service value. DW exemplifies this by using AI to support journalists while keeping editorial control with humans.
+
+Both sources emphasise the need to scrutinise AI tools for biases and maintain transparency through content labelling and human oversight.`,
+
+  "doc-2,doc-3": `Ethics & Practice: Clear governance frameworks for AI use are essential, as demonstrated by DW's internal guidelines requiring human editorial oversight.
+
+Transparency obligations include labelling AI-assisted content and ensuring audiences understand when AI tools have been used in the editorial process.`,
+
+  "doc-1,doc-2,doc-3": `Comprehensive AI Media Framework: Providers of high-risk AI systems bear the majority of obligations, while media organisations must establish governance frameworks with editorial oversight.
+
+DW's approach demonstrates these principles in practice: AI supports journalists, but human editors retain final decisions. All three sources converge on the need for transparency, bias scrutiny, and clear labelling of AI-assisted content.`,
+};
 
 /* ------------------------------------------------------------------ */
 
