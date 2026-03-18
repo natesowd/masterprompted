@@ -11,7 +11,7 @@ import { useEvaluation } from "@/contexts/EvaluationContext";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, GitBranch, ListChecks } from "lucide-react";
+import { ArrowLeft, ArrowRight, GitBranch } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { predictionTree, getDefaultPath, getOptionsForPath } from "@/data/predictionTreeData";
