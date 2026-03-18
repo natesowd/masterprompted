@@ -435,7 +435,7 @@ Output only the final transformed prompt. Do not include explanations, commentar
       }
     },
     modules: {
-      title: 'Módulos',
+      title: 'Esta unidad de aprendizaje aún está en construcción',
       comingSoon: 'Próximamente...',
       introduction: 'Introducción',
       nextWordPrediction: 'Predicción de Siguiente Palabra',
