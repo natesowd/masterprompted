@@ -173,7 +173,7 @@ export default function MultipleSourcesExercise() {
 
               {/* ── Right sidebar ── */}
               <div className="w-80 flex-shrink-0">
-                <EvaluationPanel initialIsOpen={true} canClose={true} />
+                <EvaluationPanel initialIsOpen={false} canClose={true} />
 
                 {/* Retrieved Snippets */}
                 <div className="px-4 mt-4">
