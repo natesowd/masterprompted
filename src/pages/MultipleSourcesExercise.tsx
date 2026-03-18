@@ -262,7 +262,7 @@ export default function MultipleSourcesExercise() {
 
                   {snippetsOpen && (
                     <div className="space-y-4">
-                      {SNIPPETS.map((snippet, i) => (
+                      {currentSnippets.map((snippet, i) => (
                         <div
                           key={i}
                           className="border border-border rounded-lg p-4 space-y-3"
