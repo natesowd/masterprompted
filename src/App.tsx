@@ -87,6 +87,7 @@ const App = () =>
               <Route path="/module/multiple-sources/exercise" element={<MultipleSourcesExercise />} />
               <Route path="/module/multiple-sources/takeaways" element={<MultipleSourcesTakeaways />} />
               <Route path="/module/llm-training" element={<LLMTraining />} />
+              <Route path="/module/llm-training/supervised" element={<LLMTrainingExercise />} />
               <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

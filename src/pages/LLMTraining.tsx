@@ -11,7 +11,7 @@ export default function LLMTraining() {
 
   const handleContinue = () => {
     // TODO: navigate to first exercise page when built
-    navigate("/module/llm-training");
+    navigate("/module/llm-training/supervised");
   };
 
   return (
