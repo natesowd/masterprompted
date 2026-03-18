@@ -30,6 +30,7 @@ import MultipleSourcesExercise from "./pages/MultipleSourcesExercise";
 import MultipleSourcesTakeaways from "./pages/MultipleSourcesTakeaways";
 import LLMTraining from "./pages/LLMTraining";
 import LLMTrainingExercise from "./pages/LLMTrainingExercise";
+import LLMTrainingFewShot from "./pages/LLMTrainingFewShot";
 import PromptPlayground from "./pages/PromptPlayground";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -88,6 +89,7 @@ const App = () =>
               <Route path="/module/multiple-sources/takeaways" element={<MultipleSourcesTakeaways />} />
               <Route path="/module/llm-training" element={<LLMTraining />} />
               <Route path="/module/llm-training/supervised" element={<LLMTrainingExercise />} />
+              <Route path="/module/llm-training/few-shot" element={<LLMTrainingFewShot />} />
               <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
