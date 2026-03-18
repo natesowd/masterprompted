@@ -5,8 +5,8 @@ import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, FileText, ClipboardList, AlignLeft, ChevronDown, ChevronUp } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowRight, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
