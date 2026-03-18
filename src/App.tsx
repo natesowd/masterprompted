@@ -29,6 +29,7 @@ import MultipleSources from "./pages/MultipleSources";
 import MultipleSourcesExercise from "./pages/MultipleSourcesExercise";
 import MultipleSourcesTakeaways from "./pages/MultipleSourcesTakeaways";
 import LLMTraining from "./pages/LLMTraining";
+import LLMTrainingExercise from "./pages/LLMTrainingExercise";
 import PromptPlayground from "./pages/PromptPlayground";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
