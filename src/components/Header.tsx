@@ -59,14 +59,12 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
   {
     title: "System Parameters",
     path: "/module/system-parameters",
-    completed: false,
-    comingSoon: true
+    completed: false
   },
   {
     title: "Multiple Documents",
     path: "/module/multiple-sources",
-    completed: false,
-    comingSoon: true
+    completed: false
   }
   // Hidden modules - uncomment to restore:
   // { 
