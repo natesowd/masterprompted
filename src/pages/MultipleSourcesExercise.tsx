@@ -128,6 +128,19 @@ export default function MultipleSourcesExercise() {
     });
   };
 
+  /* Derive response and snippets from selected documents */
+  const selectionKey = useMemo(() => {
+    const sorted = Array.from(selected).sort();
+    return sorted.join(",");
+  }, [selected]);
+
+  const currentResponse = RESPONSES[selectionKey] || "Select one or more documents to generate a response.";
+
+  const currentSnippets = useMemo(() => {
+    const sorted = Array.from(selected).sort();
+    return sorted.flatMap((id) => SNIPPETS_BY_DOC[id] || []);
+  }, [selected]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
