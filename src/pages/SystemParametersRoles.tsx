@@ -65,7 +65,7 @@ export default function SystemParametersRoles() {
             {/* Three column layout */}
             <div className="flex flex-1 items-start px-6 relative justify-center">
               {/* Left panel - Role selection */}
-              <div className="w-[320px] flex-shrink-0 pr-10">
+              <div className="w-[280px] lg:w-[320px] flex-shrink-0 pr-6 lg:pr-10">
                 <h2 className="text-xl font-heading font-bold text-foreground mb-4">
                   Role Prompting
                 </h2>
