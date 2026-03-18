@@ -143,16 +143,16 @@ export default function LLMTrainingFewShot() {
                     <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <p className="text-xl text-foreground leading-relaxed">
-                          {RESPONSE_TEXT_PARTS.map((part, i) =>
+                          {(selectedOption === "off" ? RESPONSE_OFF : RESPONSE_ON).map((part, i) =>
                             part.flagged ? (
                               <TextFlag
-                                key={i}
+                                key={`${selectedOption}-${i}`}
                                 text={part.text}
                                 evaluationFactor={part.factor!}
                                 explanation={part.explanation!}
                               />
                             ) : (
-                              <span key={i}>{part.text}</span>
+                              <span key={`${selectedOption}-${i}`}>{part.text}</span>
                             )
                           )}
                         </p>
