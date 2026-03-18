@@ -118,11 +118,13 @@ export default function LLMTrainingExercise() {
                         )}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-semibold text-foreground">
-                            Input Output pair {index + 1}
-                          </span>
+                          {!isSelected && (
+                            <span className="text-xs font-semibold text-foreground">
+                              Input Output pair {index + 1}
+                            </span>
+                          )}
                           {isSelected ? (
-                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                            <ChevronUp className="h-4 w-4 text-muted-foreground ml-auto" />
                           ) : (
                             <ChevronDown className="h-4 w-4 text-muted-foreground" />
                           )}
