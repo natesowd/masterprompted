@@ -95,7 +95,7 @@ export default function MultipleSourcesExercise() {
             <div className="flex flex-1">
               {/* ── Left sidebar ── */}
               <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0">
-                <h2 className="text-h4 font-heading font-bold text-foreground mb-3">
+                <h2 className="text-xl font-heading font-bold text-foreground mb-3">
                   Multiple Documents
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-6">
