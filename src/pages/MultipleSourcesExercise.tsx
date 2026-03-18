@@ -181,7 +181,7 @@ export default function MultipleSourcesExercise() {
                         <Button
                           variant="outline"
                           size="lg"
-                          onClick={() => navigate("/modules")}
+                          onClick={() => navigate("/module/multiple-sources/takeaways")}
                           className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                         >
                           Takeaways
