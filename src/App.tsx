@@ -26,6 +26,7 @@ import SystemParametersTemperature from "./pages/SystemParametersTemperature";
 import SystemParametersRoles from "./pages/SystemParametersRoles";
 import SystemParametersTakeaways from "./pages/SystemParametersTakeaways";
 import MultipleSources from "./pages/MultipleSources";
+import MultipleSourcesExercise from "./pages/MultipleSourcesExercise";
 import LLMTraining from "./pages/LLMTraining";
 import PromptPlayground from "./pages/PromptPlayground";
 import About from "./pages/About";
@@ -81,6 +82,7 @@ const App = () =>
               <Route path="/module/system-parameters/roles" element={<SystemParametersRoles />} />
               <Route path="/module/system-parameters/takeaways" element={<SystemParametersTakeaways />} />
               <Route path="/module/multiple-sources" element={<MultipleSources />} />
+              <Route path="/module/multiple-sources/exercise" element={<MultipleSourcesExercise />} />
               <Route path="/module/llm-training" element={<LLMTraining />} />
               <Route path="/module/journalistic-evaluation" element={<JournalisticEvaluation />} />
 
