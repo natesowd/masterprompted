@@ -176,16 +176,14 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
               transparent ?
               'text-white/80 hover:text-white' :
               'text-muted-foreground hover:text-foreground'}`
-              }>
+               }>
 
                 {item.label}
-                {/* Active underline */}
                 {isActive(item.path) &&
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-tertiary-500 rounded-full" />
               }
-                {/* Hover underline */}
                 {!isActive(item.path) &&
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-tertiary-500/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
               }
               </button>
             )}
