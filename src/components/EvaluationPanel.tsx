@@ -185,7 +185,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
           <button
             type="button"
             onClick={() => setIsPanelOpen(true)}
-            className="w-full flex items-center justify-between text-lg font-semibold font-heading text-card-foreground"
+            className="w-full flex items-center justify-between text-base font-semibold font-heading text-card-foreground"
           >
             <span>{t('components.evaluationPanel.title')}</span>
             <ChevronDown className="h-5 w-5 text-muted-foreground" />
