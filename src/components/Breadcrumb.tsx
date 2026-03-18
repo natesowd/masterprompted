@@ -28,6 +28,7 @@ export default function Breadcrumb() {
     "/module/system-parameters": "System Parameters",
     "/module/multiple-sources": "Multiple Sources",
     "/module/llm-training": "LLM Training",
+    "/module/llm-training/supervised": "Supervised Learning",
     "/module/next-word-prediction": "Next Word Prediction",
     "/next-word-prediction": "Next Word Prediction",
     "/takeaways": t('components.breadcrumb.takeaways')
