@@ -26,6 +26,7 @@ import SystemParametersTemperature from "./pages/SystemParametersTemperature";
 import SystemParametersRoles from "./pages/SystemParametersRoles";
 import SystemParametersTakeaways from "./pages/SystemParametersTakeaways";
 import MultipleSources from "./pages/MultipleSources";
+import MultipleSourcesExercise from "./pages/MultipleSourcesExercise";
 import LLMTraining from "./pages/LLMTraining";
 import PromptPlayground from "./pages/PromptPlayground";
 import About from "./pages/About";
