@@ -57,7 +57,7 @@ export default function SystemParametersRoles() {
           <div className="flex flex-col w-full">
             {/* Breadcrumb */}
             <div className="pt-6 pb-3 px-6 flex justify-center">
-              <div className="w-[860px]">
+              <div className="max-w-[860px]">
                 <Breadcrumb />
               </div>
             </div>
