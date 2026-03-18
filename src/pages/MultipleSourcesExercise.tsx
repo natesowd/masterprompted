@@ -95,14 +95,6 @@ export default function MultipleSourcesExercise() {
             <div className="flex flex-1">
               {/* ── Left sidebar ── */}
               <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => navigate("/module/multiple-sources")}
-                  className="mb-4 rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
-                >
-                  <ArrowLeft className="!h-5 !w-5" />
-                </Button>
                 <h2 className="text-h4 font-heading font-bold text-foreground mb-3">
                   Multiple Documents
                 </h2>
