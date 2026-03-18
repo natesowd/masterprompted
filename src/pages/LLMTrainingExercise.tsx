@@ -173,12 +173,13 @@ export default function LLMTrainingExercise() {
                   <div className="flex-1 flex flex-col">
                     {/* Response area */}
                     <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
-                      {/* Article title with icon */}
-                      <div className="flex items-center gap-2 mb-6">
-                        <FileText className="h-5 w-5 text-destructive" strokeWidth={2} />
-                        <h2 className="text-xl font-heading font-bold text-foreground underline decoration-destructive decoration-2 underline-offset-4">
-                          {ARTICLE_CONTENT.title}
-                        </h2>
+                      {/* Article title as TextFlag */}
+                      <div className="mb-6">
+                        <TextFlag
+                          text={ARTICLE_CONTENT.title}
+                          evaluationFactor="factual_accuracy"
+                          explanation="The title suggests a comprehensive outline, but the content should be verified against official EU AI Act documentation for completeness and accuracy."
+                        />
                       </div>
 
                       <div className="max-h-[500px] overflow-y-auto flex-1">
