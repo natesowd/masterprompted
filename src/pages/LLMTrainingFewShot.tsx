@@ -17,22 +17,33 @@ const EXAMPLE_LEDE = {
   lede: "Conservative Karol Nawrocki, who was backed by US President Donald Trump, won a narrow victory over his pro-EU rival, delivering a blow to Prime Minister Donald Tusk's government. DW has more",
 };
 
-const RESPONSE_TEXT_PARTS = [
+type ResponsePart = {
+  text: string;
+  flagged: boolean;
+  factor?: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
+  explanation?: string;
+};
+
+const RESPONSE_OFF: ResponsePart[] = [
   { text: "The European Union's flagship AI Act, hailed as a ", flagged: false },
   {
     text: "world-first",
     flagged: true,
-    factor: "voice" as const,
+    factor: "voice",
     explanation: "The phrase 'world-first' uses promotional language that may overstate the uniqueness of this regulation. A more neutral description would be appropriate for journalistic writing.",
   },
   { text: " in regulating artificial intelligence, is facing mounting scrutiny as fresh allegations surface linking the legislation's final text to aggressive corporate lobbying and opaque political bargaining—raising concerns ", flagged: false },
   {
     text: "about transparency and accountability at the heart of Brussels",
     flagged: true,
-    factor: "voice" as const,
+    factor: "voice",
     explanation: "This phrasing uses dramatic, editorial language ('at the heart of Brussels') that may not align with DW's neutral reporting voice. Consider more measured wording.",
   },
   { text: ".", flagged: false },
+];
+
+const RESPONSE_ON: ResponsePart[] = [
+  { text: "The European Union has finalized its AI Act, the first comprehensive legal framework for artificial intelligence. The regulation introduces a risk-based system that bans certain AI practices outright while imposing strict requirements on high-risk applications in areas such as law enforcement, migration, and critical infrastructure.", flagged: false },
 ];
 
 /* ------------------------------------------------------------------ */
