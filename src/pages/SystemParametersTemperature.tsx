@@ -39,7 +39,7 @@ export default function SystemParametersTemperature() {
           <div className="flex flex-col w-full">
             {/* Breadcrumb */}
             <div className="pt-6 pb-3 px-6 flex justify-center">
-              <div className="w-[860px]">
+              <div className="max-w-[860px]">
                 <Breadcrumb />
               </div>
             </div>
@@ -47,7 +47,7 @@ export default function SystemParametersTemperature() {
             {/* Three column layout: Left panel + Center content + Evaluation */}
             <div className="flex flex-1 items-start px-6 relative justify-center">
               {/* Left panel - Temperature controls */}
-              <div className="w-[320px] flex-shrink-0 pr-10">
+              <div className="w-[280px] lg:w-[320px] flex-shrink-0 pr-6 lg:pr-10">
                 <div className="flex items-center gap-2 mb-4">
                   <h2 className="text-xl font-heading font-bold text-foreground">Temperature</h2>
                   <Tooltip>
@@ -104,7 +104,7 @@ export default function SystemParametersTemperature() {
               </div>
 
               {/* Middle column - Prompt + Output text */}
-              <div className="w-[860px] flex-shrink-0">
+              <div className="flex-1 min-w-0">
                 {/* Prompt bubble */}
                 <ChatPrompt
                   text={PROMPT_TEXT}
