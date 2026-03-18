@@ -7,7 +7,7 @@ export default function Modules() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-6 py-6">
+      <main className="container mx-auto px-6 py-6 mt-[43px] my-[250px]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-foreground mb-4">{t('modules.title')}</h1>
@@ -15,6 +15,6 @@ export default function Modules() {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>);
+
 }

@@ -37,8 +37,8 @@ import DesignSystem from "./pages/DesignSystem";
 import DesignSystemFab from "./components/DesignSystemFab";
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+const App = () =>
+<QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
         <EvaluationProvider>
@@ -48,7 +48,7 @@ const App = () => (
             <Routes>
               {/* NAV BAR */}
               <Route path="/" element={<Landing />} />
-              <Route path="/modules" element={<Modules />} />
+              <Route path="/modules" element={<Modules />} className="mt-0" />
               <Route path="/playground" element={<PromptPlayground />} />
               {/* Hidden pages - uncomment to restore: */}
               {/* <Route path="/about" element={<About />} /> */}
@@ -93,7 +93,7 @@ const App = () => (
         </EvaluationProvider>
       </LanguageProvider>
     </TooltipProvider>
-  </QueryClientProvider>
-);
+  </QueryClientProvider>;
+
 
 export default App;
