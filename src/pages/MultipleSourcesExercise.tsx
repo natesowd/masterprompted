@@ -111,7 +111,7 @@ DW's approach demonstrates these principles in practice: AI supports journalists
 /* ------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------ */
-/*  Page                                                               */
+/* ── Page ── */
 /* ------------------------------------------------------------------ */
 
 export default function MultipleSourcesExercise() {
