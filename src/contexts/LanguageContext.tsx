@@ -86,7 +86,7 @@ const translations = {
       }
     },
     modules: {
-      title: 'Modules',
+      title: 'This Learning Unit is Still Being Built',
       comingSoon: 'Coming soon...',
       introduction: 'Introduction',
       nextWordPrediction: 'Next Word Prediction',
@@ -180,7 +180,13 @@ const translations = {
     },
     systemParameters: {
       title: 'System Parameters',
-      comingSoon: 'Coming soon...'
+      comingSoon: 'Coming soon...',
+      intro: {
+        label: 'Learning 4: System parameters',
+        title: 'How do system settings shape LLM output?',
+        description: 'LLM companies control system parameters that shape how models behave and respond. System prompting assigns the model a specific role or persona, influencing tone, style, and behavior. Temperature controls how predictable or creative responses are, with lower values producing more stable, repetitive outputs and higher values increasing randomness and variation.',
+        continue: 'Continue'
+      }
     },
     llmTraining: {
       title: 'LLM Training',
@@ -432,7 +438,7 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
       }
     },
     modules: {
-      title: 'Módulos',
+      title: 'Esta unidad de aprendizaje aún está en construcción',
       comingSoon: 'Próximamente...',
       introduction: 'Introducción',
       nextWordPrediction: 'Predicción de Siguiente Palabra',
@@ -526,7 +532,13 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
     },
     systemParameters: {
       title: 'Parámetros del Sistema',
-      comingSoon: 'Próximamente...'
+      comingSoon: 'Próximamente...',
+      intro: {
+        label: 'Aprendizaje 4: Parámetros del sistema',
+        title: '¿Cómo configuran los ajustes del sistema la salida del LLM?',
+        description: 'Las empresas de LLM controlan parámetros del sistema que determinan cómo se comportan y responden los modelos. El prompting del sistema asigna al modelo un rol o persona específica, influyendo en el tono, estilo y comportamiento. La temperatura controla cuán predecibles o creativas son las respuestas, con valores más bajos produciendo salidas más estables y repetitivas y valores más altos aumentando la aleatoriedad y variación.',
+        continue: 'Continuar'
+      }
     },
     llmTraining: {
       title: 'Entrenamiento LLM',
