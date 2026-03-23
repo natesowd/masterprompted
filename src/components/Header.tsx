@@ -128,11 +128,11 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
                   <ChevronDown className="h-4 w-4" />
                   {/* Active underline */}
                   {isModuleActive() &&
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-tertiary-500 rounded-full" />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-secondary-500 rounded-full" />
                   }
                   {/* Hover underline */}
                   {!isModuleActive() &&
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-tertiary-500/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-secondary-500/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
                   }
                 </button>
               </DropdownMenuTrigger>
@@ -146,16 +146,16 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
                   onClick={() => navigate(item.path)}
                   className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
                   isActive(item.path) ?
-                  'bg-brand-tertiary-500/10 cursor-pointer' :
+                  'bg-brand-secondary-500/10 cursor-pointer' :
                   'hover:bg-muted/50 cursor-pointer'}`
                   }>
 
                     {/* Green left bar for active item */}
                     {isActive(item.path) &&
-                      <div className="absolute left-0 top-2 bottom-2 w-[3px] bg-brand-tertiary-500 rounded-full" />
+                      <div className="absolute left-0 top-2 bottom-2 w-[3px] bg-brand-secondary-500 rounded-full" />
                     }
                     
-                    <span className={`text-sm flex-1 ${isActive(item.path) ? 'font-medium text-brand-tertiary-700' : 'text-muted-foreground'}`}>
+                    <span className={`text-sm flex-1 ${isActive(item.path) ? 'font-medium text-brand-secondary-700' : 'text-muted-foreground'}`}>
                       {item.title}
                     </span>
                   </DropdownMenuItem>
@@ -180,10 +180,10 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
 
                 {item.label}
                 {isActive(item.path) &&
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-tertiary-500 rounded-full" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-secondary-500 rounded-full" />
               }
                 {!isActive(item.path) &&
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-tertiary-500/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-secondary-500/40 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center" />
               }
               </button>
             )}
