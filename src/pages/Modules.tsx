@@ -99,15 +99,16 @@ export default function Modules() {
                   <p className="text-xs text-muted-foreground leading-snug mb-3 line-clamp-2 flex-1">
                     {t(`modules.units.${unit.key}.description`)}
                   </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full rounded-full font-heading font-semibold text-xs"
-                    onClick={() => navigate(unit.route)}
-                  >
-                    {unit.number === 0 ? t('modules.startHere') : t('modules.goToUnit')}
-                    <ArrowRight className="ml-1 h-3 w-3" />
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full"
+                      onClick={() => navigate(unit.route)}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))}
