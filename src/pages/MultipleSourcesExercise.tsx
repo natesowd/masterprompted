@@ -116,7 +116,7 @@ DW's approach demonstrates these principles in practice: AI supports journalists
 
 export default function MultipleSourcesExercise() {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<Set<string>>(new Set([DOCUMENTS[0].id, DOCUMENTS[1].id]));
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [snippetsOpen, setSnippetsOpen] = useState(true);
 
   const toggle = (id: string) => {
