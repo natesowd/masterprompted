@@ -54,17 +54,17 @@ const Introduction = () => {
               {/* Action buttons */}
               <div className="flex items-center gap-3">
                 <Button
-                  onClick={handleContinue}
-                  className="w-fit px-10 py-6 font-heading font-semibold text-base rounded-full"
-                >
-                  {t('intro.base.startAtBeginning')}
-                </Button>
-                <Button
                   variant="outline"
                   onClick={() => navigate("/modules")}
                   className="w-fit px-10 py-6 font-heading font-semibold text-base rounded-full"
                 >
                   {t('intro.base.selectLearning')}
+                </Button>
+                <Button
+                  onClick={handleContinue}
+                  className="w-fit px-10 py-6 font-heading font-semibold text-base rounded-full"
+                >
+                  {t('intro.base.startAtBeginning')}
                 </Button>
               </div>
             </CardContent>
