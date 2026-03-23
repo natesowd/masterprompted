@@ -463,6 +463,7 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
       title: 'Selecciona una Unidad de Aprendizaje',
       subtitle: 'Elige un módulo para explorar a tu ritmo, o comienza desde el principio para una experiencia guiada.',
       startAtBeginning: 'Comenzar desde el Principio',
+      unitLabel: 'Aprendizaje',
       units: {
         nextWordPrediction: {
           title: 'Predicción de Siguiente Palabra',
