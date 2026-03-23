@@ -90,7 +90,14 @@ const translations = {
       subtitle: 'Choose a module to explore at your own pace, or start from the beginning for a guided experience.',
       startAtBeginning: 'Start at Beginning',
       unitLabel: 'Learning',
+      introLabel: 'Starting Point',
+      startHere: 'Start Here',
+      goToUnit: 'Go to Unit',
       units: {
+        introduction: {
+          title: 'Introduction',
+          description: 'Get an overview of the simulator and learn what to expect from the guided learning experience.'
+        },
         nextWordPrediction: {
           title: 'Next Word Prediction',
           description: 'Understand how LLMs generate text by predicting the next word in a sequence.'
@@ -464,7 +471,14 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
       subtitle: 'Elige un módulo para explorar a tu ritmo, o comienza desde el principio para una experiencia guiada.',
       startAtBeginning: 'Comenzar desde el Principio',
       unitLabel: 'Aprendizaje',
+      introLabel: 'Punto de Partida',
+      startHere: 'Comenzar Aquí',
+      goToUnit: 'Ir a la Unidad',
       units: {
+        introduction: {
+          title: 'Introducción',
+          description: 'Obtén una visión general del simulador y aprende qué esperar de la experiencia de aprendizaje guiada.'
+        },
         nextWordPrediction: {
           title: 'Predicción de Siguiente Palabra',
           description: 'Comprende cómo los LLM generan texto prediciendo la siguiente palabra en una secuencia.'
