@@ -499,7 +499,7 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
         label: 'Introducción',
         title: 'Reportaje sobre la Ley de IA de la UE',
         description: 'En este simulador, asumirás el papel de un periodista preparando un artículo sobre la Ley de IA de la UE. En lugar de comenzar desde cero, trabajarás con prompts predefinidos y verás las salidas reales generadas por grandes modelos de lenguaje.',
-        startAtBeginning: 'Comenzar desde el inicio',
+        startNow: 'Comenzar ahora',
         selectLearning: 'Seleccionar aprendizaje'
       }
     },
