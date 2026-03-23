@@ -86,11 +86,31 @@ const translations = {
       }
     },
     modules: {
-      title: 'This Learning Unit is Still Being Built',
-      comingSoon: 'Coming soon...',
-      introduction: 'Introduction',
-      nextWordPrediction: 'Next Word Prediction',
-      promptConstruction: 'Prompt Construction'
+      title: 'Select a Learning Unit',
+      subtitle: 'Choose a module to explore at your own pace, or start from the beginning for a guided experience.',
+      startAtBeginning: 'Start at Beginning',
+      units: {
+        nextWordPrediction: {
+          title: 'Next Word Prediction',
+          description: 'Understand how LLMs generate text by predicting the next word in a sequence.'
+        },
+        promptConstruction: {
+          title: 'Prompt Construction',
+          description: 'Learn how to craft effective prompts including specificity, context, and conversation style.'
+        },
+        systemParameters: {
+          title: 'System Parameters',
+          description: 'Explore temperature, roles, and other settings that shape LLM outputs.'
+        },
+        multipleSources: {
+          title: 'Multiple Documents',
+          description: 'Discover how LLMs handle multiple sources and retrieval-augmented generation.'
+        },
+        llmTraining: {
+          title: 'LLM Training',
+          description: 'Examine supervised fine-tuning, few-shot learning, and training data influence.'
+        }
+      }
     },
     intro: {
       aboutSimulator: {
@@ -439,11 +459,31 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
       }
     },
     modules: {
-      title: 'Esta unidad de aprendizaje aún está en construcción',
-      comingSoon: 'Próximamente...',
-      introduction: 'Introducción',
-      nextWordPrediction: 'Predicción de Siguiente Palabra',
-      promptConstruction: 'Construcción de Prompts'
+      title: 'Selecciona una Unidad de Aprendizaje',
+      subtitle: 'Elige un módulo para explorar a tu ritmo, o comienza desde el principio para una experiencia guiada.',
+      startAtBeginning: 'Comenzar desde el Principio',
+      units: {
+        nextWordPrediction: {
+          title: 'Predicción de Siguiente Palabra',
+          description: 'Comprende cómo los LLM generan texto prediciendo la siguiente palabra en una secuencia.'
+        },
+        promptConstruction: {
+          title: 'Construcción de Prompts',
+          description: 'Aprende a crear prompts efectivos incluyendo especificidad, contexto y estilo de conversación.'
+        },
+        systemParameters: {
+          title: 'Parámetros del Sistema',
+          description: 'Explora la temperatura, roles y otros ajustes que moldean las salidas de los LLM.'
+        },
+        multipleSources: {
+          title: 'Múltiples Documentos',
+          description: 'Descubre cómo los LLM manejan múltiples fuentes y la generación aumentada por recuperación.'
+        },
+        llmTraining: {
+          title: 'Entrenamiento de LLM',
+          description: 'Examina el ajuste fino supervisado, el aprendizaje de pocos ejemplos y la influencia de los datos de entrenamiento.'
+        }
+      }
     },
     intro: {
       aboutSimulator: {
