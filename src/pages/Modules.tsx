@@ -11,6 +11,12 @@ import dumbbellImg from "@/assets/dumbbell.png";
 
 const LEARNING_UNITS = [
   {
+    key: 'introduction',
+    route: '/module/intro',
+    number: 0,
+    image: '/task.png',
+  },
+  {
     key: 'nextWordPrediction',
     route: '/module/next-word-prediction',
     number: 1,
@@ -64,15 +70,14 @@ export default function Modules() {
           </div>
 
           {/* Learning units tile grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
             {LEARNING_UNITS.map((unit) => (
               <Card
                 key={unit.key}
-                className="group cursor-pointer border border-border hover:border-secondary transition-all rounded-xl bg-white overflow-hidden flex flex-col"
-                onClick={() => navigate(unit.route)}
+                className="group border border-border hover:border-secondary transition-all rounded-xl bg-white overflow-hidden flex flex-col"
               >
                 {/* Image */}
-                <div className="aspect-square bg-muted/30 flex items-center justify-center p-6">
+                <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center p-6">
                   <img
                     src={unit.image}
                     alt={t(`modules.units.${unit.key}.title`)}
@@ -83,25 +88,28 @@ export default function Modules() {
                 {/* Content */}
                 <div className="p-4 flex-1 flex flex-col">
                   <span className="text-xs text-muted-foreground font-heading mb-1">
-                    {t('modules.unitLabel')} {unit.number}
+                    {unit.number === 0
+                      ? t('modules.introLabel')
+                      : `${t('modules.unitLabel')} ${unit.number}`}
                   </span>
-                  <h2 className="font-heading font-semibold text-foreground text-sm leading-tight">
+                  <h2 className="font-heading font-semibold text-foreground text-sm leading-tight mb-1">
                     {t(`modules.units.${unit.key}.title`)}
                   </h2>
+                  <p className="text-xs text-muted-foreground leading-snug mb-3 line-clamp-2 flex-1">
+                    {t(`modules.units.${unit.key}.description`)}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full rounded-full font-heading font-semibold text-xs"
+                    onClick={() => navigate(unit.route)}
+                  >
+                    {unit.number === 0 ? t('modules.startHere') : t('modules.goToUnit')}
+                    <ArrowRight className="ml-1 h-3 w-3" />
+                  </Button>
                 </div>
               </Card>
             ))}
-          </div>
-
-          {/* Start at beginning CTA */}
-          <div className="flex justify-center">
-            <Button
-              onClick={() => navigate("/module/next-word-prediction")}
-              className="rounded-full px-8 py-5 font-heading font-semibold"
-            >
-              {t('intro.base.startNow')}
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
           </div>
         </div>
       </main>
