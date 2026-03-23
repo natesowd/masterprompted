@@ -2,35 +2,43 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowRight } from "lucide-react";
+import starImage from "@/assets/star.png";
+import mannequinImage from "@/assets/mannequin.png";
+import dumbbellImg from "@/assets/dumbbell.png";
 
 const LEARNING_UNITS = [
   {
     key: 'nextWordPrediction',
     route: '/module/next-word-prediction',
     number: 1,
+    image: '/stair.png',
   },
   {
     key: 'promptConstruction',
     route: '/module/prompt-construction',
     number: 2,
+    image: starImage,
   },
   {
     key: 'systemParameters',
     route: '/module/system-parameters',
     number: 3,
+    image: mannequinImage,
   },
   {
     key: 'multipleSources',
     route: '/module/multiple-sources',
     number: 4,
+    image: '/magnifying-glass.png',
   },
   {
     key: 'llmTraining',
     route: '/module/llm-training',
     number: 5,
+    image: dumbbellImg,
   },
 ];
 
@@ -44,7 +52,7 @@ export default function Modules() {
 
       <main className="container mx-auto px-6 py-6">
         <Breadcrumb />
-        <div className="max-w-3xl mx-auto mt-8">
+        <div className="max-w-5xl mx-auto mt-8">
           {/* Page header */}
           <div className="mb-8">
             <h1 className="text-h2 font-heading text-foreground mb-2">
@@ -55,33 +63,32 @@ export default function Modules() {
             </p>
           </div>
 
-          {/* Learning units list */}
-          <div className="flex flex-col gap-3 mb-8">
+          {/* Learning units tile grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
             {LEARNING_UNITS.map((unit) => (
               <Card
                 key={unit.key}
-                className="group cursor-pointer border border-border hover:border-secondary transition-colors rounded-xl bg-white"
+                className="group cursor-pointer border border-border hover:border-secondary transition-all rounded-xl bg-white overflow-hidden flex flex-col"
                 onClick={() => navigate(unit.route)}
               >
-                <CardContent className="p-5 flex items-center gap-5">
-                  {/* Unit number */}
-                  <div className="flex-shrink-0 w-9 h-9 rounded-full bg-secondary/20 text-secondary-foreground flex items-center justify-center font-heading font-semibold text-sm">
-                    {unit.number}
-                  </div>
+                {/* Image */}
+                <div className="aspect-square bg-muted/30 flex items-center justify-center p-6">
+                  <img
+                    src={unit.image}
+                    alt={t(`modules.units.${unit.key}.title`)}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h2 className="font-heading font-semibold text-foreground text-base">
-                      {t(`modules.units.${unit.key}.title`)}
-                    </h2>
-                    <p className="text-muted-foreground text-sm mt-0.5 line-clamp-1">
-                      {t(`modules.units.${unit.key}.description`)}
-                    </p>
-                  </div>
-
-                  {/* Arrow */}
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
-                </CardContent>
+                {/* Content */}
+                <div className="p-4 flex-1 flex flex-col">
+                  <span className="text-xs text-muted-foreground font-heading mb-1">
+                    {t('modules.unitLabel')} {unit.number}
+                  </span>
+                  <h2 className="font-heading font-semibold text-foreground text-sm leading-tight">
+                    {t(`modules.units.${unit.key}.title`)}
+                  </h2>
+                </div>
               </Card>
             ))}
           </div>
@@ -89,11 +96,11 @@ export default function Modules() {
           {/* Start at beginning CTA */}
           <div className="flex justify-center">
             <Button
-              variant="outline"
               onClick={() => navigate("/module/next-word-prediction")}
               className="rounded-full px-8 py-5 font-heading font-semibold"
             >
-              {t('modules.startAtBeginning')}
+              {t('intro.base.startNow')}
+              <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
         </div>

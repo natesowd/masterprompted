@@ -64,7 +64,8 @@ const Introduction = () => {
                   onClick={handleContinue}
                   className="w-fit px-10 py-6 font-heading font-semibold text-base rounded-full"
                 >
-                  {t('intro.base.startAtBeginning')}
+                  {t('intro.base.startNow')}
+                  <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
