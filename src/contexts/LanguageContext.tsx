@@ -86,11 +86,31 @@ const translations = {
       }
     },
     modules: {
-      title: 'This Learning Unit is Still Being Built',
-      comingSoon: 'Coming soon...',
-      introduction: 'Introduction',
-      nextWordPrediction: 'Next Word Prediction',
-      promptConstruction: 'Prompt Construction'
+      title: 'Select a Learning Unit',
+      subtitle: 'Choose a module to explore at your own pace, or start from the beginning for a guided experience.',
+      startAtBeginning: 'Start at Beginning',
+      units: {
+        nextWordPrediction: {
+          title: 'Next Word Prediction',
+          description: 'Understand how LLMs generate text by predicting the next word in a sequence.'
+        },
+        promptConstruction: {
+          title: 'Prompt Construction',
+          description: 'Learn how to craft effective prompts including specificity, context, and conversation style.'
+        },
+        systemParameters: {
+          title: 'System Parameters',
+          description: 'Explore temperature, roles, and other settings that shape LLM outputs.'
+        },
+        multipleSources: {
+          title: 'Multiple Documents',
+          description: 'Discover how LLMs handle multiple sources and retrieval-augmented generation.'
+        },
+        llmTraining: {
+          title: 'LLM Training',
+          description: 'Examine supervised fine-tuning, few-shot learning, and training data influence.'
+        }
+      }
     },
     intro: {
       aboutSimulator: {
