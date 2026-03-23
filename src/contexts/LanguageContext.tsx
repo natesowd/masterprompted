@@ -90,7 +90,14 @@ const translations = {
       subtitle: 'Choose a module to explore at your own pace, or start from the beginning for a guided experience.',
       startAtBeginning: 'Start at Beginning',
       unitLabel: 'Learning',
+      introLabel: 'Starting Point',
+      startHere: 'Start Here',
+      goToUnit: 'Go to Unit',
       units: {
+        introduction: {
+          title: 'Introduction',
+          description: 'Get an overview of the simulator and learn what to expect from the guided learning experience.'
+        },
         nextWordPrediction: {
           title: 'Next Word Prediction',
           description: 'Understand how LLMs generate text by predicting the next word in a sequence.'
