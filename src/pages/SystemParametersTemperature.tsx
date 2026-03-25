@@ -85,14 +85,14 @@ export default function SystemParametersTemperature() {
                     </Tooltip>
                   </div>
 
-                  <div className="relative">
+                  <div className="relative px-1">
                     <Slider
                       value={[stepIndex]}
                       onValueChange={(val) => setStepIndex(val[0])}
                       min={0}
                       max={TEMPERATURE_STEPS.length - 1}
                       step={1}
-                      className="w-full [&_[data-slot=slider-track]]:h-4 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:bg-surface-500 [&_[data-slot=slider-range]]:bg-brand-tertiary-500 [&_[data-slot=slider-range]]:rounded-l-full [&_[data-slot=slider-thumb]]:h-7 [&_[data-slot=slider-thumb]]:w-2 [&_[data-slot=slider-thumb]]:rounded-sm [&_[data-slot=slider-thumb]]:bg-brand-tertiary-500 [&_[data-slot=slider-thumb]]:border-0 [&_.relative]:h-4 [&_.relative]:rounded-full [&_.relative]:bg-surface-500 [&_.absolute]:bg-brand-tertiary-500 [&_.absolute]:rounded-l-full [&_[role=slider]]:h-7 [&_[role=slider]]:w-2 [&_[role=slider]]:rounded-sm [&_[role=slider]]:bg-brand-tertiary-500 [&_[role=slider]]:border-0"
+                      className="w-full [&_.relative]:h-4 [&_.relative]:rounded-md [&_.relative]:bg-surface-500 [&_.absolute]:bg-brand-tertiary-500 [&_.absolute]:rounded-l-md [&_[role=slider]]:h-7 [&_[role=slider]]:w-2.5 [&_[role=slider]]:rounded-sm [&_[role=slider]]:bg-brand-tertiary-500 [&_[role=slider]]:border-0 [&_[role=slider]]:shadow-none [&_[role=slider]]:ring-0"
                     />
                     {/* Inline temperature value */}
                     <div
@@ -103,7 +103,7 @@ export default function SystemParametersTemperature() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between text-sm font-heading font-semibold text-foreground pt-5">
+                  <div className="flex justify-between text-sm font-sans font-semibold text-foreground pt-5">
                     <span>More Stable</span>
                     <span>More Random</span>
                   </div>
