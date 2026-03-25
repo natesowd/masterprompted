@@ -60,7 +60,42 @@ const ARTICLE_CONTENT = {
         "Foundation model regulations for powerful AI systems",
       ],
     },
+    {
+      heading: "Compliance Requirements",
+      items: [
+        "Conformity assessments and CE marking",
+        "Risk management systems and quality management",
+        "Data governance and record-keeping obligations",
+        "Human oversight requirements",
+      ],
+    },
+    {
+      heading: "Enforcement and Penalties",
+      items: [
+        "National supervisory authorities",
+        "Fines up to €35 million or 7% of global turnover",
+        "Phased implementation timeline through 2027",
+      ],
+    },
+    {
+      heading: "Industry Impact",
+      items: [
+        "Effects on AI developers and deployers",
+        "Compliance costs and market access",
+        "Innovation vs. regulation balance",
+        "Global influence on AI governance",
+      ],
+    },
+    {
+      heading: "Conclusion",
+      items: [
+        "Significance for the future of AI regulation",
+        "Potential model for other jurisdictions",
+        "Challenges and opportunities ahead",
+      ],
+    },
   ],
+  footer: "Would you like me to expand on any particular section or adjust the focus of the outline?",
 };
 
 /* ------------------------------------------------------------------ */
@@ -189,6 +224,12 @@ export default function LLMTrainingExercise() {
                           ))}
                         </div>
                       </div>
+
+                      {ARTICLE_CONTENT.footer && (
+                        <p className="text-sm text-muted-foreground italic mt-6">
+                          {ARTICLE_CONTENT.footer}
+                        </p>
+                      )}
 
                       {/* Navigation buttons */}
                       <div className="mt-8 flex items-center gap-3">
