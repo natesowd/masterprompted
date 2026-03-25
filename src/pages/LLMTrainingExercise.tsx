@@ -147,47 +147,42 @@ const MAIN_OUTPUT = INPUT_OUTPUT_PAIRS[1];
 type StructGroup =
   | "title"
   | "intro"
-  | "key-policies"
-  | "challenges"
-  | "economic"
+  | "key-topics"
+  | "impact"
   | "conclusion"
   | "footer"
-  | "key-provisions"
+  | "challenges"
   | "compliance"
-  | "enforcement"
-  | "industry";
+  | "enforcement";
 
 const STRUCT_COLORS: Record<string, string> = {
   title: "bg-brand-tertiary-500/20 ring-1 ring-brand-tertiary-500/30",
   intro: "bg-sky-400/20 ring-1 ring-sky-400/30",
-  "key-policies": "bg-violet-400/15 ring-1 ring-violet-400/25",
-  "key-provisions": "bg-violet-400/15 ring-1 ring-violet-400/25",
-  challenges: "bg-rose-400/15 ring-1 ring-rose-400/25",
-  compliance: "bg-rose-400/15 ring-1 ring-rose-400/25",
-  economic: "bg-amber-400/15 ring-1 ring-amber-400/25",
-  enforcement: "bg-amber-400/15 ring-1 ring-amber-400/25",
-  industry: "bg-emerald-400/15 ring-1 ring-emerald-400/25",
+  "key-topics": "bg-violet-400/15 ring-1 ring-violet-400/25",
+  impact: "bg-amber-400/15 ring-1 ring-amber-400/25",
   conclusion: "bg-emerald-400/15 ring-1 ring-emerald-400/25",
   footer: "bg-orange-400/15 ring-1 ring-orange-400/25",
+  challenges: "bg-rose-400/15 ring-1 ring-rose-400/25",
+  compliance: "bg-rose-400/15 ring-1 ring-rose-400/25",
+  enforcement: "bg-rose-400/15 ring-1 ring-rose-400/25",
 };
 
-/** Map section headings to semantic struct groups for cross-output comparison */
+/** Map section headings to semantic struct groups for cross-output comparison.
+ *  Only groups that appear in BOTH pairs will cross-highlight. */
 const SECTION_STRUCT_MAP: Record<string, StructGroup> = {
   "Introduction": "intro",
-  "Key Policies": "key-policies",
-  "Key Provisions": "key-provisions",
+  "Key Policies": "key-topics",
+  "Key Provisions": "key-topics",
   "Implementation Challenges": "challenges",
   "Compliance Requirements": "compliance",
-  "Economic Impact": "economic",
+  "Economic Impact": "impact",
   "Enforcement and Penalties": "enforcement",
-  "Industry Impact": "industry",
+  "Industry Impact": "impact",
   "Conclusion": "conclusion",
 };
 
-/** Get the struct group for a section by its index position (parallel structure) */
-function getSectionGroup(sectionIndex: number): StructGroup {
-  const positionalGroups: StructGroup[] = ["intro", "key-policies", "challenges", "economic", "industry", "conclusion"];
-  return positionalGroups[sectionIndex] || "intro";
+function getSectionGroup(heading: string): StructGroup | null {
+  return SECTION_STRUCT_MAP[heading] ?? null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -220,17 +215,17 @@ export default function LLMTrainingExercise() {
     setActiveStruct(null);
   };
 
-  const structClass = (group: StructGroup) =>
+  const structClass = (group: StructGroup | null) =>
     cn(
       "transition-all duration-200 rounded-sm",
-      activeStruct === group ? STRUCT_COLORS[group] : "",
+      group && activeStruct === group ? STRUCT_COLORS[group] : "",
       activeStruct && activeStruct !== group ? "opacity-35" : ""
     );
 
-  const structHandlers = (group: StructGroup) => ({
+  const structHandlers = (group: StructGroup | null) => group ? ({
     onMouseEnter: () => setActiveStruct(group),
     onMouseLeave: () => setActiveStruct(null),
-  });
+  }) : {};
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -312,7 +307,7 @@ export default function LLMTrainingExercise() {
 
                               <div className="mt-1.5 space-y-1.5">
                                 {pair.sections.map((section, si) => {
-                                  const group = getSectionGroup(si);
+                                  const group = getSectionGroup(section.heading);
                                   return (
                                   <div key={si}>
                                     <span
@@ -390,7 +385,7 @@ export default function LLMTrainingExercise() {
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <div className="space-y-6">
                           {MAIN_OUTPUT.sections.map((section, i) => {
-                            const group = getSectionGroup(i);
+                            const group = getSectionGroup(section.heading);
                             return (
                             <div key={i}>
                               <h3
