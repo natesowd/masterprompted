@@ -415,6 +415,30 @@ export default function LLMTrainingExercise() {
                                   </li>
                                 ))}
                               </ul>
+
+                              {/* TextFlag for Introduction */}
+                              {section.heading === "Introduction" && (
+                                <div className="mt-2 ml-1">
+                                  <TextFlag
+                                    text="Three bullet points — matching the training example"
+                                    evaluationFactor="relevance"
+                                    severity="warning"
+                                    explanation="The model produces three to four bullet points per section because that is the pattern in the training example — not because three points are the right number for this topic. This rigid structure can cause the model to leave out key information or wrongly elevate minor points to fill the pattern."
+                                  />
+                                </div>
+                              )}
+
+                              {/* TextFlag for Key Provisions */}
+                              {section.heading === "Key Provisions" && (
+                                <div className="mt-2 ml-1">
+                                  <TextFlag
+                                    text="Section placement mirrors training structure"
+                                    evaluationFactor="relevance"
+                                    severity="warning"
+                                    explanation="The order and prominence of sections in the output is shaped by the training pair's structure, not by what is most relevant to this specific topic. A section placed high in the outline may appear important, but its position is inherited from the example — you might miss key information or wrongly elevate minor points."
+                                  />
+                                </div>
+                              )}
                             </div>
                             );
                           })}
