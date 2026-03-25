@@ -148,7 +148,7 @@ const MAIN_OUTPUT = INPUT_OUTPUT_PAIRS[1];
 /** Connected groups — only these cross-highlight between sidebar & output */
 type StructGroup = "title" | "intro" | "key-topics" | "impact" | "conclusion" | "footer";
 
-const HIGHLIGHT_CLASS = "bg-brand-tertiary-500/20 ring-1 ring-brand-tertiary-500/30";
+const HIGHLIGHT_CLASS = "bg-brand-tertiary-700/15 ring-1 ring-brand-tertiary-700/25";
 
 /** Map section headings → connected group. Unconnected sections return null. */
 const SECTION_STRUCT_MAP: Record<string, StructGroup> = {
