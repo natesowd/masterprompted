@@ -85,25 +85,42 @@ export default function SystemParametersTemperature() {
                     </Tooltip>
                   </div>
 
-                  <div className="relative px-1">
-                    <Slider
-                      value={[stepIndex]}
-                      onValueChange={(val) => setStepIndex(val[0])}
-                      min={0}
-                      max={TEMPERATURE_STEPS.length - 1}
-                      step={1}
-                      className="w-full [&_.relative]:h-4 [&_.relative]:rounded-md [&_.relative]:bg-surface-500 [&_.absolute]:bg-brand-tertiary-500 [&_.absolute]:rounded-l-md [&_[role=slider]]:h-7 [&_[role=slider]]:w-2.5 [&_[role=slider]]:rounded-sm [&_[role=slider]]:bg-brand-tertiary-500 [&_[role=slider]]:border-0 [&_[role=slider]]:shadow-none [&_[role=slider]]:ring-0"
-                    />
+                  <div className="relative">
+                    {/* Custom temperature slider */}
+                    <div className="relative h-10 flex items-center">
+                      {/* Track background */}
+                      <div className="absolute inset-x-0 h-3 rounded-md bg-surface-500" />
+                      {/* Filled range */}
+                      <div
+                        className="absolute left-0 h-3 rounded-l-md bg-brand-tertiary-500"
+                        style={{ width: `calc(${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}% - 6px)` }}
+                      />
+                      {/* Thumb bar with gap */}
+                      <div
+                        className="absolute h-8 w-2.5 rounded-sm bg-brand-tertiary-500 -translate-x-1/2 cursor-pointer"
+                        style={{ left: `${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
+                      />
+                      {/* Invisible native slider for interaction */}
+                      <input
+                        type="range"
+                        min={0}
+                        max={TEMPERATURE_STEPS.length - 1}
+                        step={1}
+                        value={stepIndex}
+                        onChange={(e) => setStepIndex(Number(e.target.value))}
+                        className="absolute inset-0 w-full opacity-0 cursor-pointer"
+                      />
+                    </div>
                     {/* Inline temperature value */}
                     <div
-                      className="text-sm font-heading font-semibold text-foreground mt-2 absolute -translate-x-1/2"
+                      className="text-sm font-heading font-semibold text-foreground mt-1 absolute -translate-x-1/2"
                       style={{ left: `${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
                     >
                       {temperature.toFixed(1)}
                     </div>
                   </div>
 
-                  <div className="flex justify-between text-sm font-sans font-semibold text-foreground pt-5">
+                  <div className="flex justify-between text-sm font-heading font-semibold text-foreground pt-6">
                     <span>More Stable</span>
                     <span>More Random</span>
                   </div>
