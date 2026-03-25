@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -144,39 +144,17 @@ const MAIN_OUTPUT = INPUT_OUTPUT_PAIRS[1];
 /*  Structural highlight groups                                        */
 /* ------------------------------------------------------------------ */
 
-type StructGroup =
-  | "title"
-  | "intro"
-  | "key-topics"
-  | "impact"
-  | "conclusion"
-  | "footer"
-  | "challenges"
-  | "compliance"
-  | "enforcement";
+/** Connected groups — only these cross-highlight between sidebar & output */
+type StructGroup = "title" | "intro" | "key-topics" | "impact" | "conclusion" | "footer";
 
-const STRUCT_COLORS: Record<string, string> = {
-  title: "bg-brand-tertiary-500/20 ring-1 ring-brand-tertiary-500/30",
-  intro: "bg-sky-400/20 ring-1 ring-sky-400/30",
-  "key-topics": "bg-violet-400/15 ring-1 ring-violet-400/25",
-  impact: "bg-amber-400/15 ring-1 ring-amber-400/25",
-  conclusion: "bg-emerald-400/15 ring-1 ring-emerald-400/25",
-  footer: "bg-orange-400/15 ring-1 ring-orange-400/25",
-  challenges: "bg-rose-400/15 ring-1 ring-rose-400/25",
-  compliance: "bg-rose-400/15 ring-1 ring-rose-400/25",
-  enforcement: "bg-rose-400/15 ring-1 ring-rose-400/25",
-};
+const HIGHLIGHT_CLASS = "bg-brand-tertiary-500/20 ring-1 ring-brand-tertiary-500/30";
 
-/** Map section headings to semantic struct groups for cross-output comparison.
- *  Only groups that appear in BOTH pairs will cross-highlight. */
+/** Map section headings → connected group. Unconnected sections return null. */
 const SECTION_STRUCT_MAP: Record<string, StructGroup> = {
   "Introduction": "intro",
   "Key Policies": "key-topics",
   "Key Provisions": "key-topics",
-  "Implementation Challenges": "challenges",
-  "Compliance Requirements": "compliance",
   "Economic Impact": "impact",
-  "Enforcement and Penalties": "enforcement",
   "Industry Impact": "impact",
   "Conclusion": "conclusion",
 };
@@ -210,16 +188,34 @@ export default function LLMTrainingExercise() {
   const [activeStruct, setActiveStruct] = useState<StructGroup | null>(null);
   const { show: showHint, dismiss: dismissHint } = useStructHint();
 
+  const sidebarScrollRef = useRef<HTMLDivElement>(null);
+  const mainScrollRef = useRef<HTMLDivElement>(null);
+  const isSyncing = useRef(false);
+
+  const handleSyncScroll = useCallback((source: "sidebar" | "main") => {
+    if (isSyncing.current) return;
+    isSyncing.current = true;
+    const from = source === "sidebar" ? sidebarScrollRef.current : mainScrollRef.current;
+    const to = source === "sidebar" ? mainScrollRef.current : sidebarScrollRef.current;
+    if (from && to) {
+      const ratio = from.scrollTop / (from.scrollHeight - from.clientHeight || 1);
+      to.scrollTop = ratio * (to.scrollHeight - to.clientHeight);
+    }
+    requestAnimationFrame(() => { isSyncing.current = false; });
+  }, []);
+
   const togglePair = (id: string) => {
     setSelectedPair((prev) => (prev === id ? "" : id));
     setActiveStruct(null);
   };
 
+  /** Only connected (non-null) groups get highlight styling */
   const structClass = (group: StructGroup | null) =>
     cn(
       "transition-all duration-200 rounded-sm",
-      group && activeStruct === group ? STRUCT_COLORS[group] : "",
-      activeStruct && activeStruct !== group ? "opacity-35" : ""
+      group && activeStruct === group ? HIGHLIGHT_CLASS : "",
+      // Only dim elements that ARE connected but not the active one
+      activeStruct && group && activeStruct !== group ? "opacity-35" : ""
     );
 
   const structHandlers = (group: StructGroup | null) => group ? ({
@@ -289,67 +285,73 @@ export default function LLMTrainingExercise() {
                               </p>
                             </div>
 
-                            {/* Output – structurally highlighted */}
-                            <div>
+                            {/* Output – structurally highlighted, scrollable */}
+                            <div className="flex flex-col min-h-0">
                               <span className="text-xs font-semibold text-muted-foreground block mb-0.5">
                                 Output
                               </span>
 
-                              <span
-                                className={cn(
-                                  "text-xs font-semibold text-foreground block px-1 py-0.5 cursor-default",
-                                  structClass("title")
-                                )}
-                                {...structHandlers("title")}
+                              <div
+                                ref={sidebarScrollRef}
+                                onScroll={() => handleSyncScroll("sidebar")}
+                                className="max-h-[280px] overflow-y-auto pr-1"
                               >
-                                {pair.outputTitle}
-                              </span>
-
-                              <div className="mt-1.5 space-y-1.5">
-                                {pair.sections.map((section, si) => {
-                                  const group = getSectionGroup(section.heading);
-                                  return (
-                                  <div key={si}>
-                                    <span
-                                      className={cn(
-                                        "text-xs font-semibold text-foreground block px-1 py-0.5 cursor-default",
-                                        structClass(group)
-                                      )}
-                                      {...structHandlers(group)}
-                                    >
-                                      {section.heading}
-                                    </span>
-                                    <ul className="ml-2 mt-0.5 space-y-0.5">
-                                      {section.items.map((item, ii) => (
-                                        <li
-                                          key={ii}
-                                          className={cn(
-                                            "text-xs text-muted-foreground leading-relaxed flex items-start gap-1.5 px-1 py-0.5 cursor-default",
-                                            structClass(group)
-                                          )}
-                                          {...structHandlers(group)}
-                                        >
-                                          <span className="mt-1.5 h-1 w-1 rounded-full bg-muted-foreground flex-shrink-0" />
-                                          {item}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                  );
-                                })}
-                              </div>
-
-                              {pair.footer && (
-                                <p
+                                <span
                                   className={cn(
-                                    "text-xs text-muted-foreground italic mt-2 px-1 py-0.5 cursor-default",
-                                    structClass("footer")
+                                    "text-xs font-semibold text-foreground block px-1 py-0.5 cursor-default",
+                                    structClass("title")
                                   )}
-                                  {...structHandlers("footer")}
+                                  {...structHandlers("title")}
                                 >
-                                  {pair.footer}
-                                </p>
-                              )}
+                                  {pair.outputTitle}
+                                </span>
+
+                                <div className="mt-1.5 space-y-1.5">
+                                  {pair.sections.map((section, si) => {
+                                    const group = getSectionGroup(section.heading);
+                                    return (
+                                    <div key={si}>
+                                      <span
+                                        className={cn(
+                                          "text-xs font-semibold text-foreground block px-1 py-0.5 cursor-default",
+                                          structClass(group)
+                                        )}
+                                        {...structHandlers(group)}
+                                      >
+                                        {section.heading}
+                                      </span>
+                                      <ul className="ml-2 mt-0.5 space-y-0.5">
+                                        {section.items.map((item, ii) => (
+                                          <li
+                                            key={ii}
+                                            className={cn(
+                                              "text-xs text-muted-foreground leading-relaxed flex items-start gap-1.5 px-1 py-0.5 cursor-default",
+                                              structClass(group)
+                                            )}
+                                            {...structHandlers(group)}
+                                          >
+                                            <span className="mt-1.5 h-1 w-1 rounded-full bg-muted-foreground flex-shrink-0" />
+                                            {item}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                    );
+                                  })}
+                                </div>
+
+                                {pair.footer && (
+                                  <p
+                                    className={cn(
+                                      "text-xs text-muted-foreground italic mt-2 px-1 py-0.5 cursor-default",
+                                      structClass("footer")
+                                    )}
+                                    {...structHandlers("footer")}
+                                  >
+                                    {pair.footer}
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -382,7 +384,7 @@ export default function LLMTrainingExercise() {
                         {MAIN_OUTPUT.outputTitle}
                       </h2>
 
-                      <div className="max-h-[500px] overflow-y-auto flex-1">
+                      <div ref={mainScrollRef} onScroll={() => handleSyncScroll("main")} className="max-h-[500px] overflow-y-auto flex-1">
                         <div className="space-y-6">
                           {MAIN_OUTPUT.sections.map((section, i) => {
                             const group = getSectionGroup(section.heading);
