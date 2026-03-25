@@ -79,9 +79,45 @@ const SNIPPETS_BY_DOC: Record<string, Snippet[]> = {
 
 /* Per-document-combination responses (simulated RAG output) */
 const RESPONSES: Record<string, string> = {
-  "doc-1": `Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.
+  "doc-1": `It's all about fostering innovation while protecting people's rights, promoting fairness, and making sure AI works for everyone.
 
-Media organisations need an AI strategy focused on public service value. They should scrutinise AI products for biases and stereotypes to prevent harm amplification.`,
+Want to dive deeper into specific sectors like healthcare, education, or law enforcement? I can break those down too!
+
+Key Points from the Document:
+
+Public Service Media Responsibility:
+
+"Public service media have a special responsibility in this context. While they are bound by the mission and mandate to inform, educate, and connect people, they are also accountable to the public."
+
+Public service organizations must balance the opportunities AI offers with the risks it poses, ensuring it aligns with their ethical mission.
+
+Human Oversight and Judgment:
+
+"Human judgment must remain at the heart of our editorial decisions."
+
+Journalistic organizations are responsible for ensuring that AI tools are used to augment rather than replace human decision-making.
+
+Safeguarding Public Trust:
+
+"We must guard this trust like the apple of our eye."
+
+The document highlights the critical role organizations play in maintaining public confidence in journalism by responsibly managing AI tools and outputs.
+
+Ethical Standards:
+
+"Ethics must guide our technological choices."
+
+Journalistic organizations must establish and follow ethical guidelines to ensure that AI supports, rather than undermines, their credibility.
+
+Monitoring and Combating Risks:
+
+The document stresses the risks of AI, including disinformation, bias, and over-reliance on tech giants. Organizations are tasked with actively addressing these challenges:
+
+"The industry's outlook on tech has changed... The current generation of decision makers are in many ways more realistic about the benefits and risks of new technologies than their predecessors."
+
+Conclusion:
+
+In the context of the document, journalistic organizations bear the primary responsibility for upholding AI ethics. They must ensure that AI tools align with editorial values, are transparently used, and are managed to support public trust and journalistic integrity. This responsibility is amplified for public service media, which have a specific mandate to serve society ethically and inclusively.`,
 
   "doc-2": `AI Ethics in Media: Media organisations must establish clear governance frameworks for AI use, including editorial oversight and accountability structures.
 
@@ -91,9 +127,77 @@ Transparency with audiences about AI-generated content is a fundamental ethical 
 
 Internal guidelines require labelling of AI-assisted content and prohibit fully automated publishing without human review.`,
 
-  "doc-1,doc-2": `Obligations for Providers: The majority of obligations fall on providers (developers) of high-risk AI systems, including those outside the EU if their systems are used within the EU.
+  "doc-1,doc-2": `In light of the two documents — "TRUSTED JOURNALISM in the Age of Generative AI" and "AI Ethics Guides for Media Organizations" (by YLE) — the primary responsibility to uphold AI ethics falls most heavily on media organizations and their leadership.
 
-User Responsibilities: Users (deployers) of high-risk AI systems have certain obligations, though less than providers. Media organisations must establish governance frameworks including editorial oversight and accountability, while scrutinising AI products for biases.`,
+Here's a breakdown of where the responsibility lies, according to the themes in both documents:
+
+1. Media Organizations and Leadership
+
+Primary responsibility
+
+Why?
+
+Both documents stress the need for institutional accountability. The YLE guide, for example, emphasizes that ethical AI use must be embedded in organizational policies, not left to individual discretion.
+
+Media outlets control the design, deployment, and oversight of AI tools in news production and distribution.
+
+What they must do:
+
+Ensure transparency in AI-assisted journalism.
+
+Establish editorial standards and governance structures for AI use.
+
+Invest in training staff on AI risks and ethical implications.
+
+2. Journalists and Editorial Teams
+
+Secondary responsibility
+
+Why?
+
+As users of AI in reporting or editing tasks, journalists are gatekeepers of accuracy and fairness.
+
+The "Trusted Journalism" paper highlights the need for human oversight in content generated or augmented by AI.
+
+What they must do:
+
+Maintain editorial judgment and verify AI outputs.
+
+Be transparent with audiences about how AI was used in creating content.
+
+3. AI Developers and Technology Providers
+
+Shared but more indirect responsibility
+
+Why?
+
+While developers do not control the editorial process, they are responsible for the design and integrity of the AI systems used by media.
+
+What they must do:
+
+Provide systems that are transparent, explainable, and designed with ethical safeguards.
+
+Collaborate with media organizations to tailor tools for responsible use.
+
+4. Regulators and Policymakers
+
+Supportive responsibility
+
+Why?
+
+The YLE guide calls for legal and regulatory frameworks that support responsible AI use while preserving freedom of the press.
+
+What they must do:
+
+Define boundaries for acceptable AI use.
+
+Protect journalistic independence while ensuring public accountability.
+
+Conclusion
+
+Media organizations themselves hold the most responsibility to uphold AI ethics — through clear policies, oversight, and culture. However, journalists, developers, and regulators all share supporting roles in ensuring ethical, transparent, and trustworthy journalism in the age of AI.
+
+Let me know if you'd like a chart or summary comparing these roles!`,
 
   "doc-1,doc-3": `Trusted Journalism & DW's Approach: Media organisations need an AI strategy focused on public service value. DW exemplifies this by using AI to support journalists while keeping editorial control with humans.
 
@@ -103,9 +207,59 @@ Both sources emphasise the need to scrutinise AI tools for biases and maintain t
 
 Transparency obligations include labelling AI-assisted content and ensuring audiences understand when AI tools have been used in the editorial process.`,
 
-  "doc-1,doc-2,doc-3": `Comprehensive AI Media Framework: Providers of high-risk AI systems bear the majority of obligations, while media organisations must establish governance frameworks with editorial oversight.
+  "doc-1,doc-2,doc-3": `1. Journalistic Organizations (Primary Responsibility)
 
-DW's approach demonstrates these principles in practice: AI supports journalists, but human editors retain final decisions. All three sources converge on the need for transparency, bias scrutiny, and clear labelling of AI-assisted content.`,
+Organizations like Deutsche Welle (DW) and Yle hold the most responsibility because they are accountable for the content they produce, the decisions they make about AI implementation, and how they maintain trust with their audiences.
+
+Supporting Quotes:
+
+"DW is firmly committed to journalism that is produced by people."
+
+This highlights that the ultimate control lies with human journalists, ensuring they uphold high ethical standards.
+
+"Our journalists will continue to control all applications and thoroughly review anything before publication."
+
+Reinforces that the responsibility for ethical decisions about AI outputs rests on the organization and its journalists.
+
+"A human is always responsible for the outcome when AI is used." (Yle principles)
+
+Aligns with DW's stance on maintaining human oversight.
+
+DW's transparent and hands-on approach ensures that AI tools are aids, not replacements, reinforcing that organizations are stewards of ethical AI use.
+
+2. Developers of AI Systems
+
+While journalistic organizations are responsible for how they use AI, developers like OpenAI and Google share significant responsibility for ensuring their tools are designed ethically. They must:
+
+Minimize inherent biases in their models.
+
+Improve the transparency of how their systems function, as DW noted: "AI chatbots, such as ChatGPT, cannot be relied upon as accurate sources of information."
+
+Generative AI creators are responsible for providing tools that organizations can ethically use but have less control over how their products are applied downstream.
+
+3. Public Service and Media Organizations
+
+Public broadcasters like DW and Yle play a unique role in upholding ethics because they have a public service mandate. Their responsibility extends to:
+
+Exposing and countering disinformation, as DW emphasizes: "Generative AI makes it easier to produce and spread disinformation around the world. It is our job as journalists to expose this disinformation."
+
+Expanding fact-checking capacity to combat AI-generated falsehoods.
+
+Acting as role models in transparent AI usage, which DW and Yle commit to.
+
+4. Governments and Regulators
+
+Governments hold secondary responsibility in creating frameworks for AI ethics. However, their role is more indirect and often reactive. Their ability to enforce standards complements organizational efforts but does not supersede the immediate accountability of AI users.
+
+5. Individual Journalists
+
+Journalists are front-line practitioners, but their responsibility is bounded by organizational policies. For instance:
+
+DW requires journalists to verify AI-generated insights and never rely on chatbots as direct sources. "We will verify any information we know comes from a chatbot in the same way we verify information from other sources."
+
+Conclusion
+
+The most responsibility lies with journalistic organizations, like DW and Yle, as they integrate AI into their workflows while upholding ethical standards and trust. Developers and regulators play supporting roles by shaping tools and frameworks that facilitate ethical AI use. This layered accountability ensures that AI enhances journalism without compromising its core values of independence, transparency, and accuracy.`,
 };
 
 /* ------------------------------------------------------------------ */
