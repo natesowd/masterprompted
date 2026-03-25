@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import EvaluationPanel from "@/components/EvaluationPanel";
+import ChatPrompt from "@/components/ChatPrompt";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, File, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -375,12 +376,9 @@ export default function MultipleSourcesExercise() {
                   <div className="flex-1 flex flex-col">
                     {/* Response area */}
                     <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
-                      <div className="mb-4">
-                        <p className="text-sm font-semibold text-foreground">Prompt:</p>
-                        <p className="text-sm text-muted-foreground italic">
-                          Who holds the most responsibility to uphold AI ethics?
-                        </p>
-                      </div>
+                      <ChatPrompt
+                        text="Who holds the most responsibility to uphold AI ethics?"
+                      />
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <div className="space-y-4">
                           <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-line">
