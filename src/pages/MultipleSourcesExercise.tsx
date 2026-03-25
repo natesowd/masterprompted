@@ -198,13 +198,13 @@ export default function MultipleSourcesExercise() {
               </div>
 
               {/* ── Center content ── */}
-              <div className="flex-initial flex flex-col px-6 py-6 2xl:pt-0 items-start">
-                <div className="w-full max-w-[860px] 2xl:hidden">
+              <div className="w-[860px] flex-shrink-0 flex flex-col px-6 py-6 2xl:pt-0">
+                <div className="w-full 2xl:hidden">
                   <Breadcrumb />
                   <div className="mb-5" />
                 </div>
 
-                <div className="flex gap-6 max-w-[860px] w-full">
+                <div className="flex-1 flex flex-col">
                   <div className="flex-1 flex flex-col">
                     {/* Response area */}
                     <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
