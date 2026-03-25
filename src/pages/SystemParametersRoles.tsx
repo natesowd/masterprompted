@@ -87,17 +87,19 @@ export default function SystemParametersRoles() {
                     <Label
                       key={role.id}
                       htmlFor={`role-${role.id}`}
-                      className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors ${
+                      className={`flex items-center gap-4 p-2 pr-4 rounded-xl border-2 cursor-pointer transition-colors ${
                         selectedRole === role.id
                           ? "border-brand-tertiary-500 bg-brand-tertiary-500/5"
                           : "border-border hover:border-muted-foreground/30"
                       }`}
                     >
-                      <img
-                        src={role.image}
-                        alt={role.label}
-                        className="w-16 h-16 object-contain"
-                      />
+                      <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-lg bg-muted/30">
+                        <img
+                          src={role.image}
+                          alt={role.label}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                       <RadioGroupItem value={role.id} id={`role-${role.id}`} />
                       <span className="text-sm font-medium text-foreground">
                         {role.label}
