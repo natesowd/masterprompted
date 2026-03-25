@@ -4,6 +4,8 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import ChatPrompt from "@/components/ChatPrompt";
+import HighlightableText, { type HighlightGroup } from "@/components/HighlightableText";
+import FeatureHighlight from "@/components/FeatureHighlight";
 
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -71,6 +73,22 @@ Would you like me to expand on any particular section or adjust the focus of the
   },
 ];
 
+/** Keyword highlight groups per pair – shared between input & output */
+const PAIR_HIGHLIGHT_GROUPS: Record<string, HighlightGroup[]> = {
+  "pair-1": [
+    { id: "format", keywords: ["outline"] },
+    { id: "topic", keywords: ["renewable energy"] },
+    { id: "scope", keywords: ["Europe", "European"] },
+    { id: "subject", keywords: ["policy"] },
+    { id: "content", keywords: ["article"] },
+  ],
+  "pair-2": [
+    { id: "format", keywords: ["outline"] },
+    { id: "topic", keywords: ["EU AI Act", "AI Act"] },
+    { id: "content", keywords: ["article"] },
+  ],
+};
+
 const ARTICLE_CONTENT = {
   title: "AI Act Article Outline",
   sections: [
@@ -130,15 +148,36 @@ const ARTICLE_CONTENT = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Session-once helper                                                */
+/* ------------------------------------------------------------------ */
+const HIGHLIGHT_HINT_KEY = "llm-training-highlight-hint-seen";
+
+function useHighlightHint() {
+  const [show, setShow] = useState(() => {
+    return !sessionStorage.getItem(HIGHLIGHT_HINT_KEY);
+  });
+
+  const dismiss = () => {
+    sessionStorage.setItem(HIGHLIGHT_HINT_KEY, "1");
+    setShow(false);
+  };
+
+  return { show, dismiss };
+}
+
+/* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
 
 export default function LLMTrainingExercise() {
   const navigate = useNavigate();
   const [selectedPair, setSelectedPair] = useState<string>(INPUT_OUTPUT_PAIRS[0].id);
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
+  const { show: showHint, dismiss: dismissHint } = useHighlightHint();
 
   const togglePair = (id: string) => {
     setSelectedPair((prev) => (prev === id ? "" : id));
+    setActiveGroup(null);
   };
 
   return (
@@ -171,11 +210,13 @@ export default function LLMTrainingExercise() {
                 <div className="space-y-3 flex-1 overflow-y-auto pr-1">
                   {INPUT_OUTPUT_PAIRS.map((pair, index) => {
                     const isSelected = selectedPair === pair.id;
+                    const groups = PAIR_HIGHLIGHT_GROUPS[pair.id] || [];
                     return (
                       <button
                         key={pair.id}
                         type="button"
                         onClick={() => togglePair(pair.id)}
+                        data-highlight-target={index === 0 ? "pair-card" : undefined}
                         className={cn(
                           "w-full rounded-xl border p-3 text-left transition-shadow font-heading",
                           isSelected
@@ -195,20 +236,32 @@ export default function LLMTrainingExercise() {
                               <span className="text-xs font-semibold text-foreground block">
                                 Input
                               </span>
-                              <p className="text-xs text-muted-foreground leading-relaxed">
-                                {pair.input}
-                              </p>
+                              <HighlightableText
+                                text={pair.input}
+                                groups={groups}
+                                activeGroup={activeGroup}
+                                onGroupHover={setActiveGroup}
+                                className="text-xs text-muted-foreground leading-relaxed"
+                              />
                             </div>
                             <div>
                               <span className="text-xs font-semibold text-foreground block">
                                 Output
                               </span>
-                                <span className="text-xs font-semibold text-foreground">
-                                  {pair.outputTitle}
-                                </span>
-                              <p className="text-xs text-muted-foreground leading-relaxed mt-1 whitespace-pre-line">
-                                {pair.outputBody}
-                              </p>
+                              <HighlightableText
+                                text={pair.outputTitle}
+                                groups={groups}
+                                activeGroup={activeGroup}
+                                onGroupHover={setActiveGroup}
+                                className="text-xs font-semibold text-foreground"
+                              />
+                              <HighlightableText
+                                text={pair.outputBody}
+                                groups={groups}
+                                activeGroup={activeGroup}
+                                onGroupHover={setActiveGroup}
+                                className="text-xs text-muted-foreground leading-relaxed mt-1 whitespace-pre-line block"
+                              />
                             </div>
                           </div>
                         )}
@@ -301,6 +354,20 @@ export default function LLMTrainingExercise() {
       <div className="fixed bottom-3 left-3 text-[13px] leading-snug text-muted-foreground/70 text-left">
         LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
       </div>
+
+      {/* Feature Highlight for hover interaction */}
+      <FeatureHighlight
+        target='[data-highlight-target="pair-card"]'
+        open={showHint && selectedPair === INPUT_OUTPUT_PAIRS[0].id}
+        onClose={dismissHint}
+        side="right"
+        sideOffset={20}
+        closeLabel="Got it"
+      >
+        <strong>Try hovering over the text!</strong>
+        <br />
+        Hover over words in the input or output to see how key concepts from the prompt connect to the generated response.
+      </FeatureHighlight>
     </div>
   );
 }
