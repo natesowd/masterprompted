@@ -391,51 +391,86 @@ export default function LLMTrainingExercise() {
                             const group = getSectionGroup(section.heading);
                             return (
                             <div key={i}>
-                              <h3
-                                className={cn(
-                                  "text-lg font-heading font-semibold text-foreground mb-3 px-1 py-0.5 cursor-default",
-                                  structClass(group)
-                                )}
-                                {...structHandlers(group)}
-                              >
-                                {section.heading}
-                              </h3>
-                              <ul className="space-y-2 ml-1">
-                                {section.items.map((item, j) => (
-                                  <li
-                                    key={j}
-                                    className={cn(
-                                      "flex items-start gap-3 text-base text-foreground leading-relaxed px-1 py-0.5 cursor-default",
-                                      structClass(group)
-                                    )}
-                                    {...structHandlers(group)}
-                                  >
-                                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-foreground flex-shrink-0" />
-                                    {item}
-                                  </li>
-                                ))}
-                              </ul>
-
-                              {/* SectionFlag for Introduction */}
-                              {section.heading === "Introduction" && (
+                              {section.heading !== "Key Provisions" && (
+                                <h3
+                                  className={cn(
+                                    "text-lg font-heading font-semibold text-foreground mb-3 px-1 py-0.5 cursor-default",
+                                    structClass(group)
+                                  )}
+                                  {...structHandlers(group)}
+                                >
+                                  {section.heading}
+                                </h3>
+                              )}
+                              {section.heading === "Introduction" ? (
                                 <SectionFlag
                                   evaluationFactor="relevance"
                                   severity="warning"
                                   explanation="The model produces three to four bullet points per section because that is the pattern in the training example — not because three points are the right number for this topic. This rigid structure can cause the model to leave out key information or wrongly elevate minor points to fill the pattern."
                                 >
-                                  <p className="text-sm text-muted-foreground">Three bullet points — matching the training example</p>
+                                  <ul className="space-y-2 ml-1">
+                                    {section.items.map((item, j) => (
+                                      <li
+                                        key={j}
+                                        className={cn(
+                                          "flex items-start gap-3 text-base text-foreground leading-relaxed px-1 py-0.5 cursor-default",
+                                          structClass(group)
+                                        )}
+                                        {...structHandlers(group)}
+                                      >
+                                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-foreground flex-shrink-0" />
+                                        {item}
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </SectionFlag>
-                              )}
-
-                              {/* SectionFlag for Key Provisions */}
-                              {section.heading === "Key Provisions" && (
+                              ) : section.heading === "Key Provisions" ? (
                                 <SectionFlag
                                   evaluationFactor="relevance"
                                   severity="warning"
                                   explanation="The order and prominence of sections in the output is shaped by the training pair's structure, not by what is most relevant to this specific topic. A section placed high in the outline may appear important, but its position is inherited from the example — you might miss key information or wrongly elevate minor points."
                                 >
-                                  <p className="text-sm text-muted-foreground">Section placement mirrors training structure</p>
+                                  <h3
+                                    className={cn(
+                                      "text-lg font-heading font-semibold text-foreground mb-3 px-1 py-0.5 cursor-default",
+                                      structClass(group)
+                                    )}
+                                    {...structHandlers(group)}
+                                  >
+                                    {section.heading}
+                                  </h3>
+                                  <ul className="space-y-2 ml-1">
+                                    {section.items.map((item, j) => (
+                                      <li
+                                        key={j}
+                                        className={cn(
+                                          "flex items-start gap-3 text-base text-foreground leading-relaxed px-1 py-0.5 cursor-default",
+                                          structClass(group)
+                                        )}
+                                        {...structHandlers(group)}
+                                      >
+                                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-foreground flex-shrink-0" />
+                                        {item}
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </SectionFlag>
+                              ) : (
+                                <ul className="space-y-2 ml-1">
+                                  {section.items.map((item, j) => (
+                                    <li
+                                      key={j}
+                                      className={cn(
+                                        "flex items-start gap-3 text-base text-foreground leading-relaxed px-1 py-0.5 cursor-default",
+                                        structClass(group)
+                                      )}
+                                      {...structHandlers(group)}
+                                    >
+                                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-foreground flex-shrink-0" />
+                                      {item}
+                                    </li>
+                                  ))}
+                                </ul>
                               )}
                             </div>
                             );
