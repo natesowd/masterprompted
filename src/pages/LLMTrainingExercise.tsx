@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, ListChecks } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -137,12 +137,9 @@ export default function LLMTrainingExercise() {
                               <span className="text-xs font-semibold text-foreground block">
                                 Output
                               </span>
-                              <div className="flex items-start gap-1.5">
-                                <ListChecks className="h-3.5 w-3.5 text-destructive flex-shrink-0 mt-0.5" strokeWidth={2} />
-                                <span className="text-xs font-semibold text-foreground underline decoration-destructive underline-offset-2">
+                                <span className="text-xs font-semibold text-foreground">
                                   {pair.outputTitle}
                                 </span>
-                              </div>
                               <p className="text-xs text-muted-foreground leading-relaxed mt-1 whitespace-pre-line">
                                 {pair.outputBody}
                               </p>
