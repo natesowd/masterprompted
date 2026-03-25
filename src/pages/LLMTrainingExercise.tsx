@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import EvaluationPanel from "@/components/EvaluationPanel";
 import ChatPrompt from "@/components/ChatPrompt";
 import FeatureHighlight from "@/components/FeatureHighlight";
-import TextFlag from "@/components/TextFlag";
+import SectionFlag from "@/components/SectionFlag";
 
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
