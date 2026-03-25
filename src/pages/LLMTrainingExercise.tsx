@@ -391,8 +391,7 @@ export default function LLMTrainingExercise() {
                             const group = getSectionGroup(section.heading);
                             return (
                             <div key={i}>
-                              {section.heading !== "Key Provisions" && (
-                                <h3
+                              <h3
                                   className={cn(
                                     "text-lg font-heading font-semibold text-foreground mb-3 px-1 py-0.5 cursor-default",
                                     structClass(group)
@@ -401,7 +400,6 @@ export default function LLMTrainingExercise() {
                                 >
                                   {section.heading}
                                 </h3>
-                              )}
                               {section.heading === "Introduction" ? (
                                 <SectionFlag
                                   evaluationFactor="relevance"
@@ -424,21 +422,12 @@ export default function LLMTrainingExercise() {
                                     ))}
                                   </ul>
                                 </SectionFlag>
-                              ) : section.heading === "Key Provisions" ? (
+                              ) : section.heading === "Industry Impact" ? (
                                 <SectionFlag
                                   evaluationFactor="relevance"
                                   severity="error"
                                   explanation="The order and prominence of sections in the output is shaped by the training pair's structure, not by what is most relevant to this specific topic. A section placed high in the outline may appear important, but its position is inherited from the example — you might miss key information or wrongly elevate minor points."
                                 >
-                                  <h3
-                                    className={cn(
-                                      "text-lg font-heading font-semibold text-foreground mb-3 px-1 py-0.5 cursor-default",
-                                      structClass(group)
-                                    )}
-                                    {...structHandlers(group)}
-                                  >
-                                    {section.heading}
-                                  </h3>
                                   <ul className="space-y-2 ml-1">
                                     {section.items.map((item, j) => (
                                       <li
