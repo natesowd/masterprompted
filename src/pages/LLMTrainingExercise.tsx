@@ -22,7 +22,7 @@ interface InputOutputPair {
 const INPUT_OUTPUT_PAIRS: InputOutputPair[] = [
   {
     id: "pair-1",
-    input: "Create an outline for an article about renewable energy policy in Europe",
+    input: "Design an outline for an article about the AI Act",
     outputTitle: "European Renewable Energy Policy Article Outline",
     outputBody: `Introduction
 Current state of renewable energy in Europe
