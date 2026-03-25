@@ -162,7 +162,7 @@ export default function LLMTrainingExercise() {
                   <div className="mb-5" />
                 </div>
 
-                <div className="flex gap-6 max-w-[860px] w-full">
+                <div className="flex gap-6 max-w-[1100px] w-full">
                   <div className="flex-1 flex flex-col">
                     {/* Response area */}
                     <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
