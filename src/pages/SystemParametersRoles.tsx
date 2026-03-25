@@ -93,11 +93,11 @@ export default function SystemParametersRoles() {
                           : "border-border hover:border-muted-foreground/30"
                       }`}
                     >
-                      <div className="w-20 h-20 flex-shrink-0 overflow-hidden">
+                      <div className="w-20 h-20 flex-shrink-0 overflow-visible -mr-2">
                         <img
                           src={role.image}
                           alt={role.label}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain object-left"
                         />
                       </div>
                       <RadioGroupItem value={role.id} id={`role-${role.id}`} />
