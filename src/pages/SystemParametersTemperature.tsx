@@ -89,7 +89,7 @@ export default function SystemParametersTemperature() {
                     {/* Custom temperature slider */}
                     <div className="relative h-12 flex items-center">
                       {/* Track background */}
-                      <div className="absolute inset-x-0 h-5 rounded bg-surface-500" />
+                      <div className="absolute inset-x-0 h-5 rounded bg-surface-600" />
                       {/* Filled range */}
                       <div
                         className="absolute left-0 h-5 rounded-l bg-brand-tertiary-500"
@@ -100,9 +100,9 @@ export default function SystemParametersTemperature() {
                         className="absolute h-8 -translate-x-1/2 cursor-pointer flex items-center"
                         style={{ left: `${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
                       >
-                        <div className="h-full w-[10px] bg-background" />
+                        <div className="h-full w-[5px] bg-background" />
                         <div className="h-full w-1.5 rounded-sm bg-brand-tertiary-500" />
-                        <div className="h-full w-[10px] bg-background" />
+                        <div className="h-full w-[5px] bg-background" />
                       </div>
                       {/* Invisible native slider for interaction */}
                       <input
