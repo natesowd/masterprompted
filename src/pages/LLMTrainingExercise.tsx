@@ -391,8 +391,7 @@ export default function LLMTrainingExercise() {
                             const group = getSectionGroup(section.heading);
                             return (
                             <div key={i}>
-                              {section.heading !== "Key Provisions" && (
-                                <h3
+                              <h3
                                   className={cn(
                                     "text-lg font-heading font-semibold text-foreground mb-3 px-1 py-0.5 cursor-default",
                                     structClass(group)
@@ -401,7 +400,6 @@ export default function LLMTrainingExercise() {
                                 >
                                   {section.heading}
                                 </h3>
-                              )}
                               {section.heading === "Introduction" ? (
                                 <SectionFlag
                                   evaluationFactor="relevance"
