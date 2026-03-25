@@ -130,13 +130,16 @@ export default function SectionFlag({
         </div>
       </HoverCardTrigger>
       <HoverCardContent
-        className="w-80 bg-white border border-red-200 shadow-lg rounded-lg p-4"
+        className={cn(
+          "w-80 bg-white shadow-lg rounded-lg p-4",
+          severity === "warning" ? "border-yellow-200" : severity === "info" ? "border-blue-200" : "border-red-200"
+        )}
         sideOffset={5}
       >
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Icon className="h-4 w-4 text-red-500" />
-            <h4 className="font-semibold text-red-700 text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
+            <Icon className={cn("h-4 w-4", severity === "warning" ? "text-yellow-600" : severity === "info" ? "text-blue-500" : "text-red-500")} />
+            <h4 className={cn("font-semibold text-sm", severity === "warning" ? "text-yellow-700" : severity === "info" ? "text-blue-700" : "text-red-700")}>{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
           </div>
           <p className="text-sm text-gray-700 leading-relaxed">
             {explanation}
