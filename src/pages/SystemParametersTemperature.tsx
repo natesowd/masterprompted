@@ -93,12 +93,15 @@ export default function SystemParametersTemperature() {
                       {/* Filled range */}
                       <div
                         className="absolute left-0 h-5 rounded-l bg-brand-tertiary-500"
-                        style={{ width: `calc(${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}% - 30px)` }}
+                        style={{ width: `${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
                       />
-                      {/* Thumb bar with gap */}
+                      {/* Thumb bar with blank padding around it */}
                       <div
                         className="absolute h-8 w-1.5 rounded-sm bg-brand-tertiary-500 -translate-x-1/2 cursor-pointer"
-                        style={{ left: `${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
+                        style={{
+                          left: `${(stepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%`,
+                          boxShadow: '10px 0 0 hsl(0 0% 98.4%), -10px 0 0 hsl(0 0% 98.4%)',
+                        }}
                       />
                       {/* Invisible native slider for interaction */}
                       <input
