@@ -483,9 +483,9 @@ export default function LLMTrainingExercise() {
         sideOffset={20}
         closeLabel="Got it"
       >
-        <strong>Compare structures!</strong>
+        <strong>Compare sections!</strong>
         <br />
-        Hover over titles, headings, or bullet points in the training pair to see matching structural elements highlighted in the output column.
+        Hover over a section (e.g. Introduction, Conclusion) in the training pair to see the matching section highlighted in the output — notice how the model replicates the same structure.
       </FeatureHighlight>
     </div>
   );
