@@ -308,6 +308,10 @@ export default function MultipleSourcesExercise() {
     return sorted.flatMap((id) => SNIPPETS_BY_DOC[id] || []);
   }, [selected]);
 
+  const selectedDocs = useMemo(() => {
+    return DOCUMENTS.filter((doc) => selected.has(doc.id));
+  }, [selected]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
