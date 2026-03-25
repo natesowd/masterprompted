@@ -385,7 +385,7 @@ export default function LLMTrainingExercise() {
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <div className="space-y-6">
                           {MAIN_OUTPUT.sections.map((section, i) => {
-                            const group = getSectionGroup(i);
+                            const group = getSectionGroup(section.heading);
                             return (
                             <div key={i}>
                               <h3
