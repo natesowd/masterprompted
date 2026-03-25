@@ -215,17 +215,17 @@ export default function LLMTrainingExercise() {
     setActiveStruct(null);
   };
 
-  const structClass = (group: StructGroup) =>
+  const structClass = (group: StructGroup | null) =>
     cn(
       "transition-all duration-200 rounded-sm",
-      activeStruct === group ? STRUCT_COLORS[group] : "",
+      group && activeStruct === group ? STRUCT_COLORS[group] : "",
       activeStruct && activeStruct !== group ? "opacity-35" : ""
     );
 
-  const structHandlers = (group: StructGroup) => ({
+  const structHandlers = (group: StructGroup | null) => group ? ({
     onMouseEnter: () => setActiveStruct(group),
     onMouseLeave: () => setActiveStruct(null),
-  });
+  }) : {};
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
