@@ -176,7 +176,7 @@ const PromptPlayground = () => {
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
       const payload = {
-        model: "meta-llama/Llama-3.1-8B-Instruct:ovhcloud",
+        model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
         // model: "Qwen/Qwen3-Coder-30B-A3B-Instruct:fastest",
         temperature: 0.7,
         stream: true,
