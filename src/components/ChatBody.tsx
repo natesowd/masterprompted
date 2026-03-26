@@ -262,7 +262,7 @@ const ChatBody = memo(function ChatBody({
                 <div className="space-y-4 select-none pointer-events-none opacity-40">
                   {/* Faint prompt placeholder */}
                   <div className="flex justify-end">
-                    <div className="bg-muted/50 p-5 max-w-[80%] mx-2" style={{ borderRadius: '20px' }}>
+                    <div className="bg-muted-light p-5 max-w-[80%] mx-2" style={{ borderRadius: '20px' }}>
                       <p className="text-foreground leading-relaxed text-sm italic">
                         {t('components.chatBody.promptPlaceholder')}
                       </p>

@@ -23,12 +23,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const promptVariants = cva(
-  "mb-6 mx-2 max-w-fit ml-auto bg-muted/50 relative",
+  "mb-6 mx-2 max-w-fit ml-auto bg-muted-light relative",
   {
     variants: {
       variant: {
-        default: "bg-muted/50",
-        highlighted: "bg-muted/40 ring-2 ring-primary"
+        default: "bg-muted-light",
+        highlighted: "bg-muted-light ring-2 ring-primary"
       },
       size: {
         default: "p-5 max-w-[80%]",
