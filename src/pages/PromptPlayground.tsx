@@ -65,6 +65,13 @@ const PromptPlayground = () => {
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
   const CONTEXT_WINDOW_LIMIT_TOKENS = 125000;
 
+  // Optimization cache: key = JSON(prompt + parameters) -> optimized prompt
+  const optimizationCacheRef = useRef<Map<string, string>>(new Map());
+
+  const buildCacheKey = (prompt: string, params: Parameters): string => {
+    return JSON.stringify({ prompt: prompt.trim(), ...params });
+  };
+
   // Track current page language (forwarded from Header -> LanguageSwitcher)
   const [pageLanguage, setPageLanguage] = useState<'en' | 'es'>('en');
 
@@ -419,6 +426,10 @@ const PromptPlayground = () => {
       const optimizedPrompt = rawOptimizedPrompt.trim().replace(/^["'](.+)["']$/, '$1');
 
       if (optimizedPrompt) {
+        // Cache the result
+        const cacheKey = buildCacheKey(prompt, { specificity, style, context, bias });
+        optimizationCacheRef.current.set(cacheKey, optimizedPrompt);
+
         setEditingText(optimizedPrompt);
         setDisableOptimize(false);
         setOptimizePulse(prev => prev + 1);
@@ -507,9 +518,18 @@ const PromptPlayground = () => {
       return;
     }
     if (Object.values(parameters).some(p => p !== "")) {
-      setDisableSend(true);
       const promptToOptimize = currentPrompt.trim() ? currentPrompt : editingText;
       if (promptToOptimize) {
+        // Check cache first
+        const cacheKey = buildCacheKey(promptToOptimize, parameters);
+        const cached = optimizationCacheRef.current.get(cacheKey);
+        if (cached) {
+          setEditingText(cached);
+          setDisableOptimize(false);
+          setOptimizePulse(prev => prev + 1);
+          return;
+        }
+        setDisableSend(true);
         handlePromptOptimize(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
       }
     }
@@ -572,6 +592,20 @@ const PromptPlayground = () => {
 
   const handleChatSubmit = (submittedText: string) => { void handleSubmit(submittedText, true); };
   const handleOptimizeSubmit = async () => { if (editingText.trim()) { void handleSubmit(editingText, false); } };
+
+  const handleRegenerate = useCallback(() => {
+    const promptToOptimize = currentPrompt.trim() ? currentPrompt : editingText;
+    if (!promptToOptimize?.trim()) return;
+    if (Object.values(parameters).every(p => p === "")) return;
+    // Delete the cached entry so a fresh optimization is forced
+    const cacheKey = buildCacheKey(promptToOptimize, parameters);
+    optimizationCacheRef.current.delete(cacheKey);
+    setDisableSend(true);
+    handlePromptOptimize(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
+  }, [currentPrompt, editingText, parameters, handlePromptOptimize]);
+
+  // Show regenerate button when there's an active optimization result for the current parameter set
+  const showRegenerate = !disableOptimize && !waitingforOptimization && Object.values(parameters).some(p => p !== "");
   const handleInputChange = (input: string) => {
     setHasManualEdit(true);
     handleReset();
@@ -622,6 +656,8 @@ const PromptPlayground = () => {
                 onParameterChange: handleParameterChange,
                 onReset: handleReset,
                 onOptimize: handleOptimizeSubmit,
+                onRegenerate: handleRegenerate,
+                showRegenerate,
                 onUndo: handleUndo,
                 chatValue: editingText,
                 onChatChange: handleInputChange,

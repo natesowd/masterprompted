@@ -17,7 +17,7 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, Paperclip, SendHorizontal } from "lucide-react";
+import { Loader2, Paperclip, RefreshCcw, SendHorizontal } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -94,6 +94,10 @@ type ChatboxProps = VariantProps<typeof chatboxVariants> & {
   autoResize?: boolean;
   /** Additional CSS classes */
   className?: string;
+  /** Callback to regenerate the current optimization */
+  onRegenerate?: () => void;
+  /** Whether to show the regenerate button */
+  showRegenerate?: boolean;
 };
 
 const Chatbox = ({
@@ -113,7 +117,9 @@ const Chatbox = ({
   autoResize = false,
   className = "",
   size,
-  state
+  state,
+  onRegenerate,
+  showRegenerate = false
 }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
@@ -227,6 +233,18 @@ const Chatbox = ({
           e.target.value = "";
         }} />
 
+      {onRegenerate && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full h-4 w-4 flex-shrink-0"
+          type="button"
+          title="Regenerate optimization"
+          disabled={!showRegenerate}
+          onClick={() => onRegenerate?.()}>
+          <RefreshCcw className={cn("h-4 w-4", !showRegenerate ? "text-muted-foreground/30" : "text-muted-foreground")} />
+        </Button>
+      )}
       <Button
         variant="ghost"
         size="icon"

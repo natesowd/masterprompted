@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Info } from "lucide-react";
+import { Info, Redo2, RefreshCcw } from "lucide-react";
 import Chatbox from "./ChatBox";
 import { Parameters } from "@/pages/PromptPlayground";
 import { useState, useEffect, useRef } from "react";
@@ -135,6 +135,8 @@ interface PromptControlsProps {
     onParameterChange: (key: keyof Parameters, value: string) => void;
     onReset?: () => void;
     onOptimize?: () => void;
+    onRegenerate?: () => void;
+    showRegenerate?: boolean;
     undoEnabled?: boolean;
     onUndo?: () => void;
     disableSend?: boolean;
@@ -167,6 +169,8 @@ export default function PromptControls({
     onParameterChange,
     onReset,
     onOptimize,
+    onRegenerate,
+    showRegenerate = false,
     undoEnabled = false,
     onUndo,
     chatValue = "",
@@ -246,6 +250,8 @@ export default function PromptControls({
                     readOnly={readOnly}
                     hideSubmitButton={hideChatSubmitButton}
                     autoResize={readOnly}
+                    onRegenerate={onRegenerate}
+                    showRegenerate={showRegenerate}
                     className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
                 />
 
@@ -257,10 +263,10 @@ export default function PromptControls({
                             <PopoverTrigger asChild onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
                                 <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
                             </PopoverTrigger>
-                            <PopoverContent 
-                                side="top" 
-                                align="start" 
-                                sideOffset={6} 
+                            <PopoverContent
+                                side="top"
+                                align="start"
+                                sideOffset={6}
                                 className="max-w-xs bg-emerald-600 text-white rounded-xl shadow-lg px-5 py-4 text-sm font-medium border-none leading-relaxed z-[100]"
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
@@ -335,7 +341,7 @@ export default function PromptControls({
                     </p>
                 </div>
             </div>
-            
+
             <Dialog open={walkthroughOpen} onOpenChange={setWalkthroughOpen}>
                 <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-8 rounded-3xl border-none shadow-2xl">
                     <DialogHeader className="mb-6">
@@ -346,9 +352,9 @@ export default function PromptControls({
                             This diagram shows an overview of the prompt playground. A standard LLM is used for response generation, but a <b>specialized LLM</b> must be used for the prompt optimization, because this task has a relatively small scope. This is accomplished by giving a general-purpose LLM a specialized <b>system prompt</b>, where it’s given instructions and rules, as well as expected input and output formats. The user’s prompt is then injected into a standardized <b>meta-prompt</b> which reduces LLM volatility and encourages it to stay on-task. Also injected into the meta-prompt are the parameters selected by the user, formatted for coherency. The meta-prompt is passed to the optimizer LLM and it generates a suitable optimization prompt. The user’s original prompt is always used as the baseline prompt in order to prevent <b>model collapse</b>.
                         </p>
                         <div className="flex justify-center bg-muted/30 p-10 rounded-3xl border border-border/50 shadow-inner">
-                            <img 
-                                src={optimizationFig} 
-                                alt="Prompt Optimization Diagram" 
+                            <img
+                                src={optimizationFig}
+                                alt="Prompt Optimization Diagram"
                                 className="max-w-full h-auto rounded-xl shadow-xl border border-white/20"
                             />
                         </div>
