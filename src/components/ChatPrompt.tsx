@@ -23,12 +23,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const promptVariants = cva(
-  "mb-6 mx-2 max-w-fit ml-auto bg-muted relative",
+  "mb-6 mx-2 max-w-fit ml-auto bg-muted/50 relative",
   {
     variants: {
       variant: {
-        default: "bg-muted",
-        highlighted: "bg-muted/80 ring-2 ring-primary"
+        default: "bg-muted/50",
+        highlighted: "bg-muted/40 ring-2 ring-primary"
       },
       size: {
         default: "p-5 max-w-[80%]",
@@ -48,6 +48,8 @@ type ChatPromptProps = VariantProps<typeof promptVariants> & {
   text: string;
   /** Optional attached file name */
   fileName?: string;
+  /** Optional array of attached file names (e.g. uploaded PDFs) */
+  fileNames?: string[];
   /** System parameters used for this prompt */
   parameters?: Parameters;
   /** Current version index (0-based) */
@@ -60,21 +62,37 @@ type ChatPromptProps = VariantProps<typeof promptVariants> & {
   onNextVersion?: () => void;
 };
 
-const ChatPrompt = ({ 
-  text, 
-  fileName, 
-  parameters, 
-  versionIndex = 0, 
-  versionCount = 1, 
-  onPrevVersion, 
+const MAX_FILENAME_LENGTH = 28;
+
+const truncateFileName = (name: string): string => {
+  if (name.length <= MAX_FILENAME_LENGTH) return name;
+  const ext = name.lastIndexOf('.') !== -1 ? name.slice(name.lastIndexOf('.')) : '';
+  const base = name.slice(0, name.length - ext.length);
+  const keep = MAX_FILENAME_LENGTH - ext.length - 1; // 1 for ellipsis char
+  return base.slice(0, keep) + '…' + ext;
+};
+
+const ChatPrompt = ({
+  text,
+  fileName,
+  fileNames = [],
+  parameters,
+  versionIndex = 0,
+  versionCount = 1,
+  onPrevVersion,
   onNextVersion,
   variant,
-  size 
+  size
 }: ChatPromptProps) => {
   const paramString = parameters && Object.entries(parameters)
     .filter(([, value]) => value)
     .map(([key, value]) => `${value}`)
     .join(', ');
+
+  const allFiles = [
+    ...(fileName ? [fileName] : []),
+    ...fileNames,
+  ];
 
   return (
     <div
@@ -86,7 +104,7 @@ const ChatPrompt = ({
         text={text}
         className="text-foreground leading-relaxed"
       />
-      {(fileName || versionCount > 1) && (
+      {(allFiles.length > 0 || versionCount > 1) && (
         <div className="flex justify-between items-center mt-2">
           {/* Left side: Parameters and Attachments */}
           <div className="flex flex-col items-start gap-1">
@@ -95,12 +113,18 @@ const ChatPrompt = ({
                 {paramString}
               </p>
             )}
-            {fileName && (
-              <div className="inline-flex items-center gap-2">
-                <Paperclip className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-foreground font-medium">
-                  {fileName}
-                </span>
+            {allFiles.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Paperclip className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                {allFiles.map((name, i) => (
+                  <span
+                    key={i}
+                    className="text-xs text-muted-foreground truncate max-w-[200px]"
+                    title={name}
+                  >
+                    {truncateFileName(name)}
+                  </span>
+                ))}
               </div>
             )}
           </div>

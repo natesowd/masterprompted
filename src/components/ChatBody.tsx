@@ -9,7 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Thread } from "@/pages/PromptPlayground";
+import { Thread, ParsedFile } from "@/pages/PromptPlayground";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
 
 type RemovedComment = { id: string; value: string };
@@ -30,6 +30,7 @@ const ChatBody = memo(function ChatBody({
   onToggleThreadDiff,
   onToggleThreadEvaluation,
   onRequestControlPanelHelp,
+  uploadedFiles = [],
 }: {
   threads: Thread[];
   onPrevVersion: (threadIndex: number) => void;
@@ -37,6 +38,7 @@ const ChatBody = memo(function ChatBody({
   onToggleThreadDiff: (threadIndex: number, checked: boolean) => void;
   onToggleThreadEvaluation: (threadIndex: number, checked: boolean) => void;
   onRequestControlPanelHelp: () => void;
+  uploadedFiles?: ParsedFile[];
 }) {
   const { t } = useLanguage();
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -260,7 +262,7 @@ const ChatBody = memo(function ChatBody({
                 <div className="space-y-4 select-none pointer-events-none opacity-40">
                   {/* Faint prompt placeholder */}
                   <div className="flex justify-end">
-                    <div className="bg-muted p-5 max-w-[80%] mx-2" style={{ borderRadius: '20px' }}>
+                    <div className="bg-muted/50 p-5 max-w-[80%] mx-2" style={{ borderRadius: '20px' }}>
                       <p className="text-foreground leading-relaxed text-sm italic">
                         {t('components.chatBody.promptPlaceholder')}
                       </p>
@@ -299,6 +301,7 @@ const ChatBody = memo(function ChatBody({
                     <ChatPrompt
                       text={current.prompt}
                       parameters={current.parameters}
+                      fileNames={uploadedFiles.map(f => f.name)}
                       versionIndex={thread.currentIndex}
                       versionCount={thread.versions.length}
                       onPrevVersion={() => onPrevVersion(threadIndex)}
