@@ -320,6 +320,63 @@ const CONCISE_ITEM_POOL: Record<string, string[]> = {
   ],
 };
 
+/* Style pools for the EXAMPLE pair (renewable energy) shown in the sidebar */
+const EXAMPLE_FORMAL_POOL: Record<string, string[]> = {
+  "Introduction": [
+    "An analysis of the present state of renewable energy development across Europe",
+    "An examination of policy objectives and commitments pertaining to climate change mitigation",
+    "The strategic significance of renewable energy for ensuring energy security and addressing climate change",
+  ],
+  "Key Policies": [
+    "The objectives and strategic framework of the European Green Deal",
+    "The REPowerEU plan and its implications for European energy independence",
+    "The Renewable Energy Directive (RED III) and its quantitative targets",
+  ],
+  "Implementation Challenges": [
+    "Limitations pertaining to grid infrastructure and energy storage capacity",
+    "The financing and capital investment requirements for renewable energy deployment",
+    "The complexities of cross-border energy cooperation and regulatory harmonisation",
+  ],
+  "Economic Impact": [
+    "Employment generation within the green energy sector and associated industries",
+    "The effects of energy transition policies on consumer energy pricing",
+    "Concerns regarding industrial competitiveness in the context of energy transition",
+  ],
+  "Conclusion": [
+    "An assessment of progress toward the 2030 and 2050 climate and energy targets",
+    "The role of policy instruments in accelerating the renewable energy transition",
+    "Future outlook and the identification of remaining policy and implementation gaps",
+  ],
+};
+
+const EXAMPLE_CONCISE_POOL: Record<string, string[]> = {
+  "Introduction": [
+    "Renewable energy status in Europe",
+    "Climate policy goals",
+    "Energy security relevance",
+  ],
+  "Key Policies": [
+    "Green Deal objectives",
+    "REPowerEU plan",
+    "RED III targets",
+  ],
+  "Implementation Challenges": [
+    "Grid & storage gaps",
+    "Investment needs",
+    "Cross-border cooperation",
+  ],
+  "Economic Impact": [
+    "Green job creation",
+    "Consumer energy costs",
+    "Industry competitiveness",
+  ],
+  "Conclusion": [
+    "2030/2050 progress",
+    "Policy role in transition",
+    "Remaining gaps",
+  ],
+};
+
 /* ------------------------------------------------------------------ */
 /*  Structural highlight groups                                        */
 /* ------------------------------------------------------------------ */
@@ -444,6 +501,21 @@ export default function LLMTrainingExercise() {
     setActiveStyle(null);
   }, []);
 
+  /* ── Derive example pair items from style ── */
+  const derivedExample = useMemo((): OutputSection[] => {
+    if (!activeStyle) return editableExample;
+    const pool = activeStyle === "formal" ? EXAMPLE_FORMAL_POOL : EXAMPLE_CONCISE_POOL;
+    return editableExample.map(section => {
+      const styledItems = pool[section.heading];
+      if (!styledItems) return section;
+      // Keep the same count as the editable version, pull from styled pool
+      return {
+        ...section,
+        items: section.items.map((_, i) => styledItems[i] ?? section.items[i]),
+      };
+    });
+  }, [editableExample, activeStyle]);
+
   /* ── Derive output from editable example ── */
   const derivedOutput = useMemo(() => {
     const stylePool = activeStyle === "formal"
@@ -475,6 +547,16 @@ export default function LLMTrainingExercise() {
       return "Need changes? Let me know.";
     }
     return MAIN_OUTPUT.footer;
+  }, [activeStyle]);
+
+  const derivedExampleFooter = useMemo(() => {
+    if (activeStyle === "formal") {
+      return "Should you wish to elaborate on any particular section or adjust the thematic focus of this outline, please indicate your preferences.";
+    }
+    if (activeStyle === "concise") {
+      return "Want changes? Just say.";
+    }
+    return INPUT_OUTPUT_PAIRS[0].footer;
   }, [activeStyle]);
 
   return (
@@ -675,12 +757,16 @@ export default function LLMTrainingExercise() {
                         Output (editable)
                       </span>
 
-                      <div className="max-h-[280px] overflow-y-auto pr-1 space-y-2">
+                      <div
+                        ref={sidebarScrollRef}
+                        onScroll={() => handleSyncScroll("sidebar")}
+                        className="max-h-[280px] overflow-y-auto pr-1 space-y-2"
+                      >
                         <span className="text-xs font-semibold text-foreground block">
                           {INPUT_OUTPUT_PAIRS[0].outputTitle}
                         </span>
 
-                        {editableExample.map((section, si) => (
+                        {derivedExample.map((section, si) => (
                           <div key={si}>
                             <span className="text-xs font-semibold text-foreground block mb-0.5">
                               {section.heading}
@@ -718,9 +804,9 @@ export default function LLMTrainingExercise() {
                           </div>
                         ))}
 
-                        {INPUT_OUTPUT_PAIRS[0].footer && (
+                        {derivedExampleFooter && (
                           <p className="text-xs text-muted-foreground italic mt-1">
-                            {INPUT_OUTPUT_PAIRS[0].footer}
+                            {derivedExampleFooter}
                           </p>
                         )}
                       </div>
@@ -767,7 +853,7 @@ export default function LLMTrainingExercise() {
 
                       {/* ── Structural view output ── */}
                       {viewMode === "structural" && (
-                        <div ref={mainScrollRef} onScroll={() => handleSyncScroll("main")} className="max-h-[500px] overflow-y-auto flex-1">
+                        <div ref={mainScrollRef} onScroll={() => handleSyncScroll("main")} className="h-[calc(100vh-22rem)] overflow-y-auto flex-1">
                           {/* Title */}
                           <h2
                             className={cn(
@@ -876,7 +962,7 @@ export default function LLMTrainingExercise() {
 
                       {/* ── Interactive view output ── */}
                       {viewMode === "interactive" && (
-                        <div className="max-h-[500px] overflow-y-auto flex-1">
+                        <div ref={mainScrollRef} onScroll={() => handleSyncScroll("main")} className="h-[calc(100vh-22rem)] overflow-y-auto flex-1">
                           <h2 className="text-xl font-heading font-semibold text-foreground mb-6 px-1 py-0.5">
                             {MAIN_OUTPUT.outputTitle}
                           </h2>
