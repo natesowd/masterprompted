@@ -853,7 +853,7 @@ export default function LLMTrainingExercise() {
 
                       {/* ── Structural view output ── */}
                       {viewMode === "structural" && (
-                        <div ref={mainScrollRef} onScroll={() => handleSyncScroll("main")} className="max-h-[420px] overflow-y-auto flex-1">
+                        <div ref={mainScrollRef} onScroll={() => handleSyncScroll("main")} className="flex-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 320px)' }}>
                           {/* Title */}
                           <h2
                             className={cn(
