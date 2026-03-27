@@ -72,8 +72,8 @@ export default function MultipleSources() {
         </div>
 
         {/* LLM Disclaimer */}
-        <div className="fixed bottom-4 left-4 z-10">
-          <p className="text-[13px] text-muted-foreground/70">
+        <div className="fixed bottom-0 left-0 right-0 z-10 px-3 py-2 bg-background/80 backdrop-blur-sm">
+          <p className="text-[13px] leading-snug text-muted-foreground/70 text-left">
             LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
           </p>
         </div>
