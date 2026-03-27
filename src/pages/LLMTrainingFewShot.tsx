@@ -58,7 +58,7 @@ export default function LLMTrainingFewShot() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pb-10">
         <div className="flex-1 flex justify-center">
           <div className="flex flex-col">
             {/* Breadcrumb for 2xl */}
