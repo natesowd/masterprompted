@@ -52,7 +52,7 @@ export default function SystemParametersRoles() {
     <div className="min-h-screen bg-background overflow-x-hidden flex flex-col">
       <Header />
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pb-10">
         <div className="flex-1 flex justify-center">
           <div className="flex flex-col w-full">
             {/* Breadcrumb */}
@@ -165,8 +165,10 @@ export default function SystemParametersRoles() {
       />
 
       {/* LLM Disclaimer */}
-      <div className="fixed bottom-3 left-3 text-[13px] leading-snug text-muted-foreground/70 text-left z-10">
-        LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+      <div className="fixed bottom-0 left-0 right-0 z-10 px-3 py-2 bg-background/80 backdrop-blur-sm">
+        <p className="text-[13px] leading-snug text-muted-foreground/70 text-left">
+          LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+        </p>
       </div>
     </div>
   );
