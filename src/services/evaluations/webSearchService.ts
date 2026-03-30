@@ -7,9 +7,17 @@
 
 const WEB_SEARCH_ENDPOINT = "https://web-search-aicode.ilabhub.atc.gr/web_search/";
 
+export interface DebunkingSource {
+  context: string;
+  source: string;
+  origin: string;
+  citationNumber: number;
+}
+
 export interface WebSearchResult {
   claimDebunked: boolean;
   debunkReport: string;
+  debunkingSources: DebunkingSource[];
 }
 
 /**
@@ -32,9 +40,18 @@ export async function webSearchClaim(claimText: string): Promise<WebSearchResult
     }
 
     const data = await response.json();
+
+    const debunkingSources: DebunkingSource[] = (data.debunking ?? []).map((d: any) => ({
+      context: d.context ?? "",
+      source: d.metadata?.source ?? "",
+      origin: d.metadata?.origin ?? "",
+      citationNumber: d.metadata?.citation_number ?? 0,
+    }));
+
     return {
       claimDebunked: data.claim_debunked === true,
       debunkReport: data.debunk_report ?? "",
+      debunkingSources,
     };
   } catch (error) {
     console.error("webSearchClaim error:", error);

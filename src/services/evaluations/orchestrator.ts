@@ -82,6 +82,18 @@ export async function runAllEvaluations(
     try {
       const searchResult = await webSearchClaim(claim.claim);
       if (searchResult?.claimDebunked && searchResult.debunkReport) {
+        // Build explanation with hyperlinked sources
+        let explanation = searchResult.debunkReport;
+        if (searchResult.debunkingSources.length > 0) {
+          const sourceLinks = searchResult.debunkingSources
+            .filter(s => s.source)
+            .map(s => `- [${s.origin || s.source}](${s.source})`)
+            .join("\n");
+          if (sourceLinks) {
+            explanation += `\n\n**Sources:**\n${sourceLinks}`;
+          }
+        }
+
         const newSpan: EvaluationSpan = {
           start: claim.snippetStart,
           end: claim.snippetStart + claim.snippet.length,
@@ -89,7 +101,7 @@ export async function runAllEvaluations(
           confidence: 1.0,
           value: "factual_inaccuracy",
           source: "web_search",
-          explanation: searchResult.debunkReport,
+          explanation,
         };
         result.spans.push(newSpan);
         result.spans.sort((a, b) => a.start - b.start);

@@ -74,6 +74,8 @@ interface TextFlagProps extends VariantProps<typeof textFlagVariants> {
   className?: string;
   /** Optional external link URL (used when single explanation) */
   href?: string;
+  /** Whether to show the flag icon. Defaults to true. Set false for continuation chunks of the same region. */
+  showIcon?: boolean;
 }
 
 export default function TextFlag({
@@ -85,7 +87,8 @@ export default function TextFlag({
   className = "",
   href,
   severity,
-  noUnderline
+  noUnderline,
+  showIcon = true
 }: TextFlagProps) {
   const Icon = iconMap[evaluationFactor];
   const [hoverCardOpen, setHoverCardOpen] = useState(false);
@@ -128,7 +131,7 @@ export default function TextFlag({
             setHoverCardOpen(!hoverCardOpen);
           }}
         >
-          <Icon className="inline-block h-4 w-4 text-destructive align-middle mr-1" />
+          {showIcon && <Icon className="inline-block h-4 w-4 text-destructive align-middle mr-1" />}
           {activeHref ? (
             <a
               href={activeHref}
@@ -147,7 +150,7 @@ export default function TextFlag({
         </span>
       </HoverCardTrigger>
       <HoverCardContent
-        className="w-72 max-w-[85vw] bg-card border-destructive/20 shadow-lg rounded-lg p-3 overflow-hidden"
+        className="w-80 max-w-[85vw] bg-card border-destructive/20 shadow-lg rounded-lg p-3 overflow-hidden"
         sideOffset={5}
       >
         <div className="space-y-2 overflow-hidden">
@@ -178,7 +181,7 @@ export default function TextFlag({
               </div>
             )}
           </div>
-          <div className="text-sm text-foreground font-normal leading-relaxed break-words whitespace-normal overflow-wrap-anywhere text-left">
+          <div className="text-sm text-foreground font-normal leading-relaxed break-words whitespace-normal overflow-wrap-anywhere text-left max-h-48 overflow-y-auto">
             {currentPage && typeof currentPage.explanation === 'string' && currentPage.explanation
               ? <RichText text={currentPage.explanation} prose={false} />
               : (typeof explanation !== 'string' && explanation != null)
