@@ -7,6 +7,8 @@ import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBody";
 import { checkDisinformation, DisinformationSpan } from "@/services/disinformationApi";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 const NO_CHANGE_VALUE = "no-change";
 // const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
 //   ? "/api/chat"
@@ -66,6 +68,13 @@ const PromptPlayground = () => {
   const optimizeAbortControllerRef = useRef<AbortController | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
   const CONTEXT_WINDOW_LIMIT_TOKENS = 125000;
+  const [summarizationProgress, setSummarizationProgress] = useState<{
+    isActive: boolean;
+    fileName: string;
+    phase: string;
+    current: number;
+    total: number;
+  }>({ isActive: false, fileName: '', phase: '', current: 0, total: 0 });
 
   // Optimization cache: key = JSON(prompt + parameters) -> optimized prompt
   const optimizationCacheRef = useRef<Map<string, string>>(new Map());
@@ -493,16 +502,20 @@ const PromptPlayground = () => {
 
         if (rawTokens > SHORT_DOC_TOKEN_THRESHOLD) {
           console.log(`[pdfSummarizer] Document "${file.name}" has ${rawTokens} tokens — starting summarization...`);
+          setSummarizationProgress({ isActive: true, fileName: file.name, phase: 'starting', current: 0, total: 0 });
           try {
             const { summarizeDocument } = await import('@/lib/pdfSummarizer');
             const result = await summarizeDocument(text, NETLIFY_CHAT_URL, (phase, current, total) => {
               console.log(`[pdfSummarizer] ${file.name}: ${phase} ${current}/${total}`);
+              setSummarizationProgress({ isActive: true, fileName: file.name, phase, current, total });
             });
             finalContent = result.summary;
             isSummarized = true;
             console.log(`[pdfSummarizer] Summarized "${file.name}": ${result.originalTokenCount} → ${result.summaryTokenCount} tokens`);
           } catch (sumErr) {
             console.warn(`[pdfSummarizer] Summarization failed for "${file.name}", using raw text:`, sumErr);
+          } finally {
+            setSummarizationProgress({ isActive: false, fileName: '', phase: '', current: 0, total: 0 });
           }
         }
 
@@ -733,6 +746,46 @@ const PromptPlayground = () => {
           </div>
         </div>
       </main>
+      {summarizationProgress.isActive && (
+        <Dialog open={true}>
+          <DialogContent className="max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
+            <DialogHeader>
+              <DialogTitle>{t('promptPlayground.summarization.inProgress')}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Large documents are summarized before use. This may take a moment.
+              </p>
+              <p className="text-sm font-medium truncate">
+                {summarizationProgress.fileName}
+              </p>
+              <div className="space-y-2">
+                <Progress
+                  value={
+                    summarizationProgress.phase === 'map' && summarizationProgress.total > 0
+                      ? (summarizationProgress.current / summarizationProgress.total) * 80
+                      : summarizationProgress.phase === 'reduce'
+                        ? 90
+                        : summarizationProgress.phase === 'summarize'
+                          ? 50
+                          : 5
+                  }
+                  className="h-2"
+                />
+                <p className="text-xs text-muted-foreground text-center">
+                  {summarizationProgress.phase === 'map'
+                    ? `Analyzing section ${summarizationProgress.current} of ${summarizationProgress.total}...`
+                    : summarizationProgress.phase === 'reduce'
+                      ? 'Combining summaries...'
+                      : summarizationProgress.phase === 'summarize'
+                        ? 'Summarizing document...'
+                        : 'Preparing...'}
+                </p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
       {showControlPanelPopover && (
         <PopoverSeries
           steps={[
