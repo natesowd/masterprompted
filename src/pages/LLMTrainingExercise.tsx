@@ -6,10 +6,11 @@ import EvaluationPanel from "@/components/EvaluationPanel";
 import ChatPrompt from "@/components/ChatPrompt";
 import FeatureHighlight from "@/components/FeatureHighlight";
 import SectionFlag from "@/components/SectionFlag";
+import RichText from "@/components/RichText";
 
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ArrowLeft, ArrowRight, Plus, X, Eye, Pencil } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, X, Eye, Pencil, GraduationCap, ThumbsUp, ThumbsDown, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -378,6 +379,113 @@ const EXAMPLE_CONCISE_POOL: Record<string, string[]> = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Train-the-model data                                               */
+/* ------------------------------------------------------------------ */
+
+interface TrainingPair {
+  id: number;
+  input: string;
+  output: string;
+  isGood: boolean;          // intended correct answer
+  trait: string;            // what this example teaches
+}
+
+const TRAINING_PAIRS: TrainingPair[] = [
+  {
+    id: 1,
+    input: "Summarise the recent changes to UK immigration policy.",
+    output: "**UK Immigration Policy Changes**\n\n• Points-based visa system expanded\n• New salary thresholds for skilled workers\n• Asylum processing reforms announced\n• Impact on healthcare sector staffing",
+    isGood: true,
+    trait: "structure",
+  },
+  {
+    id: 2,
+    input: "Write about advances in quantum computing.",
+    output: "Quantum computing is really cool and super advanced. It's basically like magic for computers. Everyone is excited about it because it will change everything someday, probably. Big companies are spending lots of money on it which is awesome.",
+    isGood: false,
+    trait: "tone",
+  },
+  {
+    id: 3,
+    input: "Outline key findings from the 2024 IPCC climate report.",
+    output: "**2024 IPCC Climate Report — Key Findings**\n\n• Global temperatures on track to exceed 1.5°C by early 2030s\n• Adaptation costs for developing nations rising sharply\n• Renewable energy deployment must triple by 2030\n• Methane reduction identified as fastest lever",
+    isGood: true,
+    trait: "specificity",
+  },
+  {
+    id: 4,
+    input: "Describe the economic impact of remote work.",
+    output: "Remote work has various economic impacts. It affects many sectors. Some companies save money while others spend more. Workers have different experiences. The overall impact is complex and depends on many factors that are still being studied by researchers around the world.",
+    isGood: false,
+    trait: "vagueness",
+  },
+  {
+    id: 5,
+    input: "Summarise the EU's Digital Markets Act enforcement so far.",
+    output: "**EU Digital Markets Act — Enforcement Update**\n\n• Six gatekeepers designated: Alphabet, Amazon, Apple, ByteDance, Meta, Microsoft\n• Compliance deadline: March 2024\n• Investigations opened against Apple and Meta\n• Fines up to 10% of global turnover for breaches",
+    isGood: true,
+    trait: "factual",
+  },
+  {
+    id: 6,
+    input: "Explain CRISPR gene editing for a general audience.",
+    output: "CRISPR is a ground-breaking revolutionary game-changing technology that will transform medicine forever!!! Scientists use molecular scissors to edit DNA with unprecedented precision, opening doors to curing previously incurable diseases. The possibilities are literally endless and the future is incredibly bright for humanity.",
+    isGood: false,
+    trait: "hype",
+  },
+  {
+    id: 7,
+    input: "Brief on the current state of global semiconductor supply chains.",
+    output: "**Semiconductor Supply Chains — Current State**\n\n• TSMC expanding fab capacity in Arizona and Japan\n• EU Chips Act allocating €43B to domestic production\n• China accelerating self-sufficiency in mature nodes\n• Lead times normalising but geopolitical risks remain",
+    isGood: true,
+    trait: "conciseness",
+  },
+  {
+    id: 8,
+    input: "Write about the benefits of meditation.",
+    output: "Meditation is great. It helps with stress and stuff. People who meditate feel better. There are many types of meditation. You should try it. It's been around for thousands of years. Many celebrities meditate. Apps make it easy now.",
+    isGood: false,
+    trait: "depth",
+  },
+  {
+    id: 9,
+    input: "Outline the WHO's position on antibiotic resistance.",
+    output: "**WHO on Antibiotic Resistance**\n\n• Classified as one of the top 10 global public health threats\n• 1.27 million deaths directly attributed to resistant infections in 2019\n• Action plan calls for surveillance, stewardship, and R&D investment\n• Targets 60% reduction in inappropriate antibiotic use by 2030",
+    isGood: true,
+    trait: "evidence",
+  },
+  {
+    id: 10,
+    input: "Describe recent developments in space tourism.",
+    output: "Space tourism is becoming a thing now. Rich people can go to space. SpaceX and Blue Origin are the main companies. Virgin Galactic also exists. Tickets are expensive. It's an exciting time for space fans. Some people think it's wasteful though. The industry is growing.",
+    isGood: false,
+    trait: "quality",
+  },
+];
+
+/**
+ * Progressive output stages for the EU AI Act.
+ * Index 0 = untrained (raw), index 5 = fully trained (polished outline).
+ * The score from training decisions maps to one of these levels.
+ */
+const TRAINED_OUTPUT_STAGES: string[] = [
+  // Level 0 — untrained: rambling paragraph, no structure
+  `The EU AI Act is a regulation about artificial intelligence that the European Union made. It covers different kinds of AI systems and has rules about what's allowed and what isn't. There are penalties for not following the rules. Companies need to comply with it. The regulation was proposed a few years ago and has been in development. It classifies AI systems by risk level. Some AI practices are banned. High-risk systems have requirements. There are also rules about foundation models. The enforcement involves national authorities and fines. It will be implemented over several years. The Act could influence how other countries regulate AI too.`,
+
+  // Level 1 — some grouping emerges, still mostly prose
+  `The EU AI Act is the first comprehensive AI regulation globally, proposed in 2021 and reaching enforcement by 2025.\n\nThe regulation takes a risk-based approach. Some AI practices are prohibited outright, including social scoring and certain emotion recognition uses. High-risk AI systems must meet requirements for documentation, transparency, and human oversight. Foundation models face their own set of regulations.\n\nCompliance involves conformity assessments and CE marking. Organisations need risk management systems, data governance, and human oversight. Enforcement falls to national supervisory authorities, with fines reaching up to €35 million or 7% of global turnover. The Act will be phased in through 2027.\n\nThe regulation affects AI developers and deployers, with implications for compliance costs, innovation, and global AI governance.`,
+
+  // Level 2 — headings appear, bullets still rough
+  `**AI Act Article Outline**\n\n**Introduction**\nThe EU AI Act is the first comprehensive AI regulation globally, covering its timeline from proposal to enforcement (2021-2025) and why it matters.\n\n**Key Provisions**\nRisk-based approach with prohibited, high-risk, limited-risk, and minimal-risk categories. Banned practices include social scoring and emotion recognition in workplaces. High-risk systems need documentation, transparency, and oversight. Foundation models also regulated.\n\n**Compliance & Enforcement**\nConformity assessments and CE marking required. Risk management, data governance, and record-keeping obligations. National supervisory authorities enforce with fines up to €35 million or 7% of global turnover. Phased implementation through 2027.\n\n**Industry Impact & Conclusion**\nAffects developers and deployers. Compliance costs and market access concerns. Could become a model for other jurisdictions. Challenges and opportunities ahead.`,
+
+  // Level 3 — sections with bullets but not fully consistent
+  `**AI Act Article Outline**\n\n**Introduction**\n• What is the EU AI Act and why it matters\n• Timeline: from proposal to enforcement (2021-2025)\n• First comprehensive AI regulation globally\n\n**Key Provisions**\n• Risk-based approach: prohibited, high-risk, limited-risk, and minimal-risk AI systems\n• Prohibited AI practices (social scoring, emotion recognition in workplaces/schools, etc.)\n• Requirements for high-risk AI systems\n• Foundation model regulations\n\n**Compliance Requirements**\nConformity assessments and CE marking. Risk management systems and quality management. Data governance and record-keeping obligations. Human oversight requirements.\n\n**Enforcement and Penalties**\n• National supervisory authorities\n• Fines up to €35 million or 7% of global turnover\n• Phased implementation timeline through 2027\n\n**Industry Impact**\nEffects on AI developers and deployers, compliance costs and market access, innovation vs. regulation balance, global influence on AI governance.\n\n**Conclusion**\n• Significance for the future of AI regulation\n• Potential model for other jurisdictions\n• Challenges and opportunities ahead`,
+
+  // Level 4 — clean outline, consistent bullets throughout
+  `**AI Act Article Outline**\n\n**Introduction**\n• What is the EU AI Act and why it matters\n• Timeline: from proposal to enforcement (2021-2025)\n• First comprehensive AI regulation globally\n\n**Key Provisions**\n• Risk-based approach: prohibited, high-risk, limited-risk, and minimal-risk AI systems\n• Prohibited AI practices (social scoring, emotion recognition in workplaces/schools, etc.)\n• Requirements for high-risk AI systems (documentation, transparency, human oversight)\n• Foundation model regulations for powerful AI systems\n\n**Compliance Requirements**\n• Conformity assessments and CE marking\n• Risk management systems and quality management\n• Data governance and record-keeping obligations\n• Human oversight requirements\n\n**Enforcement and Penalties**\n• National supervisory authorities\n• Fines up to €35 million or 7% of global turnover\n• Phased implementation timeline through 2027\n\n**Industry Impact**\n• Effects on AI developers and deployers\n• Compliance costs and market access\n• Innovation vs. regulation balance\n• Global influence on AI governance\n\n**Conclusion**\n• Significance for the future of AI regulation\n• Potential model for other jurisdictions\n• Challenges and opportunities ahead\n\n_Would you like me to expand on any particular section or adjust the focus of the outline?_`,
+];
+
+/* ------------------------------------------------------------------ */
 /*  Structural highlight groups                                        */
 /* ------------------------------------------------------------------ */
 
@@ -421,7 +529,7 @@ function useStructHint() {
 
 export default function LLMTrainingExercise() {
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<"structural" | "interactive">("structural");
+  const [viewMode, setViewMode] = useState<"structural" | "interactive" | "train">("structural");
   const [selectedPair, setSelectedPair] = useState<string>(INPUT_OUTPUT_PAIRS[0].id);
   const [activeStruct, setActiveStruct] = useState<StructGroup | null>(null);
   const { show: showHint, dismiss: dismissHint } = useStructHint();
@@ -435,6 +543,47 @@ export default function LLMTrainingExercise() {
     () => INPUT_OUTPUT_PAIRS[0].sections.map(s => ({ heading: s.heading, items: [...s.items] }))
   );
   const [activeStyle, setActiveStyle] = useState<StyleModifier>(null);
+
+  /* ── Train mode state ── */
+  const [trainingDecisions, setTrainingDecisions] = useState<Record<number, "approve" | "disapprove">>({});
+  const [trainingCurrent, setTrainingCurrent] = useState(0);
+
+  const trainingScore = useMemo(() => {
+    let score = 0;
+    Object.entries(trainingDecisions).forEach(([idStr, decision]) => {
+      const pair = TRAINING_PAIRS.find(p => p.id === Number(idStr));
+      if (!pair) return;
+      // Correct decision: approving good or disapproving bad
+      const isCorrect = (pair.isGood && decision === "approve") || (!pair.isGood && decision === "disapprove");
+      score += isCorrect ? 1 : -0.5;
+    });
+    return Math.max(0, score);
+  }, [trainingDecisions]);
+
+  const trainingLevel = useMemo(() => {
+    const decisionCount = Object.keys(trainingDecisions).length;
+    if (decisionCount === 0) return 0;
+    const maxScore = TRAINING_PAIRS.length; // perfect score
+    const ratio = trainingScore / maxScore;
+    return Math.min(TRAINED_OUTPUT_STAGES.length - 1, Math.round(ratio * (TRAINED_OUTPUT_STAGES.length - 1)));
+  }, [trainingScore, trainingDecisions]);
+
+  const handleTrainingDecision = useCallback((pairId: number, decision: "approve" | "disapprove") => {
+    setTrainingDecisions(prev => ({ ...prev, [pairId]: decision }));
+    // Auto-advance to next undecided pair
+    setTrainingCurrent(curr => {
+      for (let i = curr + 1; i < TRAINING_PAIRS.length; i++) {
+        // find next undecided
+        return i;
+      }
+      return curr; // stay on last if all done
+    });
+  }, []);
+
+  const handleResetTraining = useCallback(() => {
+    setTrainingDecisions({});
+    setTrainingCurrent(0);
+  }, []);
 
   const handleSyncScroll = useCallback((source: "sidebar" | "main") => {
     if (isSyncing.current) return;
@@ -579,7 +728,9 @@ export default function LLMTrainingExercise() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   {viewMode === "structural"
                     ? "The model will use the training example (input) to create the output."
-                    : "Edit the training example below and see how it changes the model's output."
+                    : viewMode === "interactive"
+                      ? "Edit the training example below and see how it changes the model's output."
+                      : "Approve or disapprove examples to train the model. Watch how the output improves with each decision."
                   }
                 </p>
 
@@ -597,7 +748,11 @@ export default function LLMTrainingExercise() {
                     </ToggleGroupItem>
                     <ToggleGroupItem value="interactive" className="flex-1 gap-1.5 text-xs">
                       <Pencil className="h-3.5 w-3.5" />
-                      Edit Example
+                      Edit
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="train" className="flex-1 gap-1.5 text-xs">
+                      <GraduationCap className="h-3.5 w-3.5" />
+                      Train
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
@@ -837,6 +992,106 @@ export default function LLMTrainingExercise() {
                     </div>
                   </div>
                 )}
+
+                {/* ── Train view sidebar ── */}
+                {viewMode === "train" && (
+                  <div className="flex-1 overflow-y-auto pr-1 pb-4 space-y-3">
+                    {/* Progress bar */}
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-foreground">
+                        Training progress
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleResetTraining}
+                        className="text-[10px] text-muted-foreground hover:text-foreground underline flex items-center gap-1"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        Reset
+                      </button>
+                    </div>
+                    <div className="w-full bg-surface-500 rounded-full h-2">
+                      <div
+                        className="bg-brand-tertiary-500 h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${(Object.keys(trainingDecisions).length / TRAINING_PAIRS.length) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      {Object.keys(trainingDecisions).length} / {TRAINING_PAIRS.length} examples reviewed
+                      {trainingLevel > 0 && <span className="ml-1">— Output quality: level {trainingLevel}</span>}
+                    </p>
+
+                    {/* Example cards */}
+                    <div className="space-y-2">
+                      {TRAINING_PAIRS.map((pair, idx) => {
+                        const decision = trainingDecisions[pair.id];
+                        const isCurrent = idx === trainingCurrent && !decision;
+                        return (
+                          <div
+                            key={pair.id}
+                            className={cn(
+                              "rounded-lg border p-3 transition-all",
+                              isCurrent
+                                ? "border-brand-tertiary-500 shadow-sm"
+                                : decision
+                                  ? "border-border opacity-70"
+                                  : "border-border"
+                            )}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                Example {pair.id}
+                              </span>
+                              {decision && (
+                                <span className={cn(
+                                  "text-[10px] font-semibold px-1.5 py-0.5 rounded",
+                                  decision === "approve"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                )}>
+                                  {decision === "approve" ? "Approved" : "Disapproved"}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="mb-1.5">
+                              <span className="text-[10px] font-semibold text-muted-foreground block">Input</span>
+                              <p className="text-xs text-foreground leading-relaxed">{pair.input}</p>
+                            </div>
+
+                            <div className="mb-2">
+                              <span className="text-[10px] font-semibold text-muted-foreground block">Output</span>
+                              <div className="text-xs text-muted-foreground leading-relaxed max-h-[80px] overflow-y-auto whitespace-pre-line">
+                                {pair.output}
+                              </div>
+                            </div>
+
+                            {!decision && (
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleTrainingDecision(pair.id, "approve")}
+                                  className="flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-md border border-green-300 text-green-700 hover:bg-green-50 transition-colors"
+                                >
+                                  <ThumbsUp className="h-3 w-3" />
+                                  Approve
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleTrainingDecision(pair.id, "disapprove")}
+                                  className="flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors"
+                                >
+                                  <ThumbsDown className="h-3 w-3" />
+                                  Disapprove
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* ── Center content ── */}
@@ -993,6 +1248,29 @@ export default function LLMTrainingExercise() {
                               {derivedFooter}
                             </p>
                           )}
+                        </div>
+                      )}
+
+                      {/* ── Train view output ── */}
+                      {viewMode === "train" && (
+                        <div className="max-h-[420px] overflow-y-auto flex-1">
+                          <div className="flex items-center gap-2 mb-4">
+                            <span className={cn(
+                              "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded",
+                              trainingLevel === 0 ? "bg-red-100 text-red-700" :
+                              trainingLevel <= 2 ? "bg-amber-100 text-amber-700" :
+                              "bg-green-100 text-green-700"
+                            )}>
+                              {trainingLevel === 0 ? "Untrained" :
+                               trainingLevel === 1 ? "Basic" :
+                               trainingLevel === 2 ? "Improving" :
+                               trainingLevel === 3 ? "Good" :
+                               "Well-trained"}
+                            </span>
+                          </div>
+                          <div className="prose max-w-none text-foreground leading-relaxed text-base">
+                            <RichText text={TRAINED_OUTPUT_STAGES[trainingLevel]} prose={false} />
+                          </div>
                         </div>
                       )}
 
