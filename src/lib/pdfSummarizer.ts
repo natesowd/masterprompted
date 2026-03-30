@@ -82,12 +82,15 @@ async function callLLM(
   userPrompt: string,
   signal?: AbortSignal
 ): Promise<string> {
+  // Use streaming to avoid Netlify's 26s idle timeout on edge functions.
+  // The edge function streams plain text chunks back, keeping the connection alive.
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: SUMMARIZE_MODEL,
       temperature: 0.3,
+      stream: true,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
@@ -101,8 +104,18 @@ async function callLLM(
     throw new Error(`Summarization LLM call failed: ${response.status} - ${errorText}`);
   }
 
-  const result = await response.json();
-  return (result.choices?.[0]?.message?.content || '').trim();
+  // Accumulate streamed plain-text chunks into the full response
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let result = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    result += decoder.decode(value, { stream: true });
+  }
+
+  return result.trim();
 }
 
 // ---------------------------------------------------------------------------
