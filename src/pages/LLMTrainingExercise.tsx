@@ -1144,7 +1144,30 @@ export default function LLMTrainingExercise() {
                     <Dialog open={trainingDialogOpen} onOpenChange={setTrainingDialogOpen}>
                       <DialogContent className="max-w-lg">
                         <DialogHeader>
-                          <DialogTitle className="text-base">Example {currentPair.id} of {TRAINING_PAIRS.length}</DialogTitle>
+                          <DialogTitle className="text-base flex items-center justify-between">
+                            <span>Example {currentPair.id} of {TRAINING_PAIRS.length}</span>
+                            <div className="flex items-center gap-1.5">
+                              {TRAINING_PAIRS.map((pair, idx) => {
+                                const dec = trainingDecisions[pair.id];
+                                return (
+                                  <button
+                                    key={pair.id}
+                                    type="button"
+                                    onClick={() => setTrainingCurrent(idx)}
+                                    className={cn(
+                                      "h-5 w-5 rounded-full text-[9px] font-semibold flex items-center justify-center transition-all",
+                                      idx === trainingCurrent ? "ring-2 ring-brand-tertiary-500 ring-offset-1" : "",
+                                      dec === "approve" ? "bg-green-200 text-green-800" :
+                                      dec === "disapprove" ? "bg-red-200 text-red-800" :
+                                      "bg-surface-500 text-muted-foreground"
+                                    )}
+                                  >
+                                    {idx + 1}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
                           <div>
@@ -1157,14 +1180,11 @@ export default function LLMTrainingExercise() {
                               {currentPair.output}
                             </div>
                           </div>
-                          {!currentDecision && (
+                          {!currentDecision ? (
                             <div className="flex gap-3 pt-2">
                               <button
                                 type="button"
-                                onClick={() => {
-                                  handleTrainingDecision(currentPair.id, "approve");
-                                  setTrainingDialogOpen(false);
-                                }}
+                                onClick={() => handleTrainingDecision(currentPair.id, "approve")}
                                 className="flex-1 flex items-center justify-center gap-2 text-sm py-2 rounded-md border border-green-300 text-green-700 hover:bg-green-50 transition-colors"
                               >
                                 <ThumbsUp className="h-4 w-4" />
@@ -1172,19 +1192,15 @@ export default function LLMTrainingExercise() {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => {
-                                  handleTrainingDecision(currentPair.id, "disapprove");
-                                  setTrainingDialogOpen(false);
-                                }}
+                                onClick={() => handleTrainingDecision(currentPair.id, "disapprove")}
                                 className="flex-1 flex items-center justify-center gap-2 text-sm py-2 rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors"
                               >
                                 <ThumbsDown className="h-4 w-4" />
                                 Disapprove
                               </button>
                             </div>
-                          )}
-                          {currentDecision && (
-                            <div className="flex justify-center pt-2">
+                          ) : (
+                            <div className="flex items-center justify-between pt-2">
                               <span className={cn(
                                 "text-sm font-semibold px-3 py-1 rounded",
                                 currentDecision === "approve"
@@ -1193,6 +1209,24 @@ export default function LLMTrainingExercise() {
                               )}>
                                 {currentDecision === "approve" ? "Approved" : "Disapproved"}
                               </span>
+                              {!allDone ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const nextIdx = TRAINING_PAIRS.findIndex((p, i) => i > trainingCurrent && !trainingDecisions[p.id]);
+                                    const fallbackIdx = TRAINING_PAIRS.findIndex(p => !trainingDecisions[p.id]);
+                                    setTrainingCurrent(nextIdx !== -1 ? nextIdx : fallbackIdx !== -1 ? fallbackIdx : trainingCurrent);
+                                  }}
+                                  className="flex items-center gap-1.5 text-sm py-1.5 px-3 rounded-md border border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10 transition-colors"
+                                >
+                                  Next example
+                                  <ArrowRight className="h-3.5 w-3.5" />
+                                </button>
+                              ) : (
+                                <span className="text-sm text-brand-tertiary-600 font-semibold">
+                                  All done!
+                                </span>
+                              )}
                             </div>
                           )}
                         </div>
