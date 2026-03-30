@@ -40,6 +40,8 @@ export type ParsedFile = {
   content: string;
   size: number;
   isUploading?: boolean;
+  isSummarized?: boolean;
+  originalTokenCount?: number;
 };
 const PromptPlayground = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -68,8 +70,9 @@ const PromptPlayground = () => {
   // Optimization cache: key = JSON(prompt + parameters) -> optimized prompt
   const optimizationCacheRef = useRef<Map<string, string>>(new Map());
 
-  const buildCacheKey = (prompt: string, params: Parameters): string => {
-    return JSON.stringify({ prompt: prompt.trim(), ...params });
+  const buildCacheKey = (prompt: string, params: Parameters, files?: ParsedFile[]): string => {
+    const fileHash = files?.filter(f => !f.isUploading).map(f => f.name + f.size).join('|') || '';
+    return JSON.stringify({ prompt: prompt.trim(), ...params, fileHash });
   };
 
   // Track current page language (forwarded from Header -> LanguageSwitcher)
@@ -184,7 +187,9 @@ const PromptPlayground = () => {
           { role: "system", content: "You are a helpful assistant." },
           ...uploadedFiles.map(file => ({
             role: "user" as const,
-            content: `Context from uploaded PDF "${file.name}":\n\n${file.content}`
+            content: file.isSummarized
+              ? `Summary of uploaded PDF "${file.name}" (condensed from ~${file.originalTokenCount} tokens):\n\n${file.content}`
+              : `Context from uploaded PDF "${file.name}":\n\n${file.content}`
           })),
           { role: "user", content: promptText },
         ],
@@ -399,6 +404,15 @@ const PromptPlayground = () => {
         .replace('{params}', params)
         .replace('{prompt}', prompt);
 
+      // Append document context so the optimizer can incorporate uploaded content
+      const documentContext = uploadedFiles
+        .filter(f => !f.isUploading && f.content)
+        .map(f => `[Document: ${f.name}]\n${f.content}`)
+        .join('\n\n');
+      const fullOptimizePrompt = documentContext
+        ? `${optimizeUserPrompt}\n\nThe user has provided the following document(s) for reference. Consider this content when rewriting the prompt:\n\n${documentContext}`
+        : optimizeUserPrompt;
+
       const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -410,7 +424,7 @@ const PromptPlayground = () => {
               role: "system",
               content: t('promptPlayground.optimization.systemPrompt')
             },
-            { role: "user", content: optimizeUserPrompt },
+            { role: "user", content: fullOptimizePrompt },
           ],
         }),
         signal: controller.signal,
@@ -427,7 +441,7 @@ const PromptPlayground = () => {
 
       if (optimizedPrompt) {
         // Cache the result
-        const cacheKey = buildCacheKey(prompt, { specificity, style, context, bias });
+        const cacheKey = buildCacheKey(prompt, { specificity, style, context, bias }, uploadedFiles);
         optimizationCacheRef.current.set(cacheKey, optimizedPrompt);
 
         setEditingText(optimizedPrompt);
@@ -448,7 +462,7 @@ const PromptPlayground = () => {
         setWaitingForOptimization(false);
       }
     }
-  }, [pageLanguage]);
+  }, [pageLanguage, uploadedFiles]);
 
   const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
     const fileList = Array.from(files);
@@ -469,8 +483,30 @@ const PromptPlayground = () => {
         const text = await extractTextFromPDF(file);
         console.log(`Successfully parsed ${file.name}, extracted ${text.length} characters.`);
 
-        const newFileTokens = Math.ceil(text.length / 3.5);
-        console.log(`Estimated tokens for "${file.name}": ${newFileTokens} (Chars: ${text.length}).`);
+        const rawTokens = Math.ceil(text.length / 3.5);
+        console.log(`Estimated tokens for "${file.name}": ${rawTokens} (Chars: ${text.length}).`);
+
+        // Summarize large documents via map-reduce
+        let finalContent = text;
+        let isSummarized = false;
+        const SHORT_DOC_TOKEN_THRESHOLD = 6000;
+
+        if (rawTokens > SHORT_DOC_TOKEN_THRESHOLD) {
+          console.log(`[pdfSummarizer] Document "${file.name}" has ${rawTokens} tokens — starting summarization...`);
+          try {
+            const { summarizeDocument } = await import('@/lib/pdfSummarizer');
+            const result = await summarizeDocument(text, NETLIFY_CHAT_URL, (phase, current, total) => {
+              console.log(`[pdfSummarizer] ${file.name}: ${phase} ${current}/${total}`);
+            });
+            finalContent = result.summary;
+            isSummarized = true;
+            console.log(`[pdfSummarizer] Summarized "${file.name}": ${result.originalTokenCount} → ${result.summaryTokenCount} tokens`);
+          } catch (sumErr) {
+            console.warn(`[pdfSummarizer] Summarization failed for "${file.name}", using raw text:`, sumErr);
+          }
+        }
+
+        const newFileTokens = Math.ceil(finalContent.length / 3.5);
         const currentFilesTokens = uploadedFiles
           .filter(f => !f.isUploading)
           .reduce((acc, f) => acc + Math.ceil(f.content.length / 3.5), 0);
@@ -487,7 +523,14 @@ const PromptPlayground = () => {
 
         setUploadedFiles(prev => prev.map(f =>
           (f.name === file.name && f.isUploading)
-            ? { name: file.name, content: text, size: text.length, isUploading: false }
+            ? {
+                name: file.name,
+                content: finalContent,
+                size: finalContent.length,
+                isUploading: false,
+                isSummarized,
+                originalTokenCount: isSummarized ? rawTokens : undefined,
+              }
             : f
         ));
 
@@ -521,7 +564,7 @@ const PromptPlayground = () => {
       const promptToOptimize = currentPrompt.trim() ? currentPrompt : editingText;
       if (promptToOptimize) {
         // Check cache first
-        const cacheKey = buildCacheKey(promptToOptimize, parameters);
+        const cacheKey = buildCacheKey(promptToOptimize, parameters, uploadedFiles);
         const cached = optimizationCacheRef.current.get(cacheKey);
         if (cached) {
           setEditingText(cached);
@@ -598,7 +641,7 @@ const PromptPlayground = () => {
     if (!promptToOptimize?.trim()) return;
     if (Object.values(parameters).every(p => p === "")) return;
     // Delete the cached entry so a fresh optimization is forced
-    const cacheKey = buildCacheKey(promptToOptimize, parameters);
+    const cacheKey = buildCacheKey(promptToOptimize, parameters, uploadedFiles);
     optimizationCacheRef.current.delete(cacheKey);
     setDisableSend(true);
     handlePromptOptimize(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);

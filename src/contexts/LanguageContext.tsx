@@ -274,7 +274,12 @@ a) Identify the core intent that must remain untouched.
 b) Identify the specific parameters that require change.
 c) Draft the modification.
 d) Perform a "Delta Check": Remove any edits that are stylistic rather than functional to ensure the "Minimum Amount of Change" rule is met.`,
-      }
+      },
+      summarization: {
+        inProgress: 'Summarizing document...',
+        complete: 'Document summarized ({reduction}% reduction)',
+        failed: 'Summarization failed, using full text',
+      },
     },
     components: {
       miniTask: {
@@ -655,7 +660,12 @@ a) Identificar la intención principal que debe permanecer intacta.
 b) Identificar los parámetros específicos que requieren un cambio.
 c) Redactar la modificación.
 d) Realizar una «comprobación delta»: eliminar cualquier edición que sea estilística en lugar de funcional para garantizar que se cumple la regla de la «cantidad mínima de cambio».`,
-      }
+      },
+      summarization: {
+        inProgress: 'Resumiendo documento...',
+        complete: 'Documento resumido ({reduction}% de reducción)',
+        failed: 'Error al resumir, usando texto completo',
+      },
     },
     components: {
       miniTask: {
