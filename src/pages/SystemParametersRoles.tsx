@@ -121,7 +121,7 @@ export default function SystemParametersRoles() {
                   {ROLE_OUTPUTS[selectedRole].split("\n\n").map((paragraph, i) => (
                     <p
                       key={i}
-                      className="text-xl leading-relaxed text-muted-foreground/60 mb-8"
+                      className="leading-relaxed text-muted-foreground/60 mb-8 text-lg mx-0"
                     >
                       {paragraph}
                     </p>
