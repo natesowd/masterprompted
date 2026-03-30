@@ -208,12 +208,15 @@ const ChatAnswer = ({
 
   // Determine if evaluation toggle should be disabled
   const evaluationDisabled = !currentEvaluation || currentEvaluation.loading || currentEvaluation.error || !currentEvaluation.data;
-  const evaluationLoading = currentEvaluation?.loading ?? false;
+  // Show spinner while initial evaluation is loading OR while web_search is still pending
+  const evaluationLoading = (currentEvaluation?.loading ?? false)
+    || (currentEvaluation?.data?.webSearchPending ?? false);
   const evaluationClean = currentEvaluation
     && !currentEvaluation.loading
     && !currentEvaluation.error
     && currentEvaluation.data
     && currentEvaluation.data.spans.length === 0
+    && !currentEvaluation.data.webSearchPending
     && Object.values(currentEvaluation.data.pipelineStatus).every(s => s === "success");
 
   // Render text with evaluation flags

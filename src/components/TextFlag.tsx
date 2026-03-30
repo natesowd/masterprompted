@@ -1,22 +1,13 @@
 /**
  * TextFlag Component
- * 
+ *
  * Inline text annotation with evaluation criteria icons and hover explanations.
  * Automatically syncs highlighting with evaluation panel criteria.
- * 
- * @example
- * ```tsx
- * <TextFlag
- *   text="disputed claim"
- *   evaluationFactor="factual_accuracy"
- *   explanation="This claim lacks verification"
- *   href="https://source.com"
- * />
- * ```
+ * Supports paginated explanations when multiple evaluations overlap.
  */
 
 import { useEffect, useState } from "react";
-import { ListChecks, Target, Mic, Scale, Copy } from "lucide-react";
+import { ListChecks, Target, Mic, Scale, Copy, ChevronLeft, ChevronRight } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEvaluation } from "@/contexts/EvaluationContext";
@@ -62,6 +53,12 @@ const labelMap = {
   "plagiarism": "Plagiarism",
 };
 
+export interface ExplanationEntry {
+  explanation: string;
+  href?: string;
+  source: string;
+}
+
 interface TextFlagProps extends VariantProps<typeof textFlagVariants> {
   /** The text to display with the flag */
   text: string;
@@ -69,11 +66,13 @@ interface TextFlagProps extends VariantProps<typeof textFlagVariants> {
   isHtml?: boolean;
   /** The evaluation criterion this flag represents */
   evaluationFactor: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
-  /** Explanation shown in hover card */
-  explanation: React.ReactNode;
+  /** Single explanation (backward compat) */
+  explanation?: React.ReactNode;
+  /** Multiple explanations for paginated display */
+  explanations?: ExplanationEntry[];
   /** Additional CSS classes */
   className?: string;
-  /** Optional external link URL */
+  /** Optional external link URL (used when single explanation) */
   href?: string;
 }
 
@@ -82,26 +81,42 @@ export default function TextFlag({
   isHtml = false,
   evaluationFactor,
   explanation,
+  explanations,
   className = "",
   href,
   severity,
   noUnderline
 }: TextFlagProps) {
   const Icon = iconMap[evaluationFactor];
-  const label = labelMap[evaluationFactor];
   const [hoverCardOpen, setHoverCardOpen] = useState(false);
+  const [pageIndex, setPageIndex] = useState(0);
   const { t } = useLanguage();
   const { registerFactor, deregisterFactor } = useEvaluation();
 
-  // Highlight the corresponding evaluation criterion when component is mounted
+  // Build the list of pages from either explanations array or single explanation
+  const pages: ExplanationEntry[] = explanations && explanations.length > 0
+    ? explanations
+    : explanation != null
+      ? [{ explanation: typeof explanation === 'string' ? explanation : '', href, source: '' }]
+      : [];
+
+  const totalPages = pages.length;
+  const currentPage = pages[Math.min(pageIndex, totalPages - 1)] ?? pages[0];
+  const hasMultiplePages = totalPages > 1;
+
+  // Reset page index when hover card closes
+  useEffect(() => {
+    if (!hoverCardOpen) setPageIndex(0);
+  }, [hoverCardOpen]);
+
   useEffect(() => {
     registerFactor(evaluationFactor);
-
-    // Cleanup: remove highlighting when component unmounts
     return () => {
       deregisterFactor(evaluationFactor);
     };
   }, [evaluationFactor, registerFactor, deregisterFactor]);
+
+  const activeHref = currentPage?.href ?? href;
 
   return (
     <HoverCard open={hoverCardOpen} onOpenChange={setHoverCardOpen}>
@@ -114,9 +129,9 @@ export default function TextFlag({
           }}
         >
           <Icon className="inline-block h-4 w-4 text-destructive align-middle mr-1" />
-          {href ? (
+          {activeHref ? (
             <a
-              href={href}
+              href={activeHref}
               target="_blank"
               rel="noopener noreferrer"
               className="underline decoration-2 underline-offset-2 text-current hover:opacity-80"
@@ -139,9 +154,37 @@ export default function TextFlag({
           <div className="flex items-center gap-2 flex-shrink-0">
             <Icon className="h-4 w-4 text-destructive flex-shrink-0" />
             <h4 className="font-semibold text-destructive text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
+            {hasMultiplePages && (
+              <div className="flex items-center gap-1 ml-auto flex-shrink-0">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setPageIndex(Math.max(0, pageIndex - 1)); }}
+                  disabled={pageIndex === 0}
+                  className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Previous explanation"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </button>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {pageIndex + 1}/{totalPages}
+                </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setPageIndex(Math.min(totalPages - 1, pageIndex + 1)); }}
+                  disabled={pageIndex >= totalPages - 1}
+                  className="p-0.5 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Next explanation"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
           </div>
           <div className="text-sm text-foreground font-normal leading-relaxed break-words whitespace-normal overflow-wrap-anywhere text-left">
-            {typeof explanation === 'string' ? <RichText text={explanation} prose={false} /> : explanation}
+            {currentPage && typeof currentPage.explanation === 'string' && currentPage.explanation
+              ? <RichText text={currentPage.explanation} prose={false} />
+              : (typeof explanation !== 'string' && explanation != null)
+                ? explanation
+                : null
+            }
           </div>
         </div>
       </HoverCardContent>

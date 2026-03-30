@@ -23,4 +23,13 @@ export interface EvaluationResult {
     fallacy: "success" | "error";
     claims: "success" | "error";
   };
+  /** True while web_search calls are still in progress */
+  webSearchPending: boolean;
+}
+
+/** Result from the claims match pipeline (extract_claims + claim_match only) */
+export interface ClaimsMatchPipelineResult {
+  spans: EvaluationSpan[];
+  /** The extracted claims, needed for subsequent web_search calls */
+  extractedClaims: Array<{ claim: string; snippet: string; snippetStart: number }>;
 }

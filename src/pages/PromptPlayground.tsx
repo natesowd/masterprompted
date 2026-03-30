@@ -276,27 +276,37 @@ const PromptPlayground = () => {
           }
         }
 
-        // Trigger all evaluation pipelines (fallacy detection + claims pipeline)
-        let evaluationResult: EvaluationResult | null = null;
+        // Trigger all evaluation pipelines with progressive updates.
+        // Phase 1 (fallacy + claim_match) enables the toggle immediately.
+        // Phase 2 (web_search) streams in results as they arrive.
         try {
-          evaluationResult = await runAllEvaluations(accumulatedAnswer);
+          await runAllEvaluations(accumulatedAnswer, (partialResult) => {
+            setThreads(prev => {
+              const copy = [...prev];
+              const thread = copy[threadIndex];
+              if (!thread?.evaluations) return prev;
+              const evaluations = [...thread.evaluations];
+              evaluations[versionIndex] = {
+                loading: false,
+                error: false,
+                data: partialResult,
+              };
+              copy[threadIndex] = { ...thread, evaluations };
+              return copy;
+            });
+          });
         } catch (evalErr) {
           console.error("Evaluation failed but answer is visible:", evalErr);
+          setThreads(prev => {
+            const copy = [...prev];
+            const thread = copy[threadIndex];
+            if (!thread?.evaluations) return prev;
+            const evaluations = [...thread.evaluations];
+            evaluations[versionIndex] = { loading: false, error: true, data: null };
+            copy[threadIndex] = { ...thread, evaluations };
+            return copy;
+          });
         }
-
-        setThreads(prev => {
-          const copy = [...prev];
-          const thread = copy[threadIndex];
-          if (!thread?.evaluations) return prev;
-          const evaluations = [...thread.evaluations];
-          evaluations[versionIndex] = {
-            loading: false,
-            error: evaluationResult === null,
-            data: evaluationResult,
-          };
-          copy[threadIndex] = { ...thread, evaluations };
-          return copy;
-        });
 
       } catch (err: any) {
         clearTimeout(timeoutId);

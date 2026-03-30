@@ -81,6 +81,12 @@ export function applyInlineFormatting(raw: string, diff: boolean, isInline: bool
     html = html.replace(/(^|\W)\*(?!\s)(.+?)(?!\s)\*(?=\W|$)/gs, "$1<em>$2</em>");
     html = html.replace(/(^|\W)_(?!\s)(.+?)(?!\s)_(?=\W|$)/gs, "$1<em>$2</em>");
 
+    // Markdown links: [text](url)
+    html = html.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">$1</a>'
+    );
+
     // Headers: #, ##, ### (descending order of size)
     // Note: Use text-base instead of text-md as 'md' is not a standard Tailwind size
     html = html.replace(/^###\s+(.+)$/gm, '<strong class="text-base">$1</strong>');

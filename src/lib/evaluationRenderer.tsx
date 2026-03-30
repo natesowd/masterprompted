@@ -1,27 +1,81 @@
 /**
  * Evaluation Renderer Utility
- * 
- * Renders text with inline TextFlag components based on disinformation spans.
+ *
+ * Renders text with inline TextFlag components based on evaluation spans.
+ * Supports multiple overlapping spans with paginated explanations.
  */
 
 import React from "react";
 import TextFlag from "@/components/TextFlag";
+import type { ExplanationEntry } from "@/components/TextFlag";
 import RichText, { applyInlineFormatting } from "@/components/RichText.tsx";
 import { EvaluationSpan } from "@/services/evaluations/types";
 import { getFallacyExplanation } from "@/services/evaluations/fallacyService";
 
-interface TextSegment {
-  type: "text" | "flag";
-  content: string;
-  span?: EvaluationSpan;
+/**
+ * Collect all spans that overlap a given region and build explanation entries.
+ * Used to create paginated explanations when multiple evaluations flag the same text.
+ */
+function collectExplanations(
+  activeSpanIds: Set<number>,
+  spanMap: Map<number, EvaluationSpan>,
+  allSpans: EvaluationSpan[],
+  regionStart: number,
+  regionEnd: number,
+): ExplanationEntry[] {
+  // Gather all spans that overlap with the active region
+  const overlapping = new Set<number>(activeSpanIds);
+
+  // Also check all spans for overlap with this region (for spans not in activeSpanIds
+  // but sharing the same start/end range, e.g., claim_match and web_search on same snippet)
+  allSpans.forEach((span, globalIdx) => {
+    // Find the corresponding local index in spanMap
+    spanMap.forEach((mappedSpan, localIdx) => {
+      if (mappedSpan === span) return; // skip self
+      if (span.start < regionEnd && span.end > regionStart) {
+        // This span overlaps - check if it's already in the map
+        if (!overlapping.has(localIdx)) {
+          // Check if this exact span object is in the spanMap under a different key
+          for (const [k, v] of spanMap.entries()) {
+            if (v.start === span.start && v.end === span.end && v.source === span.source && v.explanation === span.explanation) {
+              overlapping.add(k);
+              break;
+            }
+          }
+        }
+      }
+    });
+  });
+
+  const entries: ExplanationEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const id of overlapping) {
+    const spanInfo = spanMap.get(id);
+    if (!spanInfo) continue;
+
+    const explanation = spanInfo.explanation ?? getFallacyExplanation(spanInfo.value);
+    // Deduplicate by explanation text
+    const key = `${spanInfo.source}:${explanation}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    entries.push({
+      explanation,
+      href: spanInfo.href,
+      source: spanInfo.source,
+    });
+  }
+
+  return entries;
 }
 
 /**
  * Renders text with inline TextFlag components for flagged segments.
  * Uses a marker-injection strategy to ensure compatibility with RichText formatting.
- * 
+ *
  * @param text - The full text to render
- * @param spans - Array of disinformation spans with start/end positions
+ * @param spans - Array of evaluation spans with start/end positions
  * @returns Array of React nodes (plain text and TextFlag components)
  */
 export function renderTextWithFlags(
@@ -46,7 +100,6 @@ export function renderTextWithFlags(
     if (!content.trim()) return null;
 
     // Extract gutter (indents/markers) and actual content
-    // We strictly require a space after markers like * and - to avoid splitting markdown bold/italic triples
     const gutterMatch = content.match(/^(\s*)(?:([*\-]|(?:\d+\.))(?=\s|$))?(\s*)/);
     const gutter = gutterMatch ? gutterMatch[0] : "";
     const gutterLen = gutter.length;
@@ -63,30 +116,45 @@ export function renderTextWithFlags(
       .filter(s => s.start < s.end)
       .sort((a, b) => b.start - a.start); // Sort descending to inject markers safely
 
+    // Deduplicate spans that have the same start/end (keep all for explanation collection)
+    // But only inject one set of markers per unique start/end range
+    const uniqueRanges = new Map<string, number>(); // "start-end" -> first span index
+    const markerSpans: Array<{ start: number; end: number; spanIndex: number }> = [];
+
+    intersectingSpans.forEach((span, i) => {
+      const key = `${span.start}-${span.end}`;
+      if (!uniqueRanges.has(key)) {
+        uniqueRanges.set(key, i);
+        markerSpans.push({ start: span.start, end: span.end, spanIndex: i });
+      }
+    });
+
+    // Sort marker spans descending by start for safe injection
+    markerSpans.sort((a, b) => b.start - a.start);
+
     // Create marked text for rich evaluation rendering
     let markedContent = actualText;
-    intersectingSpans.forEach((span, i) => {
-      // Use unique markers that won't be matched by RichText regexes
+    markerSpans.forEach((ms, i) => {
       markedContent =
-        markedContent.slice(0, span.end) + `§§END_${i}§§` +
-        markedContent.slice(span.end);
+        markedContent.slice(0, ms.end) + `§§END_${i}§§` +
+        markedContent.slice(ms.end);
       markedContent =
-        markedContent.slice(0, span.start) + `§§START_${i}§§` +
-        markedContent.slice(span.start);
+        markedContent.slice(0, ms.start) + `§§START_${i}§§` +
+        markedContent.slice(ms.start);
     });
 
     // Apply RichText formatting to the content (bypassing block structural transforms)
     const htmlWithMarkers = applyInlineFormatting(markedContent, false, true);
 
     // Parse the HTML by markers
-    // Regex to split and capture markers
     const parts = htmlWithMarkers.split(/(§§START_\d+§§|§§END_\d+§§)/);
     const nodes: React.ReactNode[] = [];
-    const activeSpans = new Set<number>();
+    const activeMarkers = new Set<number>();
 
     // Track active HTML tags to "re-apply" them inside flags if they straddle
     const tagStack: string[] = [];
-    // Prepare a map for easy lookup of original span info
+    // Prepare maps for lookup
+    const markerMap = new Map(markerSpans.map((ms, i) => [i, ms]));
     const spanMap = new Map(intersectingSpans.map((s, i) => [i, s]));
 
     parts.forEach((part, pIdx) => {
@@ -94,33 +162,67 @@ export function renderTextWithFlags(
       const endMatch = part.match(/§§END_(\d+)§§/);
 
       if (startMatch) {
-        activeSpans.add(parseInt(startMatch[1]));
+        activeMarkers.add(parseInt(startMatch[1]));
       } else if (endMatch) {
-        activeSpans.delete(parseInt(endMatch[1]));
+        activeMarkers.delete(parseInt(endMatch[1]));
       } else if (part) {
         // Find tags in this part to update tagStack for the next parts
-        // This is a simple heuristic to handle straddling tags
         const tags = part.match(/<[^>]+>/g) || [];
         tags.forEach(tag => {
           if (tag.startsWith('</')) {
             tagStack.pop();
-          } else if (!tag.endsWith('/>')) { // Ignore self-closing tags for stack
+          } else if (!tag.endsWith('/>')) {
             tagStack.push(tag);
           }
         });
 
-        if (activeSpans.size > 0) {
-          // This part is inside one or more flags. 
-          // For simplicity, we wrap it in the most recent active span's TextFlag.
-          const spanId = Array.from(activeSpans).pop()!;
-          const spanInfo = spanMap.get(spanId)!;
-          const explanation = spanInfo.explanation ?? getFallacyExplanation(spanInfo.value);
+        if (activeMarkers.size > 0) {
+          const markerId = Array.from(activeMarkers).pop()!;
+          const markerInfo = markerMap.get(markerId)!;
+          const primarySpan = spanMap.get(markerInfo.spanIndex)!;
+
+          // Collect all explanations from overlapping spans at this range
+          const regionStart = primarySpan.start + pStart + gutterLen;
+          const regionEnd = primarySpan.end + pStart + gutterLen;
+
+          // Find all intersecting spans that share this range
+          const rangeKey = `${primarySpan.start}-${primarySpan.end}`;
+          const overlappingSpanIndices = new Set<number>();
+          intersectingSpans.forEach((s, i) => {
+            const sk = `${s.start}-${s.end}`;
+            if (sk === rangeKey) {
+              overlappingSpanIndices.add(i);
+            }
+          });
+
+          // Also add any currently active markers
+          for (const mid of activeMarkers) {
+            const mi = markerMap.get(mid);
+            if (mi) overlappingSpanIndices.add(mi.spanIndex);
+          }
+
+          const explanationEntries: ExplanationEntry[] = [];
+          const seenExplanations = new Set<string>();
+
+          for (const si of overlappingSpanIndices) {
+            const sp = spanMap.get(si);
+            if (!sp) continue;
+            const expl = sp.explanation ?? getFallacyExplanation(sp.value);
+            const dedupKey = `${sp.source}:${expl}`;
+            if (seenExplanations.has(dedupKey)) continue;
+            seenExplanations.add(dedupKey);
+            explanationEntries.push({
+              explanation: expl,
+              href: sp.href,
+              source: sp.source,
+            });
+          }
 
           // Re-wrap the part in active tags so the formatting persists inside the flag
           let wrappedPart = part;
           [...tagStack].reverse().forEach(tag => {
             const tagName = tag.match(/<([^\s>]+)/)?.[1];
-            if (tagName) { // Ensure a valid tag name was found
+            if (tagName) {
               wrappedPart = tag + wrappedPart + `</${tagName}>`;
             }
           });
@@ -131,9 +233,8 @@ export function renderTextWithFlags(
               text={wrappedPart}
               isHtml={true}
               evaluationFactor="factual_accuracy"
-              explanation={explanation}
+              explanations={explanationEntries}
               severity="error"
-              href={spanInfo.href}
             />
           );
         } else {

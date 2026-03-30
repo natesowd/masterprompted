@@ -1,19 +1,19 @@
 /**
  * Claims Pipeline
  *
- * Orchestrates: extract_claims -> (claim_match + web_search per claim) -> merged EvaluationSpan[]
+ * Orchestrates: extract_claims -> claim_match per claim -> merged EvaluationSpan[]
+ * Web search is handled separately by the orchestrator for sequential execution.
  */
 
-import type { EvaluationSpan } from "./types";
+import type { EvaluationSpan, ClaimsMatchPipelineResult } from "./types";
 import { extractClaims } from "./claimExtractionService";
 import { matchClaim } from "./claimMatchService";
-import { webSearchClaim } from "./webSearchService";
 
 /**
  * Find the start index of a snippet in the source text.
  * Falls back to whitespace-normalized search if exact match fails.
  */
-function findSnippetPosition(text: string, snippet: string): number {
+export function findSnippetPosition(text: string, snippet: string): number {
   const exactIndex = text.indexOf(snippet);
   if (exactIndex !== -1) return exactIndex;
 
@@ -25,14 +25,12 @@ function findSnippetPosition(text: string, snippet: string): number {
   if (normIndex === -1) return -1;
 
   // Map normalized index back to original text position.
-  // Walk the original text, skipping excess whitespace to align with the normalized version.
   let origPos = 0;
   let normPos = 0;
   while (normPos < normIndex && origPos < text.length) {
     if (/\s/.test(text[origPos])) {
-      // In normalized form, consecutive whitespace collapses to a single space
       while (origPos < text.length && /\s/.test(text[origPos])) origPos++;
-      normPos++; // one space in normalized form
+      normPos++;
     } else {
       origPos++;
       normPos++;
@@ -42,69 +40,55 @@ function findSnippetPosition(text: string, snippet: string): number {
 }
 
 /**
- * Run the full claims pipeline on a text.
- * @param text - The full answer text to analyze
- * @returns Array of evaluation spans for debunked claims, or null on extraction failure
+ * Run the claims extraction + claim_match pipeline (no web_search).
+ * Returns both the flagged spans and the extracted claims for later web_search use.
  */
-export async function runClaimsPipeline(text: string): Promise<EvaluationSpan[] | null> {
-  if (!text.trim()) return [];
+export async function runClaimsMatchPipeline(text: string): Promise<ClaimsMatchPipelineResult | null> {
+  if (!text.trim()) return { spans: [], extractedClaims: [] };
 
   const claims = await extractClaims(text);
   if (claims === null) return null;
-  if (claims.length === 0) return [];
+  if (claims.length === 0) return { spans: [], extractedClaims: [] };
 
-  // For each claim, run claim_match and web_search in parallel
-  const results = await Promise.allSettled(
-    claims.map(async (claim) => {
-      const [matchResult, searchResult] = await Promise.allSettled([
-        matchClaim(claim.claim),
-        webSearchClaim(claim.claim),
-      ]);
+  // Locate all snippets first
+  const locatedClaims = claims.map(claim => {
+    const snippetStart = findSnippetPosition(text, claim.snippet);
+    if (snippetStart === -1) {
+      console.warn(`Claims pipeline: could not locate snippet in text: "${claim.snippet.slice(0, 80)}..."`);
+    }
+    return { ...claim, snippetStart };
+  }).filter(c => c.snippetStart !== -1);
 
-      const match = matchResult.status === "fulfilled" ? matchResult.value : null;
-      const search = searchResult.status === "fulfilled" ? searchResult.value : null;
-
-      const matchFlagged = match?.debunked === true;
-      const searchFlagged = search?.claimDebunked === true;
-
-      if (!matchFlagged && !searchFlagged) return null;
-
-      // Build explanation
-      const explanations: string[] = [];
-      let href: string | undefined;
-
-      if (matchFlagged && match) {
-        explanations.push(`This claim was debunked [here](${match.url}).`);
-        href = match.url;
-      }
-      if (searchFlagged && search) {
-        explanations.push(search.debunkReport);
-      }
-
-      // Locate the snippet in the original text
-      const snippetStart = findSnippetPosition(text, claim.snippet);
-      if (snippetStart === -1) {
-        console.warn(`Claims pipeline: could not locate snippet in text: "${claim.snippet.slice(0, 80)}..."`);
-        return null;
-      }
-
-      const span: EvaluationSpan = {
-        start: snippetStart,
-        end: snippetStart + claim.snippet.length,
-        segment: claim.snippet,
-        confidence: match?.similarityScore ?? 1.0,
-        value: "factual_inaccuracy",
-        source: matchFlagged ? "claim_match" : "web_search",
-        explanation: explanations.join("\n\n"),
-        href,
-      };
-
-      return span;
-    })
+  // Run claim_match for all claims in parallel
+  const matchResults = await Promise.allSettled(
+    locatedClaims.map(claim => matchClaim(claim.claim))
   );
 
-  return results
-    .filter((r): r is PromiseFulfilledResult<EvaluationSpan | null> => r.status === "fulfilled")
-    .map(r => r.value)
-    .filter((span): span is EvaluationSpan => span !== null);
+  const spans: EvaluationSpan[] = [];
+
+  matchResults.forEach((result, i) => {
+    const match = result.status === "fulfilled" ? result.value : null;
+    if (!match?.debunked) return;
+
+    const claim = locatedClaims[i];
+    spans.push({
+      start: claim.snippetStart,
+      end: claim.snippetStart + claim.snippet.length,
+      segment: claim.snippet,
+      confidence: match.similarityScore,
+      value: "factual_inaccuracy",
+      source: "claim_match",
+      explanation: `This claim was debunked [here](${match.url}).`,
+      href: match.url,
+    });
+  });
+
+  return {
+    spans,
+    extractedClaims: locatedClaims.map(c => ({
+      claim: c.claim,
+      snippet: c.snippet,
+      snippetStart: c.snippetStart,
+    })),
+  };
 }
