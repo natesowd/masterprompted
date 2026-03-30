@@ -10,8 +10,9 @@ import RichText from "@/components/RichText";
 
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ArrowLeft, ArrowRight, Plus, X, Eye, Pencil, GraduationCap, ThumbsUp, ThumbsDown, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, X, Eye, Pencil, GraduationCap, ThumbsUp, ThumbsDown, RotateCcw, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -547,6 +548,7 @@ export default function LLMTrainingExercise() {
   /* ── Train mode state ── */
   const [trainingDecisions, setTrainingDecisions] = useState<Record<number, "approve" | "disapprove">>({});
   const [trainingCurrent, setTrainingCurrent] = useState(0);
+  const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
 
   const trainingScore = useMemo(() => {
     let score = 0;
@@ -994,8 +996,13 @@ export default function LLMTrainingExercise() {
                 )}
 
                 {/* ── Train view sidebar ── */}
-                {viewMode === "train" && (
-                  <div className="flex-1 overflow-y-auto pr-1 pb-4 space-y-3">
+                {viewMode === "train" && (() => {
+                  const currentPair = TRAINING_PAIRS[trainingCurrent];
+                  const currentDecision = trainingDecisions[currentPair.id];
+                  const allDone = Object.keys(trainingDecisions).length === TRAINING_PAIRS.length;
+
+                  return (
+                  <div className="flex-1 pr-1 pb-4 space-y-3">
                     {/* Progress bar */}
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-semibold text-foreground">
@@ -1021,77 +1028,179 @@ export default function LLMTrainingExercise() {
                       {trainingLevel > 0 && <span className="ml-1">— Output quality: level {trainingLevel}</span>}
                     </p>
 
-                    {/* Example cards */}
-                    <div className="space-y-2">
+                    {/* Navigation dots */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       {TRAINING_PAIRS.map((pair, idx) => {
-                        const decision = trainingDecisions[pair.id];
-                        const isCurrent = idx === trainingCurrent && !decision;
+                        const dec = trainingDecisions[pair.id];
                         return (
-                          <div
+                          <button
                             key={pair.id}
+                            type="button"
+                            onClick={() => setTrainingCurrent(idx)}
                             className={cn(
-                              "rounded-lg border p-3 transition-all",
-                              isCurrent
-                                ? "border-brand-tertiary-500 shadow-sm"
-                                : decision
-                                  ? "border-border opacity-70"
-                                  : "border-border"
+                              "h-5 w-5 rounded-full text-[9px] font-semibold flex items-center justify-center transition-all",
+                              idx === trainingCurrent
+                                ? "ring-2 ring-brand-tertiary-500 ring-offset-1"
+                                : "",
+                              dec === "approve"
+                                ? "bg-green-200 text-green-800"
+                                : dec === "disapprove"
+                                  ? "bg-red-200 text-red-800"
+                                  : "bg-surface-500 text-muted-foreground"
                             )}
                           >
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                                Example {pair.id}
-                              </span>
-                              {decision && (
-                                <span className={cn(
-                                  "text-[10px] font-semibold px-1.5 py-0.5 rounded",
-                                  decision === "approve"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
-                                )}>
-                                  {decision === "approve" ? "Approved" : "Disapproved"}
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="mb-1.5">
-                              <span className="text-[10px] font-semibold text-muted-foreground block">Input</span>
-                              <p className="text-xs text-foreground leading-relaxed">{pair.input}</p>
-                            </div>
-
-                            <div className="mb-2">
-                              <span className="text-[10px] font-semibold text-muted-foreground block">Output</span>
-                              <div className="text-xs text-muted-foreground leading-relaxed max-h-[80px] overflow-y-auto whitespace-pre-line">
-                                {pair.output}
-                              </div>
-                            </div>
-
-                            {!decision && (
-                              <div className="flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleTrainingDecision(pair.id, "approve")}
-                                  className="flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-md border border-green-300 text-green-700 hover:bg-green-50 transition-colors"
-                                >
-                                  <ThumbsUp className="h-3 w-3" />
-                                  Approve
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleTrainingDecision(pair.id, "disapprove")}
-                                  className="flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors"
-                                >
-                                  <ThumbsDown className="h-3 w-3" />
-                                  Disapprove
-                                </button>
-                              </div>
-                            )}
-                          </div>
+                            {idx + 1}
+                          </button>
                         );
                       })}
                     </div>
+
+                    {/* Single current example card */}
+                    <div className="rounded-lg border border-brand-tertiary-500 p-3 transition-all">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Example {currentPair.id} of {TRAINING_PAIRS.length}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {currentDecision && (
+                            <span className={cn(
+                              "text-[10px] font-semibold px-1.5 py-0.5 rounded",
+                              currentDecision === "approve"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            )}>
+                              {currentDecision === "approve" ? "Approved" : "Disapproved"}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setTrainingDialogOpen(true)}
+                            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-surface-500 transition-colors"
+                            aria-label="Enlarge example"
+                            title="Enlarge"
+                          >
+                            <Maximize2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mb-1.5">
+                        <span className="text-[10px] font-semibold text-muted-foreground block">Input</span>
+                        <p className="text-xs text-foreground leading-relaxed">{currentPair.input}</p>
+                      </div>
+
+                      <div className="mb-2">
+                        <span className="text-[10px] font-semibold text-muted-foreground block">Output</span>
+                        <div className="text-xs text-muted-foreground leading-relaxed max-h-[120px] overflow-y-auto whitespace-pre-line pr-1">
+                          {currentPair.output}
+                        </div>
+                      </div>
+
+                      {!currentDecision && (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleTrainingDecision(currentPair.id, "approve")}
+                            className="flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-md border border-green-300 text-green-700 hover:bg-green-50 transition-colors"
+                          >
+                            <ThumbsUp className="h-3 w-3" />
+                            Approve
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleTrainingDecision(currentPair.id, "disapprove")}
+                            className="flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors"
+                          >
+                            <ThumbsDown className="h-3 w-3" />
+                            Disapprove
+                          </button>
+                        </div>
+                      )}
+
+                      {currentDecision && !allDone && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            // Jump to next undecided
+                            const nextIdx = TRAINING_PAIRS.findIndex((p, i) => i > trainingCurrent && !trainingDecisions[p.id]);
+                            const fallbackIdx = TRAINING_PAIRS.findIndex(p => !trainingDecisions[p.id]);
+                            setTrainingCurrent(nextIdx !== -1 ? nextIdx : fallbackIdx !== -1 ? fallbackIdx : trainingCurrent);
+                          }}
+                          className="w-full mt-2 flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-md border border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10 transition-colors"
+                        >
+                          Next example
+                          <ArrowRight className="h-3 w-3" />
+                        </button>
+                      )}
+
+                      {allDone && (
+                        <p className="text-xs text-brand-tertiary-600 font-semibold text-center mt-2">
+                          All examples reviewed!
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Enlarge dialog */}
+                    <Dialog open={trainingDialogOpen} onOpenChange={setTrainingDialogOpen}>
+                      <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                          <DialogTitle className="text-base">Example {currentPair.id} of {TRAINING_PAIRS.length}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <span className="text-xs font-semibold text-muted-foreground block mb-1">Input</span>
+                            <p className="text-sm text-foreground leading-relaxed">{currentPair.input}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs font-semibold text-muted-foreground block mb-1">Output</span>
+                            <div className="text-sm text-foreground leading-relaxed whitespace-pre-line max-h-[50vh] overflow-y-auto">
+                              {currentPair.output}
+                            </div>
+                          </div>
+                          {!currentDecision && (
+                            <div className="flex gap-3 pt-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleTrainingDecision(currentPair.id, "approve");
+                                  setTrainingDialogOpen(false);
+                                }}
+                                className="flex-1 flex items-center justify-center gap-2 text-sm py-2 rounded-md border border-green-300 text-green-700 hover:bg-green-50 transition-colors"
+                              >
+                                <ThumbsUp className="h-4 w-4" />
+                                Approve
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleTrainingDecision(currentPair.id, "disapprove");
+                                  setTrainingDialogOpen(false);
+                                }}
+                                className="flex-1 flex items-center justify-center gap-2 text-sm py-2 rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors"
+                              >
+                                <ThumbsDown className="h-4 w-4" />
+                                Disapprove
+                              </button>
+                            </div>
+                          )}
+                          {currentDecision && (
+                            <div className="flex justify-center pt-2">
+                              <span className={cn(
+                                "text-sm font-semibold px-3 py-1 rounded",
+                                currentDecision === "approve"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              )}>
+                                {currentDecision === "approve" ? "Approved" : "Disapproved"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
-                )}
+                  );
+                })()}
               </div>
 
               {/* ── Center content ── */}
