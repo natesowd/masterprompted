@@ -104,11 +104,21 @@ export default function Modules() {
 
                 {/* Content */}
                 <div className="p-4 flex-1 flex flex-col">
-                  <span className="text-xs text-muted-foreground font-heading mb-1">
-                    {unit.number === 0
-                      ? t('modules.introLabel')
-                      : `${t('modules.unitLabel')} ${unit.number}`}
-                  </span>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-muted-foreground font-heading">
+                      {unit.number === 0
+                        ? t('modules.introLabel')
+                        : `${t('modules.unitLabel')} ${unit.number}`}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] px-1.5 py-0 h-5 gap-0.5 font-medium ${LEVEL_CONFIG[unit.level].className}`}
+                    >
+                      {Array.from({ length: LEVEL_CONFIG[unit.level].stars }).map((_, i) => (
+                        <FourPointStar key={i} className="h-2.5 w-2.5" />
+                      ))}
+                    </Badge>
+                  </div>
                   <h2 className="font-heading font-semibold text-foreground text-sm leading-tight mb-1">
                     {t(`modules.units.${unit.key}.title`)}
                   </h2>
