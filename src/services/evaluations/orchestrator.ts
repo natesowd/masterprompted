@@ -89,12 +89,9 @@ export async function runAllEvaluations(
         let explanation = searchResult.debunkReport;
         if (searchResult.debunkingSources.length > 0) {
           const sourceLinks = searchResult.debunkingSources
-            .filter(s => s.source)
+            .filter(s => s.source && s.citationNumber)
             .sort((a, b) => (a.citationNumber ?? Infinity) - (b.citationNumber ?? Infinity))
-            .map(s => {
-              const prefix = s.citationNumber ? `[${s.citationNumber}] ` : "";
-              return `- ${prefix}[${s.origin || s.source}](${s.source})`;
-            })
+            .map(s => `- [${s.citationNumber}] [${s.origin || s.source}](${s.source})`)
             .join("\n");
           if (sourceLinks) {
             explanation += `\n\n**Sources:**\n${sourceLinks}`;
