@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowRight } from "lucide-react";
-import { FourPointStar } from "@/components/FourPointStar";
+
 import starImage from "@/assets/star.png";
 import mannequinImage from "@/assets/mannequin.png";
 import dumbbellImg from "@/assets/dumbbell.png";
