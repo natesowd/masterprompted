@@ -4,6 +4,8 @@
  * Checks if a claim has been previously debunked by searching against a database.
  */
 
+import { fetchWithRetry } from "./fetchWithRetry";
+
 const CLAIM_MATCH_ENDPOINT = "https://claim-matching-aicode.ilabhub.atc.gr/claim_match";
 
 export interface ClaimMatchResult {
@@ -21,7 +23,7 @@ export interface ClaimMatchResult {
  */
 export async function matchClaim(claim: string): Promise<ClaimMatchResult | null> {
   try {
-    const response = await fetch(CLAIM_MATCH_ENDPOINT, {
+    const response = await fetchWithRetry(CLAIM_MATCH_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: claim }),

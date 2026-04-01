@@ -5,6 +5,7 @@
  */
 
 import type { EvaluationSpan } from "./types";
+import { fetchWithRetry } from "./fetchWithRetry";
 
 interface DisinformationResponse {
   signals: Array<{
@@ -65,7 +66,7 @@ export async function checkFallacies(text: string): Promise<EvaluationSpan[] | n
   if (!text.trim()) return [];
 
   try {
-    const response = await fetch(DISINFORMATION_ENDPOINT, {
+    const response = await fetchWithRetry(DISINFORMATION_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

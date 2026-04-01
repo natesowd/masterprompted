@@ -4,6 +4,8 @@
  * Extracts individual claims and their associated text snippets from input text.
  */
 
+import { fetchWithRetry } from "./fetchWithRetry";
+
 const EXTRACT_CLAIMS_ENDPOINT = "https://claim-detection-aicode.ilabhub.atc.gr/extract_claims";
 
 export interface ExtractedClaim {
@@ -20,7 +22,7 @@ export async function extractClaims(text: string): Promise<ExtractedClaim[] | nu
   if (!text.trim()) return [];
 
   try {
-    const response = await fetch(EXTRACT_CLAIMS_ENDPOINT, {
+    const response = await fetchWithRetry(EXTRACT_CLAIMS_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),

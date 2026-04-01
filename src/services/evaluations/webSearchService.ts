@@ -5,6 +5,8 @@
  * and generates a debunking report using counter-evidence.
  */
 
+import { fetchWithRetry } from "./fetchWithRetry";
+
 const WEB_SEARCH_ENDPOINT = "https://web-search-aicode.ilabhub.atc.gr/web_search/";
 
 export interface DebunkingSource {
@@ -27,7 +29,7 @@ export interface WebSearchResult {
  */
 export async function webSearchClaim(claimText: string): Promise<WebSearchResult | null> {
   try {
-    const response = await fetch(WEB_SEARCH_ENDPOINT, {
+    const response = await fetchWithRetry(WEB_SEARCH_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ claim_text: claimText }),
