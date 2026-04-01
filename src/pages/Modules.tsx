@@ -3,12 +3,22 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowRight } from "lucide-react";
+import { FourPointStar } from "@/components/FourPointStar";
 import starImage from "@/assets/star.png";
 import mannequinImage from "@/assets/mannequin.png";
 import dumbbellImg from "@/assets/dumbbell.png";
 import magnifyingGlassImage from "@/assets/magnifying-glass.png";
+
+type KnowledgeLevel = 'beginner' | 'intermediate' | 'advanced';
+
+const LEVEL_CONFIG: Record<KnowledgeLevel, { stars: number; className: string }> = {
+  beginner:     { stars: 1, className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  intermediate: { stars: 2, className: "bg-amber-100 text-amber-700 border-amber-200" },
+  advanced:     { stars: 3, className: "bg-rose-100 text-rose-700 border-rose-200" },
+};
 
 const LEARNING_UNITS = [
   {
@@ -16,36 +26,42 @@ const LEARNING_UNITS = [
     route: '/module/intro',
     number: 0,
     image: '/task.png',
+    level: 'beginner' as KnowledgeLevel,
   },
   {
     key: 'nextWordPrediction',
     route: '/module/next-word-prediction',
     number: 1,
     image: '/stair.png',
+    level: 'beginner' as KnowledgeLevel,
   },
   {
     key: 'promptConstruction',
     route: '/module/prompt-construction',
     number: 2,
     image: starImage,
+    level: 'intermediate' as KnowledgeLevel,
   },
   {
     key: 'systemParameters',
     route: '/module/system-parameters',
     number: 3,
     image: mannequinImage,
+    level: 'intermediate' as KnowledgeLevel,
   },
   {
     key: 'multipleSources',
     route: '/module/multiple-sources',
     number: 4,
     image: magnifyingGlassImage,
+    level: 'advanced' as KnowledgeLevel,
   },
   {
     key: 'llmTraining',
     route: '/module/llm-training',
     number: 5,
     image: dumbbellImg,
+    level: 'advanced' as KnowledgeLevel,
   },
 ];
 
