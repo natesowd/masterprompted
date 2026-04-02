@@ -123,7 +123,7 @@ const SNIPPET_FLAGS: Record<string, FlagDef[][]> = {
 /** Render a paragraph with inline TextFlag annotations for flagged phrases */
 function renderFlaggedParagraph(
   text: string,
-  flags: SnippetFlagDef[],
+  flags: FlagDef[],
   paraKey: string,
 ): React.ReactNode {
   if (!flags || flags.length === 0) return text;
