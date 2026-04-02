@@ -555,7 +555,7 @@ export default function MultipleSourcesExercise() {
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <div className="space-y-4">
                           <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-line">
-                            {currentResponse}
+                            {renderFlaggedResponse(currentResponse, OUTPUT_FLAGS[selectionKey] || [])}
                           </p>
                         </div>
                       </div>
