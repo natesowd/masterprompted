@@ -78,14 +78,14 @@ const SNIPPETS_BY_DOC: Record<string, Snippet[]> = {
   ],
 };
 
-/* ── Snippet difference flags ── */
-/* Each flag highlights a phrase unique to or notably different from other docs */
-interface SnippetFlagDef {
+/* ── Difference flags ── */
+/* Each flag highlights a phrase unique to or notably different from other docs/output */
+interface FlagDef {
   text: string;
   explanation: string;
 }
 
-const SNIPPET_FLAGS: Record<string, SnippetFlagDef[][]> = {
+const SNIPPET_FLAGS: Record<string, FlagDef[][]> = {
   "doc-1": [
     [
       { text: "AI strategy", explanation: "Doc 2 frames this as 'governance frameworks' and Doc 3 as 'internal guidelines' — each document conceptualises the organisational approach differently." },
@@ -120,10 +120,79 @@ const SNIPPET_FLAGS: Record<string, SnippetFlagDef[][]> = {
   ],
 };
 
+/* ── Output difference flags ── */
+/* Highlights where the LLM output diverges from or reinterprets the retrieved snippets */
+const OUTPUT_FLAGS: Record<string, FlagDef[]> = {
+  "doc-1": [
+    { text: "fostering innovation while protecting people's rights", explanation: "The snippet says 'focus on what the technology can contribute to delivering public service value' — the output generalises this into broader language about 'rights' and 'innovation' not found in the source." },
+    { text: "Human judgment must remain at the heart of our editorial decisions", explanation: "This quote is presented as from the document, but the snippet only mentions 'scrutinise the products they use for biases' — the output adds editorial framing not in the retrieved text." },
+    { text: "Ethics must guide our technological choices", explanation: "Presented as a direct quote, but this exact phrasing doesn't appear in the retrieved snippet. The snippet discusses strategy and bias scrutiny, not 'technological choices'." },
+  ],
+  "doc-1,doc-2": [
+    { text: "institutional accountability", explanation: "The output synthesises this concept from Doc 2's 'accountability structures' and Doc 1's public-service framing — neither snippet uses the exact phrase 'institutional accountability'." },
+    { text: "journalists are gatekeepers of accuracy and fairness", explanation: "The snippets mention 'editorial oversight mechanisms' (Doc 2) and 'scrutinise products for biases' (Doc 1), but 'gatekeepers' is the model's own characterisation." },
+    { text: "Collaborate with media organizations to tailor tools", explanation: "Neither retrieved snippet mentions developer–media collaboration. The output introduces a responsibility for 'AI Developers' not present in the source documents." },
+  ],
+  "doc-1,doc-2,doc-3": [
+    { text: "DW is firmly committed to journalism that is produced by people", explanation: "Presented as a DW quote, but the retrieved snippet says 'DW uses AI tools to support journalists' and 'final editorial decisions must always rest with human editors' — different emphasis." },
+    { text: "A human is always responsible for the outcome when AI is used", explanation: "Attributed to 'Yle principles', but Yle (Doc 2) snippets discuss 'governance frameworks' and 'transparency with audiences' — this specific principle isn't in the retrieved text." },
+    { text: "Generative AI makes it easier to produce and spread disinformation", explanation: "This disinformation framing doesn't appear in any of the three retrieved snippets. The output introduces content beyond what was retrieved." },
+  ],
+};
+
+/** Render a response with inline TextFlag annotations for output-vs-snippet differences */
+function renderFlaggedResponse(
+  text: string,
+  flags: FlagDef[],
+): React.ReactNode {
+  if (!flags || flags.length === 0) return text;
+
+  // Split into lines, process each
+  const lines = text.split("\n");
+  const result: React.ReactNode[] = [];
+
+  lines.forEach((line, lineIdx) => {
+    if (lineIdx > 0) result.push(<br key={`br-${lineIdx}`} />);
+
+    // Find flags that match in this line
+    const lineFlags = flags
+      .map((f) => ({ ...f, index: line.indexOf(f.text) }))
+      .filter((f) => f.index !== -1)
+      .sort((a, b) => a.index - b.index);
+
+    if (lineFlags.length === 0) {
+      result.push(<span key={`line-${lineIdx}`}>{line}</span>);
+      return;
+    }
+
+    let last = 0;
+    lineFlags.forEach((flag, i) => {
+      if (flag.index > last) {
+        result.push(<span key={`line-${lineIdx}-t${i}`}>{line.slice(last, flag.index)}</span>);
+      }
+      result.push(
+        <TextFlag
+          key={`line-${lineIdx}-f${i}`}
+          text={flag.text}
+          evaluationFactor="factual_accuracy"
+          explanation={flag.explanation}
+          severity="warning"
+        />,
+      );
+      last = flag.index + flag.text.length;
+    });
+    if (last < line.length) {
+      result.push(<span key={`line-${lineIdx}-end`}>{line.slice(last)}</span>);
+    }
+  });
+
+  return <>{result}</>;
+}
+
 /** Render a paragraph with inline TextFlag annotations for flagged phrases */
 function renderFlaggedParagraph(
   text: string,
-  flags: SnippetFlagDef[],
+  flags: FlagDef[],
   paraKey: string,
 ): React.ReactNode {
   if (!flags || flags.length === 0) return text;
@@ -486,7 +555,7 @@ export default function MultipleSourcesExercise() {
                       <div className="max-h-[500px] overflow-y-auto flex-1">
                         <div className="space-y-4">
                           <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-line">
-                            {currentResponse}
+                            {renderFlaggedResponse(currentResponse, OUTPUT_FLAGS[selectionKey] || [])}
                           </p>
                         </div>
                       </div>
