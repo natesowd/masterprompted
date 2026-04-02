@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import ModuleNavigation from "@/components/ModuleNavigation";
 import EvaluationPanel from "@/components/EvaluationPanel";
+import TextFlag from "@/components/TextFlag";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, File, Paperclip, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
