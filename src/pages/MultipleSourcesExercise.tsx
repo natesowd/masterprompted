@@ -159,46 +159,6 @@ function renderFlaggedResponse(
   return <>{result}</>;
 }
 
-/** Render a paragraph with inline TextFlag annotations for flagged phrases */
-function renderFlaggedParagraph(
-  text: string,
-  flags: FlagDef[],
-  paraKey: string,
-): React.ReactNode {
-  if (!flags || flags.length === 0) return text;
-
-  const sorted = flags
-    .map((f) => ({ ...f, index: text.indexOf(f.text) }))
-    .filter((f) => f.index !== -1)
-    .sort((a, b) => a.index - b.index);
-
-  if (sorted.length === 0) return text;
-
-  const nodes: React.ReactNode[] = [];
-  let last = 0;
-
-  sorted.forEach((flag, i) => {
-    if (flag.index > last) {
-      nodes.push(<span key={`${paraKey}-t${i}`}>{text.slice(last, flag.index)}</span>);
-    }
-    nodes.push(
-      <TextFlag
-        key={`${paraKey}-f${i}`}
-        text={flag.text}
-        evaluationFactor="relevance"
-        explanation={flag.explanation}
-        severity="info"
-      />,
-    );
-    last = flag.index + flag.text.length;
-  });
-
-  if (last < text.length) {
-    nodes.push(<span key={`${paraKey}-end`}>{text.slice(last)}</span>);
-  }
-
-  return <>{nodes}</>;
-}
 
 /* Per-document-combination responses (simulated RAG output) */
 const RESPONSES: Record<string, string> = {
