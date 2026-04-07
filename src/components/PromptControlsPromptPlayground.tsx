@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Info, Redo2, RefreshCcw } from "lucide-react";
-import Chatbox from "./ChatBox";
+import Chatbox from "./ChatBoxPromptPlayground";
 import { Parameters } from "@/pages/PromptPlayground";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";

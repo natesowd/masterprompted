@@ -1,7 +1,7 @@
 // src/pages/PromptPlayground.tsx
 
 import Header from "@/components/Header";
-import PromptControls from "@/components/PromptControlsPromptConstruction";
+import PromptControls from "@/components/PromptControlsPromptPlayground";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -464,7 +464,7 @@ const PromptPlayground = () => {
 
     for (const file of pdfs) {
       console.log(`Parsing file: ${file.name}`);
-      setUploadedFiles(prev => [...prev, { name: file.name, content: '', size: 0, isUploading: true }]);
+      setUploadedFiles(prev => [...prev, { name: file.name, content: '', rawContent: '', size: 0, isUploading: true }]);
 
       try {
         const text = await extractTextFromPDF(file);

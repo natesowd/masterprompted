@@ -7,10 +7,15 @@
 
 export const COMPONENT_MANIFEST = {
   // Chat Components
-  ChatBox: {
-    description: "A resizable chatbox with controlled input, file upload, and animated feedback",
-    features: ["Controlled textarea", "File attachments", "Bounce animation", "Keyboard shortcuts"],
-    path: "src/components/ChatBox.tsx"
+  ChatBoxPromptPlayground: {
+    description: "Specialized chatbox for the Prompt Playground with support for prompt optimization regeneration.",
+    features: ["Controlled textarea", "File attachments", "Regenerate button", "Bounce animation", "Keyboard shortcuts"],
+    path: "src/components/ChatBoxPromptPlayground.tsx"
+  },
+  ChatBoxPromptConstruction: {
+    description: "Simplified chatbox for Guided Exploration/Prompt Construction modules.",
+    features: ["Controlled textarea", "File attachments", "Bounce animation"],
+    path: "src/components/ChatBoxPromptConstruction.tsx"
   },
   ChatPrompt: {
     description: "User message display with version navigation and rich text formatting",
@@ -88,10 +93,15 @@ export const COMPONENT_MANIFEST = {
     features: ["Previous/next navigation", "Completion status", "Route management"],
     path: "src/components/ModuleNavigation.tsx"
   },
-  PromptControls: {
-    description: "Interactive controls for prompt parameter adjustment",
-    features: ["Slider inputs", "Real-time updates", "Parameter display", "Reset functionality"],
-    path: "src/components/PromptControls.tsx"
+  PromptControlsPromptPlayground: {
+    description: "Interactive controls for the Prompt Playground including optimization walkthroughs and parameter overrides.",
+    features: ["Slider inputs", "Walkthrough dialog", "Meta-prompt info", "Real-time updates", "Reset functionality"],
+    path: "src/components/PromptControlsPromptPlayground.tsx"
+  },
+  PromptControlsPromptConstruction: {
+    description: "Guided controls for prompt parameter adjustment focusing on construction basics.",
+    features: ["Slider inputs", "Simplified parameters", "Real-time updates", "Reset functionality"],
+    path: "src/components/PromptControlsPromptConstruction.tsx"
   },
 
   // Utility Components
