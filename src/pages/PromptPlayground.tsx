@@ -40,7 +40,9 @@ export type Thread = {
 
 export type ParsedFile = {
   name: string;
-  content: string;
+  content: string;         // active content used by consumers (raw or summary)
+  rawContent: string;      // always the full extracted PDF text
+  summary?: string;        // map-reduced summary, if summarization was performed
   size: number;
   isUploading?: boolean;
   isSummarized?: boolean;
@@ -69,6 +71,17 @@ const PromptPlayground = () => {
   const optimizeAbortControllerRef = useRef<AbortController | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
   const CONTEXT_WINDOW_LIMIT_TOKENS = 125000;
+
+  // Controls whether map-reduced summaries are used instead of raw PDF text.
+  // Both default to false — when both are false, summarization is skipped entirely.
+  const [useSummaryForOptimization, setUseSummaryForOptimization] = useState<boolean>(false);
+  const [useSummaryForOutput, setUseSummaryForOutput] = useState<boolean>(false);
+
+  /** Resolve the content to use for a file given a useSummary flag. */
+  const getFileContent = (file: ParsedFile, useSummary: boolean): string => {
+    return (useSummary && file.summary) ? file.summary : file.rawContent;
+  };
+
   const [summarizationProgress, setSummarizationProgress] = useState<{
     isActive: boolean;
     fileName: string;
@@ -145,12 +158,16 @@ const PromptPlayground = () => {
         stream: true,
         messages: [
           { role: "system", content: "You are a helpful assistant." },
-          ...uploadedFiles.map(file => ({
-            role: "user" as const,
-            content: file.isSummarized
-              ? `Summary of uploaded PDF "${file.name}" (condensed from ~${file.originalTokenCount} tokens):\n\n${file.content}`
-              : `Context from uploaded PDF "${file.name}":\n\n${file.content}`
-          })),
+          ...uploadedFiles.map(file => {
+            const useSum = useSummaryForOutput && !!file.summary;
+            const fileContent = getFileContent(file, useSummaryForOutput);
+            return {
+              role: "user" as const,
+              content: useSum
+                ? `Summary of uploaded PDF "${file.name}" (condensed from ~${file.originalTokenCount} tokens):\n\n${fileContent}`
+                : `Context from uploaded PDF "${file.name}":\n\n${fileContent}`
+            };
+          }),
           { role: "user", content: promptText },
         ],
       };
@@ -336,7 +353,7 @@ const PromptPlayground = () => {
         clearTimeout(timeoutId);
       }
     },
-    [uploadedFiles]
+    [uploadedFiles, useSummaryForOutput]
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, specificity: string, style: string, context: string, bias: string) => {
@@ -376,8 +393,8 @@ const PromptPlayground = () => {
 
       // Append document context so the optimizer can incorporate uploaded content
       const documentContext = uploadedFiles
-        .filter(f => !f.isUploading && f.content)
-        .map(f => `[Document: ${f.name}]\n${f.content}`)
+        .filter(f => !f.isUploading && f.rawContent)
+        .map(f => `[Document: ${f.name}]\n${getFileContent(f, useSummaryForOptimization)}`)
         .join('\n\n');
       const fullOptimizePrompt = documentContext
         ? `${optimizeUserPrompt}\n\nThe user has provided the following document(s) for reference. Consider this content when rewriting the prompt:\n\n${documentContext}`
@@ -432,7 +449,7 @@ const PromptPlayground = () => {
         setWaitingForOptimization(false);
       }
     }
-  }, [pageLanguage, uploadedFiles]);
+  }, [pageLanguage, uploadedFiles, useSummaryForOptimization]);
 
   const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
     const fileList = Array.from(files);
@@ -456,12 +473,13 @@ const PromptPlayground = () => {
         const rawTokens = Math.ceil(text.length / 3.5);
         console.log(`Estimated tokens for "${file.name}": ${rawTokens} (Chars: ${text.length}).`);
 
-        // Summarize large documents via map-reduce
-        let finalContent = text;
+        // Only run map-reduce summarization if at least one summary flag is enabled
+        const needsSummarization = (useSummaryForOptimization || useSummaryForOutput);
+        let summaryText: string | undefined;
         let isSummarized = false;
         const SHORT_DOC_TOKEN_THRESHOLD = 6000;
 
-        if (rawTokens > SHORT_DOC_TOKEN_THRESHOLD) {
+        if (needsSummarization && rawTokens > SHORT_DOC_TOKEN_THRESHOLD) {
           console.log(`[pdfSummarizer] Document "${file.name}" has ${rawTokens} tokens — starting summarization...`);
           setSummarizationProgress({ isActive: true, fileName: file.name, phase: 'starting', current: 0, total: 0 });
           try {
@@ -470,7 +488,7 @@ const PromptPlayground = () => {
               console.log(`[pdfSummarizer] ${file.name}: ${phase} ${current}/${total}`);
               setSummarizationProgress({ isActive: true, fileName: file.name, phase, current, total });
             });
-            finalContent = result.summary;
+            summaryText = result.summary;
             isSummarized = true;
             console.log(`[pdfSummarizer] Summarized "${file.name}": ${result.originalTokenCount} → ${result.summaryTokenCount} tokens`);
           } catch (sumErr) {
@@ -480,7 +498,9 @@ const PromptPlayground = () => {
           }
         }
 
-        const newFileTokens = Math.ceil(finalContent.length / 3.5);
+        // content = whichever is active right now; rawContent always stores the full text
+        const activeContent = (isSummarized && summaryText) ? summaryText : text;
+        const newFileTokens = Math.ceil(activeContent.length / 3.5);
         const currentFilesTokens = uploadedFiles
           .filter(f => !f.isUploading)
           .reduce((acc, f) => acc + Math.ceil(f.content.length / 3.5), 0);
@@ -499,8 +519,10 @@ const PromptPlayground = () => {
           (f.name === file.name && f.isUploading)
             ? {
                 name: file.name,
-                content: finalContent,
-                size: finalContent.length,
+                content: activeContent,
+                rawContent: text,
+                summary: summaryText,
+                size: activeContent.length,
                 isUploading: false,
                 isSummarized,
                 originalTokenCount: isSummarized ? rawTokens : undefined,
@@ -517,7 +539,7 @@ const PromptPlayground = () => {
         setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
       }
     }
-  }, [uploadedFiles, isEmpty]);
+  }, [uploadedFiles, isEmpty, useSummaryForOptimization, useSummaryForOutput]);
 
   const handleRemoveFile = useCallback((index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
