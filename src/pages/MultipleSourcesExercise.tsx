@@ -85,41 +85,6 @@ interface FlagDef {
   explanation: string;
 }
 
-const SNIPPET_FLAGS: Record<string, FlagDef[][]> = {
-  "doc-1": [
-    [
-      { text: "AI strategy", explanation: "Doc 2 frames this as 'governance frameworks' and Doc 3 as 'internal guidelines' — each document conceptualises the organisational approach differently." },
-      { text: "public service value", explanation: "Unique to Doc 1: it frames AI's role through a public-service mission, unlike Doc 2's governance lens or Doc 3's practical editorial focus." },
-    ],
-    [
-      { text: "purchasing products, lobbying for regulation", explanation: "Only Doc 1 mentions using market power and political influence as ethical levers — a systemic approach absent from the other two documents." },
-    ],
-    [
-      { text: "biases and stereotypes", explanation: "Doc 1 explicitly names bias and stereotype amplification. Doc 2 addresses this indirectly via 'oversight mechanisms'; Doc 3 focuses on accuracy verification." },
-    ],
-  ],
-  "doc-2": [
-    [
-      { text: "governance frameworks", explanation: "Doc 2 uses formal governance language ('frameworks', 'structures'), contrasting with Doc 1's strategic framing and Doc 3's practitioner guidelines." },
-      { text: "accountability structures", explanation: "Unique emphasis on institutional accountability — Doc 1 centres on the public-service mandate, Doc 3 on editorial control." },
-    ],
-    [
-      { text: "Transparency with audiences", explanation: "Doc 2 frames transparency as an audience-facing obligation. Doc 3 addresses it through 'labelling' requirements; Doc 1 focuses on internal scrutiny." },
-      { text: "fundamental ethical obligation", explanation: "Stronger moral framing than the others — Doc 1 says organisations 'should' act; Doc 3 describes what DW 'has developed'." },
-    ],
-  ],
-  "doc-3": [
-    [
-      { text: "support journalists", explanation: "DW positions AI as a support tool — not a strategic asset (Doc 1) or governance challenge (Doc 2). A distinctly practitioner-oriented framing." },
-      { text: "final editorial decisions must always rest with human editors", explanation: "The strongest human-control stance across all three documents. Doc 1 mentions 'human judgment'; Doc 2 focuses on 'oversight mechanisms'." },
-    ],
-    [
-      { text: "labelling of AI-assisted content", explanation: "A concrete practice matching Doc 2's 'transparency' principle, but Doc 3 specifies it as an internal rule rather than an ethical aspiration." },
-      { text: "prohibit fully automated publishing", explanation: "Unique to Doc 3: an explicit prohibition. Neither Doc 1 nor Doc 2 draws such a hard line against full automation." },
-    ],
-  ],
-};
-
 /* ── Output difference flags ── */
 /* Highlights where the LLM output contains quotes or claims not found in the retrieved snippets */
 const OUTPUT_FLAGS: Record<string, FlagDef[]> = {
