@@ -123,8 +123,8 @@ export default function Modules() {
                       <Card
                         className={`rounded-xl overflow-hidden flex flex-col h-full cursor-pointer transition-all duration-300 ${
                           isSelected
-                            ? "border-2 border-emerald-500 bg-emerald-50 scale-105"
-                            : "border border-border bg-white opacity-50 scale-95"
+                            ? "border-2 border-emerald-500 bg-background scale-105"
+                            : "border border-border bg-background opacity-50 scale-95"
                         }`}
                         onClick={() => navigate(unit.route)}
                       >
