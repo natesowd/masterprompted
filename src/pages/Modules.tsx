@@ -78,12 +78,22 @@ export default function Modules() {
   const { t } = useLanguage();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  const spacerIndex = LEARNING_UNITS.length; // index of the blank card
+
   const onApiChange = useCallback((api: CarouselApi) => {
     if (!api) return;
-    const onSelect = () => setSelectedIndex(api.selectedScrollSnap());
+    const onSelect = () => {
+      const snap = api.selectedScrollSnap();
+      if (snap === spacerIndex) {
+        // Skip past the spacer — jump forward
+        api.scrollNext();
+      } else {
+        setSelectedIndex(snap);
+      }
+    };
     onSelect();
     api.on("select", onSelect);
-  }, []);
+  }, [spacerIndex]);
 
   return (
     <div className="min-h-screen bg-background">
