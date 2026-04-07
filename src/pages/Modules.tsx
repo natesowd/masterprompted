@@ -103,96 +103,81 @@ export default function Modules() {
           </div>
 
           {/* Learning units carousel */}
-          <div className="mb-8">
+          <div className="px-12 mb-8">
             <Carousel
               opts={{
                 align: "center",
                 loop: true,
               }}
               setApi={onApiChange}
-              className="w-full"
+              className="w-full overflow-visible"
             >
-              <CarouselContent className="-ml-4">
+              <CarouselContent className="-ml-5 overflow-visible py-4">
                 {LEARNING_UNITS.map((unit, index) => {
                   const isSelected = index === selectedIndex;
                   return (
                     <CarouselItem
                       key={unit.key}
-                      className="pl-4 basis-[80%] sm:basis-1/2 lg:basis-1/3 transition-all duration-300"
+                      className="pl-5 basis-[85%] sm:basis-1/2 lg:basis-1/3"
                     >
-                      <div
-                        className={`transition-transform duration-300 ${
-                          isSelected ? "scale-105" : "scale-90 opacity-60"
+                      <Card
+                        className={`rounded-xl overflow-hidden flex flex-col h-full cursor-pointer transition-all duration-300 ${
+                          isSelected
+                            ? "border-2 border-emerald-500 bg-emerald-50 scale-105"
+                            : "border border-border bg-white opacity-50 scale-95"
                         }`}
+                        onClick={() => navigate(unit.route)}
                       >
-                        <Card
-                          className={`group rounded-xl overflow-hidden flex flex-col h-full cursor-pointer transition-all duration-300 ${
-                            isSelected
-                              ? "border-2 border-emerald-500 ring-2 ring-emerald-200 shadow-lg bg-emerald-50"
-                              : "border border-border bg-white"
-                          }`}
-                          onClick={() => navigate(unit.route)}
-                        >
-                          {/* Image */}
-                          <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center p-6">
-                            <img
-                              src={unit.image}
-                              alt={t(`modules.units.${unit.key}.title`)}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
+                        {/* Image */}
+                        <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center p-6">
+                          <img
+                            src={unit.image}
+                            alt={t(`modules.units.${unit.key}.title`)}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
 
-                          {/* Content */}
-                          <div className="p-4 flex-1 flex flex-col">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-muted-foreground font-heading">
-                                {unit.number === 0
-                                  ? t('modules.introLabel')
-                                  : `${t('modules.unitLabel')} ${unit.number}`}
-                              </span>
-                              <Badge
-                                variant="outline"
-                                className={`text-[10px] px-1.5 py-0.5 h-auto font-medium whitespace-nowrap ${LEVEL_CONFIG[unit.level].className}`}
-                              >
-                                {LEVEL_CONFIG[unit.level].label}
-                              </Badge>
-                            </div>
-                            <h2 className="font-heading font-semibold text-foreground text-sm leading-tight mb-1">
-                              {t(`modules.units.${unit.key}.title`)}
-                            </h2>
-                            <p className="text-xs text-muted-foreground leading-snug mb-3 line-clamp-2 flex-1">
-                              {t(`modules.units.${unit.key}.description`)}
-                            </p>
-                            <div className="flex justify-end">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 rounded-full"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(unit.route);
-                                }}
-                              >
-                                <ArrowRight className="h-4 w-4" />
-                              </Button>
-                            </div>
+                        {/* Content */}
+                        <div className="p-4 flex-1 flex flex-col">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-muted-foreground font-heading">
+                              {unit.number === 0
+                                ? t('modules.introLabel')
+                                : `${t('modules.unitLabel')} ${unit.number}`}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] px-1.5 py-0.5 h-auto font-medium whitespace-nowrap ${LEVEL_CONFIG[unit.level].className}`}
+                            >
+                              {LEVEL_CONFIG[unit.level].label}
+                            </Badge>
                           </div>
-                        </Card>
-                      </div>
+                          <h2 className="font-heading font-semibold text-foreground text-sm leading-tight mb-1">
+                            {t(`modules.units.${unit.key}.title`)}
+                          </h2>
+                          <p className="text-xs text-muted-foreground leading-snug mb-3 line-clamp-2 flex-1">
+                            {t(`modules.units.${unit.key}.description`)}
+                          </p>
+                        </div>
+                      </Card>
                     </CarouselItem>
                   );
                 })}
               </CarouselContent>
-
-              {/* Navigation arrows below the carousel */}
-              <div className="flex items-center justify-center gap-4 mt-6">
-                <CarouselPrevious className="static translate-y-0 translate-x-0" />
-                <span className="text-sm text-muted-foreground font-heading">
-                  {selectedIndex + 1} / {LEARNING_UNITS.length}
-                </span>
-                <CarouselNext className="static translate-y-0 translate-x-0" />
-              </div>
+              <CarouselPrevious />
+              <CarouselNext />
             </Carousel>
+
+            {/* Single enter button for selected unit */}
+            <div className="flex justify-center mt-6">
+              <Button
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6"
+                onClick={() => navigate(LEARNING_UNITS[selectedIndex].route)}
+              >
+                {t(`modules.units.${LEARNING_UNITS[selectedIndex].key}.title`)}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </main>
