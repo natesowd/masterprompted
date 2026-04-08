@@ -123,8 +123,11 @@ async function callLLM(
 // ---------------------------------------------------------------------------
 
 const MAP_SYSTEM_PROMPT =
-  'You are a document summarizer. Produce a concise, factual summary of the following text section. ' +
-  'Preserve key facts, names, dates, statistics, and arguments. Do not add commentary.';
+  'You are a precise document summarizer. Produce a factual summary of the following text section. ' +
+  'Rules: (1) Preserve ALL names, dates, numbers, statistics, and quoted statements exactly as written — do not round, approximate, or rephrase numerical data. ' +
+  '(2) Do not infer, interpret, or add information not explicitly stated in the text. ' +
+  '(3) If a passage is ambiguous, summarize what it literally says rather than what it might mean. ' +
+  '(4) Do not add commentary, opinions, or conclusions beyond what the text states.';
 
 async function summarizeChunk(
   chunk: string,
@@ -158,8 +161,11 @@ async function summarizeChunk(
 // ---------------------------------------------------------------------------
 
 const REDUCE_SYSTEM_PROMPT =
-  'You are a document summarizer. Combine the following section summaries into a single coherent document summary. ' +
-  'Preserve all key facts and maintain logical flow. Be concise.';
+  'You are a precise document summarizer. Combine the following section summaries into a single coherent document summary. ' +
+  'Rules: (1) Preserve ALL names, dates, numbers, and statistics exactly as they appear — do not alter any factual details during consolidation. ' +
+  '(2) If two sections contain the same fact stated differently, preserve both versions rather than choosing one. ' +
+  '(3) Maintain logical flow but never add connective statements that introduce new claims. ' +
+  '(4) Be concise without sacrificing factual precision.';
 
 async function reduceSummaries(
   summaries: string[],

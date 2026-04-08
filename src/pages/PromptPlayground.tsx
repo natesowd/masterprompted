@@ -151,23 +151,39 @@ const PromptPlayground = () => {
 
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
+      // --- Grounding system prompt (conditional on PDF uploads) ---
+      const groundingPrompt = uploadedFiles.length > 0
+        ? `You are a document analysis assistant. You have been provided with one or more reference documents. Follow these rules strictly:
+
+1. BASE YOUR ANSWERS ON THE PROVIDED DOCUMENTS. When the user's question relates to topics covered in the documents, your answer must be drawn from the document content. Do not supplement with outside knowledge unless the document is insufficient to answer the question.
+2. QUOTE AND CITE. When referencing specific facts, statistics, names, or claims from a document, quote the relevant passage or clearly indicate which document and section the information comes from.
+3. DISTINGUISH SOURCES. If you must use knowledge beyond the documents (because the documents do not address the question), explicitly state: "Based on the provided documents, this is not covered. From general knowledge: ..."
+4. NEVER FABRICATE DOCUMENT CONTENT. If you cannot find specific information in the provided documents, say so. Do not guess or paraphrase loosely — accuracy is more important than completeness.
+5. PRESERVE PRECISION. Reproduce names, dates, numbers, and statistics exactly as they appear in the documents. Do not round, approximate, or restate figures unless asked.
+6. WHEN IN DOUBT, QUOTE. If uncertain whether your recollection of a document detail is exact, quote the relevant passage directly rather than paraphrasing.`
+        : "You are a helpful assistant.";
+
+      // --- Build document context with XML tags for clear boundaries ---
+      const documentContext = uploadedFiles.map((file, idx) => {
+        const useSum = useSummaryForOutput && !!file.summary;
+        const fileContent = getFileContent(file, useSummaryForOutput);
+        const label = useSum
+          ? `[Summarized from ~${file.originalTokenCount} tokens]`
+          : `[Full text]`;
+        return `<document index="${idx + 1}" filename="${file.name}" ${label}>\n${fileContent}\n</document>`;
+      }).join('\n\n');
+
+      // --- Combine: grounding prompt FIRST, then documents appended AFTER ---
+      const systemContent = uploadedFiles.length > 0
+        ? `${groundingPrompt}\n\n<reference_documents>\n${documentContext}\n</reference_documents>`
+        : groundingPrompt;
+
       const payload = {
         model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
-        // model: "Qwen/Qwen3-Coder-30B-A3B-Instruct:fastest",
-        temperature: 0.7,
+        temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
         stream: true,
         messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          ...uploadedFiles.map(file => {
-            const useSum = useSummaryForOutput && !!file.summary;
-            const fileContent = getFileContent(file, useSummaryForOutput);
-            return {
-              role: "user" as const,
-              content: useSum
-                ? `Summary of uploaded PDF "${file.name}" (condensed from ~${file.originalTokenCount} tokens):\n\n${fileContent}`
-                : `Context from uploaded PDF "${file.name}":\n\n${fileContent}`
-            };
-          }),
+          { role: "system", content: systemContent },
           { role: "user", content: promptText },
         ],
       };
