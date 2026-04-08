@@ -27,6 +27,7 @@ import SystemParametersRoles from "./pages/SystemParametersRoles";
 import SystemParametersTakeaways from "./pages/SystemParametersTakeaways";
 import MultipleSources from "./pages/MultipleSources";
 import MultipleSourcesExercise from "./pages/MultipleSourcesExercise";
+import MultipleSourcesComparison from "./pages/MultipleSourcesComparison";
 import MultipleSourcesTakeaways from "./pages/MultipleSourcesTakeaways";
 import LLMTraining from "./pages/LLMTraining";
 import LLMTrainingExercise from "./pages/LLMTrainingExercise";
@@ -87,6 +88,7 @@ const App = () =>
               <Route path="/module/system-parameters/takeaways" element={<SystemParametersTakeaways />} />
               <Route path="/module/multiple-sources" element={<MultipleSources />} />
               <Route path="/module/multiple-sources/exercise" element={<MultipleSourcesExercise />} />
+              <Route path="/module/multiple-sources/comparison" element={<MultipleSourcesComparison />} />
               <Route path="/module/multiple-sources/takeaways" element={<MultipleSourcesTakeaways />} />
               <Route path="/module/llm-training" element={<LLMTraining />} />
               <Route path="/module/llm-training/supervised" element={<LLMTrainingExercise />} />

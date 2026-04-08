@@ -503,10 +503,10 @@ export default function MultipleSourcesExercise() {
                         <Button
                           variant="outline"
                           size="lg"
-                          onClick={() => navigate("/module/multiple-sources/takeaways")}
+                          onClick={() => navigate("/module/multiple-sources/comparison")}
                           className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                         >
-                          Takeaways
+                          Continue
                           <ArrowRight className="-mr-2 !h-6 !w-6" />
                         </Button>
                       </div>
@@ -572,7 +572,7 @@ export default function MultipleSourcesExercise() {
 
       <ModuleNavigation
         previousRoute="/module/multiple-sources"
-        nextRoute="/modules"
+        nextRoute="/module/multiple-sources/comparison"
       />
     </div>
   );

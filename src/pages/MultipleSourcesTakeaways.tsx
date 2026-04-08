@@ -72,7 +72,7 @@ export default function MultipleSourcesTakeaways() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => navigate("/module/multiple-sources/exercise")}
+              onClick={() => navigate("/module/multiple-sources/comparison")}
               className="h-12 w-12 rounded-full">
               
               <ArrowLeft className="!h-6 !w-6" />
@@ -123,7 +123,7 @@ export default function MultipleSourcesTakeaways() {
         </div>
       </main>
       <ModuleNavigation
-        previousRoute="/module/multiple-sources/exercise"
+        previousRoute="/module/multiple-sources/comparison"
         nextRoute="/module/llm-training" />
       
     </div>);
