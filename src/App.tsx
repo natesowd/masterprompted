@@ -49,7 +49,7 @@ const App = () =>
         <EvaluationProvider>
           <Sonner />
           <BrowserRouter>
-            <DesignSystemFab />
+            {/* <DesignSystemFab /> */}
             <Routes>
               {/* NAV BAR */}
               <Route path="/" element={<Landing />} />
