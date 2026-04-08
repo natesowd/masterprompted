@@ -626,17 +626,19 @@ export default function MultipleSourcesExercise() {
                     {topView === "how-it-works" && (
                       <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
 
+                        {/* Prompt – always visible */}
+                        <div className="mb-6 ml-auto max-w-[80%] bg-muted p-5 rounded-[20px]">
+                          <p className="text-foreground leading-relaxed">
+                            Who holds the most responsibility to uphold AI ethics?
+                          </p>
+                        </div>
+
                         {/* Route chooser (inline in main column) */}
                         {!diagramRoute && (
                           <>
                             <p className="text-sm text-muted-foreground mb-6">
                               How does each approach handle the same query with multiple documents?
                             </p>
-                            <div className="mb-6 ml-auto max-w-[80%] bg-muted p-5 rounded-[20px]">
-                              <p className="text-foreground leading-relaxed">
-                                Who holds the most responsibility to uphold AI ethics?
-                              </p>
-                            </div>
                             <div className="flex gap-4 mt-4">
                               <button
                                 type="button"
@@ -670,20 +672,6 @@ export default function MultipleSourcesExercise() {
                             >
                               <ArrowLeft className="h-3 w-3" /> Back
                             </button>
-
-                            {/* Prompt input */}
-                            <div>
-                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Prompt
-                              </p>
-                              <div className="ml-auto max-w-[80%] bg-muted p-4 rounded-[20px]">
-                                <p className="text-sm text-foreground leading-relaxed">
-                                  Who holds the most responsibility to uphold AI ethics?
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
 
                             {/* Document selector (inline) */}
                             <div>
@@ -778,20 +766,6 @@ export default function MultipleSourcesExercise() {
                             >
                               <ArrowLeft className="h-3 w-3" /> Back
                             </button>
-
-                            {/* Prompt input */}
-                            <div>
-                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Prompt
-                              </p>
-                              <div className="ml-auto max-w-[80%] bg-muted p-4 rounded-[20px]">
-                                <p className="text-sm text-foreground leading-relaxed">
-                                  Who holds the most responsibility to uphold AI ethics?
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
 
                             {/* Indexed sources */}
                             <div>
