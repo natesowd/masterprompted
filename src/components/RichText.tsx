@@ -87,6 +87,23 @@ export function applyInlineFormatting(raw: string, diff: boolean, isInline: bool
       '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">$1</a>'
     );
 
+    // Inline citations: [1], [2], [1, p.5], [1, Section 3], [3][4] etc.
+    // Rendered as superscript badges — must run AFTER markdown links to avoid conflicts
+    html = html.replace(
+      /\[(\d{1,3}(?:,\s*(?:p\.\s*\d+|[Ss]ection\s+[\w.]+))?)\]/g,
+      '<sup class="inline-flex items-center justify-center min-w-[1.1em] h-[1.1em] px-[3px] text-[0.65em] font-semibold leading-none rounded bg-blue-100 text-blue-700 border border-blue-200 cursor-default align-super" title="Document citation [$1]">$1</sup>'
+    );
+
+    // External knowledge marker: [External] or [External: source description]
+    html = html.replace(
+      /\[External(?::\s*([^\]]*))?\]/gi,
+      (_match, source) => {
+        const label = source ? `External: ${source}` : 'External';
+        const title = source ? `External source: ${source}` : 'External knowledge (not from uploaded documents)';
+        return `<sup class="inline-flex items-center justify-center px-[4px] h-[1.1em] text-[0.6em] font-semibold leading-none rounded bg-amber-100 text-amber-700 border border-amber-200 cursor-default align-super" title="${title}">${label}</sup>`;
+      }
+    );
+
     // Headers: #, ##, ### (descending order of size)
     // Note: Use text-base instead of text-md as 'md' is not a standard Tailwind size
     html = html.replace(/^###\s+(.+)$/gm, '<strong class="text-base">$1</strong>');

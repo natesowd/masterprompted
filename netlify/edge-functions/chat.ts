@@ -37,7 +37,7 @@ export default async (request: Request, _context: Context) => {
 
     try {
         const bodyContent = await request.json();
-        const { messages, model, temperature, stream } = bodyContent;
+        const { messages, model, temperature, stream, thinking } = bodyContent;
 
         // Payload size verification (6MB limit)
         const payloadSize = new Blob([JSON.stringify(bodyContent)]).size;
@@ -66,6 +66,9 @@ export default async (request: Request, _context: Context) => {
             max_tokens: 2048,
             stream: !!stream,
         };
+
+        // Pass through provider-specific parameters
+        if (thinking) hfPayload.thinking = thinking;
 
         const hfResponse = await fetch(apiUrl, {
             method: "POST",
