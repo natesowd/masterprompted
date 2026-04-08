@@ -7,7 +7,7 @@ import EvaluationPanel from "@/components/EvaluationPanel";
 import TextFlag from "@/components/TextFlag";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ArrowLeft, ArrowRight, File, Paperclip, ChevronDown, ChevronUp, Bot, Search, Database, FileText, AlertTriangle, CheckCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, File, Paperclip, ChevronDown, ChevronUp, Bot, Search, Database, FileText, AlertTriangle, CheckCircle, ArrowDown, Lock, Eye, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -347,21 +347,28 @@ The most responsibility lies with journalistic organizations, like DW and Yle, a
 };
 
 /* ------------------------------------------------------------------ */
-/* ── Search-engine comparison data                                    */
+/* ── "How it works" block-diagram data                                */
 /* ------------------------------------------------------------------ */
 
-const DOC_COLORS: Record<string, { bg: string; border: string }> = {
-  "doc-1": { bg: "bg-blue-50", border: "border-blue-200" },
-  "doc-2": { bg: "bg-amber-50", border: "border-amber-200" },
-  "doc-3": { bg: "bg-emerald-50", border: "border-emerald-200" },
+const DOC_COLORS: Record<string, { bg: string; border: string; text: string }> = {
+  "doc-1": { bg: "bg-blue-50", border: "border-blue-300", text: "text-blue-700" },
+  "doc-2": { bg: "bg-amber-50", border: "border-amber-300", text: "text-amber-700" },
+  "doc-3": { bg: "bg-emerald-50", border: "border-emerald-300", text: "text-emerald-700" },
 };
 
 const LLM_DATABASE_SNIPPET =
-  "General training data: AI ethics principles, journalism standards, technology policy debates, and millions of web pages the model was trained on.";
+  "AI ethics principles, journalism standards, technology policy debates, and millions of web pages the model was trained on.";
+
+/* What the LLM "extracts" per doc (short fragments, some fabricated) */
+const LLM_EXTRACTIONS: Record<string, string> = {
+  "doc-1": "\"AI strategy for public service\" · \"scrutinise for biases\" · \"guard public trust\"",
+  "doc-2": "\"governance frameworks\" · \"editorial oversight\" · \"training staff on AI risks\"",
+  "doc-3": "\"journalism produced by people\" · \"control all applications\" · \"review before publication\"",
+};
 
 const LLM_MERGED_OUTPUTS: Record<string, { text: string; issues: string[] }> = {
   "doc-1": {
-    text: "Public service media have a special responsibility to inform, educate, and connect people. Human judgment must remain at the heart of editorial decisions, and ethics must guide all technological choices. Organizations must guard public trust carefully.",
+    text: "Public service media have a special responsibility to inform, educate, and connect people. Human judgment must remain at the heart of editorial decisions, and ethics must guide all technological choices.",
     issues: [
       "\"inform, educate, and connect\" — not in the source document",
       "\"Human judgment must remain at the heart\" — fabricated quote",
@@ -369,7 +376,7 @@ const LLM_MERGED_OUTPUTS: Record<string, { text: string; issues: string[] }> = {
     ],
   },
   "doc-1,doc-2": {
-    text: "Journalists are the gatekeepers of accuracy and fairness in the age of AI. Media organizations must establish governance frameworks while investing in training staff on AI risks. Regulators and policymakers also bear responsibility for creating legal frameworks to govern AI use in journalism.",
+    text: "Journalists are the gatekeepers of accuracy and fairness in the age of AI. Media organizations must establish governance frameworks while investing in training staff on AI risks. Regulators and policymakers also bear responsibility.",
     issues: [
       "\"gatekeepers\" — neither document uses this word",
       "\"training staff on AI risks\" — not in either source",
@@ -377,11 +384,11 @@ const LLM_MERGED_OUTPUTS: Record<string, { text: string; issues: string[] }> = {
     ],
   },
   "doc-1,doc-2,doc-3": {
-    text: "DW is firmly committed to journalism produced by people. Their journalists control all applications and review everything before publication. Combined with governance frameworks from ethics boards and the principle that a human is always responsible for outcomes when AI is used, the industry is moving toward responsible AI adoption.",
+    text: "DW is firmly committed to journalism produced by people. Their journalists control all applications and review everything before publication. Combined with governance frameworks from ethics boards, the industry is moving toward responsible AI adoption.",
     issues: [
       "\"control all applications\" — not in any source document",
       "\"a human is always responsible\" — fabricated attribution",
-      "Information from 3 distinct sources blended into one seamless narrative with no attribution",
+      "Information from 3 sources + training data blended with no attribution",
     ],
   },
 };
@@ -394,7 +401,12 @@ export default function MultipleSourcesExercise() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<Set<string>>(new Set(["doc-1"]));
   const [snippetsOpen, setSnippetsOpen] = useState(true);
-  const [viewMode, setViewMode] = useState<"llm" | "search">("llm");
+  /* Top-level view: "exercise" (original) or "how-it-works" (block diagram) */
+  const [topView, setTopView] = useState<"exercise" | "how-it-works">("exercise");
+  /* Inside "how-it-works": which route has the user chosen? */
+  const [diagramRoute, setDiagramRoute] = useState<null | "llm" | "search">(null);
+  /* Separate doc selection for the LLM diagram (independent from exercise) */
+  const [diagramDocs, setDiagramDocs] = useState<Set<string>>(new Set(["doc-1"]));
 
   /* Only allow sequential selection: doc-1, doc-1+doc-2, doc-1+doc-2+doc-3 */
   const ALLOWED_SETS: string[][] = [
@@ -417,6 +429,19 @@ export default function MultipleSourcesExercise() {
       return next;
     });
   };
+
+  /* Diagram doc toggle (free selection, not sequential) */
+  const toggleDiagramDoc = (id: string) => {
+    setDiagramDocs((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) { if (next.size > 1) next.delete(id); } // keep at least 1
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const diagramSelectionKey = useMemo(() => Array.from(diagramDocs).sort().join(","), [diagramDocs]);
+  const diagramSelectedDocs = useMemo(() => DOCUMENTS.filter((d) => diagramDocs.has(d.id)), [diagramDocs]);
 
   /* Derive response and snippets from selected documents */
   const selectionKey = useMemo(() => {
@@ -454,63 +479,171 @@ export default function MultipleSourcesExercise() {
                 <h2 className="text-xl font-heading font-bold text-foreground mb-3">
                   Multiple Documents
                 </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  {viewMode === "llm"
-                    ? "See how an LLM merges information from multiple sources into one answer."
-                    : "See how a search engine keeps each source separate, preserving attribution."
-                  }
-                </p>
 
-                {/* View mode toggle */}
-                <div className="mb-6">
+                {/* Top-level view toggle */}
+                <div className="mb-5">
                   <ToggleGroup
                     type="single"
-                    value={viewMode}
-                    onValueChange={(v) => v && setViewMode(v as typeof viewMode)}
+                    value={topView}
+                    onValueChange={(v) => { if (v) { setTopView(v as typeof topView); if (v === "how-it-works") setDiagramRoute(null); } }}
                     className="w-full"
                   >
-                    <ToggleGroupItem value="llm" className="flex-1 gap-1.5 text-xs">
-                      <Bot className="h-3.5 w-3.5" />
-                      LLM
+                    <ToggleGroupItem value="exercise" className="flex-1 gap-1.5 text-xs">
+                      <Eye className="h-3.5 w-3.5" />
+                      Exercise
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="search" className="flex-1 gap-1.5 text-xs">
-                      <Search className="h-3.5 w-3.5" />
-                      Search Engine
+                    <ToggleGroupItem value="how-it-works" className="flex-1 gap-1.5 text-xs">
+                      <Layers className="h-3.5 w-3.5" />
+                      How It Works
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
 
-                <p className="text-sm font-semibold text-foreground mb-3">
-                  Select one or more documents
-                </p>
+                {/* ── Exercise sidebar ── */}
+                {topView === "exercise" && (
+                  <>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                      Compare how the output changes based on three distinct sources and evaluate their respective outputs side-by-side.
+                    </p>
+                    <p className="text-sm font-semibold text-foreground mb-3">
+                      Select one or more documents
+                    </p>
+                    <div className="space-y-3">
+                      {DOCUMENTS.map((doc) => {
+                        const isSelected = selected.has(doc.id);
+                        return (
+                          <button
+                            key={doc.id}
+                            type="button"
+                            onClick={() => toggle(doc.id)}
+                            className={cn(
+                              "w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-shadow",
+                              isSelected
+                                ? "border-brand-tertiary-500 shadow-sm"
+                                : "border-border hover:shadow-md"
+                            )}
+                          >
+                            <File className="h-8 text-muted-foreground flex-shrink-0 my-[23px] w-[32px]" strokeWidth={1.5} />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-xs text-muted-foreground">{doc.date}</span>
+                              <span className="text-sm font-semibold text-foreground leading-tight block">
+                                {doc.title}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{doc.source}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
 
-                <div className="space-y-3">
-                  {DOCUMENTS.map((doc) => {
-                    const isSelected = selected.has(doc.id);
-                    return (
+                {/* ── How-it-works sidebar ── */}
+                {topView === "how-it-works" && (
+                  <>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                      {!diagramRoute
+                        ? "Choose a route to see how it processes the same query with multiple documents."
+                        : diagramRoute === "llm"
+                          ? "Select which documents to include. The LLM database is always used and cannot be removed."
+                          : "The search engine indexes each document separately and returns results with clear attribution."
+                      }
+                    </p>
+
+                    {/* Route chooser or back button */}
+                    {diagramRoute ? (
                       <button
-                        key={doc.id}
                         type="button"
-                        onClick={() => toggle(doc.id)}
-                        className={cn(
-                          "w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-shadow",
-                          isSelected
-                            ? "border-brand-tertiary-500 shadow-sm"
-                            : "border-border hover:shadow-md"
-                        )}
+                        onClick={() => setDiagramRoute(null)}
+                        className="text-xs text-brand-tertiary-500 font-semibold mb-4 flex items-center gap-1 hover:underline"
                       >
-                        <File className="h-8 text-muted-foreground flex-shrink-0 my-[23px] w-[32px]" strokeWidth={1.5} />
-                        <div className="flex-1 min-w-0">
-                          <span className="text-xs text-muted-foreground">{doc.date}</span>
-                          <span className="text-sm font-semibold text-foreground leading-tight block">
-                            {doc.title}
-                          </span>
-                          <span className="text-xs text-muted-foreground">{doc.source}</span>
-                        </div>
+                        <ArrowLeft className="h-3 w-3" /> Back to route selection
                       </button>
-                    );
-                  })}
-                </div>
+                    ) : (
+                      <div className="space-y-2 mb-4">
+                        <p className="text-sm font-semibold text-foreground mb-2">Choose a route</p>
+                        <button
+                          type="button"
+                          onClick={() => setDiagramRoute("llm")}
+                          className="w-full flex items-center gap-3 rounded-xl border-2 border-border hover:border-brand-tertiary-500 p-4 text-left transition-all hover:shadow-md"
+                        >
+                          <Bot className="h-6 w-6 text-purple-500 flex-shrink-0" />
+                          <div>
+                            <span className="text-sm font-semibold text-foreground block">LLM</span>
+                            <span className="text-xs text-muted-foreground">Merges all sources into one answer</span>
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDiagramRoute("search")}
+                          className="w-full flex items-center gap-3 rounded-xl border-2 border-border hover:border-brand-tertiary-500 p-4 text-left transition-all hover:shadow-md"
+                        >
+                          <Search className="h-6 w-6 text-emerald-500 flex-shrink-0" />
+                          <div>
+                            <span className="text-sm font-semibold text-foreground block">Search Engine</span>
+                            <span className="text-xs text-muted-foreground">Keeps each source separate</span>
+                          </div>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* LLM route: document selector + locked database */}
+                    {diagramRoute === "llm" && (
+                      <>
+                        <p className="text-sm font-semibold text-foreground mb-3">Select documents to include</p>
+                        <div className="space-y-2 mb-3">
+                          {DOCUMENTS.map((doc) => {
+                            const isOn = diagramDocs.has(doc.id);
+                            const colors = DOC_COLORS[doc.id];
+                            return (
+                              <button
+                                key={doc.id}
+                                type="button"
+                                onClick={() => toggleDiagramDoc(doc.id)}
+                                className={cn(
+                                  "w-full flex items-center gap-2.5 rounded-lg border-2 p-2.5 text-left text-xs transition-all",
+                                  isOn ? `${colors.border} ${colors.bg}` : "border-border opacity-40"
+                                )}
+                              >
+                                <FileText className={cn("h-4 w-4 flex-shrink-0", isOn ? colors.text : "text-muted-foreground")} />
+                                <span className={cn("font-semibold leading-tight", isOn ? "text-foreground" : "text-muted-foreground")}>
+                                  {doc.title}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {/* Locked LLM database */}
+                        <div className="flex items-center gap-2.5 rounded-lg border-2 border-dashed border-purple-300 bg-purple-50 p-2.5 text-xs opacity-100">
+                          <Database className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                          <span className="font-semibold text-purple-700 flex-1">LLM Training Database</span>
+                          <Lock className="h-3.5 w-3.5 text-purple-400" />
+                        </div>
+                      </>
+                    )}
+
+                    {/* Search route: show docs (read-only, all included) */}
+                    {diagramRoute === "search" && (
+                      <>
+                        <p className="text-sm font-semibold text-foreground mb-3">Indexed documents</p>
+                        <div className="space-y-2">
+                          {DOCUMENTS.map((doc) => {
+                            const colors = DOC_COLORS[doc.id];
+                            return (
+                              <div
+                                key={doc.id}
+                                className={cn("flex items-center gap-2.5 rounded-lg border-2 p-2.5 text-xs", colors.border, colors.bg)}
+                              >
+                                <FileText className={cn("h-4 w-4 flex-shrink-0", colors.text)} />
+                                <span className="font-semibold text-foreground leading-tight">{doc.title}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
 
               {/* ── Center content ── */}
@@ -522,249 +655,302 @@ export default function MultipleSourcesExercise() {
 
                 <div className="flex gap-6 max-w-[1100px] w-full">
                   <div className="flex-1 flex flex-col">
-                    {/* Response area */}
-                    <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
-                      {/* Query bubble — shared by both views */}
-                      <div
-                        className="mb-6 mx-2 max-w-fit ml-auto bg-muted p-5 max-w-[80%]"
-                        style={{ borderRadius: '20px' }}
-                      >
-                        <p className="text-foreground leading-relaxed">
-                          Who holds the most responsibility to uphold AI ethics?
-                        </p>
-                        {selectedDocs.length > 0 && (
-                          <div className="flex flex-col gap-1 mt-2">
-                            {selectedDocs.map((doc) => (
-                              <div key={doc.id} className="inline-flex items-center gap-2">
-                                <Paperclip className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                <span className="text-sm text-foreground font-medium">
-                                  {doc.title}
-                                </span>
+
+                    {/* ============================================ */}
+                    {/* EXERCISE VIEW (original)                      */}
+                    {/* ============================================ */}
+                    {topView === "exercise" && (
+                      <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
+                        <div
+                          className="mb-6 mx-2 max-w-fit ml-auto bg-muted p-5 max-w-[80%]"
+                          style={{ borderRadius: '20px' }}
+                        >
+                          <p className="text-foreground leading-relaxed">
+                            Who holds the most responsibility to uphold AI ethics?
+                          </p>
+                          {selectedDocs.length > 0 && (
+                            <div className="flex flex-col gap-1 mt-2">
+                              {selectedDocs.map((doc) => (
+                                <div key={doc.id} className="inline-flex items-center gap-2">
+                                  <Paperclip className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                  <span className="text-sm text-foreground font-medium">{doc.title}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="max-h-[500px] overflow-y-auto flex-1">
+                          <div className="space-y-4">
+                            <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-line">
+                              {renderFlaggedResponse(currentResponse, OUTPUT_FLAGS[selectionKey] || [])}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-8 flex items-center gap-3">
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            <ArrowLeft className="!h-5 !w-5" />
+                          </Button>
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            Takeaways <ArrowRight className="-mr-2 !h-6 !w-6" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ============================================ */}
+                    {/* HOW IT WORKS VIEW (block diagrams)            */}
+                    {/* ============================================ */}
+                    {topView === "how-it-works" && (
+                      <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
+
+                        {/* Prompt (shared context) */}
+                        <div className="mb-6 ml-auto max-w-[80%] bg-muted p-5 rounded-[20px]">
+                          <p className="text-foreground leading-relaxed">
+                            Who holds the most responsibility to uphold AI ethics?
+                          </p>
+                        </div>
+
+                        {/* No route chosen yet — show prompt to pick */}
+                        {!diagramRoute && (
+                          <div className="flex-1 flex items-center justify-center">
+                            <p className="text-muted-foreground text-sm">
+                              Choose <strong>LLM</strong> or <strong>Search Engine</strong> in the sidebar to see how each processes this query.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* ── LLM block diagram ── */}
+                        {diagramRoute === "llm" && (
+                          <div className="flex-1 space-y-4">
+                            {/* Step 1: Sources */}
+                            <div>
+                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                Step 1 — Sources fed to the LLM
+                              </p>
+                              <div className="flex gap-2 flex-wrap">
+                                {diagramSelectedDocs.map((doc) => {
+                                  const c = DOC_COLORS[doc.id];
+                                  return (
+                                    <div key={doc.id} className={cn("rounded-lg border-2 p-3 flex-1 min-w-[140px]", c.bg, c.border)}>
+                                      <div className="flex items-center gap-1.5 mb-1">
+                                        <FileText className={cn("h-3.5 w-3.5", c.text)} />
+                                        <span className="text-xs font-semibold text-foreground line-clamp-1">{doc.title}</span>
+                                      </div>
+                                      <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                                        {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs[0] || ""}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+                                {/* Locked database block */}
+                                <div className="rounded-lg border-2 border-dashed border-purple-300 bg-purple-50 p-3 flex-1 min-w-[140px]">
+                                  <div className="flex items-center gap-1.5 mb-1">
+                                    <Database className="h-3.5 w-3.5 text-purple-500" />
+                                    <span className="text-xs font-semibold text-purple-700">Training Database</span>
+                                    <Lock className="h-3 w-3 text-purple-400 ml-auto" />
+                                  </div>
+                                  <p className="text-[11px] text-purple-600/70 leading-relaxed line-clamp-2">
+                                    {LLM_DATABASE_SNIPPET}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Arrow down */}
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
+
+                            {/* Step 2: Extraction */}
+                            <div>
+                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                Step 2 — Information extracted
+                              </p>
+                              <div className="flex gap-2 flex-wrap">
+                                {diagramSelectedDocs.map((doc) => {
+                                  const c = DOC_COLORS[doc.id];
+                                  return (
+                                    <div key={doc.id} className={cn("rounded-lg border p-2.5 flex-1 min-w-[130px]", c.bg, c.border)}>
+                                      <p className="text-[11px] text-foreground leading-relaxed italic">
+                                        {LLM_EXTRACTIONS[doc.id]}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+                                <div className="rounded-lg border border-dashed border-purple-200 bg-purple-50/50 p-2.5 flex-1 min-w-[130px]">
+                                  <p className="text-[11px] text-purple-600/70 leading-relaxed italic">
+                                    "AI ethics" · "journalism standards" · "public trust" · …
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Arrow down */}
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
+
+                            {/* Step 3: Merge */}
+                            <div className="flex justify-center">
+                              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-heading font-semibold bg-red-100 text-red-700">
+                                <AlertTriangle className="h-4 w-4" />
+                                All information merged — sources lost
+                              </div>
+                            </div>
+
+                            {/* Arrow down */}
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
+
+                            {/* Step 4: Output */}
+                            <div>
+                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                Step 4 — Single merged output
+                              </p>
+                              {(() => {
+                                const key = Array.from(diagramDocs).sort().join(",");
+                                const merged = LLM_MERGED_OUTPUTS[key];
+                                if (!merged) return <p className="text-xs text-muted-foreground">Select a valid document combination.</p>;
+                                return (
+                                  <div className="space-y-2.5">
+                                    <div className="rounded-lg border border-border bg-white p-4">
+                                      <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
+                                    </div>
+                                    <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+                                      <div className="flex items-center gap-2 mb-1.5">
+                                        <AlertTriangle className="h-3.5 w-3.5 text-red-600" />
+                                        <span className="text-xs font-semibold text-red-700">Hallucinations from mixing</span>
+                                      </div>
+                                      <ul className="space-y-1">
+                                        {merged.issues.map((issue, i) => (
+                                          <li key={i} className="text-xs text-red-600/80 leading-relaxed flex items-start gap-1.5">
+                                            <span className="text-red-400 mt-0.5">&#x2022;</span>{issue}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* ── Search engine block diagram ── */}
+                        {diagramRoute === "search" && (
+                          <div className="flex-1 space-y-4">
+                            {/* Step 1: Indexed sources */}
+                            <div>
+                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                Step 1 — Documents indexed separately
+                              </p>
+                              <div className="flex gap-2 flex-wrap">
+                                {DOCUMENTS.map((doc) => {
+                                  const c = DOC_COLORS[doc.id];
+                                  return (
+                                    <div key={doc.id} className={cn("rounded-lg border-2 p-3 flex-1 min-w-[140px]", c.bg, c.border)}>
+                                      <div className="flex items-center gap-1.5 mb-1">
+                                        <FileText className={cn("h-3.5 w-3.5", c.text)} />
+                                        <span className="text-xs font-semibold text-foreground line-clamp-1">{doc.title}</span>
+                                      </div>
+                                      <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                                        {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs[0] || ""}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
+
+                            {/* Step 2: Query matched per document */}
+                            <div>
+                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                Step 2 — Query matched against each index
+                              </p>
+                              <div className="flex justify-center">
+                                <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-heading font-semibold bg-emerald-100 text-emerald-700">
+                                  <CheckCircle className="h-4 w-4" />
+                                  Each document searched independently
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
+
+                            {/* Step 3: Separate results */}
+                            <div>
+                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                Step 3 — Results returned with source attribution
+                              </p>
+                              <div className="space-y-2.5">
+                                {DOCUMENTS.map((doc) => {
+                                  const c = DOC_COLORS[doc.id];
+                                  return (
+                                    <div key={doc.id} className={cn("rounded-lg border-2 p-3", c.bg, c.border)}>
+                                      <div className="flex items-center gap-1.5 mb-1">
+                                        <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                                        <span className="text-xs font-semibold text-foreground">{doc.title}</span>
+                                      </div>
+                                      <p className="text-sm text-foreground leading-relaxed">
+                                        {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs.join(" ") || ""}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+
+                                <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                                  <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                                  <p className="text-xs text-emerald-700 leading-relaxed">
+                                    Each result is attributed to its source. No information is mixed. You can verify every claim against the original document.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Navigation */}
+                        <div className="mt-8 flex items-center gap-3">
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            <ArrowLeft className="!h-5 !w-5" />
+                          </Button>
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            Takeaways <ArrowRight className="-mr-2 !h-6 !w-6" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right sidebar - Evaluation & Snippets (exercise view only) */}
+                  {topView === "exercise" && (
+                    <div className="w-80 flex-shrink-0">
+                      <EvaluationPanel initialIsOpen={false} canClose={true} />
+                      <div className="px-4 mt-4">
+                        <button
+                          type="button"
+                          onClick={() => setSnippetsOpen(!snippetsOpen)}
+                          className="flex items-center gap-2 text-base font-semibold font-heading text-foreground mb-3"
+                        >
+                          Retrieved Snippets
+                          {snippetsOpen ? (
+                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </button>
+                        {snippetsOpen && (
+                          <div className="space-y-4">
+                            {currentSnippets.map((snippet, i) => (
+                              <div key={i} className="border border-border rounded-lg p-4 space-y-3">
+                                <p className="text-sm font-semibold text-foreground">{snippet.title}</p>
+                                {snippet.paragraphs.map((para, j) => (
+                                  <p key={j} className="text-sm text-muted-foreground leading-relaxed">{para}</p>
+                                ))}
                               </div>
                             ))}
                           </div>
                         )}
                       </div>
-
-                      {/* ── LLM view ── */}
-                      {viewMode === "llm" && (
-                        <>
-                          <div className="max-h-[500px] overflow-y-auto flex-1">
-                            <div className="space-y-4">
-                              <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-line">
-                                {renderFlaggedResponse(currentResponse, OUTPUT_FLAGS[selectionKey] || [])}
-                              </p>
-                            </div>
-                          </div>
-                        </>
-                      )}
-
-                      {/* ── Search engine view ── */}
-                      {viewMode === "search" && (
-                        <div className="flex-1 space-y-5">
-                          {/* Input sources */}
-                          <div>
-                            <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                              Input Sources
-                            </p>
-                            <div className="flex gap-3 flex-wrap">
-                              {selectedDocs.map((doc) => {
-                                const colors = DOC_COLORS[doc.id];
-                                return (
-                                  <div
-                                    key={doc.id}
-                                    className={cn(
-                                      "flex-1 min-w-[160px] rounded-lg border-2 p-3",
-                                      colors.bg,
-                                      colors.border
-                                    )}
-                                  >
-                                    <div className="flex items-center gap-2 mb-1.5">
-                                      <FileText className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                                      <span className="text-xs font-semibold text-foreground line-clamp-1">
-                                        {doc.title}
-                                      </span>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">
-                                      {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs[0] || ""}
-                                    </p>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-
-                          {/* Processing indicator */}
-                          <div className="flex justify-center">
-                            <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-heading font-semibold bg-emerald-100 text-emerald-700">
-                              <CheckCircle className="h-4 w-4" />
-                              Sources kept separate
-                            </div>
-                          </div>
-
-                          {/* Search results — separate per source */}
-                          <div>
-                            <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                              Search Results
-                            </p>
-                            <div className="space-y-3">
-                              {selectedDocs.map((doc) => {
-                                const colors = DOC_COLORS[doc.id];
-                                return (
-                                  <div
-                                    key={doc.id}
-                                    className={cn("rounded-lg border p-4", colors.bg, colors.border)}
-                                  >
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <Search className="h-3.5 w-3.5 text-muted-foreground" />
-                                      <span className="text-xs font-semibold text-foreground">
-                                        {doc.title}
-                                      </span>
-                                    </div>
-                                    <p className="text-sm text-foreground leading-relaxed">
-                                      {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs.join(" ") || ""}
-                                    </p>
-                                  </div>
-                                );
-                              })}
-
-                              <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
-                                <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                                <p className="text-xs text-emerald-700 leading-relaxed">
-                                  Each result is clearly attributed to its source. You can verify claims by checking the original document.
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* LLM comparison block */}
-                          <div>
-                            <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                              Compare: LLM Output for the Same Query
-                            </p>
-
-                            {/* LLM training data block */}
-                            <div className="rounded-lg border-2 border-dashed border-purple-300 bg-purple-50 p-3 mb-3">
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <Database className="h-3.5 w-3.5 text-purple-500 flex-shrink-0" />
-                                <span className="text-xs font-semibold text-purple-700">
-                                  LLM Training Data also mixed in
-                                </span>
-                              </div>
-                              <p className="text-xs text-purple-600/70 leading-relaxed">
-                                {LLM_DATABASE_SNIPPET}
-                              </p>
-                            </div>
-
-                            <div className="flex justify-center mb-3">
-                              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-heading font-semibold bg-red-100 text-red-700">
-                                <AlertTriangle className="h-4 w-4" />
-                                All sources merged into one output
-                              </div>
-                            </div>
-
-                            {(() => {
-                              const merged = LLM_MERGED_OUTPUTS[selectionKey];
-                              if (!merged) return null;
-                              return (
-                                <div className="space-y-3">
-                                  <div className="rounded-lg border border-border bg-white p-4">
-                                    <p className="text-sm text-foreground leading-relaxed">
-                                      {merged.text}
-                                    </p>
-                                  </div>
-                                  <div className="rounded-lg bg-red-50 border border-red-200 p-3">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
-                                      <span className="text-xs font-semibold text-red-700">
-                                        Information mixing detected
-                                      </span>
-                                    </div>
-                                    <ul className="space-y-1.5">
-                                      {merged.issues.map((issue, i) => (
-                                        <li
-                                          key={i}
-                                          className="text-xs text-red-600/80 leading-relaxed flex items-start gap-1.5"
-                                        >
-                                          <span className="text-red-400 mt-0.5">&#x2022;</span>
-                                          {issue}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Navigation buttons */}
-                      <div className="mt-8 flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => navigate("/module/multiple-sources")}
-                          className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
-                        >
-                          <ArrowLeft className="!h-5 !w-5" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => navigate("/module/multiple-sources/takeaways")}
-                          className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
-                        >
-                          Takeaways
-                          <ArrowRight className="-mr-2 !h-6 !w-6" />
-                        </Button>
-                      </div>
                     </div>
-                  </div>
-
-                  {/* Right sidebar - Evaluation */}
-                  <div className="w-80 flex-shrink-0">
-                    <EvaluationPanel initialIsOpen={false} canClose={true} />
-
-                    {/* Retrieved Snippets */}
-                    <div className="px-4 mt-4">
-                      <button
-                        type="button"
-                        onClick={() => setSnippetsOpen(!snippetsOpen)}
-                        className="flex items-center gap-2 text-base font-semibold font-heading text-foreground mb-3"
-                      >
-                        Retrieved Snippets
-                        {snippetsOpen ? (
-                          <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </button>
-
-                      {snippetsOpen && (
-                        <div className="space-y-4">
-                          {currentSnippets.map((snippet, i) => (
-                            <div
-                              key={i}
-                              className="border border-border rounded-lg p-4 space-y-3"
-                            >
-                              <p className="text-sm font-semibold text-foreground">
-                                {snippet.title}
-                              </p>
-                              {snippet.paragraphs.map((para, j) => (
-                                <p
-                                  key={j}
-                                  className="text-sm text-muted-foreground leading-relaxed"
-                                >
-                                  {para}
-                                </p>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
