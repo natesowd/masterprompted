@@ -212,21 +212,19 @@ function translateCohereSSE(
         new TransformStream({
             transform(chunk, controller) {
                 const decoded = decoder.decode(chunk, { stream: true });
-                // Debug: log the first chunk verbatim so we can see Cohere's exact wire format.
                 if (!loggedFirstChunk) {
                     loggedFirstChunk = true;
                     console.log(`[EDGE_DBG] cohere first chunk (${decoded.length} chars): ${JSON.stringify(decoded.slice(0, 600))}`);
                 }
+                // Cohere v2 streams NDJSON: one JSON object per line, separated
+                // by a single '\n'. Not SSE — no `data:` prefix, no blank-line
+                // frame separator.
                 buf += decoded;
-                // Accept both \n\n and \r\n\r\n SSE frame separators.
-                const normalized = buf.replace(/\r\n/g, "\n");
-                const frames = normalized.split("\n\n");
-                buf = frames.pop() ?? "";
-                for (const frame of frames) {
-                    const dataLine = frame.split("\n").find((l) => l.startsWith("data:"));
-                    if (!dataLine) continue;
-                    const json = dataLine.slice(5).trim();
-                    if (!json || json === "[DONE]") continue;
+                const lines = buf.split("\n");
+                buf = lines.pop() ?? "";
+                for (const line of lines) {
+                    const json = line.trim();
+                    if (!json) continue;
                     try {
                         const evt = JSON.parse(json);
                         eventCount++;
@@ -237,12 +235,23 @@ function translateCohereSSE(
                     } catch (e) {
                         parseErrors++;
                         if (parseErrors <= 3) {
-                            console.log(`[EDGE_DBG] cohere parse error: ${e}. json=${JSON.stringify(json.slice(0, 200))}`);
+                            console.log(`[EDGE_DBG] cohere parse error: ${e}. line=${JSON.stringify(json.slice(0, 200))}`);
                         }
                     }
                 }
             },
             flush(controller) {
+                // Any trailing buffered line (last event with no newline)
+                const tail = buf.trim();
+                if (tail) {
+                    try {
+                        const evt = JSON.parse(tail);
+                        eventCount++;
+                        handleEvent(evt, controller);
+                    } catch {
+                        // ignore
+                    }
+                }
                 console.log(`[EDGE_DBG] cohere stream done events=${eventCount} parseErrors=${parseErrors} emittedContent=${emittedContentChars}`);
                 emitDone(controller);
             },
