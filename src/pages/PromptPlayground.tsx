@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBody";
+import { SSEContentParser } from "@/lib/sseStream";
 import { runAllEvaluations } from "@/services/evaluations";
 import type { EvaluationResult } from "@/services/evaluations/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -221,6 +222,7 @@ const PromptPlayground = () => {
         }
 
         const decoder = new TextDecoder();
+        const sseParser = new SSEContentParser();
         let accumulatedAnswer = "";
         let isStreamComplete = false;
 
@@ -251,31 +253,32 @@ const PromptPlayground = () => {
 
         const monitoredStream = response.body.pipeThrough(monitor);
         const reader = monitoredStream.getReader();
-        let chunkCount = 0;
 
         console.info("Stream reading started...");
+
+        const applyDeltas = (deltas: string[]) => {
+          if (deltas.length === 0) return;
+          accumulatedAnswer += deltas.join("");
+          setThreads(prev => {
+            const copy = [...prev];
+            const thread = copy[threadIndex];
+            if (!thread?.versions[versionIndex]) return prev;
+            const versions = [...thread.versions];
+            versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
+            copy[threadIndex] = { ...thread, versions };
+            return copy;
+          });
+        };
 
         try {
           while (true) {
             const { done, value } = await reader.read();
-            if (done) break;
-
-            chunkCount++;
-            // if (chunkCount % 50 === 0) {
-            //   console.log(`Still generating... (received ${chunkCount} text chunks, ~${accumulatedAnswer.length} chars)`);
-            // }
-
-            accumulatedAnswer += decoder.decode(value, { stream: true });
-
-            setThreads(prev => {
-              const copy = [...prev];
-              const thread = copy[threadIndex];
-              if (!thread?.versions[versionIndex]) return prev;
-              const versions = [...thread.versions];
-              versions[versionIndex] = { ...versions[versionIndex], answer: accumulatedAnswer };
-              copy[threadIndex] = { ...thread, versions };
-              return copy;
-            });
+            if (done) {
+              applyDeltas(sseParser.flush());
+              break;
+            }
+            const text = decoder.decode(value, { stream: true });
+            applyDeltas(sseParser.feed(text));
           }
         } catch (err: any) {
           if (err.name === 'AbortError') {

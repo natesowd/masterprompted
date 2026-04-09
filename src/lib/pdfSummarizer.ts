@@ -4,6 +4,8 @@
  * chunk summaries into a single document summary.
  */
 
+import { SSEContentParser } from "./sseStream";
+
 const CHARS_PER_TOKEN = 3.5;
 const CHUNK_TOKEN_TARGET = 4000;
 const CHUNK_CHAR_TARGET = CHUNK_TOKEN_TARGET * CHARS_PER_TOKEN; // ~14,000
@@ -83,7 +85,8 @@ async function callLLM(
   signal?: AbortSignal
 ): Promise<string> {
   // Use streaming to avoid Netlify's 26s idle timeout on edge functions.
-  // The edge function streams plain text chunks back, keeping the connection alive.
+  // The edge function forwards raw SSE frames, so we parse `delta.content`
+  // client-side via SSEContentParser.
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -104,15 +107,19 @@ async function callLLM(
     throw new Error(`Summarization LLM call failed: ${response.status} - ${errorText}`);
   }
 
-  // Accumulate streamed plain-text chunks into the full response
+  // Parse SSE frames client-side and accumulate the content deltas
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
+  const parser = new SSEContentParser();
   let result = '';
 
   while (true) {
     const { done, value } = await reader.read();
-    if (done) break;
-    result += decoder.decode(value, { stream: true });
+    if (done) {
+      result += parser.flush().join('');
+      break;
+    }
+    result += parser.feed(decoder.decode(value, { stream: true })).join('');
   }
 
   return result.trim();

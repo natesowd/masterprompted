@@ -89,59 +89,14 @@ export default async (request: Request, _context: Context) => {
         }
 
         if (stream) {
-            // Parse the SSE stream from HF and extract only the token text,
-            // matching the plain-text format the frontend expects.
-            const encoder = new TextEncoder();
-            const decoder = new TextDecoder();
-            let buffer = "";
-
-            const transformStream = new TransformStream({
-                transform(chunk, controller) {
-                    buffer += decoder.decode(chunk, { stream: true });
-                    const lines = buffer.split("\n");
-                    // Keep the last potentially incomplete line in the buffer
-                    buffer = lines.pop() || "";
-
-                    for (const line of lines) {
-                        if (!line.startsWith("data: ")) continue;
-                        const payload = line.slice(6).trim();
-                        if (payload === "[DONE]") continue;
-                        try {
-                            const parsed = JSON.parse(payload);
-                            const content = parsed.choices?.[0]?.delta?.content;
-                            if (content) {
-                                controller.enqueue(encoder.encode(content));
-                            }
-                        } catch {
-                            // Skip malformed JSON lines
-                        }
-                    }
-                },
-                flush(controller) {
-                    // Process any remaining buffer
-                    if (buffer.startsWith("data: ")) {
-                        const payload = buffer.slice(6).trim();
-                        if (payload !== "[DONE]") {
-                            try {
-                                const parsed = JSON.parse(payload);
-                                const content = parsed.choices?.[0]?.delta?.content;
-                                if (content) {
-                                    controller.enqueue(encoder.encode(content));
-                                }
-                            } catch {
-                                // skip
-                            }
-                        }
-                    }
-                }
-            });
-
-            const readableStream = hfResponse.body!.pipeThrough(transformStream);
-
-            return new Response(readableStream, {
+            // Forward the raw SSE stream from HuggingFace directly to the browser.
+            // This preserves the full JSON payload (including any provider-specific
+            // fields like Cohere citations) so it is visible in the Network tab.
+            // The frontend parses `choices[0].delta.content` from each SSE event.
+            return new Response(hfResponse.body, {
                 headers: {
                     ...getCorsHeaders(origin),
-                    "Content-Type": "text/plain; charset=utf-8",
+                    "Content-Type": "text/event-stream; charset=utf-8",
                     "Cache-Control": "no-cache",
                     "Connection": "keep-alive",
                 },
