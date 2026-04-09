@@ -149,8 +149,14 @@ function translateCohereSSE(
     let buf = "";
     const docNumber = new Map<string, number>();
     let nextN = 1;
+    // Debug counters
+    let loggedFirstChunk = false;
+    let eventCount = 0;
+    let parseErrors = 0;
+    let emittedContentChars = 0;
 
     const emitContent = (controller: TransformStreamDefaultController, content: string) => {
+        emittedContentChars += content.length;
         const frame = {
             choices: [{ index: 0, delta: { content }, finish_reason: null }],
         };
@@ -205,8 +211,16 @@ function translateCohereSSE(
     return upstream.pipeThrough(
         new TransformStream({
             transform(chunk, controller) {
-                buf += decoder.decode(chunk, { stream: true });
-                const frames = buf.split("\n\n");
+                const decoded = decoder.decode(chunk, { stream: true });
+                // Debug: log the first chunk verbatim so we can see Cohere's exact wire format.
+                if (!loggedFirstChunk) {
+                    loggedFirstChunk = true;
+                    console.log(`[EDGE_DBG] cohere first chunk (${decoded.length} chars): ${JSON.stringify(decoded.slice(0, 600))}`);
+                }
+                buf += decoded;
+                // Accept both \n\n and \r\n\r\n SSE frame separators.
+                const normalized = buf.replace(/\r\n/g, "\n");
+                const frames = normalized.split("\n\n");
                 buf = frames.pop() ?? "";
                 for (const frame of frames) {
                     const dataLine = frame.split("\n").find((l) => l.startsWith("data:"));
@@ -214,13 +228,22 @@ function translateCohereSSE(
                     const json = dataLine.slice(5).trim();
                     if (!json || json === "[DONE]") continue;
                     try {
-                        handleEvent(JSON.parse(json), controller);
-                    } catch {
-                        // ignore malformed frame
+                        const evt = JSON.parse(json);
+                        eventCount++;
+                        if (eventCount <= 3) {
+                            console.log(`[EDGE_DBG] cohere event #${eventCount} type=${evt.type}`);
+                        }
+                        handleEvent(evt, controller);
+                    } catch (e) {
+                        parseErrors++;
+                        if (parseErrors <= 3) {
+                            console.log(`[EDGE_DBG] cohere parse error: ${e}. json=${JSON.stringify(json.slice(0, 200))}`);
+                        }
                     }
                 }
             },
             flush(controller) {
+                console.log(`[EDGE_DBG] cohere stream done events=${eventCount} parseErrors=${parseErrors} emittedContent=${emittedContentChars}`);
                 emitDone(controller);
             },
         }),
