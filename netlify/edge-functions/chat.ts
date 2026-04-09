@@ -129,16 +129,27 @@ function isContextOverflowError(status: number, errorBody: string): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Translate Cohere v2 native SSE events into OpenAI-compatible SSE frames.
+ * Translate Cohere v2 native NDJSON events into OpenAI-compatible SSE frames.
  *
- * Cohere emits `content-delta` for text chunks, then `citation-start` events
- * whose `sources` reference documents by id. We map each unique source id to
- * a stable `[N]` marker and emit a synthetic content delta when the citation
- * arrives — so users see `[1]`, `[2]` appear shortly after the cited span.
+ * Placement strategy
+ * ------------------
+ * Cohere sends `content-delta` chunks first, then `citation-start` events
+ * *after* the cited span has already streamed. Each citation carries
+ * `{start, end}` offsets into the cumulative generated text. To place
+ * `[N]` markers inline at the correct position, we buffer content and
+ * flush on citation boundaries:
  *
- * At `message-end`, we synthesize a trailing `## References` list from the
- * original `documents` array, keyed by the id→N mapping. If no citations
- * were emitted, nothing is appended.
+ *   1. `content-delta` → append to `contentBuf`, do not flush yet.
+ *   2. `citation-start` → flush buffered text up to `citation.end`, then
+ *       emit the `[N]` marker(s) immediately after.
+ *   3. `message-end` → flush any remaining buffered text, then emit the
+ *       synthesized `## References` tail and `[DONE]`.
+ *
+ * When the request has no documents, there are no citations to wait for,
+ * so we pass `content-delta` through as-is for smooth streaming.
+ *
+ * Source ids within a single citation are deduped, so two sources pointing
+ * at the same document don't produce `[1][1]`.
  */
 function translateCohereSSE(
     upstream: ReadableStream<Uint8Array>,
@@ -146,11 +157,16 @@ function translateCohereSSE(
 ): ReadableStream<Uint8Array> {
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
-    let buf = "";
+    const hasCitableDocs = !!documents?.length;
+
+    let lineBuf = "";              // raw NDJSON partial line
+    let contentBuf = "";           // full accumulated model text
+    let flushedUpTo = 0;           // chars already emitted to client
     const docNumber = new Map<string, number>();
     let nextN = 1;
 
     const emitContent = (controller: TransformStreamDefaultController, content: string) => {
+        if (!content) return;
         const frame = {
             choices: [{ index: 0, delta: { content }, finish_reason: null }],
         };
@@ -159,6 +175,14 @@ function translateCohereSSE(
 
     const emitDone = (controller: TransformStreamDefaultController) => {
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+    };
+
+    /** Emit buffered content up to (not including) char position `upTo`. */
+    const flushUpTo = (controller: TransformStreamDefaultController, upTo: number) => {
+        const clamped = Math.min(Math.max(upTo, flushedUpTo), contentBuf.length);
+        if (clamped <= flushedUpTo) return;
+        emitContent(controller, contentBuf.slice(flushedUpTo, clamped));
+        flushedUpTo = clamped;
     };
 
     const buildReferencesTail = (): string => {
@@ -172,45 +196,81 @@ function translateCohereSSE(
         return `\n\n## References\n${lines.join("\n")}\n`;
     };
 
+    const handleContentDelta = (
+        evt: any,
+        controller: TransformStreamDefaultController,
+    ) => {
+        const text = evt.delta?.message?.content?.text ?? "";
+        if (!text) return;
+        contentBuf += text;
+        // No citations expected → stream through immediately for smooth UX.
+        if (!hasCitableDocs) flushUpTo(controller, contentBuf.length);
+    };
+
+    const handleCitationStart = (
+        evt: any,
+        controller: TransformStreamDefaultController,
+    ) => {
+        // Per Cohere OpenAPI: delta.message.citations is a single Citation
+        // object with `start`/`end` char offsets and an array of sources
+        // (ChatDocumentSource | ChatToolSource). For document sources the
+        // request-supplied doc id is at `s.id`.
+        const citation = evt.delta?.message?.citations;
+        if (!citation) return;
+        const sources = Array.isArray(citation.sources) ? citation.sources : [];
+        if (sources.length === 0) return;
+
+        // Dedupe doc ids within this one citation event so a span supported
+        // by two references to the same doc doesn't render as `[1][1]`.
+        const seen = new Set<string>();
+        const markers: string[] = [];
+        for (const s of sources) {
+            const id = s?.id ?? s?.document?.id;
+            if (!id || seen.has(id)) continue;
+            seen.add(id);
+            if (!docNumber.has(id)) docNumber.set(id, nextN++);
+            markers.push(`[${docNumber.get(id)}]`);
+        }
+        if (markers.length === 0) return;
+
+        // Flush text through the end of the cited span so markers land
+        // immediately after the cited content, then emit the markers.
+        const end = typeof citation.end === "number" ? citation.end : contentBuf.length;
+        flushUpTo(controller, end);
+        emitContent(controller, markers.join(""));
+    };
+
+    const handleMessageEnd = (controller: TransformStreamDefaultController) => {
+        flushUpTo(controller, contentBuf.length);
+        const tail = buildReferencesTail();
+        if (tail) emitContent(controller, tail);
+        emitDone(controller);
+    };
+
     const handleEvent = (evt: any, controller: TransformStreamDefaultController) => {
-        if (evt.type === "content-delta") {
-            const text = evt.delta?.message?.content?.text ?? "";
-            if (text) emitContent(controller, text);
-            return;
-        }
-        if (evt.type === "citation-start") {
-            // Per Cohere OpenAPI: delta.message.citations is a single Citation
-            // object whose `sources` is an array of ChatDocumentSource | ChatToolSource.
-            // For ChatDocumentSource the request-supplied doc id is at `s.id`.
-            const sources = evt.delta?.message?.citations?.sources ?? [];
-            const markers = sources
-                .map((s: any) => {
-                    const id = s.id ?? s.document?.id;
-                    if (!id) return "";
-                    if (!docNumber.has(id)) docNumber.set(id, nextN++);
-                    return `[${docNumber.get(id)}]`;
-                })
-                .filter(Boolean)
-                .join("");
-            if (markers) emitContent(controller, markers);
-            return;
-        }
-        if (evt.type === "message-end") {
-            const tail = buildReferencesTail();
-            if (tail) emitContent(controller, tail);
-            emitDone(controller);
+        switch (evt?.type) {
+            case "content-delta":
+                handleContentDelta(evt, controller);
+                return;
+            case "citation-start":
+                handleCitationStart(evt, controller);
+                return;
+            case "message-end":
+                handleMessageEnd(controller);
+                return;
+            // message-start, content-start, content-end, citation-end: no-op
         }
     };
 
     return upstream.pipeThrough(
         new TransformStream({
             transform(chunk, controller) {
-                // Cohere v2 streams NDJSON: one JSON object per line, separated
-                // by a single '\n'. Not SSE — no `data:` prefix, no blank-line
-                // frame separator.
-                buf += decoder.decode(chunk, { stream: true });
-                const lines = buf.split("\n");
-                buf = lines.pop() ?? "";
+                // Cohere v2 streams NDJSON: one JSON object per line,
+                // separated by a single '\n'. Not SSE — no `data:` prefix,
+                // no blank-line frame separator.
+                lineBuf += decoder.decode(chunk, { stream: true });
+                const lines = lineBuf.split("\n");
+                lineBuf = lines.pop() ?? "";
                 for (const line of lines) {
                     const json = line.trim();
                     if (!json) continue;
@@ -222,14 +282,19 @@ function translateCohereSSE(
                 }
             },
             flush(controller) {
-                // Any trailing buffered line (last event with no newline)
-                const tail = buf.trim();
+                // Any trailing buffered line (last event without newline).
+                const tail = lineBuf.trim();
                 if (tail) {
                     try {
                         handleEvent(JSON.parse(tail), controller);
                     } catch {
                         // ignore
                     }
+                }
+                // Safety: if message-end was never seen, flush remaining
+                // content and close the stream cleanly.
+                if (flushedUpTo < contentBuf.length) {
+                    flushUpTo(controller, contentBuf.length);
                 }
                 emitDone(controller);
             },

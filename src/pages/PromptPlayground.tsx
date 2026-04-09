@@ -183,17 +183,34 @@ const PromptPlayground = () => {
           })
         : undefined;
 
-      const payload: Record<string, unknown> = {
-        model: "command-r-08-2024",
-        provider: "cohere",
-        temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
-        stream: true,
-        messages: [
-          { role: "system", content: groundingPrompt },
-          { role: "user", content: promptText },
-        ],
-        ...(documents ? { documents } : {}),
-      };
+      // Provider routing:
+      //   - Documents uploaded → Cohere `command-r-08-2024` for native citations.
+      //   - No documents       → Llama 3.3 70B via HuggingFace router (avoids
+      //                          the stricter Cohere rate limits for everyday
+      //                          prompts that don't need citations).
+      const hasDocs = uploadedFiles.length > 0;
+      const payload: Record<string, unknown> = hasDocs
+        ? {
+            model: "command-r-08-2024",
+            provider: "cohere",
+            temperature: 0.3,
+            stream: true,
+            messages: [
+              { role: "system", content: groundingPrompt },
+              { role: "user", content: promptText },
+            ],
+            documents,
+          }
+        : {
+            model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
+            provider: "hf",
+            temperature: 0.7,
+            stream: true,
+            messages: [
+              { role: "system", content: groundingPrompt },
+              { role: "user", content: promptText },
+            ],
+          };
 
       // Payload size verification (6MB limit)
       const payloadSize = new Blob([JSON.stringify(payload)]).size;
