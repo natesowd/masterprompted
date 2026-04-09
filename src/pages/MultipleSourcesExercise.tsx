@@ -766,9 +766,9 @@ export default function MultipleSourcesExercise() {
                                 Sources
                               </p>
                               <div
-                                onDragOver={handleDragOver}
-                                onDragLeave={handleDragLeave}
-                                onDrop={handleDrop}
+                onDragOver={handleDropZoneDragOver}
+                onDragLeave={handleDropZoneDragLeave}
+                onDrop={handleDropZoneDrop}
                                 className={cn(
                                   "min-h-[110px] rounded-lg border-2 border-dashed p-3 transition-colors",
                                   isDragOver ? "border-foreground bg-muted/40" : "border-border"
