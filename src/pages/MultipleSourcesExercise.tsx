@@ -456,21 +456,6 @@ export default function MultipleSourcesExercise() {
   };
 
   /* Diagram doc add/remove via drag-and-drop */
-  const addDiagramDoc = (id: string) => {
-    setDiagramDocs((prev) => {
-      if (prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
-  };
-  const removeDiagramDoc = (id: string) => {
-    setDiagramDocs((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-  };
 
   const addDiagramDoc = (id: string) => {
     setDiagramDocs((prev) => {
