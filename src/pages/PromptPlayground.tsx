@@ -15,8 +15,8 @@ const NO_CHANGE_VALUE = "no-change";
 // const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
 //   ? "/api/chat"
 //   : "https://luxury-blini-3336bb.netlify.app/api/chat";
-const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
-// const NETLIFY_CHAT_URL = "https://69d76b0a4a68e272bd584118--luxury-blini-3336bb.netlify.app/api/chat"
+// const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
+const NETLIFY_CHAT_URL = "https://69d76b0a4a68e272bd584118--luxury-blini-3336bb.netlify.app/api/chat"
 
 export type Parameters = {
   specificity: string;
@@ -182,10 +182,9 @@ const PromptPlayground = () => {
         : promptText;
 
       const payload: Record<string, unknown> = {
-        model: "CohereLabs/command-a-reasoning-08-2025:cohere",
+        model: "CohereLabs/c4ai-command-r-08-2024:cohere",
         temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
         stream: true,
-        thinking: { type: "disabled" },
         messages: [
           { role: "system", content: groundingPrompt },
           { role: "user", content: userContent },
