@@ -16,6 +16,7 @@ const NO_CHANGE_VALUE = "no-change";
 //   ? "/api/chat"
 //   : "https://luxury-blini-3336bb.netlify.app/api/chat";
 const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
+// const NETLIFY_CHAT_URL = "https://69d76b0a4a68e272bd584118--luxury-blini-3336bb.netlify.app/api/chat"
 
 export type Parameters = {
   specificity: string;
@@ -539,15 +540,15 @@ const PromptPlayground = () => {
         setUploadedFiles(prev => prev.map(f =>
           (f.name === file.name && f.isUploading)
             ? {
-                name: file.name,
-                content: activeContent,
-                rawContent: text,
-                summary: summaryText,
-                size: activeContent.length,
-                isUploading: false,
-                isSummarized,
-                originalTokenCount: isSummarized ? rawTokens : undefined,
-              }
+              name: file.name,
+              content: activeContent,
+              rawContent: text,
+              summary: summaryText,
+              size: activeContent.length,
+              isUploading: false,
+              isSummarized,
+              originalTokenCount: isSummarized ? rawTokens : undefined,
+            }
             : f
         ));
 
