@@ -179,10 +179,13 @@ function translateCohereSSE(
             return;
         }
         if (evt.type === "citation-start") {
+            // Per Cohere OpenAPI: delta.message.citations is a single Citation
+            // object whose `sources` is an array of ChatDocumentSource | ChatToolSource.
+            // For ChatDocumentSource the request-supplied doc id is at `s.id`.
             const sources = evt.delta?.message?.citations?.sources ?? [];
             const markers = sources
                 .map((s: any) => {
-                    const id = s.document?.id ?? s.id;
+                    const id = s.id ?? s.document?.id;
                     if (!id) return "";
                     if (!docNumber.has(id)) docNumber.set(id, nextN++);
                     return `[${docNumber.get(id)}]`;
@@ -431,6 +434,10 @@ async function serveHuggingFace(body: RequestBody, origin: string | null): Promi
 export default async (request: Request, _context: Context) => {
     const origin = request.headers.get("origin");
 
+    // Build ID lets us confirm in logs which deploy is actually serving the request.
+    const BUILD_ID = "chat-v2-multiprovider-2025-04-09";
+    console.log(`[EDGE] ${request.method} /api/chat build=${BUILD_ID} origin=${origin ?? "null"}`);
+
     if (request.method === "OPTIONS") {
         return new Response(null, { status: 204, headers: getCorsHeaders(origin) });
     }
@@ -452,11 +459,19 @@ export default async (request: Request, _context: Context) => {
         }
 
         const provider = detectProvider(body);
+        const hasCohereKey = !!Deno.env.get("COHERE_API_KEY");
+        const hasHfToken = !!Deno.env.get("HF_TOKEN");
+        console.log(
+            `[EDGE] dispatch provider=${provider} requestedModel=${body.model ?? "<none>"} ` +
+            `requestedProvider=${body.provider ?? "<none>"} ` +
+            `documents=${body.documents?.length ?? 0} messages=${body.messages.length} ` +
+            `stream=${!!body.stream} env.COHERE_API_KEY=${hasCohereKey} env.HF_TOKEN=${hasHfToken}`,
+        );
 
         if (provider === "cohere") {
             const result = await tryCohere(body, origin);
             if (result instanceof Response) return result;
-            // Fallback triggered → serve via Qwen
+            console.log(`[EDGE] cohere->qwen fallback reason=${result.reason}`);
             return serveQwenFallback(body, origin);
         }
 
