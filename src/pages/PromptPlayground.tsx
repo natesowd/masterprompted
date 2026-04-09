@@ -15,7 +15,8 @@ const NO_CHANGE_VALUE = "no-change";
 // const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
 //   ? "/api/chat"
 //   : "https://luxury-blini-3336bb.netlify.app/api/chat";
-const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
+// const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
+const NETLIFY_CHAT_URL = "https://69d76b0a4a68e272bd584118--luxury-blini-3336bb.netlify.app/api/chat"
 
 export type Parameters = {
   specificity: string;
@@ -187,7 +188,6 @@ const PromptPlayground = () => {
         provider: "cohere",
         temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
         stream: true,
-        thinking: { type: "disabled" },
         messages: [
           { role: "system", content: groundingPrompt },
           { role: "user", content: promptText },
@@ -543,15 +543,15 @@ const PromptPlayground = () => {
         setUploadedFiles(prev => prev.map(f =>
           (f.name === file.name && f.isUploading)
             ? {
-                name: file.name,
-                content: activeContent,
-                rawContent: text,
-                summary: summaryText,
-                size: activeContent.length,
-                isUploading: false,
-                isSummarized,
-                originalTokenCount: isSummarized ? rawTokens : undefined,
-              }
+              name: file.name,
+              content: activeContent,
+              rawContent: text,
+              summary: summaryText,
+              size: activeContent.length,
+              isUploading: false,
+              isSummarized,
+              originalTokenCount: isSummarized ? rawTokens : undefined,
+            }
             : f
         ));
 
@@ -712,7 +712,7 @@ const PromptPlayground = () => {
     <div className="min-h-screen max-h-screen bg-background flex flex-col">
       <Header onLanguageChange={setPageLanguage} />
       <main className="flex-1 flex flex-col">
-        <div className="flex flex-1 h-[calc(100vh-4rem)] max-w-7xl mx-auto w-full">
+        <div className="flex flex-1 h-[calc(100vh-4rem)] max-w-7xl mx-auto w-full items-center">
           <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center">
             <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
               <PromptControls {...{
