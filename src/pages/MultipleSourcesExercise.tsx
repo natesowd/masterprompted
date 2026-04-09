@@ -400,7 +400,8 @@ export default function MultipleSourcesExercise() {
   /* Inside "how-it-works": which route has the user chosen? */
   const [diagramRoute, setDiagramRoute] = useState<null | "llm" | "search">(null);
   /* Separate doc selection for the LLM diagram (independent from exercise) */
-  const [diagramDocs, setDiagramDocs] = useState<Set<string>>(new Set(["doc-1"]));
+  const [diagramDocs, setDiagramDocs] = useState<Set<string>>(new Set());
+  const [isDragOver, setIsDragOver] = useState(false);
 
   /* Only allow sequential selection: doc-1, doc-1+doc-2, doc-1+doc-2+doc-3 */
   const ALLOWED_SETS: string[][] = [
@@ -424,17 +425,40 @@ export default function MultipleSourcesExercise() {
     });
   };
 
-  /* Diagram doc toggle (free selection, not sequential) */
-  const toggleDiagramDoc = (id: string) => {
+  /* Diagram doc add/remove via drag-and-drop */
+  const addDiagramDoc = (id: string) => {
+    setDiagramDocs((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  };
+  const removeDiagramDoc = (id: string) => {
     setDiagramDocs((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) { if (next.size > 1) next.delete(id); } // keep at least 1
-      else next.add(id);
+      next.delete(id);
       return next;
     });
   };
 
-  const diagramSelectionKey = useMemo(() => Array.from(diagramDocs).sort().join(","), [diagramDocs]);
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData("docId", id);
+    e.dataTransfer.effectAllowed = "copy";
+  };
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    setIsDragOver(true);
+  };
+  const handleDragLeave = () => setIsDragOver(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const id = e.dataTransfer.getData("docId");
+    if (id) addDiagramDoc(id);
+  };
+
   const diagramSelectedDocs = useMemo(() => DOCUMENTS.filter((d) => diagramDocs.has(d.id)), [diagramDocs]);
 
   /* Derive response and snippets from selected documents */
@@ -532,11 +556,54 @@ export default function MultipleSourcesExercise() {
                   </>
                 )}
 
-                {/* ── How-it-works sidebar (minimal — controls are in main column) ── */}
+                {/* ── How-it-works sidebar ── */}
                 {topView === "how-it-works" && (
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Explore how an LLM and a search engine each process the same query with multiple documents.
-                  </p>
+                  <>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                      {diagramRoute === "llm"
+                        ? "Drag documents into the diagram to see how the LLM processes them."
+                        : "Explore how an LLM and a search engine each process the same query with multiple documents."}
+                    </p>
+
+                    {diagramRoute === "llm" && (
+                      <>
+                        <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                          Available documents
+                        </p>
+                        <div className="space-y-2">
+                          {DOCUMENTS.map((doc) => {
+                            const isAdded = diagramDocs.has(doc.id);
+                            return (
+                              <div
+                                key={doc.id}
+                                draggable={!isAdded}
+                                onDragStart={(e) => handleDragStart(e, doc.id)}
+                                className={cn(
+                                  "rounded-lg border p-3 transition-all select-none",
+                                  isAdded
+                                    ? "border-border bg-muted/30 opacity-40 cursor-not-allowed"
+                                    : "border-border bg-white cursor-grab active:cursor-grabbing hover:border-foreground hover:shadow-sm"
+                                )}
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  <FileText className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                                  <span className="text-xs font-semibold text-foreground">
+                                    {doc.title}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                  {doc.source} · {doc.date}
+                                </p>
+                                {isAdded && (
+                                  <p className="text-[10px] text-muted-foreground/70 mt-1 italic">In diagram</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -642,91 +709,154 @@ export default function MultipleSourcesExercise() {
                               <ArrowLeft className="h-3 w-3" /> Back
                             </button>
 
-                            {/* Document selector (inline) */}
+                            {/* Drop zone — sources row */}
                             <div>
                               <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Select documents to include
+                                Sources
                               </p>
-                              <div className="flex gap-2 flex-wrap mb-1">
-                                {DOCUMENTS.map((doc) => {
-                                  const isOn = diagramDocs.has(doc.id);
-                                  return (
-                                    <button
-                                      key={doc.id}
-                                      type="button"
-                                      onClick={() => toggleDiagramDoc(doc.id)}
-                                      className={cn(
-                                        "rounded-lg border p-3 flex-1 min-w-[140px] text-left transition-all",
-                                        isOn ? "border-foreground bg-muted" : "border-border opacity-40"
-                                      )}
-                                    >
-                                      <div className="flex items-center gap-1.5 mb-1">
-                                        <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-                                        <span className={cn("text-xs font-semibold", isOn ? "text-foreground" : "text-muted-foreground")}>
-                                          {doc.title}
-                                        </span>
-                                      </div>
-                                      <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                        {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs[0] || ""}
-                                      </p>
-                                    </button>
-                                  );
-                                })}
-                                {/* Locked database */}
-                                <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/50 p-3 flex-1 min-w-[140px]">
-                                  <div className="flex items-center gap-1.5 mb-1">
-                                    <Database className="h-3.5 w-3.5 text-muted-foreground" />
-                                    <span className="text-xs font-semibold text-foreground">Training Database</span>
-                                    <Lock className="h-3 w-3 text-muted-foreground/50 ml-auto" />
-                                  </div>
-                                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                    {LLM_DATABASE_SNIPPET}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
-
-                            {/* Extraction */}
-                            <div>
-                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Information extracted
-                              </p>
-                              <div className="flex gap-2 flex-wrap">
-                                {diagramSelectedDocs.map((doc) => (
-                                  <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-2.5 flex-1 min-w-[130px]">
-                                    <p className="text-[11px] text-foreground leading-relaxed italic">
-                                      {LLM_EXTRACTIONS[doc.id]}
+                              <div
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                                className={cn(
+                                  "min-h-[110px] rounded-lg border-2 border-dashed p-3 transition-colors",
+                                  isDragOver ? "border-foreground bg-muted/40" : "border-border"
+                                )}
+                              >
+                                {diagramSelectedDocs.length === 0 ? (
+                                  <div className="h-full min-h-[90px] flex items-center justify-center">
+                                    <p className="text-xs text-muted-foreground italic text-center">
+                                      Drag documents from the left sidebar into this area
                                     </p>
                                   </div>
-                                ))}
-                                <div className="rounded-lg border border-dashed border-border bg-muted/20 p-2.5 flex-1 min-w-[130px]">
-                                  <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                                    "AI ethics" · "journalism standards" · "public trust" · …
-                                  </p>
-                                </div>
+                                ) : (
+                                  <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}>
+                                    {/* Per-column pipeline: Source → arrow → Extraction */}
+                                    {diagramSelectedDocs.map((doc) => (
+                                      <div key={doc.id} className="flex flex-col items-stretch">
+                                        {/* Source block */}
+                                        <div className="rounded-lg border border-border bg-white p-3 relative">
+                                          <button
+                                            type="button"
+                                            onClick={() => removeDiagramDoc(doc.id)}
+                                            className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-muted-foreground text-[10px] leading-none"
+                                            aria-label="Remove"
+                                          >
+                                            ×
+                                          </button>
+                                          <div className="flex items-center gap-1.5 mb-1 pr-4">
+                                            <FileText className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                                            <span className="text-xs font-semibold text-foreground">{doc.title}</span>
+                                          </div>
+                                          <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                            {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs[0] || ""}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    {/* Locked training database — always present */}
+                                    <div className="flex flex-col items-stretch">
+                                      <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/50 p-3">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                          <Database className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                                          <span className="text-xs font-semibold text-foreground">Training Database</span>
+                                          <Lock className="h-3 w-3 text-muted-foreground/50 ml-auto" />
+                                        </div>
+                                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                          {LLM_DATABASE_SNIPPET}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
 
-                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
+                            {/* Per-block arrows down to extraction (only when docs added) */}
+                            {diagramSelectedDocs.length > 0 && (
+                              <>
+                                <div
+                                  className="grid gap-3 px-3"
+                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
+                                >
+                                  {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
+                                    <div key={doc.id} className="flex justify-center">
+                                      <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
+                                    </div>
+                                  ))}
+                                </div>
 
-                            {/* Output */}
-                            <div>
-                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Output
-                              </p>
-                              {(() => {
-                                const key = Array.from(diagramDocs).sort().join(",");
-                                const merged = LLM_MERGED_OUTPUTS[key];
-                                if (!merged) return <p className="text-xs text-muted-foreground">Select a valid document combination.</p>;
-                                return (
-                                  <div className="rounded-lg border border-border bg-white p-4">
-                                    <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
+                                {/* Extraction row — one box per source */}
+                                <div>
+                                  <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                    Information extracted
+                                  </p>
+                                  <div
+                                    className="grid gap-3"
+                                    style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
+                                  >
+                                    {diagramSelectedDocs.map((doc) => (
+                                      <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-2.5">
+                                        <p className="text-[11px] text-foreground leading-relaxed italic">
+                                          {LLM_EXTRACTIONS[doc.id]}
+                                        </p>
+                                      </div>
+                                    ))}
+                                    <div className="rounded-lg border border-dashed border-border bg-muted/20 p-2.5">
+                                      <p className="text-[11px] text-muted-foreground leading-relaxed italic">
+                                        "AI ethics" · "journalism standards" · "public trust" · …
+                                      </p>
+                                    </div>
                                   </div>
-                                );
-                              })()}
-                            </div>
+                                </div>
+
+                                {/* Converging arrows — each extraction has its own arrow that converges to the output */}
+                                <div className="relative h-12">
+                                  <div
+                                    className="grid gap-3 absolute inset-x-0 top-0 px-3"
+                                    style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
+                                  >
+                                    {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
+                                      <div key={doc.id} className="flex justify-center">
+                                        <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
+                                      </div>
+                                    ))}
+                                  </div>
+                                  {/* Horizontal merge line */}
+                                  <div className="absolute left-[8%] right-[8%] top-6 h-px bg-muted-foreground/30" />
+                                  {/* Vertical line down from merge to output */}
+                                  <div className="absolute left-1/2 top-6 h-6 w-px bg-muted-foreground/30 -translate-x-1/2" />
+                                  <div className="absolute left-1/2 bottom-0 -translate-x-1/2">
+                                    <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
+                                  </div>
+                                </div>
+
+                                {/* Output */}
+                                <div>
+                                  <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                    Output
+                                  </p>
+                                  {(() => {
+                                    const key = Array.from(diagramDocs).sort().join(",");
+                                    const merged = LLM_MERGED_OUTPUTS[key];
+                                    if (!merged) {
+                                      return (
+                                        <div className="rounded-lg border border-border bg-white p-4">
+                                          <p className="text-sm text-muted-foreground italic">
+                                            Add more documents to see how the LLM merges them.
+                                          </p>
+                                        </div>
+                                      );
+                                    }
+                                    return (
+                                      <div className="rounded-lg border border-border bg-white p-4">
+                                        <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                              </>
+                            )}
                           </div>
                         )}
 
@@ -746,9 +876,9 @@ export default function MultipleSourcesExercise() {
                               <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                                 Documents indexed separately
                               </p>
-                              <div className="flex gap-2 flex-wrap">
+                              <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${DOCUMENTS.length}, minmax(0, 1fr))` }}>
                                 {DOCUMENTS.map((doc) => (
-                                  <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-3 flex-1 min-w-[140px]">
+                                  <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-3">
                                     <div className="flex items-center gap-1.5 mb-1">
                                       <FileText className="h-3.5 w-3.5 text-muted-foreground" />
                                       <span className="text-xs font-semibold text-foreground">{doc.title}</span>
@@ -761,21 +891,28 @@ export default function MultipleSourcesExercise() {
                               </div>
                             </div>
 
-                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-muted-foreground/40" /></div>
+                            {/* Per-block arrows down */}
+                            <div className="grid gap-3 px-3" style={{ gridTemplateColumns: `repeat(${DOCUMENTS.length}, minmax(0, 1fr))` }}>
+                              {DOCUMENTS.map((doc) => (
+                                <div key={doc.id} className="flex justify-center">
+                                  <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
+                                </div>
+                              ))}
+                            </div>
 
-                            {/* Separate results */}
+                            {/* Separate results — one column per doc, vertical so text fits */}
                             <div>
                               <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                                 Results returned with source attribution
                               </p>
-                              <div className="space-y-2.5">
+                              <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${DOCUMENTS.length}, minmax(0, 1fr))` }}>
                                 {DOCUMENTS.map((doc) => (
                                   <div key={doc.id} className="rounded-lg border border-border bg-white p-3">
                                     <div className="flex items-center gap-1.5 mb-1">
                                       <Search className="h-3.5 w-3.5 text-muted-foreground" />
                                       <span className="text-xs font-semibold text-foreground">{doc.title}</span>
                                     </div>
-                                    <p className="text-sm text-foreground leading-relaxed">
+                                    <p className="text-xs text-foreground leading-relaxed">
                                       {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs.join(" ") || ""}
                                     </p>
                                   </div>
