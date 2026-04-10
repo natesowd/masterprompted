@@ -11,6 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Thread, ParsedFile } from "@/pages/PromptPlayground";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
+import WebSearchStatus from "@/components/WebSearchStatus";
+import WebSearchReferences from "@/components/WebSearchReferences";
 
 type RemovedComment = { id: string; value: string };
 
@@ -307,7 +309,16 @@ const ChatBody = memo(function ChatBody({
                       onPrevVersion={() => onPrevVersion(threadIndex)}
                       onNextVersion={() => onNextVersion(threadIndex)}
                     />
-                    {!current.answer && (
+                    {current.searchStatus === "searching" && (
+                      <WebSearchStatus status="searching" />
+                    )}
+                    {current.searchStatus === "streaming" && !current.answer && (
+                      <WebSearchStatus status="complete" resultCount={current.webSearchSources?.length ?? 0} />
+                    )}
+                    {current.searchStatus === "error" && !current.answer && (
+                      <WebSearchStatus status="error" />
+                    )}
+                    {!current.answer && !current.searchStatus && (
                       <div className="space-y-2">
                         <Skeleton className="h-4 w-[500px]" />
                         <Skeleton className="h-4 w-[300px]" />
@@ -331,6 +342,9 @@ const ChatBody = memo(function ChatBody({
                         onCommentClick={handleCommentClick}
                         toggleDiffHelp={handleToggleDiffHelp}
                       />
+                    )}
+                    {current.answer && current.webSearchSources && current.webSearchSources.length > 0 && (
+                      <WebSearchReferences sources={current.webSearchSources} />
                     )}
                   </div>
                 );

@@ -154,6 +154,8 @@ interface PromptControlsProps {
     readOnly?: boolean;
     hideChatSubmitButton?: boolean;
     className?: string;
+    webSearchEnabled?: boolean;
+    onToggleWebSearch?: () => void;
 }
 
 export default function PromptControls({
@@ -187,7 +189,9 @@ export default function PromptControls({
     waitingforOptimization = false,
     readOnly = false,
     hideChatSubmitButton = false,
-    className
+    className,
+    webSearchEnabled = false,
+    onToggleWebSearch,
 }: PromptControlsProps) {
     const { t } = useLanguage();
     const [titlePopoverOpen, setTitlePopoverOpen] = useState(false);
@@ -252,6 +256,8 @@ export default function PromptControls({
                     autoResize={readOnly}
                     onRegenerate={onRegenerate}
                     showRegenerate={showRegenerate}
+                    webSearchEnabled={webSearchEnabled}
+                    onToggleWebSearch={onToggleWebSearch}
                     className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
                 />
 
