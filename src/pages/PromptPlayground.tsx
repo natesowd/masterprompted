@@ -165,52 +165,32 @@ const PromptPlayground = () => {
 6. WHEN IN DOUBT, QUOTE. If uncertain whether your recollection of a document detail is exact, quote the relevant passage directly rather than paraphrasing.`
         : "You are a helpful assistant.";
 
-      // --- Build documents array in Cohere's native format ---
-      // The edge function sends this directly to Cohere's `documents` parameter
-      // for native citations, and stringifies it into the system prompt for
-      // the Qwen fallback path.
+      // Build documents array — the edge function injects these into the
+      // system message as numbered references for the model to cite.
       const documents = uploadedFiles.length > 0
         ? uploadedFiles.map((file, idx) => {
-          const useSum = useSummaryForOutput && !!file.summary;
-          const text = getFileContent(file, useSummaryForOutput);
-          const titleSuffix = useSum
-            ? ` [summary of ~${file.originalTokenCount} tokens]`
-            : "";
-          return {
-            id: `doc-${idx + 1}`,
-            data: { title: `${file.name}${titleSuffix}`, text },
-          };
-        })
+            const useSum = useSummaryForOutput && !!file.summary;
+            const text = getFileContent(file, useSummaryForOutput);
+            const titleSuffix = useSum
+              ? ` [summary of ~${file.originalTokenCount} tokens]`
+              : "";
+            return {
+              id: `doc-${idx + 1}`,
+              data: { title: `${file.name}${titleSuffix}`, text },
+            };
+          })
         : undefined;
 
-      // Provider routing:
-      //   - Documents uploaded → Cohere `command-r-08-2024` for native citations.
-      //   - No documents       → Llama 3.3 70B via HuggingFace router (avoids
-      //                          the stricter Cohere rate limits for everyday
-      //                          prompts that don't need citations).
-      const hasDocs = uploadedFiles.length > 0;
-      const payload: Record<string, unknown> = hasDocs
-        ? {
-            model: "command-r-08-2024",
-            provider: "cohere",
-            temperature: 0.3,
-            stream: true,
-            messages: [
-              { role: "system", content: groundingPrompt },
-              { role: "user", content: promptText },
-            ],
-            documents,
-          }
-        : {
-            model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
-            provider: "hf",
-            temperature: 0.7,
-            stream: true,
-            messages: [
-              { role: "system", content: groundingPrompt },
-              { role: "user", content: promptText },
-            ],
-          };
+      const payload: Record<string, unknown> = {
+        model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
+        temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
+        stream: true,
+        messages: [
+          { role: "system", content: groundingPrompt },
+          { role: "user", content: promptText },
+        ],
+        ...(documents ? { documents } : {}),
+      };
 
       // Payload size verification (6MB limit)
       const payloadSize = new Blob([JSON.stringify(payload)]).size;
