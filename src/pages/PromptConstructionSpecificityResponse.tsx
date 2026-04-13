@@ -129,10 +129,40 @@ export default function SpecificityResponse() {
                     specificity
                   }}
                   onParameterChange={(key, value) => {
-                    setSpecificity(key === 'specificity' ? value : "");
-                    setStyle(key === 'style' ? value : "");
-                    setContext(key === 'context' ? value : "");
-                    setBias(key === 'bias' ? value : "");
+                    // Compute new values up front so we can auto-apply immediately
+                    const newSpecificity = key === 'specificity' ? value : "";
+                    const newStyle = key === 'style' ? value : "";
+                    const newContext = key === 'context' ? value : "";
+                    const newBias = key === 'bias' ? value : "";
+                    setSpecificity(newSpecificity);
+                    setStyle(newStyle);
+                    setContext(newContext);
+                    setBias(newBias);
+                    // Auto-apply: bypass the optimize button by mirroring into the
+                    // applied state, so the chat body updates immediately.
+                    setAppliedSpecificity(newSpecificity);
+                    setAppliedStyle(newStyle);
+                    setAppliedContext(newContext);
+                    setAppliedBias(newBias);
+                    setSentPrompt(
+                      newBias === t("components.promptControls.bias.right") ?
+                      "Summarize how the EU AI Act stifles AI research." :
+                      newBias === t("components.promptControls.bias.left") ?
+                      "Summarize whether the EU AI Act stifles AI research." :
+                      newContext === t("components.promptControls.context.right") ?
+                      "I'm researching recent regulations on artificial intelligence. Please give me a summary of the main points in the AI Act, focusing on its key rules and how it aims to regulate AI systems." :
+                      newContext === t("components.promptControls.context.left") ?
+                      "Summarize the main points in the AI Act." :
+                      newStyle === t("components.promptControls.conversationStyle.right") ?
+                      "TDLR; EU AI Act" :
+                      newStyle === t("components.promptControls.conversationStyle.left") ?
+                      "Can you give me a summary of the main points in the AI Act?" :
+                      newSpecificity === t("components.promptControls.specificity.right") ?
+                      "Summarize the main points of the EU AI Act, including its risk categories and rules for high-risk AI systems" :
+                      newSpecificity === t("components.promptControls.specificity.left") ?
+                      "Tell me about the AI Act." :
+                      "Give me a summary of the main points in the AI Act."
+                    );
                     if (key === 'bias' && value === t("components.promptControls.bias.right") && !moreBiasPromptShown) {
                       setMoreBiasPromptShown(true);
                     }
@@ -144,6 +174,8 @@ export default function SpecificityResponse() {
                   onOptimize={handleApplyChanges}
                   readOnly={true}
                   hideChatSubmitButton={true}
+                  hidePromptBox={true}
+                  hideOptimizeButton={true}
                   disableOptimize={!hasUnappliedChanges}
                   disableSend={true}
                   files={[{ name: "EU_AI_Act.pdf" }]} />
