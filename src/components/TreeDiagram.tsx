@@ -18,6 +18,7 @@ import {
   type PredictionNode } from
 "@/data/predictionTreeData";
 import { isFlaggedWord, getFlaggedConfig, FACTOR_META } from "@/data/flaggedWords";
+import FlagIntroHighlight, { useFlagIntroHighlight } from "@/components/FlagIntroHighlight";
 
 /**
  * TreeDiagram - Shows all possible sentence branches,
@@ -41,6 +42,9 @@ export function TreeDiagram({
   const maxDepth = useMemo(() => getMaxDepth(), []);
   const defaultPathWords = useMemo(() => getDefaultPath(), []);
   const allLeafPaths = useMemo(() => getAllLeafPaths(), []);
+
+  // First-visible-flag intro highlight (shared with TextFlag / BranchDiagram)
+  const { id: introHighlightId, show: showFlagIntro, close: closeFlagIntro } = useFlagIntroHighlight();
 
   // Intro animation disabled - start interactive immediately
   const [isIntroAnimating, setIsIntroAnimating] = useState(false);
@@ -288,6 +292,10 @@ export function TreeDiagram({
     const hypotheticalPath = [...currentPath, word];
     return computePathY(hypotheticalPath, currentLevel, selections, currentLevel, adjustedCenterY);
   };
+
+  // Render-phase tracker: attach the intro-highlight id to the FIRST
+  // flagged-word button rendered in this pass. Resets each render.
+  let introIdAttached = false;
 
   return (
     <div className={cn("relative", className)}>
@@ -591,6 +599,7 @@ export function TreeDiagram({
                                 <HoverCard openDelay={100} closeDelay={200}>
                                   <HoverCardTrigger asChild>
                                     <button
+                                      id={!introIdAttached ? (introIdAttached = true, introHighlightId) : undefined}
                                       onClickCapture={() => handleWordClick(currentLevel, opt.word)}
                                       disabled={isAnimating}
                                       className={cn(
@@ -723,6 +732,8 @@ export function TreeDiagram({
           </Button>
         </div>
       }
+
+      <FlagIntroHighlight targetId={introHighlightId} open={showFlagIntro} onClose={closeFlagIntro} />
     </div>);
 
 }
