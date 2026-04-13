@@ -171,6 +171,10 @@ interface PromptControlsProps {
     onRemoveFile?: (index: number) => void;
     readOnly?: boolean;
     hideChatSubmitButton?: boolean;
+    /** Hide the entire prompt chatbox. Default false — can be toggled back on later. */
+    hidePromptBox?: boolean;
+    /** Hide the "Send optimized prompt" button. Default false — can be toggled back on later. */
+    hideOptimizeButton?: boolean;
     className?: string;
 }
 
@@ -203,6 +207,8 @@ export default function PromptControls({
     waitingforOptimization = false,
     readOnly = false,
     hideChatSubmitButton = false,
+    hidePromptBox = false,
+    hideOptimizeButton = false,
     className
 }: PromptControlsProps) {
     const { t } = useLanguage();
@@ -223,25 +229,27 @@ export default function PromptControls({
     return (
         <div className={cn("bg-surface-200 flex flex-col overflow-hidden [&_*]:!font-heading [&_textarea]:!font-['Manrope']", className)}>
             <div className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-1 min-h-0">
-                {/* Chatbox */}
-                <div id="prompt-controls-chatbox">
-                    <Chatbox
-                        value={chatValue}
-                        onChange={onChatChange ?? (() => { })}
-                        onSubmit={onChatSubmit}
-                        submitButtonId={chatSubmitButtonId}
-                        disableSend={disableSend}
-                        animationKey={chatAnimationKey}
-                        waitingforOptimization={waitingforOptimization}
-                        onUploadFiles={onUploadFiles}
-                        files={files}
-                        onRemoveFile={onRemoveFile}
-                        readOnly={readOnly}
-                        hideSubmitButton={hideChatSubmitButton}
-                        autoResize={readOnly}
-                        className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
-                    />
-                </div>
+                {/* Chatbox — can be brought back by setting hidePromptBox={false} */}
+                {!hidePromptBox && (
+                    <div id="prompt-controls-chatbox">
+                        <Chatbox
+                            value={chatValue}
+                            onChange={onChatChange ?? (() => { })}
+                            onSubmit={onChatSubmit}
+                            submitButtonId={chatSubmitButtonId}
+                            disableSend={disableSend}
+                            animationKey={chatAnimationKey}
+                            waitingforOptimization={waitingforOptimization}
+                            onUploadFiles={onUploadFiles}
+                            files={files}
+                            onRemoveFile={onRemoveFile}
+                            readOnly={readOnly}
+                            hideSubmitButton={hideChatSubmitButton}
+                            autoResize={readOnly}
+                            className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
+                        />
+                    </div>
+                )}
 
                 {/* Parameters area */}
                 <div className="flex-initial flex flex-col justify-end min-h-0 overflow-y-auto">
@@ -310,17 +318,20 @@ export default function PromptControls({
                         />
                     </div>
 
-                    <div className="flex py-3 items-stretch">
-                        <Button
-                            onClick={handleSubmitClick}
-                            variant="secondary"
-                            size="lg"
-                            className="flex-1 min-h-[48px] leading-tight whitespace-normal text-center font-heading font-semibold bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white"
-                            disabled={disableOptimize}
-                        >
-                            {t('components.promptControls.sendOptimizedPrompt')}
-                        </Button>
-                    </div>
+                    {/* Optimize button — can be brought back by setting hideOptimizeButton={false} */}
+                    {!hideOptimizeButton && (
+                        <div className="flex py-3 items-stretch">
+                            <Button
+                                onClick={handleSubmitClick}
+                                variant="secondary"
+                                size="lg"
+                                className="flex-1 min-h-[48px] leading-tight whitespace-normal text-center font-heading font-semibold bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white"
+                                disabled={disableOptimize}
+                            >
+                                {t('components.promptControls.sendOptimizedPrompt')}
+                            </Button>
+                        </div>
+                    )}
                     <p className="text-[10px] leading-snug text-muted-foreground/70 text-left pt-2">
                         LLMs used in the creation of prompt output examples in the Guided Exploration include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
                     </p>
