@@ -23,7 +23,8 @@ const textFlagVariants = cva(
       severity: {
         error: "[&>a]:decoration-destructive [&>span]:decoration-destructive",
         warning: "[&>a]:decoration-yellow-600 [&>span]:decoration-yellow-600",
-        info: "[&>a]:decoration-blue-500 [&>span]:decoration-blue-500"
+        info: "[&>a]:decoration-blue-500 [&>span]:decoration-blue-500",
+        success: "[&>a]:decoration-green-600 [&>span]:decoration-green-600"
       },
       noUnderline: {
         true: "[&>span]:no-underline [&>a]:no-underline",
@@ -121,6 +122,33 @@ export default function TextFlag({
 
   const activeHref = currentPage?.href ?? href;
 
+  const severityColorClass =
+    severity === "success"
+      ? "text-green-600"
+      : severity === "warning"
+        ? "text-yellow-600"
+        : severity === "info"
+          ? "text-blue-500"
+          : "text-destructive";
+
+  const severityUnderlineClass =
+    severity === "success"
+      ? "decoration-green-600"
+      : severity === "warning"
+        ? "decoration-yellow-600"
+        : severity === "info"
+          ? "decoration-blue-500"
+          : "decoration-destructive";
+
+  const severityBorderClass =
+    severity === "success"
+      ? "border-green-600/20"
+      : severity === "warning"
+        ? "border-yellow-600/20"
+        : severity === "info"
+          ? "border-blue-500/20"
+          : "border-destructive/20";
+
   return (
     <HoverCard open={hoverCardOpen} onOpenChange={setHoverCardOpen}>
       <HoverCardTrigger asChild>
@@ -131,7 +159,7 @@ export default function TextFlag({
             setHoverCardOpen(!hoverCardOpen);
           }}
         >
-          {showIcon && <Icon className="inline-block h-4 w-4 text-destructive align-middle mr-1" />}
+          {showIcon && <Icon className={cn("inline-block h-4 w-4 align-middle mr-1", severityColorClass)} />}
           {activeHref ? (
             <a
               href={activeHref}
@@ -143,20 +171,20 @@ export default function TextFlag({
             />
           ) : (
             <span
-              className="underline decoration-2 underline-offset-2 decoration-destructive text-current"
+              className={cn("underline decoration-2 underline-offset-2 text-current", severityUnderlineClass)}
               {...(isHtml ? { dangerouslySetInnerHTML: { __html: text } } : { children: <RichText text={text} inline /> })}
             />
           )}
         </span>
       </HoverCardTrigger>
       <HoverCardContent
-        className="w-80 max-w-[85vw] bg-card border-destructive/20 shadow-lg rounded-lg p-3 overflow-hidden"
+        className={cn("w-80 max-w-[85vw] bg-card shadow-lg rounded-lg p-3 overflow-hidden", severityBorderClass)}
         sideOffset={5}
       >
         <div className="space-y-2 overflow-hidden">
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Icon className="h-4 w-4 text-destructive flex-shrink-0" />
-            <h4 className="font-semibold text-destructive text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
+            <Icon className={cn("h-4 w-4 flex-shrink-0", severityColorClass)} />
+            <h4 className={cn("font-semibold text-sm", severityColorClass)}>{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
             {hasMultiplePages && (
               <div className="flex items-center gap-1 ml-auto flex-shrink-0">
                 <button

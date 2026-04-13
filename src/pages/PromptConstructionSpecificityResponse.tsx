@@ -450,7 +450,7 @@ export default function SpecificityResponse() {
                                       </div>
                                     </div>
 
-                                    <p className="text-base font-semibold text-gray-900"><TextFlag text="Counterarguments:" evaluationFactor="relevance" explanation="The model generates counterarguments to provide a more balanced summary, contrasting the biased example where only one side is presented." /></p>
+                                    <p className="text-base font-semibold text-gray-900"><TextFlag text="Counterarguments:" evaluationFactor="relevance" severity="success" explanation="The model generates counterarguments to provide a more balanced summary, contrasting the biased example where only one side is presented." /></p>
 
                                     <div className="space-y-4">
                                       <div>
