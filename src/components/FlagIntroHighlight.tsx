@@ -47,13 +47,20 @@ export default function FlagIntroHighlight() {
 
     let mo: MutationObserver | null = null;
     let timerId: number | null = null;
+    let intervalId: number | null = null;
     let claimedLocal = false;
 
     const tryClaim = () => {
       if (introClaimed || claimedLocal) {
         mo?.disconnect();
+        if (intervalId != null) window.clearInterval(intervalId);
         return;
       }
+      // Defer if another FeatureHighlight (or any modal) is currently
+      // active — they lock body.scroll. We'll retry on the next mutation,
+      // scroll, or interval tick once that finishes.
+      if (document.body.style.overflow === "hidden") return;
+
       const els = document.querySelectorAll<HTMLElement>("[data-flag-intro]");
       for (const el of els) {
         if (isElementVisible(el)) {
@@ -62,6 +69,7 @@ export default function FlagIntroHighlight() {
           // Mark the specific element so FeatureHighlight can target it
           el.id = TARGET_ID;
           mo?.disconnect();
+          if (intervalId != null) window.clearInterval(intervalId);
           // Small delay so FeatureHighlight measurement is stable after
           // any layout / scroll / animation settles.
           timerId = window.setTimeout(() => setShow(true), 350);
@@ -70,11 +78,12 @@ export default function FlagIntroHighlight() {
       }
     };
 
-    // Initial attempt
+    // Initial attempt (likely a no-op; routes may not be mounted yet)
     tryClaim();
     if (claimedLocal) return;
 
-    // Watch DOM for new flagged elements + scroll/resize for visibility
+    // Watch DOM for new flagged elements and for body style changes
+    // (so we re-try once any blocking modal closes).
     mo = new MutationObserver(() => tryClaim());
     mo.observe(document.body, {
       childList: true,
@@ -87,9 +96,15 @@ export default function FlagIntroHighlight() {
     window.addEventListener("scroll", onScrollOrResize, { passive: true, capture: true });
     window.addEventListener("resize", onScrollOrResize);
 
+    // Polling fallback in case Mutation/scroll events miss the moment
+    // (e.g., the existing NWP 3-step tutorial finishing without further
+    //  DOM changes). Cheap — just a querySelectorAll every 1.5s until claimed.
+    intervalId = window.setInterval(() => tryClaim(), 1500);
+
     return () => {
       mo?.disconnect();
       if (timerId != null) window.clearTimeout(timerId);
+      if (intervalId != null) window.clearInterval(intervalId);
       window.removeEventListener("scroll", onScrollOrResize, { capture: true } as EventListenerOptions);
       window.removeEventListener("resize", onScrollOrResize);
     };
