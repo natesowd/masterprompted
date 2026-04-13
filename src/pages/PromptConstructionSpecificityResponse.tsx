@@ -111,7 +111,7 @@ export default function SpecificityResponse() {
           <div className="flex flex-1">
             {/* Left Sidebar - Prompt Controls with grey background extending full height */}
             <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center">
-              <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
+              <div className="w-[264px] pt-[3.25rem] pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
                 <PromptControls
                   chatValue={inputPrompt}
                   showSpecificity={true}
