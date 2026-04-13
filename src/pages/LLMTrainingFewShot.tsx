@@ -24,6 +24,7 @@ type ResponsePart = {
   flagged: boolean;
   factor?: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
   explanation?: string;
+  severity?: "error" | "warning" | "info" | "success";
 };
 
 const RESPONSE_OFF: ResponsePart[] = [
@@ -32,6 +33,7 @@ const RESPONSE_OFF: ResponsePart[] = [
     text: "world-first",
     flagged: true,
     factor: "voice",
+    severity: "warning",
     explanation: "The phrase 'world-first' uses promotional language that may overstate the uniqueness of this regulation. A more neutral description would be appropriate for journalistic writing.",
   },
   { text: " in regulating artificial intelligence, is facing mounting scrutiny as fresh allegations surface linking the legislation's final text to aggressive corporate lobbying and opaque political bargaining—raising concerns ", flagged: false },
@@ -39,6 +41,7 @@ const RESPONSE_OFF: ResponsePart[] = [
     text: "about transparency and accountability at the heart of Brussels",
     flagged: true,
     factor: "voice",
+    severity: "warning",
     explanation: "This phrasing uses dramatic, editorial language ('at the heart of Brussels') that may not align with DW's neutral reporting voice. Consider more measured wording.",
   },
   { text: ".", flagged: false },
@@ -408,6 +411,7 @@ export default function LLMTrainingFewShot() {
                                     key={`${selectedOption}-${i}`}
                                     text={part.text}
                                     evaluationFactor={part.factor!}
+                                    severity={part.severity}
                                     explanation={part.explanation!}
                                   />
                                 ) : (

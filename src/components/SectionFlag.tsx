@@ -30,7 +30,8 @@ const sectionFlagVariants = cva(
       severity: {
         error: "border-red-500",
         warning: "border-yellow-500",
-        info: "border-blue-500"
+        info: "border-blue-500",
+        success: "border-green-500"
       },
       size: {
         default: "p-3",
@@ -52,7 +53,8 @@ const iconBadgeVariants = cva(
       severity: {
         error: "bg-white text-red-500",
         warning: "bg-white text-yellow-600",
-        info: "bg-white text-blue-500"
+        info: "bg-white text-blue-500",
+        success: "bg-white text-green-600"
       },
       position: {
         topRight: "-top-3 -right-3",
@@ -132,14 +134,14 @@ export default function SectionFlag({
       <HoverCardContent
         className={cn(
           "w-80 bg-white shadow-lg rounded-lg p-4",
-          severity === "warning" ? "border-yellow-200" : severity === "info" ? "border-blue-200" : "border-red-200"
+          severity === "warning" ? "border-yellow-200" : severity === "info" ? "border-blue-200" : severity === "success" ? "border-green-200" : "border-red-200"
         )}
         sideOffset={5}
       >
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Icon className={cn("h-4 w-4", severity === "warning" ? "text-yellow-600" : severity === "info" ? "text-blue-500" : "text-red-500")} />
-            <h4 className={cn("font-semibold text-sm", severity === "warning" ? "text-yellow-700" : severity === "info" ? "text-blue-700" : "text-red-700")}>{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
+            <Icon className={cn("h-4 w-4", severity === "warning" ? "text-yellow-600" : severity === "info" ? "text-blue-500" : severity === "success" ? "text-green-600" : "text-red-500")} />
+            <h4 className={cn("font-semibold text-sm", severity === "warning" ? "text-yellow-700" : severity === "info" ? "text-blue-700" : severity === "success" ? "text-green-700" : "text-red-700")}>{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
           </div>
           <p className="text-sm text-gray-700 leading-relaxed">
             {explanation}

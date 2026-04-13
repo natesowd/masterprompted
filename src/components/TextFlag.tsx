@@ -21,9 +21,10 @@ const textFlagVariants = cva(
   {
     variants: {
       severity: {
-        error: "[&>a]:decoration-destructive [&>span]:decoration-destructive",
+        error: "[&>a]:decoration-red-500 [&>span]:decoration-red-500",
         warning: "[&>a]:decoration-yellow-600 [&>span]:decoration-yellow-600",
-        info: "[&>a]:decoration-blue-500 [&>span]:decoration-blue-500"
+        info: "[&>a]:decoration-blue-500 [&>span]:decoration-blue-500",
+        success: "[&>a]:decoration-green-600 [&>span]:decoration-green-600"
       },
       noUnderline: {
         true: "[&>span]:no-underline [&>a]:no-underline",
@@ -36,6 +37,34 @@ const textFlagVariants = cva(
     }
   }
 );
+
+const severityIconColor: Record<string, string> = {
+  error: "text-red-500",
+  warning: "text-yellow-600",
+  info: "text-blue-500",
+  success: "text-green-600",
+};
+
+const severityHeadingColor: Record<string, string> = {
+  error: "text-red-600",
+  warning: "text-yellow-700",
+  info: "text-blue-600",
+  success: "text-green-700",
+};
+
+const severityBorderColor: Record<string, string> = {
+  error: "border-red-200",
+  warning: "border-yellow-200",
+  info: "border-blue-200",
+  success: "border-green-200",
+};
+
+const severityUnderline: Record<string, string> = {
+  error: "decoration-red-500",
+  warning: "decoration-yellow-600",
+  info: "decoration-blue-500",
+  success: "decoration-green-600",
+};
 
 const iconMap = {
   "factual_accuracy": ListChecks,
@@ -120,6 +149,11 @@ export default function TextFlag({
   }, [evaluationFactor, registerFactor, deregisterFactor]);
 
   const activeHref = currentPage?.href ?? href;
+  const sev = severity ?? "error";
+  const iconColor = severityIconColor[sev];
+  const headingColor = severityHeadingColor[sev];
+  const borderColor = severityBorderColor[sev];
+  const underlineColor = severityUnderline[sev];
 
   return (
     <HoverCard open={hoverCardOpen} onOpenChange={setHoverCardOpen}>
@@ -131,7 +165,7 @@ export default function TextFlag({
             setHoverCardOpen(!hoverCardOpen);
           }}
         >
-          {showIcon && <Icon className="inline-block h-4 w-4 text-destructive align-middle mr-1" />}
+          {showIcon && <Icon className={cn("inline-block h-4 w-4 align-middle mr-1", iconColor)} />}
           {activeHref ? (
             <a
               href={activeHref}
@@ -143,20 +177,20 @@ export default function TextFlag({
             />
           ) : (
             <span
-              className="underline decoration-2 underline-offset-2 decoration-destructive text-current"
+              className={cn("underline decoration-2 underline-offset-2 text-current", underlineColor)}
               {...(isHtml ? { dangerouslySetInnerHTML: { __html: text } } : { children: <RichText text={text} inline /> })}
             />
           )}
         </span>
       </HoverCardTrigger>
       <HoverCardContent
-        className="w-80 max-w-[85vw] bg-card border-destructive/20 shadow-lg rounded-lg p-3 overflow-hidden"
+        className={cn("w-80 max-w-[85vw] bg-card shadow-lg rounded-lg p-3 overflow-hidden", borderColor)}
         sideOffset={5}
       >
         <div className="space-y-2 overflow-hidden">
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Icon className="h-4 w-4 text-destructive flex-shrink-0" />
-            <h4 className="font-semibold text-destructive text-sm">{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
+            <Icon className={cn("h-4 w-4 flex-shrink-0", iconColor)} />
+            <h4 className={cn("font-semibold text-sm", headingColor)}>{t(`components.textFlag.type.${evaluationFactor}`)}</h4>
             {hasMultiplePages && (
               <div className="flex items-center gap-1 ml-auto flex-shrink-0">
                 <button
