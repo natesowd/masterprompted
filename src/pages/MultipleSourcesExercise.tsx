@@ -84,23 +84,24 @@ const SNIPPETS_BY_DOC: Record<string, Snippet[]> = {
 interface FlagDef {
   text: string;
   explanation: string;
+  severity?: "error" | "warning" | "info" | "success";
 }
 
 /* ── Output difference flags ── */
 /* Highlights where the LLM output contains quotes or claims not found in the retrieved snippets */
 const OUTPUT_FLAGS: Record<string, FlagDef[]> = {
   "doc-1": [
-    { text: "Public service media have a special responsibility in this context. While they are bound by the mission and mandate to inform, educate, and connect people, they are also accountable to the public.", explanation: "This is presented as a direct quote from the document, but this text does not appear anywhere in the retrieved snippet. The snippet discusses AI strategy and public service value — not a specific mandate to 'inform, educate, and connect'." },
-    { text: "Human judgment must remain at the heart of our editorial decisions.", explanation: "Fabricated quote: the retrieved snippet discusses scrutinising products for 'biases and stereotypes' — it never mentions 'editorial decisions' or 'human judgment'." },
-    { text: "We must guard this trust like the apple of our eye.", explanation: "This quote does not appear in the retrieved snippet. The snippet focuses on AI strategy, regulation lobbying, and bias scrutiny — trust preservation is not mentioned." },
-    { text: "Ethics must guide our technological choices.", explanation: "Another fabricated quote. The retrieved snippet says organisations need 'an AI strategy' and should 'scrutinise the products they use' — it never frames this as 'technological choices'." },
-    { text: "The industry's outlook on tech has changed... The current generation of decision makers are in many ways more realistic about the benefits and risks of new technologies than their predecessors.", explanation: "This quote is not in the retrieved snippet. The model appears to have generated text that sounds authoritative but cannot be verified against the provided source material." },
+    { text: "Public service media have a special responsibility in this context. While they are bound by the mission and mandate to inform, educate, and connect people, they are also accountable to the public.", severity: "error", explanation: "This is presented as a direct quote from the document, but this text does not appear anywhere in the retrieved snippet. The snippet discusses AI strategy and public service value — not a specific mandate to 'inform, educate, and connect'." },
+    { text: "Human judgment must remain at the heart of our editorial decisions.", severity: "error", explanation: "Fabricated quote: the retrieved snippet discusses scrutinising products for 'biases and stereotypes' — it never mentions 'editorial decisions' or 'human judgment'." },
+    { text: "We must guard this trust like the apple of our eye.", severity: "error", explanation: "This quote does not appear in the retrieved snippet. The snippet focuses on AI strategy, regulation lobbying, and bias scrutiny — trust preservation is not mentioned." },
+    { text: "Ethics must guide our technological choices.", severity: "error", explanation: "Another fabricated quote. The retrieved snippet says organisations need 'an AI strategy' and should 'scrutinise the products they use' — it never frames this as 'technological choices'." },
+    { text: "The industry's outlook on tech has changed... The current generation of decision makers are in many ways more realistic about the benefits and risks of new technologies than their predecessors.", severity: "error", explanation: "This quote is not in the retrieved snippet. The model appears to have generated text that sounds authoritative but cannot be verified against the provided source material." },
   ],
   "doc-1,doc-2": [
-    { text: "journalists are gatekeepers of accuracy and fairness", explanation: "Neither snippet uses the word 'gatekeepers'. Doc 1 mentions 'scrutinise products for biases'; Doc 2 mentions 'editorial oversight mechanisms' — the model reframes these with its own terminology." },
-    { text: "AI Developers and Technology Providers", explanation: "Neither Doc 1 nor Doc 2 snippets mention AI developers or technology providers. The model introduces an entire responsibility category not supported by the retrieved text." },
-    { text: "Regulators and Policymakers", explanation: "No retrieved snippet mentions regulators or policymakers. The model fabricates this section, including claims about 'legal and regulatory frameworks' attributed to 'the YLE guide'." },
-    { text: "Invest in training staff on AI risks and ethical implications", explanation: "Not in either retrieved snippet. The snippets discuss governance frameworks and transparency obligations — staff training is the model's own addition." },
+    { text: "journalists are gatekeepers of accuracy and fairness", severity: "warning", explanation: "Neither snippet uses the word 'gatekeepers'. Doc 1 mentions 'scrutinise products for biases'; Doc 2 mentions 'editorial oversight mechanisms' — the model reframes these with its own terminology." },
+    { text: "AI Developers and Technology Providers", severity: "error", explanation: "Neither Doc 1 nor Doc 2 snippets mention AI developers or technology providers. The model introduces an entire responsibility category not supported by the retrieved text." },
+    { text: "Regulators and Policymakers", severity: "error", explanation: "No retrieved snippet mentions regulators or policymakers. The model fabricates this section, including claims about 'legal and regulatory frameworks' attributed to 'the YLE guide'." },
+    { text: "Invest in training staff on AI risks and ethical implications", severity: "error", explanation: "Not in either retrieved snippet. The snippets discuss governance frameworks and transparency obligations — staff training is the model's own addition." },
   ],
   "doc-2": [
     { text: "Organizations should implement labelling systems and disclosure policies.", explanation: "The retrieved snippet mentions 'transparency with audiences' and 'editorial oversight mechanisms' — but never specifically mentions 'labelling systems' or 'disclosure policies'. The model adds implementation details not present in the source." },
@@ -117,11 +118,11 @@ const OUTPUT_FLAGS: Record<string, FlagDef[]> = {
     { text: "ensuring audiences understand when AI tools have been used in the editorial process", explanation: "Doc 2 mentions 'transparency with audiences about AI-generated content' and Doc 3 mentions 'labelling of AI-assisted content' — the model reframes these as 'ensuring audiences understand', adding an interpretive layer not present in either source." },
   ],
   "doc-1,doc-2,doc-3": [
-    { text: "DW is firmly committed to journalism that is produced by people.", explanation: "Presented as a DW quote, but the Doc 3 snippet actually says 'DW uses AI tools to support journalists but maintains that final editorial decisions must always rest with human editors' — similar sentiment, different wording." },
-    { text: "Our journalists will continue to control all applications and thoroughly review anything before publication.", explanation: "This quote is not in the Doc 3 snippet. The snippet mentions 'labelling of AI-assisted content' and prohibiting 'fully automated publishing' — not 'control all applications'." },
-    { text: "A human is always responsible for the outcome when AI is used.", explanation: "Attributed to 'Yle principles', but the Doc 2 snippet discusses 'governance frameworks' and 'transparency with audiences' — this specific principle is not in the retrieved text." },
-    { text: "AI chatbots, such as ChatGPT, cannot be relied upon as accurate sources of information.", explanation: "Not found in any retrieved snippet. The model presents this as a DW quote, but it's not supported by the retrieved document excerpts." },
-    { text: "Generative AI makes it easier to produce and spread disinformation around the world. It is our job as journalists to expose this disinformation.", explanation: "This quote about disinformation does not appear in any of the three retrieved snippets. The model introduces content beyond what was retrieved." },
+    { text: "DW is firmly committed to journalism that is produced by people.", severity: "warning", explanation: "Presented as a DW quote, but the Doc 3 snippet actually says 'DW uses AI tools to support journalists but maintains that final editorial decisions must always rest with human editors' — similar sentiment, different wording." },
+    { text: "Our journalists will continue to control all applications and thoroughly review anything before publication.", severity: "error", explanation: "This quote is not in the Doc 3 snippet. The snippet mentions 'labelling of AI-assisted content' and prohibiting 'fully automated publishing' — not 'control all applications'." },
+    { text: "A human is always responsible for the outcome when AI is used.", severity: "error", explanation: "Attributed to 'Yle principles', but the Doc 2 snippet discusses 'governance frameworks' and 'transparency with audiences' — this specific principle is not in the retrieved text." },
+    { text: "AI chatbots, such as ChatGPT, cannot be relied upon as accurate sources of information.", severity: "error", explanation: "Not found in any retrieved snippet. The model presents this as a DW quote, but it's not supported by the retrieved document excerpts." },
+    { text: "Generative AI makes it easier to produce and spread disinformation around the world. It is our job as journalists to expose this disinformation.", severity: "error", explanation: "This quote about disinformation does not appear in any of the three retrieved snippets. The model introduces content beyond what was retrieved." },
   ],
 };
 
@@ -161,7 +162,7 @@ function renderFlaggedResponse(
           text={flag.text}
           evaluationFactor="factual_accuracy"
           explanation={flag.explanation}
-          severity="warning"
+          severity={flag.severity ?? "error"}
         />,
       );
       last = flag.index + flag.text.length;
