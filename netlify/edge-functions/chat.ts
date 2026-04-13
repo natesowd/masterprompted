@@ -74,8 +74,7 @@ function injectDocumentsIntoMessages(
         .join("\n\n");
     const instruction =
         `\n\n## Reference Documents\n` +
-        `Cite sources using [1], [2], etc. matching the document numbers below. ` +
-        `End your answer with a "## References" section listing each cited document.\n\n${docsBlock}`;
+        `Cite sources using [1], [2], etc. matching the document numbers below.\n\n${docsBlock}`;
 
     const result = [...messages];
     const sysIdx = result.findIndex((m) => m.role === "system");

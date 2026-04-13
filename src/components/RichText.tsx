@@ -87,11 +87,19 @@ export function applyInlineFormatting(raw: string, diff: boolean, isInline: bool
       '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">$1</a>'
     );
 
-    // Inline citations: [1], [2], [1, p.5], [1, Section 3], [3][4] etc.
-    // Rendered as superscript badges — must run AFTER markdown links to avoid conflicts
+    // Inline citations — must run AFTER markdown links to avoid conflicts
+    // Enriched format: [N|||sourceName|||sourceUrl] (from orchestrator/ChatBody)
+    html = html.replace(
+      /\[(\d{1,3})\|\|\|(.+?)\|\|\|(.+?)\]/g,
+      (_match, num, name, url) => {
+        // num, name are already HTML-escaped (escapeHtml ran on the full string above)
+        return `<button tabindex="0" class="inline-citation-button"><span class="inline-citation">${num}</span><span class="inline-citation-tooltip"><a href="${url}" target="_blank" rel="noopener noreferrer" class="citation-tooltip-link">${name}</a></span></button>`;
+      }
+    );
+    // Plain citations: [1], [2], [1, p.5], [1, Section 3], [3][4] etc.
     html = html.replace(
       /\[(\d{1,3}(?:,\s*(?:p\.\s*\d+|[Ss]ection\s+[\w.]+))?)\]/g,
-      '<sup class="inline-flex items-center justify-center min-w-[1.1em] h-[1.1em] px-[3px] text-[0.65em] font-semibold leading-none rounded bg-blue-100 text-blue-700 border border-blue-200 cursor-default align-super" title="Document citation [$1]">$1</sup>'
+      '<button tabindex="0" class="inline-citation-button"><span class="inline-citation">$1</span><span class="inline-citation-tooltip">Citation [$1]</span></button>'
     );
 
     // External knowledge marker: [External] or [External: source description]

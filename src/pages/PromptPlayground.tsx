@@ -17,8 +17,8 @@ const NO_CHANGE_VALUE = "no-change";
 // const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
 //   ? "/api/chat"
 //   : "https://luxury-blini-3336bb.netlify.app/api/chat";
-const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
-// const NETLIFY_CHAT_URL = "https://69d797e3d03e41390f860165--luxury-blini-3336bb.netlify.app/api/chat"
+// const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
+const NETLIFY_CHAT_URL = "https://69dcafb26499a614437a4607--luxury-blini-3336bb.netlify.app/api/chat"
 
 export type Parameters = {
   specificity: string;
@@ -331,16 +331,16 @@ const PromptPlayground = () => {
       // system message as numbered references for the model to cite.
       const documents = uploadedFiles.length > 0
         ? uploadedFiles.map((file, idx) => {
-            const useSum = useSummaryForOutput && !!file.summary;
-            const text = getFileContent(file, useSummaryForOutput);
-            const titleSuffix = useSum
-              ? ` [summary of ~${file.originalTokenCount} tokens]`
-              : "";
-            return {
-              id: `doc-${idx + 1}`,
-              data: { title: `${file.name}${titleSuffix}`, text },
-            };
-          })
+          const useSum = useSummaryForOutput && !!file.summary;
+          const text = getFileContent(file, useSummaryForOutput);
+          const titleSuffix = useSum
+            ? ` [summary of ~${file.originalTokenCount} tokens]`
+            : "";
+          return {
+            id: `doc-${idx + 1}`,
+            data: { title: `${file.name}${titleSuffix}`, text },
+          };
+        })
         : undefined;
 
       const payload: Record<string, unknown> = {

@@ -36,7 +36,7 @@ const WebSearchReferences: React.FC<WebSearchReferencesProps> = ({
           const domain = extractDomain(source.url);
           return (
             <li key={source.position} className="flex items-start gap-2 text-sm">
-              <span className="inline-flex items-center justify-center min-w-[1.4em] h-[1.4em] px-1 text-[0.7em] font-semibold rounded bg-blue-100 text-blue-700 border border-blue-200 mt-0.5 flex-shrink-0">
+              <span className="inline-citation size-5 px-2 mt-1">
                 {source.position}
               </span>
               <img

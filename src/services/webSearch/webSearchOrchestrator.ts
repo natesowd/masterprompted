@@ -45,7 +45,7 @@ const WEB_RAG_SYSTEM_PROMPT = `You are a research assistant that answers questio
 2. CITE SOURCES using [1], [2], etc. matching the document numbers. Place citations inline immediately after relevant claims.
 3. If the search results do not contain enough information to answer the question, say so clearly. Do not fabricate information.
 4. Be concise and factual. Synthesize information across multiple sources when possible.
-5. End your answer with a "## References" section listing each cited source with its title and URL.`;
+5. Do NOT include a references section.`;
 
 // ---------------------------------------------------------------------------
 // Orchestrator

@@ -34,8 +34,9 @@ export interface ChatDocument {
 // Search endpoint — mirrors NETLIFY_CHAT_URL pattern
 // ---------------------------------------------------------------------------
 
-const WEB_SEARCH_URL =
-  "https://luxury-blini-3336bb.netlify.app/api/web-search";
+// const NETLIFY_SEARCH_URL =
+//   "https://luxury-blini-3336bb.netlify.app/api/web-search";
+const NETLIFY_SEARCH_URL = "https://69dcafb26499a614437a4607--luxury-blini-3336bb.netlify.app/api/web-search"
 
 // ---------------------------------------------------------------------------
 // Functions
@@ -53,7 +54,7 @@ export async function searchWeb(
   count = 6,
   signal?: AbortSignal,
 ): Promise<WebSearchResult[]> {
-  const response = await fetchWithRetry(WEB_SEARCH_URL, {
+  const response = await fetchWithRetry(NETLIFY_SEARCH_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, count }),

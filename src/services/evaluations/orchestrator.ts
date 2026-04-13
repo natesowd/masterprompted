@@ -88,9 +88,23 @@ export async function runAllEvaluations(
         // Build explanation with hyperlinked sources
         let explanation = searchResult.debunkReport;
         if (searchResult.debunkingSources.length > 0) {
-          const sourceLinks = searchResult.debunkingSources
+          const validSources = searchResult.debunkingSources
             .filter(s => s.source && s.citationNumber)
-            .sort((a, b) => (a.citationNumber ?? Infinity) - (b.citationNumber ?? Infinity))
+            .sort((a, b) => (a.citationNumber ?? Infinity) - (b.citationNumber ?? Infinity));
+
+          // Enrich inline citations [N] → [N|||name|||url] so RichText can show tooltips
+          for (const s of validSources) {
+            const num = s.citationNumber;
+            const name = (s.origin || s.source).replace(/\|/g, '-');
+            const url = s.source.replace(/\|/g, '-');
+            // Replace all occurrences of [N] with the enriched format
+            explanation = explanation.replaceAll(
+              `[${num}]`,
+              `[${num}|||${name}|||${url}]`
+            );
+          }
+
+          const sourceLinks = validSources
             .map(s => `- [${s.citationNumber}] [${s.origin || s.source}](${s.source})`)
             .join("\n");
           if (sourceLinks) {
