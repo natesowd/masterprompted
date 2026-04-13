@@ -6,7 +6,7 @@
  * Supports paginated explanations when multiple evaluations overlap.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ListChecks, Target, Mic, Scale, Copy, ChevronLeft, ChevronRight } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -15,6 +15,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 import RichText from "@/components/RichText.tsx";
+import FeatureHighlight from "@/components/FeatureHighlight";
+
+/* ------------------------------------------------------------------ */
+/*  First-in-session intro highlight                                   */
+/* ------------------------------------------------------------------ */
+// Module-level singleton: only the first TextFlag to become visible in a
+// session claims the intro highlight. Resets on full page reload.
+const INTRO_SESSION_KEY = "textflag-intro-shown";
+let introHighlightClaimed = false;
 
 const textFlagVariants = cva(
   "inline cursor-pointer",
@@ -125,6 +134,12 @@ export default function TextFlag({
   const { t } = useLanguage();
   const { registerFactor, deregisterFactor } = useEvaluation();
 
+  // Intro FeatureHighlight — shown once per session, on the first
+  // TextFlag that becomes visible in the viewport.
+  const [showIntroHighlight, setShowIntroHighlight] = useState(false);
+  const introIdRef = useRef(`textflag-intro-${Math.random().toString(36).slice(2, 9)}`);
+  const introId = introIdRef.current;
+
   // Build the list of pages from either explanations array or single explanation
   const pages: ExplanationEntry[] = explanations && explanations.length > 0
     ? explanations
@@ -148,6 +163,46 @@ export default function TextFlag({
     };
   }, [evaluationFactor, registerFactor, deregisterFactor]);
 
+  // Claim the intro highlight the first time this flag intersects the viewport
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (sessionStorage.getItem(INTRO_SESSION_KEY)) return;
+    } catch {
+      /* ignore */
+    }
+    if (introHighlightClaimed) return;
+
+    const el = document.getElementById(introId);
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !introHighlightClaimed) {
+            introHighlightClaimed = true;
+            observer.disconnect();
+            // Small delay so FeatureHighlight measurement is stable
+            window.setTimeout(() => setShowIntroHighlight(true), 350);
+            return;
+          }
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [introId]);
+
+  const handleCloseIntroHighlight = () => {
+    try {
+      sessionStorage.setItem(INTRO_SESSION_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+    setShowIntroHighlight(false);
+  };
+
   const activeHref = currentPage?.href ?? href;
   const sev = severity ?? "error";
   const iconColor = severityIconColor[sev];
@@ -156,9 +211,11 @@ export default function TextFlag({
   const underlineColor = severityUnderline[sev];
 
   return (
+    <>
     <HoverCard open={hoverCardOpen} onOpenChange={setHoverCardOpen}>
       <HoverCardTrigger asChild>
         <span
+          id={introId}
           className={cn(textFlagVariants({ severity, noUnderline }), "inline whitespace-normal", className)}
           onClick={(e) => {
             e.stopPropagation();
@@ -226,5 +283,40 @@ export default function TextFlag({
         </div>
       </HoverCardContent>
     </HoverCard>
+
+    {showIntroHighlight && (
+      <FeatureHighlight
+        target={`#${introId}`}
+        open={showIntroHighlight}
+        onClose={handleCloseIntroHighlight}
+        side="bottom"
+        closeLabel="Got it"
+      >
+        <div className="space-y-3">
+          <p className="font-semibold text-base">Highlighted text</p>
+          <p>
+            Whenever you see an <span className="underline decoration-white/80 decoration-2 underline-offset-2">underlined phrase</span>, hover over it or click it to read an explanation of why it&apos;s been flagged.
+          </p>
+          <div className="pt-1">
+            <p className="font-semibold text-sm mb-2">Underline colour shows severity:</p>
+            <ul className="space-y-1.5 text-xs">
+              <li className="flex items-start gap-2">
+                <span className="mt-1 inline-block h-2 w-2 rounded-full bg-red-400 flex-shrink-0" />
+                <span><strong>Red</strong> — a big problem (e.g. fabricated quote, factual error)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1 inline-block h-2 w-2 rounded-full bg-yellow-300 flex-shrink-0" />
+                <span><strong>Yellow</strong> — potentially dangerous (e.g. misleading tone)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1 inline-block h-2 w-2 rounded-full bg-green-300 flex-shrink-0" />
+                <span><strong>Green</strong> — something the model did well</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </FeatureHighlight>
+    )}
+    </>
   );
 }
