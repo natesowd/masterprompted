@@ -24,7 +24,7 @@ import magnifyingGlassImage from "@/assets/magnifying-glass.png";
 type KnowledgeLevel = 'none' | 'builds';
 
 const LEVEL_CONFIG: Record<KnowledgeLevel, { label: string; labelDe: string; className: string }> = {
-  none:   { label: "No Knowledge Required", labelDe: "Kein Vorwissen nötig", className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  none:   { label: "No Prior Knowledge", labelDe: "Kein Vorwissen nötig", className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
   builds: { label: "Builds on Knowledge", labelDe: "Baut auf Vorwissen auf", className: "bg-amber-100 text-amber-700 border-amber-200" },
 };
 
