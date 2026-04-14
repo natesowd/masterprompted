@@ -99,7 +99,6 @@ export async function runAllEvaluations(
             const url = s.source.replace(/\|/g, '-');
             // Replace all occurrences of [N] with the enriched format
             explanation = explanation.split(`[${num}]`).join(
-              `[${num}]`,
               `[${num}|||${name}|||${url}]`
             );
           }
