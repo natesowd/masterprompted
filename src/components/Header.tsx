@@ -1,4 +1,4 @@
-import { Star, ChevronDown } from "lucide-react";
+import { Star, ChevronDown, Check } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
@@ -9,6 +9,7 @@ import {
 "@/components/ui/dropdown-menu";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useModuleProgress } from "@/hooks/useModuleProgress";
 
 type Language = 'en' | 'es';
 
@@ -40,36 +41,38 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
   // { label: t('nav.imprint'), path: "/imprint" }
   ];
 
+  const { completed } = useModuleProgress();
+
   const moduleItems = [
   {
     title: t('modules.units.introduction.title'),
     path: "/module/intro/about-simulator",
-    completed: false
+    moduleKey: "introduction",
   },
   {
     title: t('modules.units.nextWordPrediction.title'),
     path: "/module/next-word-prediction",
-    completed: false
+    moduleKey: "nextWordPrediction",
   },
   {
     title: t('modules.units.promptConstruction.title'),
     path: "/module/prompt-construction",
-    completed: false
+    moduleKey: "promptConstruction",
   },
   {
     title: t('modules.units.systemParameters.title'),
     path: "/module/system-parameters",
-    completed: false
+    moduleKey: "systemParameters",
   },
   {
     title: t('modules.units.multipleSources.title'),
     path: "/module/multiple-sources",
-    completed: false
+    moduleKey: "multipleSources",
   },
   {
     title: t('modules.units.llmTraining.title'),
     path: "/module/llm-training",
-    completed: false
+    moduleKey: "llmTraining",
   }
   ];
 
@@ -158,6 +161,9 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
                     <span className={`text-sm flex-1 ${isActive(item.path) ? 'font-medium text-brand-secondary-700' : 'text-muted-foreground'}`}>
                       {item.title}
                     </span>
+                    {completed[item.moduleKey] && (
+                      <Check className="h-4 w-4 text-brand-secondary-500 flex-shrink-0" />
+                    )}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
