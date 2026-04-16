@@ -819,23 +819,6 @@ const PromptPlaygroundV2 = () => {
           <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center overflow-y-auto">
             <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
 
-              {/* ── Prompt box — always at the top ── */}
-              <div className="px-4 pt-3 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
-                <Chatbox
-                  value={editingText}
-                  onChange={handleInputChange}
-                  onSubmit={handleChatSubmit}
-                  submitButtonId="prompt-playground-submit"
-                  disableSend={disableSend}
-                  animationKey={optimizePulse}
-                  waitingforOptimization={waitingforOptimization}
-                  files={uploadedFiles}
-                  onUploadFiles={handleUploadFiles}
-                  onRemoveFile={handleRemoveFile}
-                  className="z-50 w-full flex-auto min-h-0"
-                />
-              </div>
-
               {/* ── View mode toggle ── */}
               <div className="px-4 pt-1 pb-2 [&_*]:!font-heading">
                 <ToggleGroup
@@ -851,6 +834,23 @@ const PromptPlaygroundV2 = () => {
                     All Controls
                   </ToggleGroupItem>
                 </ToggleGroup>
+              </div>
+
+              {/* ── Prompt box — always visible ── */}
+              <div className="px-4 pt-1 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
+                <Chatbox
+                  value={editingText}
+                  onChange={handleInputChange}
+                  onSubmit={handleChatSubmit}
+                  submitButtonId="prompt-playground-submit"
+                  disableSend={disableSend}
+                  animationKey={optimizePulse}
+                  waitingforOptimization={waitingforOptimization}
+                  files={uploadedFiles}
+                  onUploadFiles={handleUploadFiles}
+                  onRemoveFile={handleRemoveFile}
+                  className="z-50 w-full flex-auto min-h-0"
+                />
               </div>
 
               {/* ============================================ */}
