@@ -860,7 +860,7 @@ const PromptPlaygroundV2 = () => {
       {learningMode !== "none" && learningMode !== "prompt-construction" && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
           <div className="bg-surface-200 border border-border rounded-lg shadow-lg overflow-hidden [&_*]:!font-heading [&_textarea]:!font-['Manrope']"
-               style={{ width: 'min(600px, calc(100vw - 3rem))' }}>
+               style={{ width: learningMode === "few-shot" ? 'min(900px, calc(100vw - 3rem))' : 'min(600px, calc(100vw - 3rem))' }}>
             {/* Header / toggle */}
             <button
               type="button"
@@ -987,35 +987,41 @@ const PromptPlaygroundV2 = () => {
 
                 {/* ── Few-shot Examples ── */}
                 {learningMode === "few-shot" && (
-                  <div className="space-y-2">
-                    <p className="text-[11px] text-muted-foreground">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground mb-2">
                       Provide input/output pairs to guide the model's style and format.
                     </p>
-                    {fewShotExamples.map((ex, idx) => (
-                      <div key={idx} className="rounded-lg border border-border p-2 space-y-1.5 relative">
-                        {fewShotExamples.length > 1 && (
-                          <button type="button" onClick={() => removeFewShotExample(idx)} className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground">
-                            <X className="h-3 w-3" />
-                          </button>
-                        )}
-                        <span className="text-[10px] text-muted-foreground font-semibold">Example {idx + 1}</span>
-                        <Textarea
-                          placeholder="Input..."
-                          value={ex.input}
-                          onChange={(e) => updateFewShotExample(idx, "input", e.target.value)}
-                          className="text-xs min-h-[40px] max-h-[12vh] resize-y !font-['Manrope']"
-                        />
-                        <Textarea
-                          placeholder="Expected output..."
-                          value={ex.output}
-                          onChange={(e) => updateFewShotExample(idx, "output", e.target.value)}
-                          className="text-xs min-h-[40px] max-h-[12vh] resize-y !font-['Manrope']"
-                        />
-                      </div>
-                    ))}
-                    <Button type="button" variant="outline" size="sm" className="w-full text-xs gap-1" onClick={addFewShotExample}>
-                      <Plus className="h-3 w-3" /> Add example
-                    </Button>
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {fewShotExamples.map((ex, idx) => (
+                        <div key={idx} className="rounded-lg border border-border p-2 space-y-1.5 relative w-56 flex-shrink-0">
+                          {fewShotExamples.length > 1 && (
+                            <button type="button" onClick={() => removeFewShotExample(idx)} className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground">
+                              <X className="h-3 w-3" />
+                            </button>
+                          )}
+                          <span className="text-[10px] text-muted-foreground font-semibold">Example {idx + 1}</span>
+                          <Textarea
+                            placeholder="Input..."
+                            value={ex.input}
+                            onChange={(e) => updateFewShotExample(idx, "input", e.target.value)}
+                            className="text-xs min-h-[40px] max-h-[12vh] resize-y !font-['Manrope']"
+                          />
+                          <Textarea
+                            placeholder="Expected output..."
+                            value={ex.output}
+                            onChange={(e) => updateFewShotExample(idx, "output", e.target.value)}
+                            className="text-xs min-h-[40px] max-h-[12vh] resize-y !font-['Manrope']"
+                          />
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={addFewShotExample}
+                        className="rounded-lg border-2 border-dashed border-border hover:border-foreground/30 p-2 w-14 flex-shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Plus className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
