@@ -16,6 +16,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Chatbox from "@/components/ChatBoxPromptPlayground";
 const NO_CHANGE_VALUE = "no-change";
 // const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
@@ -90,6 +93,15 @@ const PromptPlaygroundV2 = () => {
   /* ------------------------------------------------------------------ */
   type LearningMode = "none" | "prompt-construction" | "system-parameters" | "multiple-sources" | "few-shot";
   const [learningMode, setLearningMode] = useState<LearningMode>("none");
+
+  // Top-level view: "learning" (mode-based) vs "all" (unified single page)
+  type ViewMode = "learning" | "all";
+  const [viewMode, setViewMode] = useState<ViewMode>("learning");
+
+  // Toggles for the unified "all" view
+  const [sysPromptEnabled, setSysPromptEnabled] = useState(false);
+  const [contextPipelineEnabled, setContextPipelineEnabled] = useState(false);
+  const [fewShotEnabled, setFewShotEnabled] = useState(false);
 
   // System Parameters mode
   const [sysPromptText, setSysPromptText] = useState("");
@@ -202,22 +214,31 @@ const PromptPlaygroundV2 = () => {
 
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
-      // --- Grounding system prompt (conditional on PDF uploads + learning mode) ---
+      // --- Grounding system prompt (conditional on PDF uploads + learning/unified mode) ---
+      // Resolve which features are active based on view mode
+      const useSysPrompt = viewMode === "all" ? sysPromptEnabled : learningMode === "system-parameters";
+      const useContextPipeline = viewMode === "all" ? contextPipelineEnabled : learningMode === "multiple-sources";
+      const useFewShot = viewMode === "all" ? fewShotEnabled : learningMode === "few-shot";
+
       let groundingPrompt: string;
-      if (learningMode === "multiple-sources") {
-        // Assemble context pipeline blocks into a structured system prompt
+      const parts: string[] = [];
+
+      // System prompt
+      if (useSysPrompt && sysPromptText.trim()) {
+        parts.push(sysPromptText.trim());
+      }
+
+      // Context pipeline blocks
+      if (useContextPipeline) {
         const enabledBlocks = contextBlocks.filter((b) => b.enabled && b.content.trim());
-        if (enabledBlocks.length > 0) {
-          const sections = enabledBlocks.map((b) => {
-            const header = b.type === "persona" ? "ROLE" : b.type === "knowledge" ? "REFERENCE" : "INSTRUCTION";
-            return `[${header}: ${b.label}]\n${b.content.trim()}`;
-          });
-          groundingPrompt = sections.join("\n\n");
-        } else {
-          groundingPrompt = "You are a helpful assistant.";
+        for (const b of enabledBlocks) {
+          const header = b.type === "persona" ? "ROLE" : b.type === "knowledge" ? "REFERENCE" : "INSTRUCTION";
+          parts.push(`[${header}: ${b.label}]\n${b.content.trim()}`);
         }
-      } else if (learningMode === "system-parameters" && sysPromptText.trim()) {
-        groundingPrompt = sysPromptText.trim();
+      }
+
+      if (parts.length > 0) {
+        groundingPrompt = parts.join("\n\n");
       } else if (uploadedFiles.length > 0) {
         groundingPrompt = `You are a document analysis assistant. You have been provided with one or more reference documents. Follow these rules strictly:
 
@@ -253,7 +274,7 @@ const PromptPlaygroundV2 = () => {
       const messages: { role: string; content: string }[] = [
         { role: "system", content: groundingPrompt },
       ];
-      if (learningMode === "few-shot") {
+      if (useFewShot) {
         for (const ex of fewShotExamples) {
           if (ex.input.trim()) {
             messages.push({ role: "user", content: ex.input.trim() });
@@ -263,8 +284,8 @@ const PromptPlaygroundV2 = () => {
       }
       messages.push({ role: "user", content: promptText });
 
-      // Resolve temperature: learning mode override > doc default > base default
-      const resolvedTemp = learningMode === "system-parameters"
+      // Resolve temperature: sys-params override > doc default > base default
+      const resolvedTemp = useSysPrompt
         ? temperature
         : uploadedFiles.length > 0 ? 0.3 : 0.7;
 
@@ -460,7 +481,7 @@ const PromptPlaygroundV2 = () => {
         clearTimeout(timeoutId);
       }
     },
-    [uploadedFiles, useSummaryForOutput, learningMode, sysPromptText, temperature, fewShotExamples, contextBlocks]
+    [uploadedFiles, useSummaryForOutput, learningMode, viewMode, sysPromptEnabled, contextPipelineEnabled, fewShotEnabled, sysPromptText, temperature, fewShotExamples, contextBlocks]
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, specificity: string, style: string, context: string, bias: string) => {
@@ -798,8 +819,47 @@ const PromptPlaygroundV2 = () => {
           <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center overflow-y-auto">
             <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
 
+              {/* ── Prompt box — always at the top ── */}
+              <div className="px-4 pt-3 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
+                <Chatbox
+                  value={editingText}
+                  onChange={handleInputChange}
+                  onSubmit={handleChatSubmit}
+                  submitButtonId="prompt-playground-submit"
+                  disableSend={disableSend}
+                  animationKey={optimizePulse}
+                  waitingforOptimization={waitingforOptimization}
+                  files={uploadedFiles}
+                  onUploadFiles={handleUploadFiles}
+                  onRemoveFile={handleRemoveFile}
+                  className="z-50 w-full flex-auto min-h-0"
+                />
+              </div>
+
+              {/* ── View mode toggle ── */}
+              <div className="px-4 pt-1 pb-2 [&_*]:!font-heading">
+                <ToggleGroup
+                  type="single"
+                  value={viewMode}
+                  onValueChange={(v) => v && setViewMode(v as ViewMode)}
+                  className="w-full"
+                >
+                  <ToggleGroupItem value="learning" className="flex-1 text-[11px]">
+                    By Learning
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="all" className="flex-1 text-[11px]">
+                    All Controls
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+
+              {/* ============================================ */}
+              {/* "By Learning" view                            */}
+              {/* ============================================ */}
+              {viewMode === "learning" && (
+              <>
               {/* ── Learning mode selector ── */}
-              <div className="px-4 pt-3 pb-2 [&_*]:!font-heading">
+              <div className="px-4 pt-1 pb-2 [&_*]:!font-heading">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
                   Learning Mode
                 </label>
