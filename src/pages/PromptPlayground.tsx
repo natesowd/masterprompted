@@ -39,6 +39,8 @@ export type ThreadVersion = {
   parameters?: Parameters;
   webSearchSources?: WebSearchResult[];
   searchStatus?: 'idle' | 'searching' | 'streaming' | 'complete' | 'error';
+  webSearchEnabled?: boolean;
+  fileNames?: string[];
 };
 export type Thread = {
   versions: ThreadVersion[];
@@ -617,6 +619,7 @@ const PromptPlayground = () => {
 
         setEditingText(optimizedPrompt);
         setDisableOptimize(false);
+        setHasManualEdit(false);
         setOptimizePulse(prev => prev + 1);
       } else {
         throw new Error("handlePromptOptimize: optimized_prompt missing or empty");
@@ -714,7 +717,8 @@ const PromptPlayground = () => {
             : f
         ));
 
-        setHasManualEdit(true);
+        setHasManualEdit(false);
+        setDisableOptimize(false);
         // console.log(isEmpty);
         setDisableSend(isEmpty);
 
@@ -727,6 +731,8 @@ const PromptPlayground = () => {
 
   const handleRemoveFile = useCallback((index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setDisableOptimize(false);
+    setHasManualEdit(false);
   }, []);
 
   useEffect(() => {
@@ -770,15 +776,22 @@ const PromptPlayground = () => {
 
   const createNewThreadAndFetch = async (submittedText: string) => {
     const newThreadIndex = threads.length;
-    setThreads(prev => [...prev, { versions: [{ prompt: submittedText }], currentIndex: 0, showDiff: false }]);
+    const currentFileNames = uploadedFiles.filter(f => !f.isUploading).map(f => f.name);
+    setThreads(prev => [...prev, { versions: [{ prompt: submittedText, webSearchEnabled, fileNames: currentFileNames }], currentIndex: 0, showDiff: false }]);
     await submitAnswerForThreadVersion(newThreadIndex, 0, submittedText);
   };
 
   const submitAnswerForLatestVersion = async (promptText: string) => {
     if (threads.length === 0) return;
     const threadIndex = threads.length - 1;
-    const lastVersionPrompt = threads[threadIndex].versions[threads[threadIndex].versions.length - 1]?.prompt;
-    if (promptText !== lastVersionPrompt) {
+    const lastVersion = threads[threadIndex].versions[threads[threadIndex].versions.length - 1];
+    const currentFileNames = uploadedFiles.filter(f => !f.isUploading).map(f => f.name);
+    const lastFileNames = lastVersion?.fileNames || [];
+    const contextChanged =
+      promptText !== lastVersion?.prompt ||
+      webSearchEnabled !== (lastVersion?.webSearchEnabled ?? false) ||
+      JSON.stringify(currentFileNames) !== JSON.stringify(lastFileNames);
+    if (contextChanged) {
       const newVersionIndex = threads[threadIndex].versions.length;
       setThreads(prev => {
         const copy = [...prev];
@@ -788,7 +801,7 @@ const PromptPlayground = () => {
         }
         copy[threadIndex] = {
           ...targetThread,
-          versions: [...targetThread.versions, { prompt: promptText, answer: undefined, parameters }],
+          versions: [...targetThread.versions, { prompt: promptText, answer: undefined, parameters, webSearchEnabled, fileNames: currentFileNames }],
           currentIndex: newVersionIndex,
         };
         return copy;
@@ -898,7 +911,11 @@ const PromptPlayground = () => {
                 onUploadFiles: handleUploadFiles,
                 onRemoveFile: handleRemoveFile,
                 webSearchEnabled,
-                onToggleWebSearch: () => setWebSearchEnabled(prev => !prev),
+                onToggleWebSearch: () => {
+                  setWebSearchEnabled(prev => !prev);
+                  setDisableOptimize(false);
+                  setHasManualEdit(false);
+                },
               }} />
             </div>
           </div>

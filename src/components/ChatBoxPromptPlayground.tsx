@@ -22,6 +22,7 @@ import { useState, useRef, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const chatboxVariants = cva(
   "relative bg-card border border-border rounded-2xl shadow-lg w-full flex flex-col",
@@ -240,42 +241,66 @@ const Chatbox = ({
         }} />
 
       {onRegenerate && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full h-4 w-4 flex-shrink-0"
-          type="button"
-          title="Regenerate optimization"
-          disabled={!showRegenerate}
-          onClick={() => onRegenerate?.()}>
-          <RefreshCcw className={cn("h-4 w-4", !showRegenerate ? "text-muted-foreground/30" : "text-muted-foreground")} />
-        </Button>
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full h-4 w-4 flex-shrink-0"
+              type="button"
+              disabled={!showRegenerate}
+              onClick={() => onRegenerate?.()}
+            >
+              <RefreshCcw className={cn("h-4 w-4", !showRegenerate ? "text-muted-foreground/30" : "text-muted-foreground")} />
+            </Button>
+          </TooltipTrigger>
+          {showRegenerate && (
+            <TooltipContent className="px-3 py-1.5 text-xs">
+              Regenerate optimization
+            </TooltipContent>
+          )}
+        </Tooltip>
       )}
       {onToggleWebSearch && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(
-            "rounded-full h-4 w-4 flex-shrink-0",
-            webSearchEnabled && "bg-blue-100"
-          )}
-          type="button"
-          title={webSearchEnabled ? "Disable web search" : "Enable web search"}
-          onClick={onToggleWebSearch}>
-          <Globe className={cn("h-4 w-4", webSearchEnabled ? "text-blue-600" : "text-muted-foreground")} />
-        </Button>
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full h-4 w-4 flex-shrink-0",
+                webSearchEnabled && "bg-blue-100"
+              )}
+              type="button"
+              onClick={onToggleWebSearch}
+            >
+              <Globe className={cn("h-4 w-4", webSearchEnabled ? "text-blue-600" : "text-muted-foreground")} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="px-3 py-1.5 text-xs">
+            {webSearchEnabled ? "Disable web search" : "Enable web search"}
+          </TooltipContent>
+        </Tooltip>
       )}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="rounded-full h-4 w-4 flex-shrink-0"
-        type="button"
-        disabled={webSearchEnabled}
-        title={webSearchEnabled ? "File upload disabled during web search" : "Upload PDF"}
-        onClick={() => fileInputRef.current?.click()}>
-
-        <Paperclip className={cn("h-4 w-4", webSearchEnabled ? "text-muted-foreground/30" : "text-muted-foreground")} />
-      </Button>
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full h-4 w-4 flex-shrink-0"
+            type="button"
+            disabled={webSearchEnabled}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Paperclip className={cn("h-4 w-4", webSearchEnabled ? "text-muted-foreground/30" : "text-muted-foreground")} />
+          </Button>
+        </TooltipTrigger>
+        {!webSearchEnabled && (
+          <TooltipContent className="px-3 py-1.5 text-xs">
+            Upload PDF
+          </TooltipContent>
+        )}
+      </Tooltip>
       <div className="flex-1 flex flex-wrap items-center gap-1 max-w-[250px] max-h-[1.75rem] overflow-y-auto">
         {files.map((file, index) =>
           <div

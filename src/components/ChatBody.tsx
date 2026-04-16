@@ -390,11 +390,12 @@ const ChatBody = memo(function ChatBody({
                     <ChatPrompt
                       text={current.prompt}
                       parameters={current.parameters}
-                      fileNames={uploadedFiles.map(f => f.name)}
+                      fileNames={current.fileNames || uploadedFiles.map(f => f.name)}
                       versionIndex={thread.currentIndex}
                       versionCount={thread.versions.length}
                       onPrevVersion={() => onPrevVersion(threadIndex)}
                       onNextVersion={() => onNextVersion(threadIndex)}
+                      webSearchEnabled={current.webSearchEnabled}
                     />
                     {current.searchStatus === "searching" && (
                       <WebSearchStatus status="searching" />
