@@ -1050,22 +1050,8 @@ const PromptPlaygroundV2 = () => {
                 </div>
               )}
 
-              {/* ── Prompt box — always below learning mode ── */}
-              <div className="px-4 pt-3 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
-                <Chatbox
-                  value={editingText}
-                  onChange={handleInputChange}
-                  onSubmit={handleChatSubmit}
-                  submitButtonId="prompt-playground-submit"
-                  disableSend={disableSend}
-                  animationKey={optimizePulse}
-                  waitingforOptimization={waitingforOptimization}
-                  files={uploadedFiles}
-                  onUploadFiles={handleUploadFiles}
-                  onRemoveFile={handleRemoveFile}
-                  className="z-50 w-full flex-auto min-h-0"
-                />
-              </div>
+              </>
+              )}
             </div>
           </div>
           <div className="flex-1 px-6 py-4 overflow-auto">
