@@ -856,66 +856,67 @@ const PromptPlaygroundV2 = () => {
         </div>
       </main>
 
-      {/* ── Floating bottom bar for learning-mode controls ── */}
+      {/* ── Floating bottom panel for learning-mode controls ── */}
       {learningMode !== "none" && learningMode !== "prompt-construction" && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-card/95 backdrop-blur-sm border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-          {/* Header / toggle */}
-          <button
-            type="button"
-            onClick={() => setBottomBarOpen((v) => !v)}
-            className="w-full flex items-center justify-between px-6 py-2 text-xs font-heading font-semibold text-foreground hover:bg-muted/30 transition-colors"
-          >
-            <span>
-              {learningMode === "system-parameters" && "System Parameters"}
-              {learningMode === "multiple-sources" && "Context Pipeline"}
-              {learningMode === "few-shot" && "Few-shot Examples"}
-            </span>
-            {bottomBarOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronUp className="h-4 w-4 text-muted-foreground" />}
-          </button>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
+          <div className="bg-surface-200 border border-border rounded-lg shadow-lg overflow-hidden [&_*]:!font-heading [&_textarea]:!font-['Manrope']"
+               style={{ width: 'min(600px, calc(100vw - 3rem))' }}>
+            {/* Header / toggle */}
+            <button
+              type="button"
+              onClick={() => setBottomBarOpen((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted/30 transition-colors"
+            >
+              <span>
+                {learningMode === "system-parameters" && "System Parameters"}
+                {learningMode === "multiple-sources" && "Context Pipeline"}
+                {learningMode === "few-shot" && "Few-shot Examples"}
+              </span>
+              {bottomBarOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronUp className="h-4 w-4 text-muted-foreground" />}
+            </button>
 
-          {bottomBarOpen && (
-            <div className="px-6 pb-4 max-h-[40vh] overflow-y-auto">
+            {bottomBarOpen && (
+              <div className="px-4 pb-4 max-h-[50vh] overflow-y-auto">
 
-              {/* ── System Parameters ── */}
-              {learningMode === "system-parameters" && (
-                <div className="flex gap-6 items-start">
-                  <div className="flex-1">
-                    <label className="text-xs font-semibold text-foreground mb-1 block font-heading">System Prompt</label>
-                    <Textarea
-                      placeholder="You are a helpful journalist assistant..."
-                      value={sysPromptText}
-                      onChange={(e) => setSysPromptText(e.target.value)}
-                      className="text-sm min-h-[80px] max-h-[25vh] resize-y"
-                    />
-                  </div>
-                  <div className="w-48 flex-shrink-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-foreground font-heading">Temperature</label>
-                      <span className="text-xs text-muted-foreground tabular-nums">{temperature.toFixed(1)}</span>
+                {/* ── System Parameters ── */}
+                {learningMode === "system-parameters" && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-semibold text-foreground mb-1 block">System Prompt</label>
+                      <Textarea
+                        placeholder="You are a helpful journalist assistant..."
+                        value={sysPromptText}
+                        onChange={(e) => setSysPromptText(e.target.value)}
+                        className="text-sm min-h-[80px] max-h-[25vh] resize-y !font-['Manrope']"
+                      />
                     </div>
-                    <Slider
-                      value={[temperature]}
-                      onValueChange={([v]) => setTemperature(v)}
-                      min={0}
-                      max={1}
-                      step={0.1}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1 font-heading">
-                      <span>Stable</span>
-                      <span>Random</span>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-semibold text-foreground">Temperature</label>
+                        <span className="text-xs text-muted-foreground tabular-nums">{temperature.toFixed(1)}</span>
+                      </div>
+                      <Slider
+                        value={[temperature]}
+                        onValueChange={([v]) => setTemperature(v)}
+                        min={0}
+                        max={1}
+                        step={0.1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                        <span>Stable</span>
+                        <span>Random</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* ── Context Pipeline ── */}
-              {learningMode === "multiple-sources" && (
-                <div>
-                  <p className="text-[11px] text-muted-foreground mb-2 font-heading">
-                    Build a RAG-style context by adding blocks. Each enabled block is assembled into the system prompt before your query is sent.
-                  </p>
-                  <div className="flex gap-3 flex-wrap mb-3">
+                {/* ── Context Pipeline ── */}
+                {learningMode === "multiple-sources" && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-muted-foreground">
+                      Build a RAG-style context by adding blocks. Each enabled block is assembled into the system prompt.
+                    </p>
                     {contextBlocks.map((block) => {
                       const typeColors: Record<ContextBlock["type"], string> = {
                         instruction: "border-blue-300 bg-blue-50/50",
@@ -930,7 +931,7 @@ const PromptPlaygroundV2 = () => {
                       return (
                         <div
                           key={block.id}
-                          className={`rounded-lg border p-2.5 space-y-1 w-64 flex-shrink-0 transition-opacity ${
+                          className={`rounded-lg border p-2 space-y-1 transition-opacity ${
                             block.enabled ? typeColors[block.type] : "border-border bg-muted/30 opacity-50"
                           }`}
                         >
@@ -941,14 +942,10 @@ const PromptPlaygroundV2 = () => {
                               onChange={(e) => updateContextBlock(block.id, "enabled", e.target.checked)}
                               className="h-3 w-3 rounded accent-foreground"
                             />
-                            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider font-heading">
+                            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
                               {typeLabels[block.type]}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => removeContextBlock(block.id)}
-                              className="ml-auto text-muted-foreground hover:text-foreground"
-                            >
+                            <button type="button" onClick={() => removeContextBlock(block.id)} className="ml-auto text-muted-foreground hover:text-foreground">
                               <X className="h-3 w-3" />
                             </button>
                           </div>
@@ -956,7 +953,7 @@ const PromptPlaygroundV2 = () => {
                             type="text"
                             value={block.label}
                             onChange={(e) => updateContextBlock(block.id, "label", e.target.value)}
-                            className="w-full text-xs font-semibold text-foreground bg-transparent border-none outline-none p-0"
+                            className="w-full text-xs font-semibold text-foreground bg-transparent border-none outline-none p-0 !font-['Manrope']"
                             placeholder="Label..."
                           />
                           <Textarea
@@ -969,67 +966,61 @@ const PromptPlaygroundV2 = () => {
                             }
                             value={block.content}
                             onChange={(e) => updateContextBlock(block.id, "content", e.target.value)}
-                            className="text-xs min-h-[50px] max-h-[15vh] resize-y"
+                            className="text-xs min-h-[50px] max-h-[15vh] resize-y !font-['Manrope']"
                           />
                         </div>
                       );
                     })}
+                    <div className="flex gap-1.5 pt-1">
+                      <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("instruction")}>
+                        <Plus className="h-3 w-3" /> Instruction
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("knowledge")}>
+                        <Plus className="h-3 w-3" /> Knowledge
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("persona")}>
+                        <Plus className="h-3 w-3" /> Persona
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button type="button" variant="outline" size="sm" className="text-xs gap-1" onClick={() => addContextBlock("instruction")}>
-                      <Plus className="h-3 w-3" /> Instruction
-                    </Button>
-                    <Button type="button" variant="outline" size="sm" className="text-xs gap-1" onClick={() => addContextBlock("knowledge")}>
-                      <Plus className="h-3 w-3" /> Knowledge
-                    </Button>
-                    <Button type="button" variant="outline" size="sm" className="text-xs gap-1" onClick={() => addContextBlock("persona")}>
-                      <Plus className="h-3 w-3" /> Persona
-                    </Button>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {/* ── Few-shot Examples ── */}
-              {learningMode === "few-shot" && (
-                <div>
-                  <p className="text-[11px] text-muted-foreground mb-2 font-heading">
-                    Provide input/output pairs to guide the model's style and format.
-                  </p>
-                  <div className="flex gap-3 flex-wrap mb-3">
+                {/* ── Few-shot Examples ── */}
+                {learningMode === "few-shot" && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-muted-foreground">
+                      Provide input/output pairs to guide the model's style and format.
+                    </p>
                     {fewShotExamples.map((ex, idx) => (
-                      <div key={idx} className="rounded-lg border border-border p-2.5 space-y-1.5 w-64 flex-shrink-0 relative">
+                      <div key={idx} className="rounded-lg border border-border p-2 space-y-1.5 relative">
                         {fewShotExamples.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeFewShotExample(idx)}
-                            className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground"
-                          >
+                          <button type="button" onClick={() => removeFewShotExample(idx)} className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground">
                             <X className="h-3 w-3" />
                           </button>
                         )}
-                        <span className="text-[10px] text-muted-foreground font-semibold font-heading">Example {idx + 1}</span>
+                        <span className="text-[10px] text-muted-foreground font-semibold">Example {idx + 1}</span>
                         <Textarea
                           placeholder="Input..."
                           value={ex.input}
                           onChange={(e) => updateFewShotExample(idx, "input", e.target.value)}
-                          className="text-xs min-h-[40px] max-h-[12vh] resize-y"
+                          className="text-xs min-h-[40px] max-h-[12vh] resize-y !font-['Manrope']"
                         />
                         <Textarea
                           placeholder="Expected output..."
                           value={ex.output}
                           onChange={(e) => updateFewShotExample(idx, "output", e.target.value)}
-                          className="text-xs min-h-[40px] max-h-[12vh] resize-y"
+                          className="text-xs min-h-[40px] max-h-[12vh] resize-y !font-['Manrope']"
                         />
                       </div>
                     ))}
+                    <Button type="button" variant="outline" size="sm" className="w-full text-xs gap-1" onClick={addFewShotExample}>
+                      <Plus className="h-3 w-3" /> Add example
+                    </Button>
                   </div>
-                  <Button type="button" variant="outline" size="sm" className="text-xs gap-1" onClick={addFewShotExample}>
-                    <Plus className="h-3 w-3" /> Add example
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
