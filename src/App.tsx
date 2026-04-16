@@ -33,6 +33,7 @@ import LLMTrainingExercise from "./pages/LLMTrainingExercise";
 import LLMTrainingFewShot from "./pages/LLMTrainingFewShot";
 import LLMTrainingTakeaways from "./pages/LLMTrainingTakeaways";
 import PromptPlayground from "./pages/PromptPlayground";
+import PromptPlaygroundV2 from "./pages/PromptPlaygroundV2";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Imprint from "./pages/Imprint";
@@ -57,6 +58,7 @@ const App = () =>
               <Route path="/" element={<Landing />} />
               <Route path="/modules" element={<Modules />} />
               <Route path="/playground" element={<PromptPlayground />} />
+              <Route path="/playground-v2" element={<PromptPlaygroundV2 />} />
               {/* Hidden pages - uncomment to restore: */}
               {/* <Route path="/about" element={<About />} /> */}
               <Route path="/contact" element={<Contact />} />
