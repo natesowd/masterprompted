@@ -36,6 +36,7 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
   const navigationItems = [
   { label: t('nav.promptPlayground'), path: "/playground" },
   { label: "PP v2", path: "/playground-v2" },
+  { label: t('landing.features.debunker.title'), path: "https://dh-hetzner.fbk.eu/aicode-v2/" },
   { label: t('nav.contact'), path: "/contact" }
   // Hidden pages - uncomment to restore:
   // { label: t('nav.about'), path: "/about" },
@@ -174,7 +175,7 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
             {navigationItems.map((item) =>
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
+              onClick={() => item.path.startsWith("http") ? window.location.assign(item.path) : navigate(item.path)}
               className={`group relative px-4 py-3 text-[15px] tracking-wide transition-colors duration-200 ${
               isActive(item.path) ?
               transparent ?
