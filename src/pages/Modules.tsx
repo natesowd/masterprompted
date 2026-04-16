@@ -5,6 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
 import {
   type CarouselApi,
   Carousel,
@@ -14,6 +15,7 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useModuleProgress } from "@/hooks/useModuleProgress";
 import { ArrowRight } from "lucide-react";
 
 import starImage from "@/assets/star.png";
@@ -24,7 +26,7 @@ import magnifyingGlassImage from "@/assets/magnifying-glass.png";
 type KnowledgeLevel = 'none' | 'builds';
 
 const LEVEL_CONFIG: Record<KnowledgeLevel, { label: string; labelDe: string; className: string }> = {
-  none:   { label: "No Knowledge Required", labelDe: "Kein Vorwissen nötig", className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  none:   { label: "No Prior Knowledge", labelDe: "Kein Vorwissen nötig", className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
   builds: { label: "Builds on Knowledge", labelDe: "Baut auf Vorwissen auf", className: "bg-amber-100 text-amber-700 border-amber-200" },
 };
 
@@ -76,6 +78,7 @@ const LEARNING_UNITS = [
 export default function Modules() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { completed } = useModuleProgress();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const spacerIndex = LEARNING_UNITS.length; // index of the blank card
@@ -148,12 +151,17 @@ export default function Modules() {
                         }`}
                         onClick={() => navigate(unit.route)}
                       >
-                        <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center p-6">
+                        <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center p-6 relative">
                           <img
                             src={unit.image}
                             alt={t(`modules.units.${unit.key}.title`)}
                             className="w-full h-full object-contain"
                           />
+                          {completed[unit.key] && (
+                            <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-brand-secondary-500 flex items-center justify-center shadow-sm">
+                              <Check className="h-3.5 w-3.5 text-white" />
+                            </div>
+                          )}
                         </div>
                         <div className="p-4 flex-1 flex flex-col">
                           <div className="flex items-center justify-between mb-1">

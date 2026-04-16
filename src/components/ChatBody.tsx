@@ -11,6 +11,88 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Thread, ParsedFile } from "@/pages/PromptPlayground";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
+import WebSearchStatus from "@/components/WebSearchStatus";
+import WebSearchReferences from "@/components/WebSearchReferences";
+import type { WebSearchResult } from "@/services/webSearch/webSearchClient";
+
+// Helper to process citations: renumber and filter sources to match only what appears in text
+function processCitations(text: string, sources?: WebSearchResult[]) {
+  if (!text || !sources || sources.length === 0) return { enriched: text, activeSources: sources || [] };
+  
+  let enriched = text;
+  const activeSources: WebSearchResult[] = [];
+  const sourceMap = new Map(sources.map(s => [s.position, s]));
+  
+  // Match any digits that appear inside square brackets.
+  // This correctly isolates '1', '2', '3', '6' from strings like "[1, 2, 3, 6]" or "[1][2]".
+  const matches = Array.from(text.matchAll(/\[(.*?)\]/g));
+  const usedPositions = new Set<number>();
+  
+  for (const match of matches) {
+    const bracketContent = match[1];
+    // Skip if it's already an enriched format
+    if (bracketContent.includes('|||')) continue;
+    
+    // Find all numbers within this bracket
+    const numbers = bracketContent.match(/\d+/g);
+    if (numbers) {
+      for (const numStr of numbers) {
+        const num = parseInt(numStr, 10);
+        if (sourceMap.has(num)) usedPositions.add(num);
+      }
+    }
+  }
+
+  // If we didn't find any valid citations, return the original data untouched
+  if (usedPositions.size === 0) {
+    return { enriched: text, activeSources: sources };
+  }
+
+  const usedArray = Array.from(usedPositions).sort((a, b) => a - b);
+  const remapping = new Map<number, number>();
+  
+  usedArray.forEach((oldNum, idx) => {
+    const newNum = idx + 1;
+    remapping.set(oldNum, newNum);
+    const s = sourceMap.get(oldNum)!;
+    activeSources.push({ ...s, position: newNum });
+  });
+
+  // We need to carefully replace the old numbers with the new numbers inside the brackets.
+  // Using a replacer function ensures we only rewrite the exact valid citations.
+  // Importantly, if we find `[1, 2]`, we need to expand it into `[1|||...][2|||...]`
+  // so that RichText properly maps each to an individual button.
+  enriched = enriched.replace(/\[((?:\d+(?:,\s*)?)+)\]/g, (fullMatch, innerContent) => {
+    // If it's already enriched, skip
+    if (innerContent.includes('|||')) return fullMatch;
+    
+    let isModified = false;
+    let rewrittenTags = '';
+    
+    // Process each number and build individual enriched tags
+    const numbers = innerContent.match(/\d+/g);
+    if (!numbers) return fullMatch;
+
+    for (const numStr of numbers) {
+      const oldNum = parseInt(numStr, 10);
+      if (remapping.has(oldNum)) {
+        isModified = true;
+        const newNum = remapping.get(oldNum)!;
+        const s = sourceMap.get(oldNum)!;
+        const name = s.title.replace(/\|/g, '-').replace(/\]/g, '');
+        const url = (s.url || '').replace(/\|/g, '-').replace(/\]/g, '');
+        rewrittenTags += `[${newNum}|||${name}|||${url}]`;
+      } else {
+        // If it wasn't mapped (e.g., an invalid citation number), keep it plain
+        rewrittenTags += `[${numStr}]`;
+      }
+    }
+
+    return isModified ? rewrittenTags : fullMatch;
+  });
+
+  return { enriched, activeSources };
+}
 
 type RemovedComment = { id: string; value: string };
 
@@ -59,8 +141,15 @@ const ChatBody = memo(function ChatBody({
     const comments: RemovedComment[] = [];
     threads.forEach((thread, threadIndex) => {
       if (!thread.showDiff || thread.currentIndex === 0) return;
-      const currentAnswer = thread.versions[thread.currentIndex].answer?.replace(/\\n/g, "\n") ?? "";
-      const originalAnswer = thread.versions[0].answer?.replace(/\\n/g, "\n") ?? "";
+      const vCurrent = thread.versions[thread.currentIndex];
+      const vOriginal = thread.versions[0];
+      
+      const currentAnswerRaw = vCurrent.answer?.replace(/\\n/g, "\n") ?? "";
+      const originalAnswerRaw = vOriginal.answer?.replace(/\\n/g, "\n") ?? "";
+      
+      const currentAnswer = processCitations(currentAnswerRaw, vCurrent.webSearchSources).enriched;
+      const originalAnswer = processCitations(originalAnswerRaw, vOriginal.webSearchSources).enriched;
+      
       const diffResult = diffWordsWithNewlineProtection(originalAnswer, currentAnswer);
       diffResult.forEach((part, index) => {
         if (part.removed) {
@@ -301,37 +390,57 @@ const ChatBody = memo(function ChatBody({
                     <ChatPrompt
                       text={current.prompt}
                       parameters={current.parameters}
-                      fileNames={uploadedFiles.map(f => f.name)}
+                      fileNames={current.fileNames || uploadedFiles.map(f => f.name)}
                       versionIndex={thread.currentIndex}
                       versionCount={thread.versions.length}
                       onPrevVersion={() => onPrevVersion(threadIndex)}
                       onNextVersion={() => onNextVersion(threadIndex)}
+                      webSearchEnabled={current.webSearchEnabled}
                     />
-                    {!current.answer && (
+                    {current.searchStatus === "searching" && (
+                      <WebSearchStatus status="searching" />
+                    )}
+                    {current.searchStatus === "streaming" && !current.answer && (
+                      <WebSearchStatus status="complete" resultCount={current.webSearchSources?.length ?? 0} />
+                    )}
+                    {current.searchStatus === "error" && !current.answer && (
+                      <WebSearchStatus status="error" />
+                    )}
+                    {!current.answer && !current.searchStatus && (
                       <div className="space-y-2">
                         <Skeleton className="h-4 w-[500px]" />
                         <Skeleton className="h-4 w-[300px]" />
                       </div>
                     )}
-                    {current.answer && (
-                      <ChatAnswer
-                        text={current.answer}
-                        answerArray={thread.versions.map(v => v.answer ?? "")}
-                        currentIndex={thread.currentIndex}
-                        threadIndex={threadIndex}
-                        showDiff={Boolean(thread.showDiff)}
-                        onToggleDiff={checked => onToggleThreadDiff(threadIndex, checked)}
-                        showEvaluation={Boolean(thread.showEvaluation)}
-                        onToggleEvaluation={checked => onToggleThreadEvaluation(threadIndex, checked)}
-                        currentEvaluation={thread.evaluations?.[thread.currentIndex]}
-                        onHoverComment={handleHoverComment}
-                        scrollContainerRef={chatContainerRef}
-                        onUpdateCommentPosition={handleUpdateCommentPosition}
-                        inlineCommentIds={inlineCommentIds}
-                        onCommentClick={handleCommentClick}
-                        toggleDiffHelp={handleToggleDiffHelp}
-                      />
-                    )}
+                    {(() => {
+                      const processedCurrent = processCitations(current.answer ?? "", current.webSearchSources);
+                      return (
+                        <>
+                          {current.answer && (
+                            <ChatAnswer
+                              text={processedCurrent.enriched}
+                              answerArray={thread.versions.map(v => processCitations(v.answer ?? "", v.webSearchSources).enriched)}
+                              currentIndex={thread.currentIndex}
+                              threadIndex={threadIndex}
+                              showDiff={Boolean(thread.showDiff)}
+                              onToggleDiff={checked => onToggleThreadDiff(threadIndex, checked)}
+                              showEvaluation={Boolean(thread.showEvaluation)}
+                              onToggleEvaluation={checked => onToggleThreadEvaluation(threadIndex, checked)}
+                              currentEvaluation={thread.evaluations?.[thread.currentIndex]}
+                              onHoverComment={handleHoverComment}
+                              scrollContainerRef={chatContainerRef}
+                              onUpdateCommentPosition={handleUpdateCommentPosition}
+                              inlineCommentIds={inlineCommentIds}
+                              onCommentClick={handleCommentClick}
+                              toggleDiffHelp={handleToggleDiffHelp}
+                            />
+                          )}
+                          {processedCurrent.enriched && processedCurrent.activeSources.length > 0 && (
+                            <WebSearchReferences sources={processedCurrent.activeSources} />
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 );
               })}

@@ -154,6 +154,8 @@ interface PromptControlsProps {
     readOnly?: boolean;
     hideChatSubmitButton?: boolean;
     className?: string;
+    webSearchEnabled?: boolean;
+    onToggleWebSearch?: () => void;
 }
 
 export default function PromptControls({
@@ -187,7 +189,9 @@ export default function PromptControls({
     waitingforOptimization = false,
     readOnly = false,
     hideChatSubmitButton = false,
-    className
+    className,
+    webSearchEnabled = false,
+    onToggleWebSearch,
 }: PromptControlsProps) {
     const { t } = useLanguage();
     const [titlePopoverOpen, setTitlePopoverOpen] = useState(false);
@@ -235,26 +239,6 @@ export default function PromptControls({
     return (
         <div className={cn("bg-surface-200 flex flex-col overflow-hidden h-fit [&_*]:!font-heading [&_textarea]:!font-['Manrope']", className)}>
             <div className="px-4 pb-4 pt-3 flex flex-col gap-1 min-h-0">
-                {/* Chatbox */}
-                <Chatbox
-                    value={chatValue}
-                    onChange={onChatChange ?? (() => { })}
-                    onSubmit={onChatSubmit}
-                    submitButtonId={chatSubmitButtonId}
-                    disableSend={disableSend}
-                    animationKey={chatAnimationKey}
-                    waitingforOptimization={waitingforOptimization}
-                    onUploadFiles={onUploadFiles}
-                    files={files}
-                    onRemoveFile={onRemoveFile}
-                    readOnly={readOnly}
-                    hideSubmitButton={hideChatSubmitButton}
-                    autoResize={readOnly}
-                    onRegenerate={onRegenerate}
-                    showRegenerate={showRegenerate}
-                    className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
-                />
-
                 {/* Parameters area */}
                 <div className="flex-initial flex flex-col justify-end min-h-0 overflow-y-auto">
                     <div className="flex items-center gap-1.5 mt-2 mb-1">

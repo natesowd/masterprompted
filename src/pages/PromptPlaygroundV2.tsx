@@ -132,6 +132,7 @@ const PromptPlaygroundV2 = () => {
   const removeContextBlock = (id: string) => setContextBlocks((prev) => prev.filter((b) => b.id !== id));
   const updateContextBlock = (id: string, field: keyof ContextBlock, value: string | boolean) =>
     setContextBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)));
+  type FewShotExample = { input: string; output: string };
   const [fewShotExamples, setFewShotExamples] = useState<FewShotExample[]>([{ input: "", output: "" }]);
 
   const addFewShotExample = () => setFewShotExamples((prev) => [...prev, { input: "", output: "" }]);
@@ -1048,172 +1049,23 @@ const PromptPlaygroundV2 = () => {
                   </Button>
                 </div>
               )}
-              </>
-              )}
 
-              {/* ============================================ */}
-              {/* "All Controls" unified view                   */}
-              {/* ============================================ */}
-              {viewMode === "all" && (
-                <div className="px-4 pb-4 pt-2 flex-1 flex flex-col gap-3 overflow-y-auto [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
-
-                  {/* System Prompt (toggle) */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-semibold text-foreground">System Prompt</label>
-                      <Switch checked={sysPromptEnabled} onCheckedChange={setSysPromptEnabled} className="scale-75" />
-                    </div>
-                    {sysPromptEnabled && (
-                      <Textarea
-                        placeholder="You are a helpful journalist assistant..."
-                        value={sysPromptText}
-                        onChange={(e) => setSysPromptText(e.target.value)}
-                        className="text-sm min-h-[60px] resize-y !font-['Manrope']"
-                      />
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Temperature */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-foreground">Temperature</label>
-                      <span className="text-xs text-muted-foreground tabular-nums">{temperature.toFixed(1)}</span>
-                    </div>
-                    <Slider
-                      value={[temperature]}
-                      onValueChange={([v]) => setTemperature(v)}
-                      min={0}
-                      max={1}
-                      step={0.1}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-                      <span>Stable</span>
-                      <span>Random</span>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Context Pipeline (toggle) */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-semibold text-foreground">Context Pipeline</label>
-                      <Switch checked={contextPipelineEnabled} onCheckedChange={setContextPipelineEnabled} className="scale-75" />
-                    </div>
-                    {contextPipelineEnabled && (
-                      <div className="space-y-2">
-                        {contextBlocks.map((block) => {
-                          const typeColors: Record<ContextBlock["type"], string> = {
-                            instruction: "border-blue-300 bg-blue-50/50",
-                            knowledge: "border-amber-300 bg-amber-50/50",
-                            persona: "border-purple-300 bg-purple-50/50",
-                          };
-                          const typeLabels: Record<ContextBlock["type"], string> = {
-                            instruction: "Instruction",
-                            knowledge: "Knowledge",
-                            persona: "Persona",
-                          };
-                          return (
-                            <div
-                              key={block.id}
-                              className={`rounded-lg border p-2 space-y-1 transition-opacity ${
-                                block.enabled ? typeColors[block.type] : "border-border bg-muted/30 opacity-50"
-                              }`}
-                            >
-                              <div className="flex items-center gap-1.5">
-                                <input
-                                  type="checkbox"
-                                  checked={block.enabled}
-                                  onChange={(e) => updateContextBlock(block.id, "enabled", e.target.checked)}
-                                  className="h-3 w-3 rounded accent-foreground"
-                                />
-                                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
-                                  {typeLabels[block.type]}
-                                </span>
-                                <button type="button" onClick={() => removeContextBlock(block.id)} className="ml-auto text-muted-foreground hover:text-foreground">
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </div>
-                              <input
-                                type="text"
-                                value={block.label}
-                                onChange={(e) => updateContextBlock(block.id, "label", e.target.value)}
-                                className="w-full text-xs font-semibold text-foreground bg-transparent border-none outline-none p-0 !font-['Manrope']"
-                                placeholder="Label..."
-                              />
-                              <Textarea
-                                placeholder={
-                                  block.type === "instruction"
-                                    ? "e.g. Summarize the key points, cite sources..."
-                                    : block.type === "knowledge"
-                                      ? "Paste reference text, data, or article content..."
-                                      : "e.g. You are a senior DW journalist..."
-                                }
-                                value={block.content}
-                                onChange={(e) => updateContextBlock(block.id, "content", e.target.value)}
-                                className="text-xs min-h-[40px] resize-y !font-['Manrope']"
-                              />
-                            </div>
-                          );
-                        })}
-                        <div className="flex gap-1.5">
-                          <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("instruction")}>
-                            <Plus className="h-3 w-3" /> Instruction
-                          </Button>
-                          <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("knowledge")}>
-                            <Plus className="h-3 w-3" /> Knowledge
-                          </Button>
-                          <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("persona")}>
-                            <Plus className="h-3 w-3" /> Persona
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Few-shot Examples (toggle) */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-semibold text-foreground">Few-shot Examples</label>
-                      <Switch checked={fewShotEnabled} onCheckedChange={setFewShotEnabled} className="scale-75" />
-                    </div>
-                    {fewShotEnabled && (
-                      <div className="space-y-2">
-                        {fewShotExamples.map((ex, idx) => (
-                          <div key={idx} className="rounded-lg border border-border p-2 space-y-1.5 relative">
-                            {fewShotExamples.length > 1 && (
-                              <button type="button" onClick={() => removeFewShotExample(idx)} className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground">
-                                <X className="h-3 w-3" />
-                              </button>
-                            )}
-                            <span className="text-[10px] text-muted-foreground font-semibold">Example {idx + 1}</span>
-                            <Textarea
-                              placeholder="Input..."
-                              value={ex.input}
-                              onChange={(e) => updateFewShotExample(idx, "input", e.target.value)}
-                              className="text-xs min-h-[36px] resize-y !font-['Manrope']"
-                            />
-                            <Textarea
-                              placeholder="Expected output..."
-                              value={ex.output}
-                              onChange={(e) => updateFewShotExample(idx, "output", e.target.value)}
-                              className="text-xs min-h-[36px] resize-y !font-['Manrope']"
-                            />
-                          </div>
-                        ))}
-                        <Button type="button" variant="outline" size="sm" className="w-full text-xs gap-1" onClick={addFewShotExample}>
-                          <Plus className="h-3 w-3" /> Add example
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* ── Prompt box — always below learning mode ── */}
+              <div className="px-4 pt-3 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
+                <Chatbox
+                  value={editingText}
+                  onChange={handleInputChange}
+                  onSubmit={handleChatSubmit}
+                  submitButtonId="prompt-playground-submit"
+                  disableSend={disableSend}
+                  animationKey={optimizePulse}
+                  waitingforOptimization={waitingforOptimization}
+                  files={uploadedFiles}
+                  onUploadFiles={handleUploadFiles}
+                  onRemoveFile={handleRemoveFile}
+                  className="z-50 w-full flex-auto min-h-0"
+                />
+              </div>
             </div>
           </div>
           <div className="flex-1 px-6 py-4 overflow-auto">

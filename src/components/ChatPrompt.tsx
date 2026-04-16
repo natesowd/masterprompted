@@ -16,7 +16,7 @@
  * ```
  */
 
-import { Paperclip, ChevronLeft, ChevronRight } from "lucide-react";
+import { Paperclip, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import RichText from "./RichText";
 import type { Parameters } from "@/pages/PromptPlayground";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -60,6 +60,8 @@ type ChatPromptProps = VariantProps<typeof promptVariants> & {
   onPrevVersion?: () => void;
   /** Callback to navigate to next version */
   onNextVersion?: () => void;
+  /** Whether web search was enabled for this version */
+  webSearchEnabled?: boolean;
 };
 
 const MAX_FILENAME_LENGTH = 20;
@@ -82,7 +84,8 @@ const ChatPrompt = ({
   onPrevVersion,
   onNextVersion,
   variant,
-  size
+  size,
+  webSearchEnabled = false
 }: ChatPromptProps) => {
   const paramString = parameters && Object.entries(parameters)
     .filter(([, value]) => value)
@@ -104,14 +107,20 @@ const ChatPrompt = ({
         text={text}
         className="text-foreground leading-relaxed"
       />
-      {(allFiles.length > 0 || versionCount > 1) && (
+      {(allFiles.length > 0 || versionCount > 1 || webSearchEnabled || paramString) && (
         <div className="flex justify-between items-center mt-2">
-          {/* Left side: Parameters and Attachments */}
+          {/* Left side: Parameters, Web Search, and Attachments */}
           <div className="flex flex-col items-start gap-1">
             {versionIndex > 0 && paramString && (
               <p className="text-xs text-muted-foreground italic">
                 {paramString}
               </p>
+            )}
+            {webSearchEnabled && (
+              <div className="flex items-center gap-1.5">
+                <Globe className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
+                <span className="text-xs text-blue-600 font-medium">Web Search</span>
+              </div>
             )}
             {allFiles.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">

@@ -44,5 +44,5 @@ export function getFlaggedConfig(word: string): FlaggedWordConfig | undefined {
 
 export const FACTOR_META: Record<FlaggedEvaluationFactor, { label: string; colorClass: string; hslColor: string }> = {
   factual_accuracy: { label: "Factual Accuracy", colorClass: "destructive", hslColor: "hsl(var(--destructive))" },
-  relevance: { label: "Relevance", colorClass: "yellow-600", hslColor: "hsl(45 93% 47%)" },
+  relevance: { label: "Relevance", colorClass: "amber-500", hslColor: "hsl(38 92% 50%)" },
 };

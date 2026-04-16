@@ -457,21 +457,6 @@ export default function MultipleSourcesExercise() {
   };
 
   /* Diagram doc add/remove via drag-and-drop */
-  const addDiagramDoc = (id: string) => {
-    setDiagramDocs((prev) => {
-      if (prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
-  };
-  const removeDiagramDoc = (id: string) => {
-    setDiagramDocs((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-  };
 
   const addDiagramDoc = (id: string) => {
     setDiagramDocs((prev) => {
@@ -767,9 +752,9 @@ export default function MultipleSourcesExercise() {
                                 Sources
                               </p>
                               <div
-                                onDragOver={handleDragOver}
-                                onDragLeave={handleDragLeave}
-                                onDrop={handleDrop}
+                                onDragOver={handleDropZoneDragOver}
+                                onDragLeave={handleDropZoneDragLeave}
+                                onDrop={handleDropZoneDrop}
                                 className={cn(
                                   "min-h-[110px] rounded-lg border-2 border-dashed p-3 transition-colors",
                                   isDragOver ? "border-foreground bg-muted/40" : "border-border"

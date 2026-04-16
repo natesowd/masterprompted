@@ -22,7 +22,7 @@ const textFlagVariants = cva(
     variants: {
       severity: {
         error: "[&>a]:decoration-red-500 [&>span]:decoration-red-500",
-        warning: "[&>a]:decoration-yellow-600 [&>span]:decoration-yellow-600",
+        warning: "[&>a]:decoration-amber-500 [&>span]:decoration-amber-500",
         info: "[&>a]:decoration-blue-500 [&>span]:decoration-blue-500",
         success: "[&>a]:decoration-green-600 [&>span]:decoration-green-600"
       },
@@ -40,28 +40,28 @@ const textFlagVariants = cva(
 
 const severityIconColor: Record<string, string> = {
   error: "text-red-500",
-  warning: "text-yellow-600",
+  warning: "text-amber-500",
   info: "text-blue-500",
   success: "text-green-600",
 };
 
 const severityHeadingColor: Record<string, string> = {
   error: "text-red-600",
-  warning: "text-yellow-700",
+  warning: "text-amber-600",
   info: "text-blue-600",
   success: "text-green-700",
 };
 
 const severityBorderColor: Record<string, string> = {
   error: "border-red-200",
-  warning: "border-yellow-200",
+  warning: "border-amber-200",
   info: "border-blue-200",
   success: "border-green-200",
 };
 
 const severityUnderline: Record<string, string> = {
   error: "decoration-red-500",
-  warning: "decoration-yellow-600",
+  warning: "decoration-amber-500",
   info: "decoration-blue-500",
   success: "decoration-green-600",
 };

@@ -359,7 +359,7 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
         },
         promptHistory: 'Prompt history',
         noHistory: 'No prompt history yet. Send a prompt to get started.',
-        sendOptimizedPrompt: 'Send Optimize Prompt',
+        sendOptimizedPrompt: 'Send Optimized Prompt',
         sendPrompt: 'Send Prompt',
         promptSpecificity: 'Prompt Specificity',
         interactionStyle: 'Interaction Style',

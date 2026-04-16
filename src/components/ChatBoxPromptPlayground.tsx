@@ -17,11 +17,12 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, Paperclip, RefreshCcw, SendHorizontal } from "lucide-react";
+import { Globe, Loader2, Paperclip, RefreshCcw, SendHorizontal } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const chatboxVariants = cva(
   "relative bg-card border border-border rounded-2xl shadow-lg w-full flex flex-col",
@@ -98,6 +99,10 @@ type ChatboxProps = VariantProps<typeof chatboxVariants> & {
   onRegenerate?: () => void;
   /** Whether to show the regenerate button */
   showRegenerate?: boolean;
+  /** Whether web search mode is enabled */
+  webSearchEnabled?: boolean;
+  /** Callback to toggle web search mode */
+  onToggleWebSearch?: () => void;
 };
 
 const Chatbox = ({
@@ -119,7 +124,9 @@ const Chatbox = ({
   size,
   state,
   onRegenerate,
-  showRegenerate = false
+  showRegenerate = false,
+  webSearchEnabled = false,
+  onToggleWebSearch,
 }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
@@ -234,26 +241,66 @@ const Chatbox = ({
         }} />
 
       {onRegenerate && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full h-4 w-4 flex-shrink-0"
-          type="button"
-          title="Regenerate optimization"
-          disabled={!showRegenerate}
-          onClick={() => onRegenerate?.()}>
-          <RefreshCcw className={cn("h-4 w-4", !showRegenerate ? "text-muted-foreground/30" : "text-muted-foreground")} />
-        </Button>
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full h-4 w-4 flex-shrink-0"
+              type="button"
+              disabled={!showRegenerate}
+              onClick={() => onRegenerate?.()}
+            >
+              <RefreshCcw className={cn("h-4 w-4", !showRegenerate ? "text-muted-foreground/30" : "text-muted-foreground")} />
+            </Button>
+          </TooltipTrigger>
+          {showRegenerate && (
+            <TooltipContent className="px-3 py-1.5 text-xs">
+              Regenerate optimization
+            </TooltipContent>
+          )}
+        </Tooltip>
       )}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="rounded-full h-4 w-4 flex-shrink-0"
-        type="button"
-        onClick={() => fileInputRef.current?.click()}>
-
-        <Paperclip className="h-4 w-4 text-muted-foreground" />
-      </Button>
+      {onToggleWebSearch && (
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full h-4 w-4 flex-shrink-0",
+                webSearchEnabled && "bg-blue-100"
+              )}
+              type="button"
+              onClick={onToggleWebSearch}
+            >
+              <Globe className={cn("h-4 w-4", webSearchEnabled ? "text-blue-600" : "text-muted-foreground")} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="px-3 py-1.5 text-xs">
+            {webSearchEnabled ? "Disable web search" : "Enable web search"}
+          </TooltipContent>
+        </Tooltip>
+      )}
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full h-4 w-4 flex-shrink-0"
+            type="button"
+            disabled={webSearchEnabled}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Paperclip className={cn("h-4 w-4", webSearchEnabled ? "text-muted-foreground/30" : "text-muted-foreground")} />
+          </Button>
+        </TooltipTrigger>
+        {!webSearchEnabled && (
+          <TooltipContent className="px-3 py-1.5 text-xs">
+            Upload PDF
+          </TooltipContent>
+        )}
+      </Tooltip>
       <div className="flex-1 flex flex-wrap items-center gap-1 max-w-[250px] max-h-[1.75rem] overflow-y-auto">
         {files.map((file, index) =>
           <div

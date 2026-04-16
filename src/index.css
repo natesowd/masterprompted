@@ -12,8 +12,10 @@ All colors MUST be HSL.
   :root {
     /* --- NEW DESIGN SYSTEM COLORS (LIGHT MODE) --- */
     /* Background/Foreground based on Surface 100 (#F9F9F9) and Primary 500 (#1F1F1F) */
-    --background: 0 0% 98.4%; /* Surface 100 */
-    --foreground: 0 0% 12%; /* Primary 500 */
+    --background: 0 0% 98.4%;
+    /* Surface 100 */
+    --foreground: 0 0% 12%;
+    /* Primary 500 */
 
     --card: 0 0% 98.4%;
     --card-foreground: 0 0% 12%;
@@ -44,7 +46,8 @@ All colors MUST be HSL.
     /* BORDER, INPUT, RING */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 0 0% 12%; /* Set to Primary 500 */
+    --ring: 0 0% 12%;
+    /* Set to Primary 500 */
 
     /* Gradients (Kept for now, these should be reviewed for new color scheme) */
     --gradient-hero: linear-gradient(135deg, hsl(145 62% 45%) 0%, hsl(145 62% 63%) 100%);
@@ -112,34 +115,56 @@ All colors MUST be HSL.
   }
 }
 
-  /* One-shot bounce animation for ChatBox feedback */
-  @keyframes bounce-once {
-    0% { transform: translateY(0); }
-    30% { transform: translateY(-6px); }
-    60% { transform: translateY(2px); }
-    100% { transform: translateY(0); }
+/* One-shot bounce animation for ChatBox feedback */
+@keyframes bounce-once {
+  0% {
+    transform: translateY(0);
   }
 
-  /* One-shot pulse animation for parameter activation */
-  @keyframes pulse-once {
-    0% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.03); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+  30% {
+    transform: translateY(-6px);
   }
 
-  .animate-pulse-once {
-    animation: pulse-once 600ms ease-out both;
+  60% {
+    transform: translateY(2px);
   }
 
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* One-shot pulse animation for parameter activation */
+@keyframes pulse-once {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-once {
+  animation: pulse-once 600ms ease-out both;
+}
+
+.bounce-once {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
   .bounce-once {
-    will-change: transform;
+    animation: bounce-once 350ms cubic-bezier(.25, .8, .25, 1) both;
   }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .bounce-once {
-      animation: bounce-once 350ms cubic-bezier(.25,.8,.25,1) both;
-    }
-  }
+}
 
 @layer base {
   * {
@@ -154,9 +179,14 @@ All colors MUST be HSL.
     @apply font-sans;
   }
 
-h1, h2, h3, h4, h5, h6 {
-  @apply font-heading;
-}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
 
   .pagination-indicator {
     display: flex;
@@ -172,7 +202,7 @@ h1, h2, h3, h4, h5, h6 {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -207,5 +237,95 @@ h1, h2, h3, h4, h5, h6 {
 
   .scrollbar-auto-hide::-webkit-scrollbar-track {
     background: transparent;
+  }
+
+  /* ── Inline citation button wrapper ── */
+  .inline-citation-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+
+  /* ── Inline citation badge ── */
+  .inline-citation {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.1em;
+    height: 1.2em;
+    padding: 0 4px;
+    margin-right: 2px;
+    font-size: 0.75em;
+    font-weight: 500;
+    line-height: 1;
+    border-radius: 4px;
+    background-color: #449566;
+    /* blue-100 */
+    color: rgb(255, 255, 255);
+    /* blue-700 */
+    border: 0px solid #244F36;
+    /* blue-200 */
+  }
+
+  /* ── Inline citation custom tooltip ── */
+  .inline-citation-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #AEECC8;
+    color: #112a1c;
+    font-weight: 500;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    padding: 8px 12px;
+    border-radius: 6px;
+    /* allow the tooltip to wrap text if it gets too wide */
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 260px;
+    width: max-content;
+    text-align: center;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    z-index: 50;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .inline-citation-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #AEECC8;
+  }
+
+  /* Show on hover or when the button is focused (e.g. clicked) */
+  .inline-citation-button:hover .inline-citation-tooltip,
+  .inline-citation-button:focus .inline-citation-tooltip,
+  .inline-citation-button:focus-within .inline-citation-tooltip {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .citation-tooltip-link {
+    color: hsl(210 100% 75%);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .citation-tooltip-link:hover {
+    color: hsl(210, 100%, 46%);
   }
 }

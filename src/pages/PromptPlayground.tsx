@@ -9,6 +9,8 @@ import ChatBody from "@/components/ChatBody";
 import { SSEContentParser } from "@/lib/sseStream";
 import { runAllEvaluations } from "@/services/evaluations";
 import type { EvaluationResult } from "@/services/evaluations/types";
+import { runWebSearchRAG } from "@/services/webSearch";
+import type { WebSearchResult } from "@/services/webSearch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 const NO_CHANGE_VALUE = "no-change";
@@ -16,7 +18,7 @@ const NO_CHANGE_VALUE = "no-change";
 //   ? "/api/chat"
 //   : "https://luxury-blini-3336bb.netlify.app/api/chat";
 // const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
-const NETLIFY_CHAT_URL = "https://69d76b0a4a68e272bd584118--luxury-blini-3336bb.netlify.app/api/chat"
+const NETLIFY_CHAT_URL = "https://69dcafb26499a614437a4607--luxury-blini-3336bb.netlify.app/api/chat"
 
 export type Parameters = {
   specificity: string;
@@ -31,7 +33,15 @@ export type VersionEvaluation = {
   data: EvaluationResult | null;
 };
 
-export type ThreadVersion = { prompt: string; answer?: string; parameters?: Parameters };
+export type ThreadVersion = {
+  prompt: string;
+  answer?: string;
+  parameters?: Parameters;
+  webSearchSources?: WebSearchResult[];
+  searchStatus?: 'idle' | 'searching' | 'streaming' | 'complete' | 'error';
+  webSearchEnabled?: boolean;
+  fileNames?: string[];
+};
 export type Thread = {
   versions: ThreadVersion[];
   currentIndex: number;
@@ -72,6 +82,7 @@ const PromptPlayground = () => {
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
   const optimizeAbortControllerRef = useRef<AbortController | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<ParsedFile[]>([]);
+  const [webSearchEnabled, setWebSearchEnabled] = useState<boolean>(false);
   const CONTEXT_WINDOW_LIMIT_TOKENS = 125000;
 
   // Controls whether map-reduced summaries are used instead of raw PDF text.
@@ -153,6 +164,169 @@ const PromptPlayground = () => {
 
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
+
+      // ── Web Search RAG branch ──────────────────────────────────────────
+      if (webSearchEnabled && uploadedFiles.length === 0) {
+        // Initialize the version in the thread
+        setThreads(prev => {
+          const copy = [...prev];
+          const thread = copy[threadIndex];
+          if (!thread?.versions[versionIndex]) return prev;
+          const versions = [...thread.versions];
+          versions[versionIndex] = { ...versions[versionIndex], answer: "", searchStatus: "searching", webSearchSources: [] };
+          const evaluations = [...(thread.evaluations || [])];
+          evaluations[versionIndex] = { loading: false, error: false, data: null };
+          copy[threadIndex] = { ...thread, versions, evaluations, showEvaluation: false };
+          return copy;
+        });
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120_000);
+
+        try {
+          const { answer, sources } = await runWebSearchRAG(promptText, {
+            chatUrl: NETLIFY_CHAT_URL,
+            model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
+            temperature: 0.3,
+            abortSignal: controller.signal,
+
+            onSearchStart: () => {
+              setThreads(prev => {
+                const copy = [...prev];
+                const thread = copy[threadIndex];
+                if (!thread?.versions[versionIndex]) return prev;
+                const versions = [...thread.versions];
+                versions[versionIndex] = { ...versions[versionIndex], searchStatus: "searching" };
+                copy[threadIndex] = { ...thread, versions };
+                return copy;
+              });
+            },
+
+            onSearchComplete: (results) => {
+              setThreads(prev => {
+                const copy = [...prev];
+                const thread = copy[threadIndex];
+                if (!thread?.versions[versionIndex]) return prev;
+                const versions = [...thread.versions];
+                versions[versionIndex] = { ...versions[versionIndex], searchStatus: "streaming", webSearchSources: results };
+                copy[threadIndex] = { ...thread, versions };
+                return copy;
+              });
+            },
+
+            onSearchError: () => {
+              setThreads(prev => {
+                const copy = [...prev];
+                const thread = copy[threadIndex];
+                if (!thread?.versions[versionIndex]) return prev;
+                const versions = [...thread.versions];
+                versions[versionIndex] = { ...versions[versionIndex], searchStatus: "error" };
+                copy[threadIndex] = { ...thread, versions };
+                return copy;
+              });
+            },
+
+            onStreamDelta: (_delta, accumulated) => {
+              setThreads(prev => {
+                const copy = [...prev];
+                const thread = copy[threadIndex];
+                if (!thread?.versions[versionIndex]) return prev;
+                const versions = [...thread.versions];
+                versions[versionIndex] = { ...versions[versionIndex], answer: accumulated };
+                copy[threadIndex] = { ...thread, versions };
+                return copy;
+              });
+            },
+
+            onStreamComplete: (fullAnswer) => {
+              setThreads(prev => {
+                const copy = [...prev];
+                const thread = copy[threadIndex];
+                if (!thread?.versions[versionIndex]) return prev;
+                const versions = [...thread.versions];
+                versions[versionIndex] = { ...versions[versionIndex], answer: fullAnswer, searchStatus: "complete" };
+                copy[threadIndex] = { ...thread, versions };
+                return copy;
+              });
+            },
+
+            onStreamError: (err) => {
+              console.error("[WebSearchRAG] Stream error in playground:", err);
+              setThreads(prev => {
+                const copy = [...prev];
+                const thread = copy[threadIndex];
+                if (!thread?.versions[versionIndex]) return prev;
+                const versions = [...thread.versions];
+                const current = versions[versionIndex];
+                const errorMsg = current.answer
+                  ? `${current.answer}\n\n[[ERROR: [STREAM_FAILED - ${err.message}]]]`
+                  : `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`;
+                versions[versionIndex] = { ...versions[versionIndex], answer: errorMsg, searchStatus: "complete" };
+                copy[threadIndex] = { ...thread, versions };
+                return copy;
+              });
+            },
+          });
+
+          // Run evaluations on the final answer
+          if (answer) {
+            // Set loading state now that the stream is complete
+            setThreads(prev => {
+              const copy = [...prev];
+              const thread = copy[threadIndex];
+              if (!thread?.evaluations) return prev;
+              const evaluations = [...thread.evaluations];
+              evaluations[versionIndex] = { loading: true, error: false, data: null };
+              copy[threadIndex] = { ...thread, evaluations };
+              return copy;
+            });
+            try {
+              await runAllEvaluations(answer, (partialResult) => {
+                setThreads(prev => {
+                  const copy = [...prev];
+                  const thread = copy[threadIndex];
+                  if (!thread?.evaluations) return prev;
+                  const evaluations = [...thread.evaluations];
+                  evaluations[versionIndex] = { loading: false, error: false, data: partialResult };
+                  copy[threadIndex] = { ...thread, evaluations };
+                  return copy;
+                });
+              });
+            } catch (evalErr) {
+              console.error("Evaluation failed but answer is visible:", evalErr);
+              setThreads(prev => {
+                const copy = [...prev];
+                const thread = copy[threadIndex];
+                if (!thread?.evaluations) return prev;
+                const evaluations = [...thread.evaluations];
+                evaluations[versionIndex] = { loading: false, error: true, data: null };
+                copy[threadIndex] = { ...thread, evaluations };
+                return copy;
+              });
+            }
+          }
+        } catch (err: any) {
+          console.error("Web search RAG outer error:", err);
+          setThreads(prev => {
+            const copy = [...prev];
+            const thread = copy[threadIndex];
+            if (!thread?.versions[versionIndex]) return prev;
+            const versions = [...thread.versions];
+            if (!versions[versionIndex].answer || versions[versionIndex].answer!.length < 5) {
+              versions[versionIndex] = { ...versions[versionIndex], answer: `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`, searchStatus: "error" };
+            }
+            const evaluations = [...(thread.evaluations || [])];
+            evaluations[versionIndex] = { loading: false, error: true, data: null };
+            copy[threadIndex] = { ...thread, versions, evaluations };
+            return copy;
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
+        return;
+      }
+
+      // ── Standard / PDF-grounded flow ───────────────────────────────────
       // --- Grounding system prompt (conditional on PDF uploads) ---
       const groundingPrompt = uploadedFiles.length > 0
         ? `You are a document analysis assistant. You have been provided with one or more reference documents. Follow these rules strictly:
@@ -165,27 +339,24 @@ const PromptPlayground = () => {
 6. WHEN IN DOUBT, QUOTE. If uncertain whether your recollection of a document detail is exact, quote the relevant passage directly rather than paraphrasing.`
         : "You are a helpful assistant.";
 
-      // --- Build documents array in Cohere's native format ---
-      // The edge function sends this directly to Cohere's `documents` parameter
-      // for native citations, and stringifies it into the system prompt for
-      // the Qwen fallback path.
+      // Build documents array — the edge function injects these into the
+      // system message as numbered references for the model to cite.
       const documents = uploadedFiles.length > 0
         ? uploadedFiles.map((file, idx) => {
-            const useSum = useSummaryForOutput && !!file.summary;
-            const text = getFileContent(file, useSummaryForOutput);
-            const titleSuffix = useSum
-              ? ` [summary of ~${file.originalTokenCount} tokens]`
-              : "";
-            return {
-              id: `doc-${idx + 1}`,
-              data: { title: `${file.name}${titleSuffix}`, text },
-            };
-          })
+          const useSum = useSummaryForOutput && !!file.summary;
+          const text = getFileContent(file, useSummaryForOutput);
+          const titleSuffix = useSum
+            ? ` [summary of ~${file.originalTokenCount} tokens]`
+            : "";
+          return {
+            id: `doc-${idx + 1}`,
+            data: { title: `${file.name}${titleSuffix}`, text },
+          };
+        })
         : undefined;
 
       const payload: Record<string, unknown> = {
-        model: "command-r-08-2024",
-        provider: "cohere",
+        model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
         temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
         stream: true,
         messages: [
@@ -240,7 +411,7 @@ const PromptPlayground = () => {
           versions[versionIndex] = { ...versions[versionIndex], answer: "" };
 
           const evaluations = [...(thread.evaluations || [])];
-          evaluations[versionIndex] = { loading: true, error: false, data: null };
+          evaluations[versionIndex] = { loading: false, error: false, data: null };
 
           copy[threadIndex] = { ...thread, versions, evaluations, showEvaluation: false };
           return copy;
@@ -321,6 +492,16 @@ const PromptPlayground = () => {
         // Trigger all evaluation pipelines with progressive updates.
         // Phase 1 (fallacy + claim_match) enables the toggle immediately.
         // Phase 2 (web_search) streams in results as they arrive.
+        // Set loading state now that the stream is complete
+        setThreads(prev => {
+          const copy = [...prev];
+          const thread = copy[threadIndex];
+          if (!thread?.evaluations) return prev;
+          const evaluations = [...thread.evaluations];
+          evaluations[versionIndex] = { loading: true, error: false, data: null };
+          copy[threadIndex] = { ...thread, evaluations };
+          return copy;
+        });
         try {
           await runAllEvaluations(accumulatedAnswer, (partialResult) => {
             setThreads(prev => {
@@ -378,7 +559,7 @@ const PromptPlayground = () => {
         clearTimeout(timeoutId);
       }
     },
-    [uploadedFiles, useSummaryForOutput]
+    [uploadedFiles, useSummaryForOutput, webSearchEnabled]
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, specificity: string, style: string, context: string, bias: string) => {
@@ -458,6 +639,7 @@ const PromptPlayground = () => {
 
         setEditingText(optimizedPrompt);
         setDisableOptimize(false);
+        setHasManualEdit(false);
         setOptimizePulse(prev => prev + 1);
       } else {
         throw new Error("handlePromptOptimize: optimized_prompt missing or empty");
@@ -555,7 +737,8 @@ const PromptPlayground = () => {
             : f
         ));
 
-        setHasManualEdit(true);
+        setHasManualEdit(false);
+        setDisableOptimize(false);
         // console.log(isEmpty);
         setDisableSend(isEmpty);
 
@@ -568,6 +751,8 @@ const PromptPlayground = () => {
 
   const handleRemoveFile = useCallback((index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setDisableOptimize(false);
+    setHasManualEdit(false);
   }, []);
 
   useEffect(() => {
@@ -611,15 +796,22 @@ const PromptPlayground = () => {
 
   const createNewThreadAndFetch = async (submittedText: string) => {
     const newThreadIndex = threads.length;
-    setThreads(prev => [...prev, { versions: [{ prompt: submittedText }], currentIndex: 0, showDiff: false }]);
+    const currentFileNames = uploadedFiles.filter(f => !f.isUploading).map(f => f.name);
+    setThreads(prev => [...prev, { versions: [{ prompt: submittedText, webSearchEnabled, fileNames: currentFileNames }], currentIndex: 0, showDiff: false }]);
     await submitAnswerForThreadVersion(newThreadIndex, 0, submittedText);
   };
 
   const submitAnswerForLatestVersion = async (promptText: string) => {
     if (threads.length === 0) return;
     const threadIndex = threads.length - 1;
-    const lastVersionPrompt = threads[threadIndex].versions[threads[threadIndex].versions.length - 1]?.prompt;
-    if (promptText !== lastVersionPrompt) {
+    const lastVersion = threads[threadIndex].versions[threads[threadIndex].versions.length - 1];
+    const currentFileNames = uploadedFiles.filter(f => !f.isUploading).map(f => f.name);
+    const lastFileNames = lastVersion?.fileNames || [];
+    const contextChanged =
+      promptText !== lastVersion?.prompt ||
+      webSearchEnabled !== (lastVersion?.webSearchEnabled ?? false) ||
+      JSON.stringify(currentFileNames) !== JSON.stringify(lastFileNames);
+    if (contextChanged) {
       const newVersionIndex = threads[threadIndex].versions.length;
       setThreads(prev => {
         const copy = [...prev];
@@ -629,7 +821,7 @@ const PromptPlayground = () => {
         }
         copy[threadIndex] = {
           ...targetThread,
-          versions: [...targetThread.versions, { prompt: promptText, answer: undefined, parameters }],
+          versions: [...targetThread.versions, { prompt: promptText, answer: undefined, parameters, webSearchEnabled, fileNames: currentFileNames }],
           currentIndex: newVersionIndex,
         };
         return copy;
@@ -737,7 +929,13 @@ const PromptPlayground = () => {
                 waitingforOptimization,
                 files: uploadedFiles,
                 onUploadFiles: handleUploadFiles,
-                onRemoveFile: handleRemoveFile
+                onRemoveFile: handleRemoveFile,
+                webSearchEnabled,
+                onToggleWebSearch: () => {
+                  setWebSearchEnabled(prev => !prev);
+                  setDisableOptimize(false);
+                  setHasManualEdit(false);
+                },
               }} />
             </div>
           </div>

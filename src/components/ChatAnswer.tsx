@@ -211,13 +211,16 @@ const ChatAnswer = ({
   // Show spinner while initial evaluation is loading OR while web_search is still pending
   const evaluationLoading = (currentEvaluation?.loading ?? false)
     || (currentEvaluation?.data?.webSearchPending ?? false);
+  // "Nothing detected" should only show when ALL evaluations are truly done:
+  // - not loading, has data, no web searches pending, and zero spans found.
+  // Note: we don't require every pipeline status to be "success" — a pipeline
+  // that errored but produced no spans shouldn't block the clean badge.
   const evaluationClean = currentEvaluation
     && !currentEvaluation.loading
     && !currentEvaluation.error
     && currentEvaluation.data
     && currentEvaluation.data.spans.length === 0
-    && !currentEvaluation.data.webSearchPending
-    && Object.values(currentEvaluation.data.pipelineStatus).every(s => s === "success");
+    && !currentEvaluation.data.webSearchPending;
 
   // Render text with evaluation flags
   const renderEvaluation = () => {
