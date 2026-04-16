@@ -11,6 +11,11 @@ import { runAllEvaluations } from "@/services/evaluations";
 import type { EvaluationResult } from "@/services/evaluations/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { Plus, X } from "lucide-react";
 const NO_CHANGE_VALUE = "no-change";
 // const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
 //   ? "/api/chat"
@@ -78,6 +83,25 @@ const PromptPlaygroundV2 = () => {
   // Both default to false — when both are false, summarization is skipped entirely.
   const [useSummaryForOptimization, setUseSummaryForOptimization] = useState<boolean>(false);
   const [useSummaryForOutput, setUseSummaryForOutput] = useState<boolean>(false);
+
+  /* ------------------------------------------------------------------ */
+  /*  Learning mode state                                                */
+  /* ------------------------------------------------------------------ */
+  type LearningMode = "none" | "prompt-construction" | "system-parameters" | "multiple-sources" | "few-shot";
+  const [learningMode, setLearningMode] = useState<LearningMode>("none");
+
+  // System Parameters mode
+  const [sysPromptText, setSysPromptText] = useState("");
+  const [temperature, setTemperature] = useState(0.7);
+
+  // Few-shot mode
+  type FewShotExample = { input: string; output: string };
+  const [fewShotExamples, setFewShotExamples] = useState<FewShotExample[]>([{ input: "", output: "" }]);
+
+  const addFewShotExample = () => setFewShotExamples((prev) => [...prev, { input: "", output: "" }]);
+  const removeFewShotExample = (idx: number) => setFewShotExamples((prev) => prev.filter((_, i) => i !== idx));
+  const updateFewShotExample = (idx: number, field: "input" | "output", value: string) =>
+    setFewShotExamples((prev) => prev.map((ex, i) => (i === idx ? { ...ex, [field]: value } : ex)));
 
   /** Resolve the content to use for a file given a useSummary flag. */
   const getFileContent = (file: ParsedFile, useSummary: boolean): string => {
@@ -153,17 +177,22 @@ const PromptPlaygroundV2 = () => {
 
   const submitAnswerForThreadVersion = useCallback(
     async (threadIndex: number, versionIndex: number, promptText: string) => {
-      // --- Grounding system prompt (conditional on PDF uploads) ---
-      const groundingPrompt = uploadedFiles.length > 0
-        ? `You are a document analysis assistant. You have been provided with one or more reference documents. Follow these rules strictly:
+      // --- Grounding system prompt (conditional on PDF uploads + learning mode) ---
+      let groundingPrompt: string;
+      if (learningMode === "system-parameters" && sysPromptText.trim()) {
+        groundingPrompt = sysPromptText.trim();
+      } else if (uploadedFiles.length > 0) {
+        groundingPrompt = `You are a document analysis assistant. You have been provided with one or more reference documents. Follow these rules strictly:
 
 1. BASE YOUR ANSWERS ON THE PROVIDED DOCUMENTS. When the user's question relates to topics covered in the documents, your answer must be drawn from the document content. Do not supplement with outside knowledge unless the document is insufficient to answer the question.
 2. CITE WITH NUMBERED REFERENCES. When referencing specific facts, statistics, names, or claims from a document, place an inline citation immediately after the claim using the format [1], [2], etc., where the number corresponds to the document index. If citing a specific section, use [1, p.X] or [1, Section Y].
 3. DISTINGUISH SOURCES. If you must use knowledge beyond the documents (because the documents do not address the question), mark the claim with [External] and briefly note the source if known.
 4. NEVER FABRICATE DOCUMENT CONTENT. If you cannot find specific information in the provided documents, say so. Do not guess or paraphrase loosely — accuracy is more important than completeness.
 5. PRESERVE PRECISION. Reproduce names, dates, numbers, and statistics exactly as they appear in the documents. Do not round, approximate, or restate figures unless asked.
-6. WHEN IN DOUBT, QUOTE. If uncertain whether your recollection of a document detail is exact, quote the relevant passage directly rather than paraphrasing.`
-        : "You are a helpful assistant.";
+6. WHEN IN DOUBT, QUOTE. If uncertain whether your recollection of a document detail is exact, quote the relevant passage directly rather than paraphrasing.`;
+      } else {
+        groundingPrompt = "You are a helpful assistant.";
+      }
 
       // --- Build documents array in Cohere's native format ---
       // The edge function sends this directly to Cohere's `documents` parameter
@@ -183,15 +212,31 @@ const PromptPlaygroundV2 = () => {
           })
         : undefined;
 
+      // Build messages array — inject few-shot examples when in that mode
+      const messages: { role: string; content: string }[] = [
+        { role: "system", content: groundingPrompt },
+      ];
+      if (learningMode === "few-shot") {
+        for (const ex of fewShotExamples) {
+          if (ex.input.trim()) {
+            messages.push({ role: "user", content: ex.input.trim() });
+            if (ex.output.trim()) messages.push({ role: "assistant", content: ex.output.trim() });
+          }
+        }
+      }
+      messages.push({ role: "user", content: promptText });
+
+      // Resolve temperature: learning mode override > doc default > base default
+      const resolvedTemp = learningMode === "system-parameters"
+        ? temperature
+        : uploadedFiles.length > 0 ? 0.3 : 0.7;
+
       const payload: Record<string, unknown> = {
         model: "command-r-08-2024",
         provider: "cohere",
-        temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
+        temperature: resolvedTemp,
         stream: true,
-        messages: [
-          { role: "system", content: groundingPrompt },
-          { role: "user", content: promptText },
-        ],
+        messages,
         ...(documents ? { documents } : {}),
       };
 
@@ -378,7 +423,7 @@ const PromptPlaygroundV2 = () => {
         clearTimeout(timeoutId);
       }
     },
-    [uploadedFiles, useSummaryForOutput]
+    [uploadedFiles, useSummaryForOutput, learningMode, sysPromptText, temperature, fewShotExamples]
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, specificity: string, style: string, context: string, bias: string) => {
@@ -713,8 +758,135 @@ const PromptPlaygroundV2 = () => {
       <Header onLanguageChange={setPageLanguage} />
       <main className="flex-1 flex flex-col">
         <div className="flex flex-1 h-[calc(100vh-4rem)] max-w-7xl mx-auto w-full items-center">
-          <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center">
+          <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center overflow-y-auto">
             <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
+
+              {/* ── Learning mode selector ── */}
+              <div className="px-4 pt-3 pb-2 [&_*]:!font-heading">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
+                  Learning Mode
+                </label>
+                <Select value={learningMode} onValueChange={(v) => setLearningMode(v as LearningMode)}>
+                  <SelectTrigger className="w-full text-sm">
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="prompt-construction">Prompt Construction</SelectItem>
+                    <SelectItem value="system-parameters">System Parameters</SelectItem>
+                    <SelectItem value="multiple-sources">Multiple Documents</SelectItem>
+                    <SelectItem value="few-shot">Few-shot Prompting</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* ── Per-mode additional controls ── */}
+              {learningMode === "system-parameters" && (
+                <div className="px-4 pb-3 space-y-3 border-b border-border [&_*]:!font-heading">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground mb-1 block">System Prompt</label>
+                    <Textarea
+                      placeholder="You are a helpful journalist assistant..."
+                      value={sysPromptText}
+                      onChange={(e) => setSysPromptText(e.target.value)}
+                      className="text-sm min-h-[80px] resize-y !font-['Manrope']"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-semibold text-foreground">Temperature</label>
+                      <span className="text-xs text-muted-foreground tabular-nums">{temperature.toFixed(1)}</span>
+                    </div>
+                    <Slider
+                      value={[temperature]}
+                      onValueChange={([v]) => setTemperature(v)}
+                      min={0}
+                      max={1}
+                      step={0.1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                      <span>Stable</span>
+                      <span>Random</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {learningMode === "multiple-sources" && (
+                <div className="px-4 pb-3 border-b border-border [&_*]:!font-heading">
+                  <label className="text-xs font-semibold text-foreground mb-1 block">Upload Documents</label>
+                  <p className="text-[11px] text-muted-foreground mb-2">
+                    Add your own reference documents. These will be used alongside the prompt to ground the output.
+                  </p>
+                  <input
+                    type="file"
+                    accept=".pdf,.txt,.csv,.json,.md"
+                    multiple
+                    onChange={(e) => { if (e.target.files) handleUploadFiles(e.target.files); }}
+                    className="block w-full text-xs text-muted-foreground file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80 cursor-pointer"
+                  />
+                  {uploadedFiles.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {uploadedFiles.map((f, i) => (
+                        <div key={i} className="flex items-center gap-1.5 text-xs text-foreground bg-muted/40 rounded px-2 py-1">
+                          <span className="truncate flex-1">{f.name}</span>
+                          <button type="button" onClick={() => handleRemoveFile(i)} className="text-muted-foreground hover:text-foreground">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {learningMode === "few-shot" && (
+                <div className="px-4 pb-3 border-b border-border [&_*]:!font-heading">
+                  <label className="text-xs font-semibold text-foreground mb-1 block">Few-shot Examples</label>
+                  <p className="text-[11px] text-muted-foreground mb-2">
+                    Provide input/output pairs to guide the model's style and format.
+                  </p>
+                  <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
+                    {fewShotExamples.map((ex, idx) => (
+                      <div key={idx} className="rounded-lg border border-border p-2 space-y-1.5 relative">
+                        {fewShotExamples.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeFewShotExample(idx)}
+                            className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
+                        <span className="text-[10px] text-muted-foreground font-semibold">Example {idx + 1}</span>
+                        <Textarea
+                          placeholder="Input..."
+                          value={ex.input}
+                          onChange={(e) => updateFewShotExample(idx, "input", e.target.value)}
+                          className="text-xs min-h-[40px] resize-y !font-['Manrope']"
+                        />
+                        <Textarea
+                          placeholder="Expected output..."
+                          value={ex.output}
+                          onChange={(e) => updateFewShotExample(idx, "output", e.target.value)}
+                          className="text-xs min-h-[40px] resize-y !font-['Manrope']"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2 text-xs gap-1"
+                    onClick={addFewShotExample}
+                  >
+                    <Plus className="h-3 w-3" /> Add example
+                  </Button>
+                </div>
+              )}
+
               <PromptControls {...{
                 parameters,
                 onParameterChange: handleParameterChange,
