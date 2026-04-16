@@ -94,8 +94,31 @@ const PromptPlaygroundV2 = () => {
   const [sysPromptText, setSysPromptText] = useState("");
   const [temperature, setTemperature] = useState(0.7);
 
-  // Few-shot mode
-  type FewShotExample = { input: string; output: string };
+  // Multiple Sources / Context Engineering mode
+  type ContextBlock = {
+    id: string;
+    type: "instruction" | "knowledge" | "persona";
+    label: string;
+    content: string;
+    enabled: boolean;
+  };
+  const [contextBlocks, setContextBlocks] = useState<ContextBlock[]>([
+    { id: "ctx-1", type: "instruction", label: "Task instruction", content: "", enabled: true },
+  ]);
+  const addContextBlock = (type: ContextBlock["type"]) => {
+    const labels: Record<ContextBlock["type"], string> = {
+      instruction: "Task instruction",
+      knowledge: "Knowledge source",
+      persona: "Persona / role",
+    };
+    setContextBlocks((prev) => [
+      ...prev,
+      { id: `ctx-${Date.now()}`, type, label: labels[type], content: "", enabled: true },
+    ]);
+  };
+  const removeContextBlock = (id: string) => setContextBlocks((prev) => prev.filter((b) => b.id !== id));
+  const updateContextBlock = (id: string, field: keyof ContextBlock, value: string | boolean) =>
+    setContextBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)));
   const [fewShotExamples, setFewShotExamples] = useState<FewShotExample[]>([{ input: "", output: "" }]);
 
   const addFewShotExample = () => setFewShotExamples((prev) => [...prev, { input: "", output: "" }]);
@@ -179,7 +202,19 @@ const PromptPlaygroundV2 = () => {
     async (threadIndex: number, versionIndex: number, promptText: string) => {
       // --- Grounding system prompt (conditional on PDF uploads + learning mode) ---
       let groundingPrompt: string;
-      if (learningMode === "system-parameters" && sysPromptText.trim()) {
+      if (learningMode === "multiple-sources") {
+        // Assemble context pipeline blocks into a structured system prompt
+        const enabledBlocks = contextBlocks.filter((b) => b.enabled && b.content.trim());
+        if (enabledBlocks.length > 0) {
+          const sections = enabledBlocks.map((b) => {
+            const header = b.type === "persona" ? "ROLE" : b.type === "knowledge" ? "REFERENCE" : "INSTRUCTION";
+            return `[${header}: ${b.label}]\n${b.content.trim()}`;
+          });
+          groundingPrompt = sections.join("\n\n");
+        } else {
+          groundingPrompt = "You are a helpful assistant.";
+        }
+      } else if (learningMode === "system-parameters" && sysPromptText.trim()) {
         groundingPrompt = sysPromptText.trim();
       } else if (uploadedFiles.length > 0) {
         groundingPrompt = `You are a document analysis assistant. You have been provided with one or more reference documents. Follow these rules strictly:
@@ -423,7 +458,7 @@ const PromptPlaygroundV2 = () => {
         clearTimeout(timeoutId);
       }
     },
-    [uploadedFiles, useSummaryForOutput, learningMode, sysPromptText, temperature, fewShotExamples]
+    [uploadedFiles, useSummaryForOutput, learningMode, sysPromptText, temperature, fewShotExamples, contextBlocks]
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, specificity: string, style: string, context: string, bias: string) => {
@@ -815,29 +850,81 @@ const PromptPlaygroundV2 = () => {
 
               {learningMode === "multiple-sources" && (
                 <div className="px-4 pb-3 border-b border-border [&_*]:!font-heading">
-                  <label className="text-xs font-semibold text-foreground mb-1 block">Upload Documents</label>
+                  <label className="text-xs font-semibold text-foreground mb-1 block">Context Pipeline</label>
                   <p className="text-[11px] text-muted-foreground mb-2">
-                    Add your own reference documents. These will be used alongside the prompt to ground the output.
+                    Build a RAG-style context by adding blocks. Each enabled block is assembled into the system prompt before your query is sent.
                   </p>
-                  <input
-                    type="file"
-                    accept=".pdf,.txt,.csv,.json,.md"
-                    multiple
-                    onChange={(e) => { if (e.target.files) handleUploadFiles(e.target.files); }}
-                    className="block w-full text-xs text-muted-foreground file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80 cursor-pointer"
-                  />
-                  {uploadedFiles.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {uploadedFiles.map((f, i) => (
-                        <div key={i} className="flex items-center gap-1.5 text-xs text-foreground bg-muted/40 rounded px-2 py-1">
-                          <span className="truncate flex-1">{f.name}</span>
-                          <button type="button" onClick={() => handleRemoveFile(i)} className="text-muted-foreground hover:text-foreground">
-                            <X className="h-3 w-3" />
-                          </button>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                    {contextBlocks.map((block) => {
+                      const typeColors: Record<ContextBlock["type"], string> = {
+                        instruction: "border-blue-300 bg-blue-50/50",
+                        knowledge: "border-amber-300 bg-amber-50/50",
+                        persona: "border-purple-300 bg-purple-50/50",
+                      };
+                      const typeLabels: Record<ContextBlock["type"], string> = {
+                        instruction: "Instruction",
+                        knowledge: "Knowledge",
+                        persona: "Persona",
+                      };
+                      return (
+                        <div
+                          key={block.id}
+                          className={`rounded-lg border p-2 space-y-1 relative transition-opacity ${
+                            block.enabled ? typeColors[block.type] : "border-border bg-muted/30 opacity-50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="checkbox"
+                              checked={block.enabled}
+                              onChange={(e) => updateContextBlock(block.id, "enabled", e.target.checked)}
+                              className="h-3 w-3 rounded accent-foreground"
+                            />
+                            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                              {typeLabels[block.type]}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeContextBlock(block.id)}
+                              className="ml-auto text-muted-foreground hover:text-foreground"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            value={block.label}
+                            onChange={(e) => updateContextBlock(block.id, "label", e.target.value)}
+                            className="w-full text-xs font-semibold text-foreground bg-transparent border-none outline-none p-0 !font-['Manrope']"
+                            placeholder="Label..."
+                          />
+                          <Textarea
+                            placeholder={
+                              block.type === "instruction"
+                                ? "e.g. Summarize the key points, cite sources..."
+                                : block.type === "knowledge"
+                                  ? "Paste reference text, data, or article content..."
+                                  : "e.g. You are a senior DW journalist..."
+                            }
+                            value={block.content}
+                            onChange={(e) => updateContextBlock(block.id, "content", e.target.value)}
+                            className="text-xs min-h-[50px] resize-y !font-['Manrope']"
+                          />
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      );
+                    })}
+                  </div>
+                  <div className="flex gap-1.5 mt-2">
+                    <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("instruction")}>
+                      <Plus className="h-3 w-3" /> Instruction
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("knowledge")}>
+                      <Plus className="h-3 w-3" /> Knowledge
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("persona")}>
+                      <Plus className="h-3 w-3" /> Persona
+                    </Button>
+                  </div>
                 </div>
               )}
 
