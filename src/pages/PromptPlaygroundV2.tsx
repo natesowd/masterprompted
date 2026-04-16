@@ -797,6 +797,23 @@ const PromptPlaygroundV2 = () => {
           <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center overflow-y-auto">
             <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
 
+              {/* ── Prompt box — always at the top ── */}
+              <div className="px-4 pt-3 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
+                <Chatbox
+                  value={editingText}
+                  onChange={handleInputChange}
+                  onSubmit={handleChatSubmit}
+                  submitButtonId="prompt-playground-submit"
+                  disableSend={disableSend}
+                  animationKey={optimizePulse}
+                  waitingforOptimization={waitingforOptimization}
+                  files={uploadedFiles}
+                  onUploadFiles={handleUploadFiles}
+                  onRemoveFile={handleRemoveFile}
+                  className="z-50 w-full flex-auto min-h-0"
+                />
+              </div>
+
               {/* ── Learning mode selector ── */}
               <div className="px-4 pt-3 pb-2 [&_*]:!font-heading">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
@@ -874,19 +891,6 @@ const PromptPlaygroundV2 = () => {
                       <span>Random</span>
                     </div>
                   </div>
-
-                  <Chatbox
-                    value={editingText}
-                    onChange={handleInputChange}
-                    onSubmit={handleChatSubmit}
-                    submitButtonId="prompt-playground-submit"
-                    disableSend={disableSend}
-                    animationKey={optimizePulse}
-                    files={uploadedFiles}
-                    onUploadFiles={handleUploadFiles}
-                    onRemoveFile={handleRemoveFile}
-                    className="z-50 w-full flex-auto min-h-0"
-                  />
                 </div>
               )}
 
@@ -963,19 +967,6 @@ const PromptPlaygroundV2 = () => {
                       <Plus className="h-3 w-3" /> Persona
                     </Button>
                   </div>
-
-                  <Chatbox
-                    value={editingText}
-                    onChange={handleInputChange}
-                    onSubmit={handleChatSubmit}
-                    submitButtonId="prompt-playground-submit"
-                    disableSend={disableSend}
-                    animationKey={optimizePulse}
-                    files={uploadedFiles}
-                    onUploadFiles={handleUploadFiles}
-                    onRemoveFile={handleRemoveFile}
-                    className="z-50 w-full flex-auto min-h-0"
-                  />
                 </div>
               )}
 
@@ -1012,19 +1003,6 @@ const PromptPlaygroundV2 = () => {
                   <Button type="button" variant="outline" size="sm" className="w-full text-xs gap-1" onClick={addFewShotExample}>
                     <Plus className="h-3 w-3" /> Add example
                   </Button>
-
-                  <Chatbox
-                    value={editingText}
-                    onChange={handleInputChange}
-                    onSubmit={handleChatSubmit}
-                    submitButtonId="prompt-playground-submit"
-                    disableSend={disableSend}
-                    animationKey={optimizePulse}
-                    files={uploadedFiles}
-                    onUploadFiles={handleUploadFiles}
-                    onRemoveFile={handleRemoveFile}
-                    className="z-50 w-full flex-auto min-h-0"
-                  />
                 </div>
               )}
             </div>
