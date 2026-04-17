@@ -198,18 +198,8 @@ const Header = ({ transparent = false, onLanguageChange }: HeaderProps) => {
           </nav>
         </div>
 
-        {/* Language Switcher, Debunker link, and Right side logo */}
+        {/* Language Switcher and Right side logo */}
         <div className={`flex items-center gap-4 ${transparent ? 'text-white' : 'text-foreground'}`}>
-          <button
-            onClick={() => window.location.assign("https://dh-hetzner.fbk.eu/aicode-v2/")}
-            className={`text-[15px] font-heading tracking-wide transition-colors duration-200 ${
-              transparent
-                ? 'text-white/80 hover:text-white'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            AI Debunker
-          </button>
           <LanguageSwitcher onLanguageChange={onLanguageChange} />
           {transparent ?
           <svg width="101" height="25" viewBox="0 0 101 25" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-auto">
