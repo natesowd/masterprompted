@@ -3,6 +3,7 @@
 import Header from "@/components/Header";
 import PromptControls from "@/components/PromptControlsPromptPlaygroundV2";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBodyV2";
@@ -13,7 +14,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCcw, X } from "lucide-react";
+import { Plus, RefreshCcw, X, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Chatbox from "@/components/ChatBoxPromptPlaygroundV2";
@@ -57,6 +59,7 @@ export type ParsedFile = {
   originalTokenCount?: number;
 };
 const PromptPlaygroundV2 = () => {
+  const navigate = useNavigate();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [parameters, setParameters] = useState<Parameters>({ specificity: "", style: "", context: "", bias: "" });
   const [disableSend, setDisableSend] = useState(true);
@@ -836,9 +839,9 @@ const PromptPlaygroundV2 = () => {
     <div className="min-h-screen max-h-screen bg-background flex flex-col">
       <Header onLanguageChange={setPageLanguage} />
       <main className="flex-1 flex flex-col">
-        <div className="flex flex-1 h-[calc(100vh-4rem)] w-full 2xl:max-w-7xl 2xl:mx-auto items-center">
-          <div className="w-64 md:w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center overflow-y-auto h-full">
-            <div className="w-full px-2 md:px-0 md:w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72 flex flex-col h-full">
+        <div className="flex flex-1 h-[calc(100vh-4rem)] w-full 2xl:max-w-7xl 2xl:mx-auto items-stretch">
+          <div className="w-64 md:w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center overflow-y-auto">
+            <div className="w-full px-2 md:px-0 md:w-[264px] pt-4 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72 flex flex-col">
 
               {/* ── User / System tabs ── */}
               <div className="px-4 pt-3 pb-1 [&_*]:!font-heading">
@@ -884,9 +887,24 @@ const PromptPlaygroundV2 = () => {
                   {/* Few-shot examples */}
                   {fewShotExamples.length > 0 && (
                     <div className="px-4 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
-                      <h3 className="font-bold text-foreground text-lg mb-1.5">
-                        Examples ({fewShotExamples.length})
-                      </h3>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <h3 className="font-bold text-foreground text-lg">
+                          Examples ({fewShotExamples.length})
+                        </h3>
+                        <TooltipProvider>
+                          <Tooltip delayDuration={200}>
+                            <TooltipTrigger asChild>
+                              <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                              <p>Provide input/output pairs so the model learns the style, format, and tone you want. This is called few-shot prompting.</p>
+                              <button type="button" onClick={() => navigate("/module/llm-training/few-shot")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                                Go to Few-shot Prompting learning →
+                              </button>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <div className="space-y-2 max-h-[140px] overflow-y-auto">
                         {fewShotExamples.map((ex, idx) => (
                           <div key={idx} className="rounded-lg border border-border p-2 space-y-1.5 relative">
@@ -938,7 +956,22 @@ const PromptPlaygroundV2 = () => {
 
                   {/* System Prompt */}
                   <div>
-                    <h3 className="font-bold text-foreground text-lg mb-1.5">System Prompt</h3>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <h3 className="font-bold text-foreground text-lg">System Prompt</h3>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={200}>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                            <p>The system prompt sets the role and behaviour of the LLM before it sees your message. It shapes tone, constraints, and focus.</p>
+                            <button type="button" onClick={() => navigate("/module/system-parameters")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                              Go to System Parameters learning →
+                            </button>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <Textarea
                       placeholder="You are a helpful journalist assistant..."
                       value={sysPromptText}
@@ -949,7 +982,22 @@ const PromptPlaygroundV2 = () => {
 
                   {/* Context injection buttons */}
                   <div>
-                    <h3 className="font-bold text-foreground text-lg mb-1.5">Context</h3>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <h3 className="font-bold text-foreground text-lg">Context</h3>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={200}>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                            <p>Add structured blocks to the system prompt: instructions for the task, knowledge sources to ground the output, or a persona to define the voice.</p>
+                            <button type="button" onClick={() => navigate("/module/multiple-sources")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                              Go to Multiple Documents learning →
+                            </button>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <div className="flex gap-1.5">
                       <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => injectContextBlock("instruction")}>
                         {hasBlock("instruction") ? <RefreshCcw className="h-3 w-3" /> : <Plus className="h-3 w-3" />} Instruction
@@ -967,17 +1015,29 @@ const PromptPlaygroundV2 = () => {
 
                   {/* Temperature — guided simulator style */}
                   <div>
-                    <h3 className="font-bold text-foreground text-lg mb-2">Temperature</h3>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <h3 className="font-bold text-foreground text-lg">Temperature</h3>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={200}>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                            <p>Temperature controls how random the output is. Low values produce predictable, deterministic text. High values produce more creative but less reliable text.</p>
+                            <button type="button" onClick={() => navigate("/module/system-parameters/temperature")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                              Go to Temperature learning →
+                            </button>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <div className="relative">
                       <div className="relative h-10 flex items-center">
-                        {/* Track background */}
                         <div className="absolute inset-x-0 h-4 rounded bg-surface-600" />
-                        {/* Filled range */}
                         <div
                           className="absolute left-0 h-4 rounded-l bg-brand-tertiary-500"
                           style={{ width: `${(tempStepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
                         />
-                        {/* Thumb */}
                         <div
                           className="absolute h-7 -translate-x-1/2 cursor-pointer flex items-center"
                           style={{ left: `${(tempStepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
@@ -986,7 +1046,6 @@ const PromptPlaygroundV2 = () => {
                           <div className="h-full w-1 rounded-sm bg-brand-tertiary-500" />
                           <div className="h-full w-[4px] bg-background" />
                         </div>
-                        {/* Invisible slider */}
                         <input
                           type="range"
                           min={0}
@@ -997,7 +1056,6 @@ const PromptPlaygroundV2 = () => {
                           className="absolute inset-0 w-full opacity-0 cursor-pointer"
                         />
                       </div>
-                      {/* Value label */}
                       <div
                         className="text-xs font-semibold text-foreground mt-1 absolute -translate-x-1/2"
                         style={{ left: `${(tempStepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
@@ -1009,6 +1067,13 @@ const PromptPlaygroundV2 = () => {
                       <span>More Stable</span>
                       <span>More Random</span>
                     </div>
+                  </div>
+
+                  {/* LLM Disclaimer */}
+                  <div className="mt-auto pt-4">
+                    <p className="text-[10px] leading-snug text-muted-foreground/70 text-left">
+                      LLMs used in the Prompt Playground include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+                    </p>
                   </div>
                 </div>
               )}
