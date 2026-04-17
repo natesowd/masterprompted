@@ -1,6 +1,7 @@
 // src/pages/PromptPlaygroundV2.tsx
 
 import Header from "@/components/Header";
+import PromptControls from "@/components/PromptControlsPromptPlaygroundV2";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,10 +12,8 @@ import type { EvaluationResult } from "@/services/evaluations/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Chatbox from "@/components/ChatBoxPromptPlaygroundV2";
@@ -92,13 +91,23 @@ const PromptPlaygroundV2 = () => {
   // User / System tab
   const [controlTab, setControlTab] = useState<"user" | "system">("user");
 
-  // System-tab toggles
-  const [sysPromptEnabled, setSysPromptEnabled] = useState(false);
-  const [contextPipelineEnabled, setContextPipelineEnabled] = useState(false);
+  // System-tab state
+  const TEMPERATURE_STEPS = [0.0, 0.2, 0.5, 0.8, 1.0];
+  const [tempStepIndex, setTempStepIndex] = useState(3); // default 0.8
 
-  // System Parameters mode
+  // Inject a context block into the system prompt with a colored tag
+  const injectContextBlock = (type: "instruction" | "knowledge" | "persona") => {
+    const templates: Record<string, string> = {
+      instruction: "[INSTRUCTION]\nSummarize the key points, cite all sources, and use a neutral journalistic tone.\n[/INSTRUCTION]",
+      knowledge: "[KNOWLEDGE]\nPaste your reference text, data, or article content here.\n[/KNOWLEDGE]",
+      persona: "[PERSONA]\nYou are an experienced investigative journalist at DW.\n[/PERSONA]",
+    };
+    const block = templates[type];
+    setSysPromptText((prev) => prev ? `${prev}\n\n${block}` : block);
+  };
+
+  // System prompt
   const [sysPromptText, setSysPromptText] = useState("");
-  const [temperature, setTemperature] = useState(0.7);
 
   // Multiple Sources / Context Engineering mode
   type ContextBlock = {
@@ -209,8 +218,8 @@ const PromptPlaygroundV2 = () => {
     async (threadIndex: number, versionIndex: number, promptText: string) => {
       // --- Grounding system prompt (conditional on PDF uploads + learning/unified mode) ---
       // Resolve which features are active based on view mode
-      const useSysPrompt = sysPromptEnabled;
-      const useContextPipeline = contextPipelineEnabled;
+      const useSysPrompt = !!sysPromptText.trim();
+      const useContextPipeline = contextBlocks.some(b => b.enabled && b.content.trim());
       const useFewShot = fewShotExamples.some(e => e.input.trim());
 
       let groundingPrompt: string;
@@ -277,10 +286,8 @@ const PromptPlaygroundV2 = () => {
       }
       messages.push({ role: "user", content: promptText });
 
-      // Resolve temperature: sys-params override > doc default > base default
-      const resolvedTemp = useSysPrompt
-        ? temperature
-        : uploadedFiles.length > 0 ? 0.3 : 0.7;
+      // Resolve temperature
+      const resolvedTemp = TEMPERATURE_STEPS[tempStepIndex];
 
       const payload: Record<string, unknown> = {
         model: "command-r-08-2024",
@@ -474,7 +481,7 @@ const PromptPlaygroundV2 = () => {
         clearTimeout(timeoutId);
       }
     },
-    [uploadedFiles, useSummaryForOutput, sysPromptEnabled, contextPipelineEnabled, sysPromptText, temperature, fewShotExamples, contextBlocks]
+    [uploadedFiles, useSummaryForOutput, sysPromptText, tempStepIndex, fewShotExamples, contextBlocks]
   );
 
   const handlePromptOptimize = useCallback(async (prompt: string, specificity: string, style: string, context: string, bias: string) => {
@@ -833,9 +840,9 @@ const PromptPlaygroundV2 = () => {
               {/* USER tab                                      */}
               {/* ============================================ */}
               {controlTab === "user" && (
-                <div className="flex-1 flex flex-col overflow-hidden [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
-                  {/* Chatbox */}
-                  <div className="px-4 pt-2 pb-2">
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {/* Chatbox + few-shot */}
+                  <div className="px-4 pt-2 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
                     <Chatbox
                       value={editingText}
                       onChange={handleInputChange}
@@ -853,36 +860,52 @@ const PromptPlaygroundV2 = () => {
                     />
                   </div>
 
-                  {/* Few-shot examples (added via + button) */}
+                  {/* Few-shot examples */}
                   {fewShotExamples.length > 0 && (
-                    <div className="px-4 pb-3 flex-1 overflow-y-auto">
+                    <div className="px-4 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
                       <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
                         Examples ({fewShotExamples.length})
                       </label>
-                      <div className="space-y-2">
+                      <div className="space-y-2 max-h-[140px] overflow-y-auto">
                         {fewShotExamples.map((ex, idx) => (
                           <div key={idx} className="rounded-lg border border-border p-2 space-y-1.5 relative">
                             <button type="button" onClick={() => removeFewShotExample(idx)} className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground">
                               <X className="h-3 w-3" />
                             </button>
                             <span className="text-[10px] text-muted-foreground font-semibold">Example {idx + 1}</span>
-                            <Textarea
-                              placeholder="Input..."
-                              value={ex.input}
-                              onChange={(e) => updateFewShotExample(idx, "input", e.target.value)}
-                              className="text-xs min-h-[36px] resize-y !font-['Manrope']"
-                            />
-                            <Textarea
-                              placeholder="Expected output..."
-                              value={ex.output}
-                              onChange={(e) => updateFewShotExample(idx, "output", e.target.value)}
-                              className="text-xs min-h-[36px] resize-y !font-['Manrope']"
-                            />
+                            <Textarea placeholder="Input..." value={ex.input} onChange={(e) => updateFewShotExample(idx, "input", e.target.value)} className="text-xs min-h-[32px] resize-y !font-['Manrope']" />
+                            <Textarea placeholder="Expected output..." value={ex.output} onChange={(e) => updateFewShotExample(idx, "output", e.target.value)} className="text-xs min-h-[32px] resize-y !font-['Manrope']" />
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
+
+                  {/* Prompt parameters */}
+                  <PromptControls {...{
+                    parameters,
+                    onParameterChange: handleParameterChange,
+                    onReset: handleReset,
+                    onOptimize: handleOptimizeSubmit,
+                    onRegenerate: handleRegenerate,
+                    showRegenerate,
+                    onUndo: handleUndo,
+                    chatValue: editingText,
+                    onChatChange: handleInputChange,
+                    onChatSubmit: handleChatSubmit,
+                    chatSubmitButtonId: "prompt-playground-submit-2",
+                    disableSend,
+                    disableOptimize,
+                    enableBias,
+                    enableSpecificity,
+                    enableContext,
+                    enableStyle,
+                    chatAnimationKey: optimizePulse,
+                    waitingforOptimization,
+                    files: uploadedFiles,
+                    onUploadFiles: handleUploadFiles,
+                    onRemoveFile: handleRemoveFile
+                  }} />
                 </div>
               )}
 
@@ -894,119 +917,79 @@ const PromptPlaygroundV2 = () => {
 
                   {/* System Prompt */}
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-semibold text-foreground">System Prompt</label>
-                      <Switch checked={sysPromptEnabled} onCheckedChange={setSysPromptEnabled} className="scale-75" />
-                    </div>
-                    {sysPromptEnabled && (
-                      <Textarea
-                        placeholder="You are a helpful journalist assistant..."
-                        value={sysPromptText}
-                        onChange={(e) => setSysPromptText(e.target.value)}
-                        className="text-sm min-h-[80px] resize-y !font-['Manrope']"
-                      />
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Temperature */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-foreground">Temperature</label>
-                      <span className="text-xs text-muted-foreground tabular-nums">{temperature.toFixed(1)}</span>
-                    </div>
-                    <Slider
-                      value={[temperature]}
-                      onValueChange={([v]) => setTemperature(v)}
-                      min={0}
-                      max={1}
-                      step={0.1}
-                      className="w-full"
+                    <label className="text-xs font-semibold text-foreground mb-1.5 block">System Prompt</label>
+                    <Textarea
+                      placeholder="You are a helpful journalist assistant..."
+                      value={sysPromptText}
+                      onChange={(e) => setSysPromptText(e.target.value)}
+                      className="text-sm min-h-[100px] resize-y !font-['Manrope']"
                     />
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-                      <span>Stable</span>
-                      <span>Random</span>
+                  </div>
+
+                  {/* Context injection buttons */}
+                  <div>
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
+                      Add to system prompt
+                    </label>
+                    <div className="flex gap-1.5">
+                      <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => injectContextBlock("instruction")}>
+                        <Plus className="h-3 w-3" /> Instruction
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-amber-300 text-amber-700 hover:bg-amber-50" onClick={() => injectContextBlock("knowledge")}>
+                        <Plus className="h-3 w-3" /> Knowledge
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-purple-300 text-purple-700 hover:bg-purple-50" onClick={() => injectContextBlock("persona")}>
+                        <Plus className="h-3 w-3" /> Persona
+                      </Button>
                     </div>
                   </div>
 
                   <Separator />
 
-                  {/* Context Pipeline */}
+                  {/* Temperature — guided simulator style */}
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-semibold text-foreground">Context Pipeline</label>
-                      <Switch checked={contextPipelineEnabled} onCheckedChange={setContextPipelineEnabled} className="scale-75" />
-                    </div>
-                    {contextPipelineEnabled && (
-                      <div className="space-y-2">
-                        {contextBlocks.map((block) => {
-                          const typeColors: Record<ContextBlock["type"], string> = {
-                            instruction: "border-blue-300 bg-blue-50/50",
-                            knowledge: "border-amber-300 bg-amber-50/50",
-                            persona: "border-purple-300 bg-purple-50/50",
-                          };
-                          const typeLabels: Record<ContextBlock["type"], string> = {
-                            instruction: "Instruction",
-                            knowledge: "Knowledge",
-                            persona: "Persona",
-                          };
-                          return (
-                            <div
-                              key={block.id}
-                              className={`rounded-lg border p-2 space-y-1 transition-opacity ${
-                                block.enabled ? typeColors[block.type] : "border-border bg-muted/30 opacity-50"
-                              }`}
-                            >
-                              <div className="flex items-center gap-1.5">
-                                <input
-                                  type="checkbox"
-                                  checked={block.enabled}
-                                  onChange={(e) => updateContextBlock(block.id, "enabled", e.target.checked)}
-                                  className="h-3 w-3 rounded accent-foreground"
-                                />
-                                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
-                                  {typeLabels[block.type]}
-                                </span>
-                                <button type="button" onClick={() => removeContextBlock(block.id)} className="ml-auto text-muted-foreground hover:text-foreground">
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </div>
-                              <input
-                                type="text"
-                                value={block.label}
-                                onChange={(e) => updateContextBlock(block.id, "label", e.target.value)}
-                                className="w-full text-xs font-semibold text-foreground bg-transparent border-none outline-none p-0 !font-['Manrope']"
-                                placeholder="Label..."
-                              />
-                              <Textarea
-                                placeholder={
-                                  block.type === "instruction"
-                                    ? "e.g. Summarize the key points, cite sources..."
-                                    : block.type === "knowledge"
-                                      ? "Paste reference text, data, or article content..."
-                                      : "e.g. You are a senior DW journalist..."
-                                }
-                                value={block.content}
-                                onChange={(e) => updateContextBlock(block.id, "content", e.target.value)}
-                                className="text-xs min-h-[50px] resize-y !font-['Manrope']"
-                              />
-                            </div>
-                          );
-                        })}
-                        <div className="flex gap-1.5">
-                          <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("instruction")}>
-                            <Plus className="h-3 w-3" /> Instruction
-                          </Button>
-                          <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("knowledge")}>
-                            <Plus className="h-3 w-3" /> Knowledge
-                          </Button>
-                          <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1" onClick={() => addContextBlock("persona")}>
-                            <Plus className="h-3 w-3" /> Persona
-                          </Button>
+                    <label className="text-xs font-semibold text-foreground mb-2 block">Temperature</label>
+                    <div className="relative">
+                      <div className="relative h-10 flex items-center">
+                        {/* Track background */}
+                        <div className="absolute inset-x-0 h-4 rounded bg-surface-600" />
+                        {/* Filled range */}
+                        <div
+                          className="absolute left-0 h-4 rounded-l bg-brand-tertiary-500"
+                          style={{ width: `${(tempStepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
+                        />
+                        {/* Thumb */}
+                        <div
+                          className="absolute h-7 -translate-x-1/2 cursor-pointer flex items-center"
+                          style={{ left: `${(tempStepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
+                        >
+                          <div className="h-full w-[4px] bg-background" />
+                          <div className="h-full w-1 rounded-sm bg-brand-tertiary-500" />
+                          <div className="h-full w-[4px] bg-background" />
                         </div>
+                        {/* Invisible slider */}
+                        <input
+                          type="range"
+                          min={0}
+                          max={TEMPERATURE_STEPS.length - 1}
+                          step={1}
+                          value={tempStepIndex}
+                          onChange={(e) => setTempStepIndex(Number(e.target.value))}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer"
+                        />
                       </div>
-                    )}
+                      {/* Value label */}
+                      <div
+                        className="text-xs font-semibold text-foreground mt-1 absolute -translate-x-1/2"
+                        style={{ left: `${(tempStepIndex / (TEMPERATURE_STEPS.length - 1)) * 100}%` }}
+                      >
+                        {TEMPERATURE_STEPS[tempStepIndex].toFixed(1)}
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-muted-foreground pt-5">
+                      <span>More Stable</span>
+                      <span>More Random</span>
+                    </div>
                   </div>
                 </div>
               )}
