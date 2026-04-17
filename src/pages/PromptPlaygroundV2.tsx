@@ -156,7 +156,7 @@ const PromptPlaygroundV2 = () => {
   const updateContextBlock = (id: string, field: keyof ContextBlock, value: string | boolean) =>
     setContextBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)));
   type FewShotExample = { input: string; output: string };
-  const [fewShotExamples, setFewShotExamples] = useState<FewShotExample[]>([{ input: "", output: "" }]);
+  const [fewShotExamples, setFewShotExamples] = useState<FewShotExample[]>([]);
 
   const addFewShotExample = () => setFewShotExamples((prev) => [...prev, { input: "", output: "" }]);
   const removeFewShotExample = (idx: number) => setFewShotExamples((prev) => prev.filter((_, i) => i !== idx));
@@ -836,9 +836,9 @@ const PromptPlaygroundV2 = () => {
     <div className="min-h-screen max-h-screen bg-background flex flex-col">
       <Header onLanguageChange={setPageLanguage} />
       <main className="flex-1 flex flex-col">
-        <div className="flex flex-1 h-[calc(100vh-4rem)] max-w-7xl mx-auto w-full items-center">
-          <div className="w-80 flex-shrink-0 bg-surface-200 2xl:bg-transparent 2xl:pb-4 flex items-start justify-center overflow-y-auto h-full">
-            <div className="w-[264px] pt-6 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72 flex flex-col h-full">
+        <div className="flex flex-1 h-[calc(100vh-4rem)] w-full items-center">
+          <div className="w-64 md:w-80 flex-shrink-0 bg-surface-200 flex items-start justify-center overflow-y-auto h-full">
+            <div className="w-full px-2 md:px-0 md:w-[264px] pt-6 pb-4 flex flex-col h-full">
 
               {/* ── User / System tabs ── */}
               <div className="px-4 pt-3 pb-1 [&_*]:!font-heading">
