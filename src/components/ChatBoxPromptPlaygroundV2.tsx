@@ -17,7 +17,7 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Globe, Loader2, Paperclip, RefreshCcw, SendHorizontal } from "lucide-react";
+import { Globe, Loader2, Paperclip, Plus, RefreshCcw, SendHorizontal } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -103,6 +103,10 @@ type ChatboxProps = VariantProps<typeof chatboxVariants> & {
   webSearchEnabled?: boolean;
   /** Callback to toggle web search mode */
   onToggleWebSearch?: () => void;
+  /** Callback to add a few-shot example */
+  onAddExample?: () => void;
+  /** Number of few-shot examples currently added */
+  exampleCount?: number;
 };
 
 const Chatbox = ({
@@ -127,6 +131,8 @@ const Chatbox = ({
   showRegenerate = false,
   webSearchEnabled = false,
   onToggleWebSearch,
+  onAddExample,
+  exampleCount = 0,
 }: ChatboxProps) => {
   // Controlled-only component: `value` drives the textarea and `onChange` must be provided.
 
@@ -301,6 +307,29 @@ const Chatbox = ({
           </TooltipContent>
         )}
       </Tooltip>
+      {onAddExample && (
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full h-4 w-4 flex-shrink-0 relative"
+              type="button"
+              onClick={onAddExample}
+            >
+              <Plus className="h-4 w-4 text-muted-foreground" />
+              {exampleCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 rounded-full bg-brand-tertiary-500 text-[8px] text-white flex items-center justify-center font-bold">
+                  {exampleCount}
+                </span>
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="px-3 py-1.5 text-xs">
+            Add few-shot example
+          </TooltipContent>
+        </Tooltip>
+      )}
       <div className="flex-1 flex flex-wrap items-center gap-1 max-w-[250px] max-h-[1.75rem] overflow-y-auto">
         {files.map((file, index) =>
           <div
