@@ -879,7 +879,7 @@ const PromptPlaygroundV2 = () => {
                           <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
                             <p>Provide input/output pairs so the model learns the style, format, and tone you want. This is called few-shot prompting.</p>
                             <button type="button" onClick={() => navigate("/module/llm-training/few-shot")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                              Go to Few-shot Prompting learning →
+                              Go to learning →
                             </button>
                           </PopoverContent>
                         </Popover>
@@ -946,7 +946,7 @@ const PromptPlaygroundV2 = () => {
                         <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
                           <p>The system prompt sets the role and behaviour of the LLM before it sees your message. It shapes tone, constraints, and focus.</p>
                           <button type="button" onClick={() => navigate("/module/system-parameters")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                            Go to System Parameters learning →
+                            Go to learning →
                           </button>
                         </PopoverContent>
                       </Popover>
@@ -970,7 +970,7 @@ const PromptPlaygroundV2 = () => {
                         <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
                           <p>Add structured blocks to the system prompt: instructions for the task, knowledge sources to ground the output, or a persona to define the voice.</p>
                           <button type="button" onClick={() => navigate("/module/multiple-sources")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                            Go to Multiple Documents learning →
+                            Go to learning →
                           </button>
                         </PopoverContent>
                       </Popover>
@@ -1001,7 +1001,7 @@ const PromptPlaygroundV2 = () => {
                         <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
                           <p>Temperature controls how random the output is. Low values produce predictable, deterministic text. High values produce more creative but less reliable text.</p>
                           <button type="button" onClick={() => navigate("/module/system-parameters/temperature")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                            Go to Temperature learning →
+                            Go to learning →
                           </button>
                         </PopoverContent>
                       </Popover>
