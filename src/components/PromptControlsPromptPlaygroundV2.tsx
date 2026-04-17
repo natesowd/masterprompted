@@ -10,6 +10,7 @@ import { Info, Redo2, RefreshCcw } from "lucide-react";
 import Chatbox from "./ChatBoxPromptPlaygroundV2";
 import { Parameters } from "@/pages/PromptPlaygroundV2";
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import optimizationFig from "@/assets/optimization_fig.png";
 
@@ -194,6 +195,7 @@ export default function PromptControls({
     onToggleWebSearch,
 }: PromptControlsProps) {
     const { t } = useLanguage();
+    const navigate = useNavigate();
     const [titlePopoverOpen, setTitlePopoverOpen] = useState(false);
     const [walkthroughOpen, setWalkthroughOpen] = useState(false);
     const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -255,7 +257,12 @@ export default function PromptControls({
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
                             >
-                                {t('components.promptControls.titleInfo')}
+                                <div className="space-y-2">
+                                    <div>{t('components.promptControls.titleInfo')}</div>
+                                    <button type="button" onClick={() => navigate("/module/prompt-construction")} className="text-white/90 hover:text-white hover:underline text-xs font-semibold block">
+                                        Go to Prompt Construction learning →
+                                    </button>
+                                </div>
                             </PopoverContent>
                         </Popover>
                     </div>
