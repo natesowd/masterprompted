@@ -864,26 +864,7 @@ const PromptPlaygroundV2 = () => {
               {/* USER tab                                      */}
               {/* ============================================ */}
               {controlTab === "user" && (
-                <div className="flex-1 flex flex-col overflow-hidden">
-                  {/* Chatbox + few-shot */}
-                  <div className="px-4 pt-2 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
-                    <Chatbox
-                      value={editingText}
-                      onChange={handleInputChange}
-                      onSubmit={handleChatSubmit}
-                      submitButtonId="prompt-playground-submit"
-                      disableSend={disableSend}
-                      animationKey={optimizePulse}
-                      waitingforOptimization={waitingforOptimization}
-                      files={uploadedFiles}
-                      onUploadFiles={handleUploadFiles}
-                      onRemoveFile={handleRemoveFile}
-                      onAddExample={addFewShotExample}
-                      exampleCount={fewShotExamples.filter(e => e.input.trim() || e.output.trim()).length}
-                      className="z-50 w-full flex-auto min-h-0"
-                    />
-                  </div>
-
+                <div className="flex-1 flex flex-col overflow-y-auto">
                   {/* Few-shot examples */}
                   {fewShotExamples.length > 0 && (
                     <div className="px-4 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
@@ -920,7 +901,7 @@ const PromptPlaygroundV2 = () => {
                     </div>
                   )}
 
-                  {/* Prompt parameters */}
+                  {/* Prompt Construction controls (with chatbox inside) */}
                   <PromptControls {...{
                     parameters,
                     onParameterChange: handleParameterChange,
@@ -932,7 +913,7 @@ const PromptPlaygroundV2 = () => {
                     chatValue: editingText,
                     onChatChange: handleInputChange,
                     onChatSubmit: handleChatSubmit,
-                    chatSubmitButtonId: "prompt-playground-submit-2",
+                    chatSubmitButtonId: "prompt-playground-submit",
                     disableSend,
                     disableOptimize,
                     enableBias,
@@ -943,7 +924,9 @@ const PromptPlaygroundV2 = () => {
                     waitingforOptimization,
                     files: uploadedFiles,
                     onUploadFiles: handleUploadFiles,
-                    onRemoveFile: handleRemoveFile
+                    onRemoveFile: handleRemoveFile,
+                    onAddExample: addFewShotExample,
+                    exampleCount: fewShotExamples.filter(e => e.input.trim() || e.output.trim()).length,
                   }} />
                 </div>
               )}
