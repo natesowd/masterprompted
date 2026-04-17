@@ -288,7 +288,7 @@ export default function PromptControls({
                                 <div className="space-y-2">
                                     <div>{t('components.promptControls.titleInfo')}</div>
                                     <button type="button" onClick={() => navigate("/module/prompt-construction")} className="text-white/90 hover:text-white hover:underline text-xs font-semibold block">
-                                        Go to Prompt Construction learning →
+                                        Go to learning →
                                     </button>
                                 </div>
                             </PopoverContent>

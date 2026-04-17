@@ -15,7 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCcw, X, Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Chatbox from "@/components/ChatBoxPromptPlaygroundV2";
@@ -872,19 +872,17 @@ const PromptPlaygroundV2 = () => {
                         <h3 className="font-bold text-foreground text-lg">
                           Examples ({fewShotExamples.length})
                         </h3>
-                        <TooltipProvider>
-                          <Tooltip delayDuration={200}>
-                            <TooltipTrigger asChild>
-                              <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
-                              <p>Provide input/output pairs so the model learns the style, format, and tone you want. This is called few-shot prompting.</p>
-                              <button type="button" onClick={() => navigate("/module/llm-training/few-shot")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                                Go to Few-shot Prompting learning →
-                              </button>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                            <p>Provide input/output pairs so the model learns the style, format, and tone you want. This is called few-shot prompting.</p>
+                            <button type="button" onClick={() => navigate("/module/llm-training/few-shot")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                              Go to learning →
+                            </button>
+                          </PopoverContent>
+                        </Popover>
                       </div>
                       <div className="space-y-2 max-h-[140px] overflow-y-auto">
                         {fewShotExamples.map((ex, idx) => (
@@ -941,19 +939,17 @@ const PromptPlaygroundV2 = () => {
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <h3 className="font-bold text-foreground text-lg">System Prompt</h3>
-                      <TooltipProvider>
-                        <Tooltip delayDuration={200}>
-                          <TooltipTrigger asChild>
-                            <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
-                            <p>The system prompt sets the role and behaviour of the LLM before it sees your message. It shapes tone, constraints, and focus.</p>
-                            <button type="button" onClick={() => navigate("/module/system-parameters")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                              Go to System Parameters learning →
-                            </button>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                          <p>The system prompt sets the role and behaviour of the LLM before it sees your message. It shapes tone, constraints, and focus.</p>
+                          <button type="button" onClick={() => navigate("/module/system-parameters")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                            Go to learning →
+                          </button>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <Textarea
                       placeholder="You are a helpful journalist assistant..."
@@ -967,19 +963,17 @@ const PromptPlaygroundV2 = () => {
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <h3 className="font-bold text-foreground text-lg">Context</h3>
-                      <TooltipProvider>
-                        <Tooltip delayDuration={200}>
-                          <TooltipTrigger asChild>
-                            <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
-                            <p>Add structured blocks to the system prompt: instructions for the task, knowledge sources to ground the output, or a persona to define the voice.</p>
-                            <button type="button" onClick={() => navigate("/module/multiple-sources")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                              Go to Multiple Documents learning →
-                            </button>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                          <p>Add structured blocks to the system prompt: instructions for the task, knowledge sources to ground the output, or a persona to define the voice.</p>
+                          <button type="button" onClick={() => navigate("/module/multiple-sources")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                            Go to learning →
+                          </button>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="flex gap-1.5">
                       <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => injectContextBlock("instruction")}>
@@ -1000,19 +994,17 @@ const PromptPlaygroundV2 = () => {
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
                       <h3 className="font-bold text-foreground text-lg">Temperature</h3>
-                      <TooltipProvider>
-                        <Tooltip delayDuration={200}>
-                          <TooltipTrigger asChild>
-                            <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-xs text-sm space-y-2 p-3">
-                            <p>Temperature controls how random the output is. Low values produce predictable, deterministic text. High values produce more creative but less reliable text.</p>
-                            <button type="button" onClick={() => navigate("/module/system-parameters/temperature")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
-                              Go to Temperature learning →
-                            </button>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Info className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs text-sm space-y-2 p-3">
+                          <p>Temperature controls how random the output is. Low values produce predictable, deterministic text. High values produce more creative but less reliable text.</p>
+                          <button type="button" onClick={() => navigate("/module/system-parameters/temperature")} className="text-brand-tertiary-500 hover:underline text-xs font-semibold">
+                            Go to learning →
+                          </button>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="relative">
                       <div className="relative h-10 flex items-center">
