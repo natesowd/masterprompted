@@ -157,6 +157,8 @@ interface PromptControlsProps {
     className?: string;
     webSearchEnabled?: boolean;
     onToggleWebSearch?: () => void;
+    onAddExample?: () => void;
+    exampleCount?: number;
 }
 
 export default function PromptControls({
@@ -193,6 +195,8 @@ export default function PromptControls({
     className,
     webSearchEnabled = false,
     onToggleWebSearch,
+    onAddExample,
+    exampleCount = 0,
 }: PromptControlsProps) {
     const { t } = useLanguage();
     const navigate = useNavigate();
@@ -241,6 +245,30 @@ export default function PromptControls({
     return (
         <div className={cn("bg-surface-200 flex flex-col overflow-hidden h-fit [&_*]:!font-heading [&_textarea]:!font-['Manrope']", className)}>
             <div className="px-4 pb-4 pt-3 flex flex-col gap-1 min-h-0">
+                {/* Chatbox */}
+                <div id="prompt-controls-chatbox" className="mb-2">
+                    <Chatbox
+                        value={chatValue}
+                        onChange={onChatChange ?? (() => {})}
+                        onSubmit={onChatSubmit}
+                        submitButtonId={chatSubmitButtonId}
+                        disableSend={disableSend}
+                        animationKey={chatAnimationKey}
+                        waitingforOptimization={waitingforOptimization}
+                        onUploadFiles={onUploadFiles}
+                        files={files}
+                        onRemoveFile={onRemoveFile}
+                        readOnly={readOnly}
+                        hideSubmitButton={hideChatSubmitButton}
+                        autoResize={readOnly}
+                        webSearchEnabled={webSearchEnabled}
+                        onToggleWebSearch={onToggleWebSearch}
+                        onAddExample={onAddExample}
+                        exampleCount={exampleCount}
+                        className={cn("z-50 w-full", readOnly ? "flex-none" : "flex-auto min-h-0")}
+                    />
+                </div>
+
                 {/* Parameters area */}
                 <div className="flex-initial flex flex-col justify-end min-h-0 overflow-y-auto">
                     <div className="flex items-center gap-1.5 mt-2 mb-1">
