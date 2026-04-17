@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus, RefreshCcw, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Chatbox from "@/components/ChatBoxPromptPlaygroundV2";
@@ -95,15 +95,36 @@ const PromptPlaygroundV2 = () => {
   const TEMPERATURE_STEPS = [0.0, 0.2, 0.5, 0.8, 1.0];
   const [tempStepIndex, setTempStepIndex] = useState(3); // default 0.8
 
-  // Inject a context block into the system prompt with a colored tag
-  const injectContextBlock = (type: "instruction" | "knowledge" | "persona") => {
-    const templates: Record<string, string> = {
-      instruction: "[INSTRUCTION]\nSummarize the key points, cite all sources, and use a neutral journalistic tone.\n[/INSTRUCTION]",
-      knowledge: "[KNOWLEDGE]\nPaste your reference text, data, or article content here.\n[/KNOWLEDGE]",
-      persona: "[PERSONA]\nYou are an experienced investigative journalist at DW.\n[/PERSONA]",
-    };
-    const block = templates[type];
-    setSysPromptText((prev) => prev ? `${prev}\n\n${block}` : block);
+  // Inject or regenerate a context block in the system prompt
+  type BlockType = "instruction" | "knowledge" | "persona";
+  const BLOCK_TAGS: Record<BlockType, { open: string; close: string }> = {
+    instruction: { open: "[INSTRUCTION]", close: "[/INSTRUCTION]" },
+    knowledge: { open: "[KNOWLEDGE]", close: "[/KNOWLEDGE]" },
+    persona: { open: "[PERSONA]", close: "[/PERSONA]" },
+  };
+  const BLOCK_TEMPLATES: Record<BlockType, string> = {
+    instruction: "Summarize the key points, cite all sources, and use a neutral journalistic tone.",
+    knowledge: "Paste your reference text, data, or article content here.",
+    persona: "You are an experienced investigative journalist at DW.",
+  };
+
+  const hasBlock = (type: BlockType): boolean => {
+    const { open, close } = BLOCK_TAGS[type];
+    return sysPromptText.includes(open) && sysPromptText.includes(close);
+  };
+
+  const injectContextBlock = (type: BlockType) => {
+    const { open, close } = BLOCK_TAGS[type];
+    const newContent = `${open}\n${BLOCK_TEMPLATES[type]}\n${close}`;
+
+    if (hasBlock(type)) {
+      // Regenerate: replace existing block
+      const regex = new RegExp(`\\${open.replace('[', '\\[')}[\\s\\S]*?\\${close.replace('[', '\\[').replace('/', '\\/')}`, 'g');
+      setSysPromptText((prev) => prev.replace(regex, newContent));
+    } else {
+      // First inject
+      setSysPromptText((prev) => prev ? `${prev}\n\n${newContent}` : newContent);
+    }
   };
 
   // System prompt
@@ -933,13 +954,13 @@ const PromptPlaygroundV2 = () => {
                     </label>
                     <div className="flex gap-1.5">
                       <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => injectContextBlock("instruction")}>
-                        <Plus className="h-3 w-3" /> Instruction
+                        {hasBlock("instruction") ? <RefreshCcw className="h-3 w-3" /> : <Plus className="h-3 w-3" />} Instruction
                       </Button>
                       <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-amber-300 text-amber-700 hover:bg-amber-50" onClick={() => injectContextBlock("knowledge")}>
-                        <Plus className="h-3 w-3" /> Knowledge
+                        {hasBlock("knowledge") ? <RefreshCcw className="h-3 w-3" /> : <Plus className="h-3 w-3" />} Knowledge
                       </Button>
                       <Button type="button" variant="outline" size="sm" className="flex-1 text-[10px] gap-1 px-1 border-purple-300 text-purple-700 hover:bg-purple-50" onClick={() => injectContextBlock("persona")}>
-                        <Plus className="h-3 w-3" /> Persona
+                        {hasBlock("persona") ? <RefreshCcw className="h-3 w-3" /> : <Plus className="h-3 w-3" />} Persona
                       </Button>
                     </div>
                   </div>
