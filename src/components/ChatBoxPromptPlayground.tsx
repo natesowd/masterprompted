@@ -118,8 +118,7 @@ const Chatbox = ({
   files = [],
   onRemoveFile,
   readOnly = false,
-  // Submit button is archived — flip default to `false` to restore it.
-  hideSubmitButton = true,
+  hideSubmitButton = false,
   autoResize = false,
   className = "",
   size,

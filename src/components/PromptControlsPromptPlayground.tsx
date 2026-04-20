@@ -154,7 +154,6 @@ interface PromptControlsProps {
     onUploadFiles?: (files: FileList | File[]) => void;
     onRemoveFile?: (index: number) => void;
     readOnly?: boolean;
-    hideChatSubmitButton?: boolean;
     className?: string;
     webSearchEnabled?: boolean;
     onToggleWebSearch?: () => void;
@@ -191,7 +190,6 @@ export default function PromptControls({
     onRemoveFile,
     waitingforOptimization = false,
     readOnly = false,
-    hideChatSubmitButton = false,
     className,
     webSearchEnabled = false,
     onToggleWebSearch,
@@ -256,7 +254,10 @@ export default function PromptControls({
                         files={files}
                         onRemoveFile={onRemoveFile}
                         readOnly={readOnly}
-                        hideSubmitButton={hideChatSubmitButton}
+                        // Archived: the primary action button in this panel is the single
+                        // source of submit/optimize. Flip to `false` to restore the in-chatbox
+                        // submit button. This is the ONLY place the flag is set — no layered defaults.
+                        hideSubmitButton={true}
                         autoResize={readOnly}
                         webSearchEnabled={webSearchEnabled}
                         onToggleWebSearch={onToggleWebSearch}
