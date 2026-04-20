@@ -135,6 +135,8 @@ interface PromptControlsProps {
     onParameterChange: (key: keyof Parameters, value: string) => void;
     onReset?: () => void;
     onOptimize?: () => void;
+    /** Which label/behavior to show on the primary action button. */
+    buttonMode?: 'submit' | 'optimize';
     onRegenerate?: () => void;
     showRegenerate?: boolean;
     undoEnabled?: boolean;
@@ -171,6 +173,7 @@ export default function PromptControls({
     onParameterChange,
     onReset,
     onOptimize,
+    buttonMode = 'optimize',
     onRegenerate,
     showRegenerate = false,
     undoEnabled = false,
@@ -337,9 +340,11 @@ export default function PromptControls({
                             variant="secondary"
                             size="lg"
                             className="flex-1 min-h-[48px] leading-tight whitespace-normal text-center font-heading font-semibold bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white"
-                            disabled={disableOptimize}
+                            disabled={buttonMode === 'submit' ? disableSend : disableOptimize}
                         >
-                            {t('components.promptControls.sendOptimizedPrompt')}
+                            {buttonMode === 'submit'
+                                ? t('components.promptControls.sendPrompt')
+                                : t('components.promptControls.sendOptimizedPrompt')}
                         </Button>
                     </div>
                     <p className="text-[10px] leading-snug text-muted-foreground/70 text-left">
