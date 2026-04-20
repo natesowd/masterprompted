@@ -29,9 +29,9 @@ const chatboxVariants = cva(
   {
     variants: {
       size: {
-        default: "min-w-0 min-h-[150px] max-h-[400px]",
+        default: "min-w-0 min-h-[190px] max-h-[460px]",
         compact: "min-w-0 min-h-[120px] max-h-[300px]",
-        expanded: "min-w-0 min-h-[200px] max-h-[500px]"
+        expanded: "min-w-0 min-h-[240px] max-h-[540px]"
       },
       state: {
         default: "",
@@ -118,7 +118,8 @@ const Chatbox = ({
   files = [],
   onRemoveFile,
   readOnly = false,
-  hideSubmitButton = false,
+  // Submit button is archived — flip default to `false` to restore it.
+  hideSubmitButton = true,
   autoResize = false,
   className = "",
   size,
@@ -354,8 +355,8 @@ const Chatbox = ({
       {!waitingforOptimization &&
         <Textarea
           placeholder="Type your message here..."
-          className={cn("border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 py-2 mt-2 mb-2 pl-4 pr-16 leading-relaxed text-card-foreground font-['Manrope'] text-md resize-none mx-0",
-
+          className={cn("border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 py-2 mt-2 mb-2 pl-4 leading-relaxed text-card-foreground font-['Manrope'] text-md resize-none mx-0",
+            hideSubmitButton ? "pr-4" : "pr-16",
             autoResize ? "h-auto overflow-hidden" : "flex-1 h-full min-h-0 overflow-y-auto"
           )}
           value={value}
@@ -376,7 +377,10 @@ const Chatbox = ({
       }
       {waitingforOptimization &&
         <div
-          className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 py-4 pr-16 text-lg leading-relaxed text-card-foreground font-['Manrope'] flex-1 h-full min-h-[140px] resize-none overflow-y-auto">
+          className={cn(
+            "border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 py-4 text-lg leading-relaxed text-card-foreground font-['Manrope'] flex-1 h-full min-h-[140px] resize-none overflow-y-auto",
+            hideSubmitButton ? "pr-4" : "pr-16"
+          )}>
           <Skeleton className="mt-2 h-4 w-[180px]" />
           <Skeleton className="mt-2 h-4 w-[150px]" />
         </div>
