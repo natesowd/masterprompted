@@ -709,9 +709,6 @@ export default function MultipleSourcesExercise() {
 
                             {/* Drop zone — sources row */}
                             <div>
-                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Sources
-                              </p>
                               <div
                                 onDragOver={handleDropZoneDragOver}
                                 onDragLeave={handleDropZoneDragLeave}
@@ -734,6 +731,7 @@ export default function MultipleSourcesExercise() {
                                       <div key={doc.id} className="flex flex-col items-stretch">
                                         {/* Source block */}
                                         <div className="rounded-lg border border-border bg-white p-3 relative">
+                                          <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Source</p>
                                           <button
                                             type="button"
                                             onClick={() => removeDiagramDoc(doc.id)}
@@ -755,6 +753,7 @@ export default function MultipleSourcesExercise() {
                                     {/* Locked training database — always present */}
                                     <div className="flex flex-col items-stretch">
                                       <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/50 p-3">
+                                        <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Source</p>
                                         <div className="flex items-center gap-1.5 mb-1">
                                           <Database className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
                                           <span className="text-xs font-semibold text-foreground">Training Database</span>
@@ -785,26 +784,23 @@ export default function MultipleSourcesExercise() {
                                 </div>
 
                                 {/* Extraction row — one box per source */}
-                                <div>
-                                  <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                    Information extracted
-                                  </p>
-                                  <div
-                                    className="grid gap-3"
-                                    style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
-                                  >
-                                    {diagramSelectedDocs.map((doc) => (
-                                      <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-2.5">
-                                        <p className="text-[11px] text-foreground leading-relaxed italic">
-                                          {LLM_EXTRACTIONS[doc.id]}
-                                        </p>
-                                      </div>
-                                    ))}
-                                    <div className="rounded-lg border border-dashed border-border bg-muted/20 p-2.5">
-                                      <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                                        "AI ethics" · "journalism standards" · "public trust" · …
+                                <div
+                                  className="grid gap-3"
+                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
+                                >
+                                  {diagramSelectedDocs.map((doc) => (
+                                    <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-2.5 max-h-[100px] overflow-y-auto">
+                                      <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Extracted</p>
+                                      <p className="text-[11px] text-foreground leading-relaxed italic">
+                                        {LLM_EXTRACTIONS[doc.id]}
                                       </p>
                                     </div>
+                                  ))}
+                                  <div className="rounded-lg border border-dashed border-border bg-muted/20 p-2.5 max-h-[100px] overflow-y-auto">
+                                    <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Extracted</p>
+                                    <p className="text-[11px] text-muted-foreground leading-relaxed italic">
+                                      "AI ethics" · "journalism standards" · "public trust" · …
+                                    </p>
                                   </div>
                                 </div>
 
@@ -830,29 +826,26 @@ export default function MultipleSourcesExercise() {
                                 </div>
 
                                 {/* Output */}
-                                <div>
-                                  <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                    Output
-                                  </p>
-                                  {(() => {
-                                    const key = Array.from(diagramDocs).sort().join(",");
-                                    const merged = LLM_MERGED_OUTPUTS[key];
-                                    if (!merged) {
-                                      return (
-                                        <div className="rounded-lg border border-border bg-white p-4">
-                                          <p className="text-sm text-muted-foreground italic">
-                                            Add more documents to see how the LLM merges them.
-                                          </p>
-                                        </div>
-                                      );
-                                    }
+                                {(() => {
+                                  const key = Array.from(diagramDocs).sort().join(",");
+                                  const merged = LLM_MERGED_OUTPUTS[key];
+                                  if (!merged) {
                                     return (
                                       <div className="rounded-lg border border-border bg-white p-4">
-                                        <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
+                                        <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Output</p>
+                                        <p className="text-sm text-muted-foreground italic">
+                                          Add more documents to see how the LLM merges them.
+                                        </p>
                                       </div>
                                     );
+                                  }
+                                  return (
+                                    <div className="rounded-lg border border-border bg-white p-4">
+                                      <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Output</p>
+                                      <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
+                                    </div>
+                                    );
                                   })()}
-                                </div>
                               </>
                             )}
                           </div>
