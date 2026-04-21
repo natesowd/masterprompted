@@ -816,8 +816,6 @@ export default function MultipleSourcesExercise() {
                                       </div>
                                     ))}
                                   </div>
-                                  {/* Vertical line down from merge to output */}
-                                  <div className="absolute left-1/2 top-6 h-6 w-0.5 bg-brand-tertiary-500/40 -translate-x-1/2" />
                                 </div>
 
                                 {/* Output */}
