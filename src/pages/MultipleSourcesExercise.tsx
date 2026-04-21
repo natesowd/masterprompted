@@ -695,7 +695,7 @@ export default function MultipleSourcesExercise() {
                     {/* HOW IT WORKS VIEW                             */}
                     {/* ============================================ */}
                     {topView === "how-it-works" && (
-                      <div className="bg-background rounded-xl p-8 flex-1 flex flex-col border border-brand-tertiary-500/20">
+                      <div className="bg-background rounded-xl p-8 flex-1 flex flex-col">
 
                         {/* Prompt – always visible */}
                         <div className="mb-6 ml-auto max-w-[80%] bg-muted p-5 rounded-[20px]">
