@@ -1017,7 +1017,7 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
                       placeholder="You are a helpful journalist assistant..."
                       value={sysPromptText}
                       onChange={(e) => setSysPromptText(e.target.value)}
-                      className="text-sm min-h-[100px] resize-y !font-['Manrope']"
+                      className="text-sm min-h-[200px] resize-y !font-['Manrope']"
                     />
                   </div>
 
