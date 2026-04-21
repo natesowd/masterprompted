@@ -695,11 +695,11 @@ export default function MultipleSourcesExercise() {
                     {/* HOW IT WORKS VIEW                             */}
                     {/* ============================================ */}
                     {topView === "how-it-works" && (
-                      <div className="bg-background rounded-lg p-8 flex-1 flex flex-col">
+                      <div className="bg-white rounded-lg p-8 flex-1 flex flex-col border border-border shadow-sm">
 
                         {/* Prompt – always visible */}
                         <div className="mb-6 ml-auto max-w-[80%] bg-muted p-5 rounded-[20px]">
-                          <p className="text-foreground leading-relaxed">
+                          <p className="text-foreground leading-relaxed font-medium">
                             Who holds the most responsibility to uphold AI ethics?
                           </p>
                         </div>
@@ -730,8 +730,8 @@ export default function MultipleSourcesExercise() {
                                     {diagramSelectedDocs.map((doc) => (
                                       <div key={doc.id} className="flex flex-col items-stretch">
                                         {/* Source block */}
-                                        <div className="rounded-lg border border-border bg-white p-3 relative">
-                                          <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Source</p>
+                                        <div className="rounded-lg border-2 border-border bg-white p-3 relative shadow-sm">
+                                          <p className="text-[9px] font-heading font-bold text-foreground/60 uppercase tracking-widest mb-1">Source</p>
                                           <button
                                             type="button"
                                             onClick={() => removeDiagramDoc(doc.id)}
@@ -752,8 +752,8 @@ export default function MultipleSourcesExercise() {
                                     ))}
                                     {/* Locked training database — always present */}
                                     <div className="flex flex-col items-stretch">
-                                      <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/50 p-3">
-                                        <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Source</p>
+                                      <div className="rounded-lg border-2 border-dashed border-muted-foreground/40 bg-muted/60 p-3 shadow-sm">
+                                        <p className="text-[9px] font-heading font-bold text-foreground/60 uppercase tracking-widest mb-1">Source</p>
                                         <div className="flex items-center gap-1.5 mb-1">
                                           <Database className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
                                           <span className="text-xs font-semibold text-foreground">Training Database</span>
@@ -778,7 +778,7 @@ export default function MultipleSourcesExercise() {
                                 >
                                   {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
                                     <div key={doc.id} className="flex justify-center">
-                                      <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
+                                      <ArrowDown className="h-5 w-5 text-foreground/50" />
                                     </div>
                                   ))}
                                 </div>
@@ -789,15 +789,15 @@ export default function MultipleSourcesExercise() {
                                   style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
                                 >
                                   {diagramSelectedDocs.map((doc) => (
-                                    <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-2.5 max-h-[100px] overflow-y-auto">
-                                      <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Extracted</p>
+                                    <div key={doc.id} className="rounded-lg border-2 border-border bg-muted/40 p-2.5 max-h-[100px] overflow-y-auto shadow-sm">
+                                      <p className="text-[9px] font-heading font-bold text-foreground/60 uppercase tracking-widest mb-1">Extracted</p>
                                       <p className="text-[11px] text-foreground leading-relaxed italic">
                                         {LLM_EXTRACTIONS[doc.id]}
                                       </p>
                                     </div>
                                   ))}
-                                  <div className="rounded-lg border border-dashed border-border bg-muted/20 p-2.5 max-h-[100px] overflow-y-auto">
-                                    <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Extracted</p>
+                                  <div className="rounded-lg border-2 border-dashed border-border bg-muted/30 p-2.5 max-h-[100px] overflow-y-auto shadow-sm">
+                                    <p className="text-[9px] font-heading font-bold text-foreground/60 uppercase tracking-widest mb-1">Extracted</p>
                                     <p className="text-[11px] text-muted-foreground leading-relaxed italic">
                                       "AI ethics" · "journalism standards" · "public trust" · …
                                     </p>
@@ -812,7 +812,7 @@ export default function MultipleSourcesExercise() {
                                   >
                                     {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
                                       <div key={doc.id} className="flex justify-center">
-                                        <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
+                                        <ArrowDown className="h-5 w-5 text-foreground/50" />
                                       </div>
                                     ))}
                                   </div>
@@ -826,8 +826,8 @@ export default function MultipleSourcesExercise() {
                                   const merged = LLM_MERGED_OUTPUTS[key];
                                   if (!merged) {
                                     return (
-                                      <div className="rounded-lg border border-border bg-white p-4">
-                                        <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Output</p>
+                                      <div className="rounded-lg border-2 border-border bg-white p-4 shadow-sm">
+                                        <p className="text-[9px] font-heading font-bold text-foreground/60 uppercase tracking-widest mb-1">Output</p>
                                         <p className="text-sm text-muted-foreground italic">
                                           Add more documents to see how the LLM merges them.
                                         </p>
@@ -835,8 +835,8 @@ export default function MultipleSourcesExercise() {
                                     );
                                   }
                                   return (
-                                    <div className="rounded-lg border border-border bg-white p-4">
-                                      <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Output</p>
+                                    <div className="rounded-lg border-2 border-border bg-white p-4 shadow-sm">
+                                      <p className="text-[9px] font-heading font-bold text-foreground/60 uppercase tracking-widest mb-1">Output</p>
                                       <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
                                     </div>
                                     );
