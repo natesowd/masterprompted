@@ -120,6 +120,14 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
       setEditingText(DISASTER_USER_PROMPT);
       setDisableSend(false);
     }
+    if (next === 5) {
+      // Auto-submit the prompt
+      handleChatSubmit(DISASTER_USER_PROMPT);
+      // Wait for the response to start streaming, then show step 6
+      setTimeout(() => setTutorialStep(6), 2000);
+      setTutorialStep(next);
+      return;
+    }
     setTutorialStep(next);
   };
 
@@ -1195,13 +1203,25 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
       <FeatureHighlight
         target="#prompt-playground-submit"
         open={tutorialStep === 5}
+        onClose={advanceTutorial}
+        side="left"
+        sideOffset={24}
+        closeLabel="Send prompt"
+      >
+        <p className="font-semibold mb-1">Send your prompt</p>
+        <p>We'll now submit this prompt to the LLM. It will produce a <strong>diversity summary with source attribution</strong> — the same approach a journalist would use to cover disaster response fairly. Click <strong>Send prompt</strong> to see the result.</p>
+      </FeatureHighlight>
+
+      <FeatureHighlight
+        target=".flex-1.px-6.py-4"
+        open={tutorialStep === 6}
         onClose={() => { resetTutorial(); setTutorialStep(0); }}
         side="left"
         sideOffset={24}
-        closeLabel="Start experimenting"
+        closeLabel="Reset & try your own"
       >
-        <p className="font-semibold mb-1">Ready to go!</p>
-        <p>Hit <strong>Send</strong> to submit your prompt. The LLM will produce a diversity summary with source attribution. When you're done, use the navigation buttons below to continue to the takeaways. Click <strong>Start experimenting</strong> to reset and try your own scenario.</p>
+        <p className="font-semibold mb-1">Here's the result</p>
+        <p>The LLM has generated a diversity summary from the disaster-response scenario. Each bullet point is attributed to its source, preserving all viewpoints. You can now <strong>reset and try your own documents</strong> — upload PDFs, set your own system prompt, and experiment freely. Use the navigation buttons below to continue to the takeaways when you're ready.</p>
       </FeatureHighlight>
 
       {summarizationProgress.isActive && (
