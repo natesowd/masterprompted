@@ -3,7 +3,7 @@
 import Header from "@/components/Header";
 import PromptControls from "@/components/PromptControlsPromptPlaygroundV2";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatBody from "@/components/ChatBodyV2";
@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCcw, X, Info } from "lucide-react";
+import { Plus, RefreshCcw, X, Info, ArrowLeft, ArrowRight } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -90,6 +90,8 @@ function InfoPopover({ children }: { children: React.ReactNode }) {
 
 const PromptPlaygroundV2 = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fromGuidedSimulator = searchParams.get("from") === "gs";
   const [threads, setThreads] = useState<Thread[]>([]);
   const [parameters, setParameters] = useState<Parameters>({ specificity: "", style: "", context: "", bias: "" });
   const [disableSend, setDisableSend] = useState(true);
@@ -1078,6 +1080,30 @@ const PromptPlaygroundV2 = () => {
         </div>
       </main>
 
+      {/* Guided simulator navigation — shown when arriving from the GS flow */}
+      {fromGuidedSimulator && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
+          <div className="flex items-center gap-3 bg-card/95 backdrop-blur-sm border border-border rounded-full px-4 py-2 shadow-lg">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/module/multiple-sources/try-it")}
+              className="h-9 w-9 rounded-full hover:bg-muted"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="w-px h-5 bg-border" />
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/module/multiple-sources/takeaways")}
+              className="rounded-full px-4 h-9 text-sm font-heading font-semibold hover:bg-muted gap-1.5"
+            >
+              Continue to Takeaways
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {summarizationProgress.isActive && (
         <Dialog open={true}>

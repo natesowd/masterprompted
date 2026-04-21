@@ -110,7 +110,7 @@ export default function MultipleSourcesTryItYourself() {
               <ArrowLeft className="!h-6 !w-6" />
             </Button>
             <Button
-              onClick={() => navigate("/playground-v2")}
+              onClick={() => navigate("/playground-v2?from=gs")}
               className="font-heading font-semibold text-base px-10 py-6 rounded-full bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white"
             >
               Open Prompt Playground
