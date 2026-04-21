@@ -92,10 +92,10 @@ function InfoPopover({ children }: { children: React.ReactNode }) {
 const PromptPlaygroundV2 = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const fromGuidedSimulator = searchParams.get("from") === "gs";
+  const fromMultipleSources = searchParams.get("from") === "ms";
 
   /* ── GS tutorial (disaster case study) ── */
-  const [tutorialStep, setTutorialStep] = useState(fromGuidedSimulator ? 1 : 0);
+  const [tutorialStep, setTutorialStep] = useState(fromMultipleSources ? 1 : 0);
 
   const DISASTER_SYSTEM_PROMPT = `You are a diversity-aware summarization assistant for journalists.
 
@@ -1121,7 +1121,7 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
       </main>
 
       {/* Guided simulator navigation — GS-style green outlined buttons */}
-      {fromGuidedSimulator && tutorialStep === 0 && (
+      {fromMultipleSources && tutorialStep === 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3">
           <Button
             variant="outline"

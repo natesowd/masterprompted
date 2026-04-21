@@ -684,8 +684,8 @@ export default function MultipleSourcesExercise() {
                           <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
                             <ArrowLeft className="!h-5 !w-5" />
                           </Button>
-                          <Button variant="outline" size="lg" onClick={() => navigate("/playground-v2?from=gs")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
-                            Continue <ArrowRight className="-mr-2 !h-6 !w-6" />
+                          <Button variant="outline" size="lg" onClick={() => navigate("/playground-v2?from=ms")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            Try it in the Prompt Playground <ArrowRight className="-mr-2 !h-6 !w-6" />
                           </Button>
                         </div>
                       </div>
@@ -850,8 +850,8 @@ export default function MultipleSourcesExercise() {
                           <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
                             <ArrowLeft className="!h-5 !w-5" />
                           </Button>
-                          <Button variant="outline" size="lg" onClick={() => navigate("/playground-v2?from=gs")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
-                            Continue <ArrowRight className="-mr-2 !h-6 !w-6" />
+                          <Button variant="outline" size="lg" onClick={() => navigate("/playground-v2?from=ms")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            Try it in the Prompt Playground <ArrowRight className="-mr-2 !h-6 !w-6" />
                           </Button>
                         </div>
                       </div>
