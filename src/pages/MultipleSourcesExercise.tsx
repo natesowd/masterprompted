@@ -7,7 +7,7 @@ import EvaluationPanel from "@/components/EvaluationPanel";
 import TextFlag from "@/components/TextFlag";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ArrowLeft, ArrowRight, File, Paperclip, ChevronDown, ChevronUp, Bot, Search, Database, FileText, ArrowDown, Lock, Eye, Layers } from "lucide-react";
+import { ArrowLeft, ArrowRight, File, Paperclip, ChevronDown, ChevronUp, Bot, Database, FileText, ArrowDown, Lock, Eye, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -598,7 +598,7 @@ export default function MultipleSourcesExercise() {
                 {topView === "how-it-works" && (
                   <>
                     <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                      Explore how an LLM and a search engine each process the same query with multiple documents.
+                      Explore how an LLM processes the same query with multiple documents.
                     </p>
                     {diagramRoute === "llm" && (
                       <>
@@ -721,15 +721,6 @@ export default function MultipleSourcesExercise() {
                                 <Bot className="h-8 w-8 text-muted-foreground" />
                                 <span className="text-sm font-heading font-semibold text-foreground">LLM</span>
                                 <span className="text-xs text-muted-foreground text-center">Merges all sources into one answer</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setDiagramRoute("search")}
-                                className="flex-1 flex flex-col items-center gap-3 rounded-xl border-2 border-border hover:border-brand-tertiary-500 p-6 transition-all hover:shadow-md"
-                              >
-                                <Search className="h-8 w-8 text-muted-foreground" />
-                                <span className="text-sm font-heading font-semibold text-foreground">Search Engine</span>
-                                <span className="text-xs text-muted-foreground text-center">Keeps each source separate</span>
                               </button>
                             </div>
                           </>
@@ -894,68 +885,6 @@ export default function MultipleSourcesExercise() {
                                 </div>
                               </>
                             )}
-                          </div>
-                        )}
-
-                        {/* ── Search engine block diagram ── */}
-                        {diagramRoute === "search" && (
-                          <div className="flex-1 space-y-4">
-                            <button
-                              type="button"
-                              onClick={() => setDiagramRoute(null)}
-                              className="text-xs text-brand-tertiary-500 font-semibold flex items-center gap-1 hover:underline mb-2"
-                            >
-                              <ArrowLeft className="h-3 w-3" /> Back
-                            </button>
-
-                            {/* Indexed sources */}
-                            <div>
-                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Documents indexed separately
-                              </p>
-                              <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${DOCUMENTS.length}, minmax(0, 1fr))` }}>
-                                {DOCUMENTS.map((doc) => (
-                                  <div key={doc.id} className="rounded-lg border border-border bg-muted/30 p-3">
-                                    <div className="flex items-center gap-1.5 mb-1">
-                                      <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-                                      <span className="text-xs font-semibold text-foreground">{doc.title}</span>
-                                    </div>
-                                    <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                      {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs[0] || ""}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Per-block arrows down */}
-                            <div className="grid gap-3 px-3" style={{ gridTemplateColumns: `repeat(${DOCUMENTS.length}, minmax(0, 1fr))` }}>
-                              {DOCUMENTS.map((doc) => (
-                                <div key={doc.id} className="flex justify-center">
-                                  <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
-                                </div>
-                              ))}
-                            </div>
-
-                            {/* Separate results — one column per doc, vertical so text fits */}
-                            <div>
-                              <p className="text-xs font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                Results returned with source attribution
-                              </p>
-                              <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${DOCUMENTS.length}, minmax(0, 1fr))` }}>
-                                {DOCUMENTS.map((doc) => (
-                                  <div key={doc.id} className="rounded-lg border border-border bg-white p-3">
-                                    <div className="flex items-center gap-1.5 mb-1">
-                                      <Search className="h-3.5 w-3.5 text-muted-foreground" />
-                                      <span className="text-xs font-semibold text-foreground">{doc.title}</span>
-                                    </div>
-                                    <p className="text-xs text-foreground leading-relaxed">
-                                      {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs.join(" ") || ""}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
                           </div>
                         )}
 
