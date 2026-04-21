@@ -713,9 +713,9 @@ export default function MultipleSourcesExercise() {
                                 onDragOver={handleDropZoneDragOver}
                                 onDragLeave={handleDropZoneDragLeave}
                                 onDrop={handleDropZoneDrop}
-                                className={cn(
-                                  "min-h-[110px] rounded-lg border-2 border-dashed p-3 transition-colors",
-                                  isDragOver ? "border-foreground bg-muted/40" : "border-border"
+                                 className={cn(
+                                  "min-h-[110px] rounded-lg p-3 transition-colors",
+                                  isDragOver ? "bg-muted/40" : ""
                                 )}
                               >
                                 {diagramSelectedDocs.length === 0 ? (
