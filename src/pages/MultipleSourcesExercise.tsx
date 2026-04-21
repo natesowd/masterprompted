@@ -822,9 +822,6 @@ export default function MultipleSourcesExercise() {
                                   </div>
                                   {/* Vertical line down from merge to output */}
                                   <div className="absolute left-1/2 top-6 h-6 w-px bg-muted-foreground/30 -translate-x-1/2" />
-                                  <div className="absolute left-1/2 bottom-0 -translate-x-1/2">
-                                    <ArrowDown className="h-5 w-5 text-muted-foreground/40" />
-                                  </div>
                                 </div>
 
                                 {/* Output */}
