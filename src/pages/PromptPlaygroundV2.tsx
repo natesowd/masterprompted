@@ -39,7 +39,15 @@ export type VersionEvaluation = {
   data: EvaluationResult | null;
 };
 
-export type ThreadVersion = { prompt: string; answer?: string; parameters?: Parameters };
+export type ThreadVersion = {
+  prompt: string;
+  answer?: string;
+  parameters?: Parameters;
+  fileNames?: string[];
+  webSearchEnabled?: boolean;
+  webSearchSources?: import("@/services/webSearch/webSearchClient").WebSearchResult[];
+  searchStatus?: "searching" | "streaming" | "complete" | "error";
+};
 export type Thread = {
   versions: ThreadVersion[];
   currentIndex: number;

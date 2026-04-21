@@ -63,18 +63,17 @@ export type ParsedFile = {
 const PromptPlayground = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [parameters, setParameters] = useState<Parameters>({ specificity: "", style: "", context: "", bias: "" });
-  const [disableSend, setDisableSend] = useState(true);
-  const [disableOptimize, setDisableOptimize] = useState(true);
   const [optimizePulse, setOptimizePulse] = useState(0);
   const [currentPrompt, setCurrentPrompt] = useState<string>("");
   const [editingText, setEditingText] = useState<string>("");
   const [previousPrompt, setPreviousPrompt] = useState<string>("");
+  // Dirty flags track whether a given trigger category has been touched since the last send.
+  // They determine the button's mode (submit vs optimize) and whether it's enabled.
   const [hasManualEdit, setHasManualEdit] = useState<boolean>(false);
-  const [isEmpty, setIsEmpty] = useState<boolean>(true);
-  const [enableBias, setEnableBias] = useState<boolean>(false);
-  const [enableSpecificity, setEnableSpecificity] = useState<boolean>(false);
-  const [enableStyle, setEnableStyle] = useState<boolean>(false);
-  const [enableContext, setEnableContext] = useState<boolean>(false);
+  const [paramChangeDirty, setParamChangeDirty] = useState<boolean>(false);
+  const [fileOrSearchDirty, setFileOrSearchDirty] = useState<boolean>(false);
+  // Last non-null mode; used to keep the button label stable while it's disabled.
+  const [lastButtonMode, setLastButtonMode] = useState<'submit' | 'optimize'>('submit');
   const [fullReset, setFullReset] = useState<boolean>(false);
   const LOCALSTORAGE_POPKEY = "promptPlayground.popoverSeen";
   const [showControlPanelPopover, setShowControlPanelPopover] = useState<boolean>(false);
@@ -152,13 +151,36 @@ const PromptPlayground = () => {
   }, []);
 
   const handleParameterChange = (paramKey: keyof Parameters, value: string) => {
-    setParameters(prev => ({ ...prev, [paramKey]: value }));
+    setParameters(prev => {
+      const next = { ...prev, [paramKey]: value };
+      setParamChangeDirty(Object.values(next).some(p => p !== ""));
+      return next;
+    });
   };
 
   const handleReset = () => {
     setFullReset(true);
     setParameters({ specificity: "", style: "", context: "", bias: "" });
+    setParamChangeDirty(false);
   };
+
+  // Derive the currently-active trigger category, with precedence:
+  // manual edit > param change > file/web-search change.
+  // When no trigger is active, the button is disabled but keeps the last mode's label.
+  const activeMode: 'submit' | 'optimize' | null = hasManualEdit
+    ? 'submit'
+    : paramChangeDirty
+      ? 'optimize'
+      : fileOrSearchDirty
+        ? 'submit'
+        : null;
+  const buttonMode: 'submit' | 'optimize' = activeMode ?? lastButtonMode;
+  const promptHasText = !!editingText.trim();
+  const sendButtonDisabled = !activeMode || !promptHasText || waitingforOptimization;
+
+  useEffect(() => {
+    if (activeMode) setLastButtonMode(activeMode);
+  }, [activeMode]);
 
 
 
@@ -638,7 +660,6 @@ const PromptPlayground = () => {
         optimizationCacheRef.current.set(cacheKey, optimizedPrompt);
 
         setEditingText(optimizedPrompt);
-        setDisableOptimize(false);
         setHasManualEdit(false);
         setOptimizePulse(prev => prev + 1);
       } else {
@@ -737,22 +758,18 @@ const PromptPlayground = () => {
             : f
         ));
 
-        setHasManualEdit(false);
-        setDisableOptimize(false);
-        // console.log(isEmpty);
-        setDisableSend(isEmpty);
+        setFileOrSearchDirty(true);
 
       } catch (err) {
         console.error(`Failed to parse PDF ${file.name}:`, err);
         setUploadedFiles(prev => prev.filter(f => f.name !== file.name || f.isUploading !== true));
       }
     }
-  }, [uploadedFiles, isEmpty, useSummaryForOptimization, useSummaryForOutput]);
+  }, [uploadedFiles, useSummaryForOptimization, useSummaryForOutput]);
 
   const handleRemoveFile = useCallback((index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-    setDisableOptimize(false);
-    setHasManualEdit(false);
+    setFileOrSearchDirty(true);
   }, []);
 
   useEffect(() => {
@@ -760,7 +777,6 @@ const PromptPlayground = () => {
     if (Object.values(parameters).every(p => p === "")) {
       if (!fullReset) {
         setEditingText(currentPrompt);
-        setDisableOptimize(true);
         setOptimizePulse(prev => prev + 1);
       }
       setFullReset(false);
@@ -774,11 +790,9 @@ const PromptPlayground = () => {
         const cached = optimizationCacheRef.current.get(cacheKey);
         if (cached) {
           setEditingText(cached);
-          setDisableOptimize(false);
           setOptimizePulse(prev => prev + 1);
           return;
         }
-        setDisableSend(true);
         handlePromptOptimize(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
       }
     }
@@ -789,9 +803,6 @@ const PromptPlayground = () => {
     setCurrentPrompt(previousPrompt);
     setEditingText(previousPrompt);
     setPreviousPrompt("");
-    const empty = !previousPrompt.trim();
-    setIsEmpty(empty);
-    setDisableSend(empty);
   };
 
   const createNewThreadAndFetch = async (submittedText: string) => {
@@ -830,24 +841,33 @@ const PromptPlayground = () => {
     }
   };
 
-  const handleSubmit = async (submittedText: string, isOptimize: boolean = false) => {
+  // Branch between new-thread and new-version based on whether the user manually
+  // edited the prompt since the last send — manual edit always starts a new thread.
+  // `isSubmitMode` updates currentPrompt (the user's typed baseline); optimize mode
+  // preserves it so undo/restore still reference the original prompt.
+  const handleSubmit = async (submittedText: string, isSubmitMode: boolean) => {
     if (!submittedText.trim()) return;
-    if (isOptimize) {
+    if (isSubmitMode) {
       setCurrentPrompt(submittedText);
     }
-    setDisableSend(true);
-    setDisableOptimize(true);
+    const wasManualEdit = hasManualEdit;
     setHasManualEdit(false);
-    setEnableSpecificity(true); setEnableBias(true); setEnableContext(true); setEnableStyle(true);
-    if (threads.length === 0 || hasManualEdit) {
+    setParamChangeDirty(false);
+    setFileOrSearchDirty(false);
+    if (threads.length === 0 || wasManualEdit) {
       await createNewThreadAndFetch(submittedText);
     } else {
       await submitAnswerForLatestVersion(submittedText);
     }
   };
 
-  const handleChatSubmit = (submittedText: string) => { void handleSubmit(submittedText, true); };
-  const handleOptimizeSubmit = async () => { if (editingText.trim()) { void handleSubmit(editingText, false); } };
+  // Unified action for the primary button. Accepts an optional arg so it matches
+  // the Chatbox onSubmit signature (ignored — we use editingText state).
+  const handlePrimaryAction = (_submittedText?: string) => {
+    if (sendButtonDisabled) return;
+    if (!editingText.trim()) return;
+    void handleSubmit(editingText, buttonMode === 'submit');
+  };
 
   const handleRegenerate = useCallback(() => {
     const promptToOptimize = currentPrompt.trim() ? currentPrompt : editingText;
@@ -856,22 +876,16 @@ const PromptPlayground = () => {
     // Delete the cached entry so a fresh optimization is forced
     const cacheKey = buildCacheKey(promptToOptimize, parameters, uploadedFiles);
     optimizationCacheRef.current.delete(cacheKey);
-    setDisableSend(true);
     handlePromptOptimize(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
   }, [currentPrompt, editingText, parameters, handlePromptOptimize]);
 
   // Show regenerate button when there's an active optimization result for the current parameter set
-  const showRegenerate = !disableOptimize && !waitingforOptimization && Object.values(parameters).some(p => p !== "");
+  const showRegenerate = paramChangeDirty && !waitingforOptimization && Object.values(parameters).some(p => p !== "");
   const handleInputChange = (input: string) => {
     setHasManualEdit(true);
     handleReset();
     setEditingText(input);
     setCurrentPrompt(input);
-    const empty = !input.trim();
-    setIsEmpty(empty);
-    setDisableSend(empty);
-    setDisableOptimize(true);
-    setEnableSpecificity(false); setEnableBias(false); setEnableContext(false); setEnableStyle(false);
   };
 
   const handlePrevVersion = useCallback((threadIndex: number) => {
@@ -911,20 +925,21 @@ const PromptPlayground = () => {
                 parameters,
                 onParameterChange: handleParameterChange,
                 onReset: handleReset,
-                onOptimize: handleOptimizeSubmit,
+                onOptimize: handlePrimaryAction,
+                buttonMode,
                 onRegenerate: handleRegenerate,
                 showRegenerate,
                 onUndo: handleUndo,
                 chatValue: editingText,
                 onChatChange: handleInputChange,
-                onChatSubmit: handleChatSubmit,
+                onChatSubmit: handlePrimaryAction,
                 chatSubmitButtonId: "prompt-playground-submit",
-                disableSend,
-                disableOptimize,
-                enableBias,
-                enableSpecificity,
-                enableContext,
-                enableStyle,
+                disableSend: sendButtonDisabled,
+                disableOptimize: sendButtonDisabled,
+                enableBias: promptHasText,
+                enableSpecificity: promptHasText,
+                enableContext: promptHasText,
+                enableStyle: promptHasText,
                 chatAnimationKey: optimizePulse,
                 waitingforOptimization,
                 files: uploadedFiles,
@@ -933,8 +948,7 @@ const PromptPlayground = () => {
                 webSearchEnabled,
                 onToggleWebSearch: () => {
                   setWebSearchEnabled(prev => !prev);
-                  setDisableOptimize(false);
-                  setHasManualEdit(false);
+                  setFileOrSearchDirty(true);
                 },
               }} />
             </div>

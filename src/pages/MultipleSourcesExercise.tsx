@@ -713,9 +713,9 @@ export default function MultipleSourcesExercise() {
                                 onDragOver={handleDropZoneDragOver}
                                 onDragLeave={handleDropZoneDragLeave}
                                 onDrop={handleDropZoneDrop}
-                                className={cn(
-                                  "min-h-[110px] rounded-lg border-2 border-dashed p-3 transition-colors shadow-inner",
-                                  isDragOver ? "border-foreground bg-muted/50" : "border-border/60 bg-muted/10"
+                                 className={cn(
+                                  "min-h-[110px] rounded-lg p-3 transition-colors",
+                                  isDragOver ? "bg-muted/40" : ""
                                 )}
                               >
                                 {diagramSelectedDocs.length === 0 ? (
@@ -816,13 +816,8 @@ export default function MultipleSourcesExercise() {
                                       </div>
                                     ))}
                                   </div>
-                                  {/* Horizontal merge line */}
-                                  <div className="absolute left-[8%] right-[8%] top-6 h-0.5 bg-foreground/40" />
                                   {/* Vertical line down from merge to output */}
-                                  <div className="absolute left-1/2 top-6 h-6 w-0.5 bg-foreground/40 -translate-x-1/2" />
-                                  <div className="absolute left-1/2 bottom-0 -translate-x-1/2">
-                                    <ArrowDown className="h-5 w-5 text-foreground/50" />
-                                  </div>
+                                  <div className="absolute left-1/2 top-6 h-6 w-px bg-muted-foreground/30 -translate-x-1/2" />
                                 </div>
 
                                 {/* Output */}
