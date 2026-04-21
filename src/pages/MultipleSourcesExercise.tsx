@@ -441,7 +441,7 @@ export default function MultipleSourcesExercise() {
   /* Top-level view: "exercise" (original) or "how-it-works" (block diagram) */
   const [topView, setTopView] = useState<"exercise" | "how-it-works">("exercise");
   /* Inside "how-it-works": which route has the user chosen? */
-  const [diagramRoute, setDiagramRoute] = useState<null | "llm" | "search">(null);
+  // Note: how-it-works view always shows the LLM RAG diagram (no route chooser)
   /* Separate doc selection for the LLM diagram (independent from exercise) */
   const [diagramDocs, setDiagramDocs] = useState<Set<string>>(new Set(["doc-1"]));
   /* Drag-and-drop visual state for the LLM diagram drop zone */
@@ -541,7 +541,7 @@ export default function MultipleSourcesExercise() {
                   <ToggleGroup
                     type="single"
                     value={topView}
-                    onValueChange={(v) => { if (v) { setTopView(v as typeof topView); if (v === "how-it-works") setDiagramRoute(null); } }}
+                    onValueChange={(v) => { if (v) setTopView(v as typeof topView); }}
                     className="w-full"
                   >
                     <ToggleGroupItem value="exercise" className="flex-1 gap-1.5 text-xs">
@@ -600,11 +600,10 @@ export default function MultipleSourcesExercise() {
                     <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                       Explore how an LLM processes the same query with multiple documents.
                     </p>
-                    {diagramRoute === "llm" && (
-                      <>
-                        <p className="text-sm font-semibold text-foreground mb-3">
-                          Drag documents into the diagram
-                        </p>
+                    <>
+                      <p className="text-sm font-semibold text-foreground mb-3">
+                        Drag documents into the diagram
+                      </p>
                         <div className="space-y-3">
                           {DOCUMENTS.map((doc) => {
                             const inDiagram = diagramDocs.has(doc.id);
@@ -637,7 +636,6 @@ export default function MultipleSourcesExercise() {
                           })}
                         </div>
                       </>
-                    )}
                   </>
                 )}
               </div>
@@ -706,36 +704,8 @@ export default function MultipleSourcesExercise() {
                           </p>
                         </div>
 
-                        {/* Route chooser (inline in main column) */}
-                        {!diagramRoute && (
-                          <>
-                            <p className="text-sm text-muted-foreground mb-6">
-                              How does each approach handle the same query with multiple documents?
-                            </p>
-                            <div className="flex gap-4 mt-4">
-                              <button
-                                type="button"
-                                onClick={() => setDiagramRoute("llm")}
-                                className="flex-1 flex flex-col items-center gap-3 rounded-xl border-2 border-border hover:border-brand-tertiary-500 p-6 transition-all hover:shadow-md"
-                              >
-                                <Bot className="h-8 w-8 text-muted-foreground" />
-                                <span className="text-sm font-heading font-semibold text-foreground">LLM</span>
-                                <span className="text-xs text-muted-foreground text-center">Merges all sources into one answer</span>
-                              </button>
-                            </div>
-                          </>
-                        )}
-
-                        {/* ── LLM block diagram ── */}
-                        {diagramRoute === "llm" && (
-                          <div className="flex-1 space-y-0">
-                            <button
-                              type="button"
-                              onClick={() => setDiagramRoute(null)}
-                              className="text-xs text-brand-tertiary-500 font-semibold flex items-center gap-1 hover:underline mb-4"
-                            >
-                              <ArrowLeft className="h-3 w-3" /> Back
-                            </button>
+                        {/* ── LLM block diagram (RAG flow) ── */}
+                        <div className="flex-1 space-y-0">
 
                             {/* Drop zone — sources row */}
                             <div>
@@ -886,25 +856,22 @@ export default function MultipleSourcesExercise() {
                               </>
                             )}
                           </div>
-                        )}
 
                         {/* Navigation */}
-                        {diagramRoute && (
-                          <div className="mt-8 flex items-center gap-3">
-                            <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
-                              <ArrowLeft className="!h-5 !w-5" />
-                            </Button>
-                            <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
-                              Takeaways <ArrowRight className="-mr-2 !h-6 !w-6" />
-                            </Button>
-                          </div>
-                        )}
+                        <div className="mt-8 flex items-center gap-3">
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            <ArrowLeft className="!h-5 !w-5" />
+                          </Button>
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            Takeaways <ArrowRight className="-mr-2 !h-6 !w-6" />
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
 
                   {/* Right sidebar - Evaluation */}
-                  {(topView === "exercise" || (topView === "how-it-works" && diagramRoute === "llm")) && (
+                  {(topView === "exercise" || topView === "how-it-works") && (
                     <div className="w-80 flex-shrink-0">
                       <EvaluationPanel initialIsOpen={topView === "how-it-works"} canClose={true} />
 
