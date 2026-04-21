@@ -249,16 +249,17 @@ const Chatbox = ({
               className="rounded-full h-4 w-4 flex-shrink-0"
               type="button"
               disabled={!showRegenerate}
+              // Inline pointer-events override so the Tooltip still fires on hover
+              // while the button is disabled. `disabled` still blocks clicks.
+              style={{ pointerEvents: 'auto' }}
               onClick={() => onRegenerate?.()}
             >
               <RefreshCcw className={cn("h-4 w-4", !showRegenerate ? "text-muted-foreground/30" : "text-muted-foreground")} />
             </Button>
           </TooltipTrigger>
-          {showRegenerate && (
-            <TooltipContent className="px-3 py-1.5 text-xs">
-              Regenerate optimization
-            </TooltipContent>
-          )}
+          <TooltipContent className="px-3 py-1.5 text-xs">
+            Regenerate optimization
+          </TooltipContent>
         </Tooltip>
       )}
       {onToggleWebSearch && (

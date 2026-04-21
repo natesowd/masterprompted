@@ -253,6 +253,8 @@ export default function PromptControls({
                         onUploadFiles={onUploadFiles}
                         files={files}
                         onRemoveFile={onRemoveFile}
+                        onRegenerate={onRegenerate}
+                        showRegenerate={showRegenerate}
                         readOnly={readOnly}
                         // Archived: the primary action button in this panel is the single
                         // source of submit/optimize. Flip to `false` to restore the in-chatbox
