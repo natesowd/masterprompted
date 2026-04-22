@@ -342,7 +342,7 @@ const ChatBody = memo(function ChatBody({
   const handleToggleDiffHelp = useCallback(() => setShowDiffPopover(true), []);
 
   return (
-    <div className="w-full max-w-6xl min-w-0 flex flex-col h-[calc(100vh-8rem)] relative">
+    <div className="w-full max-w-6xl min-w-0 flex flex-col flex-1 min-h-0 relative">
       <div className="flex h-full">
         <div className="flex-1 min-w-0 flex flex-col h-full relative">
           <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
