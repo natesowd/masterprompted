@@ -605,21 +605,14 @@ export default function MultipleSourcesExercise() {
                         Drag documents into the diagram
                       </p>
                         <div className="space-y-3">
-                          {DOCUMENTS.map((doc) => {
-                            const inDiagram = diagramDocs.has(doc.id);
-                            return (
+                          {DOCUMENTS.filter((doc) => !diagramDocs.has(doc.id)).map((doc) => (
                               <button
                                 key={doc.id}
                                 type="button"
                                 draggable
                                 onDragStart={(e) => handleDocDragStart(e, doc.id)}
                                 onClick={() => addDiagramDoc(doc.id)}
-                                className={cn(
-                                  "w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-shadow cursor-grab active:cursor-grabbing",
-                                  inDiagram
-                                    ? "border-brand-tertiary-500 shadow-sm opacity-60"
-                                    : "border-border hover:shadow-md"
-                                )}
+                                className="w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-shadow cursor-grab active:cursor-grabbing border-border hover:shadow-md"
                               >
                                 <File className="h-8 text-muted-foreground flex-shrink-0 my-[23px] w-[32px]" strokeWidth={1.5} />
                                 <div className="flex-1 min-w-0">
@@ -628,12 +621,14 @@ export default function MultipleSourcesExercise() {
                                     {doc.title}
                                   </span>
                                   <span className="text-xs text-muted-foreground">
-                                    {inDiagram ? "In diagram" : doc.source}
+                                    {doc.source}
                                   </span>
                                 </div>
                               </button>
-                            );
-                          })}
+                          ))}
+                          {DOCUMENTS.every((doc) => diagramDocs.has(doc.id)) && (
+                            <p className="text-xs text-muted-foreground italic text-center py-2">All documents added</p>
+                          )}
                         </div>
                       </>
                   </>
