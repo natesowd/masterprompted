@@ -138,8 +138,23 @@ const ChatBody = memo(function ChatBody({
   const [inlineCommentIds, setInlineCommentIds] = useState<Set<string>>(() => new Set());
   const [showDiffPopover, setShowDiffPopover] = useState(false);
   // Per-thread sidebar containers; CompareView portals its sidebar blocks into these.
-  const compareSidebarRefs = useRef<Map<number, HTMLDivElement | null>>(new Map());
-  const [, setCompareSidebarTick] = useState(0);
+  // Held in state so a child re-render is triggered once the portal target mounts,
+  // but ref callbacks must be stable across renders (inline callbacks cause null/el
+  // flap → infinite loop).
+  const [compareContainers, setCompareContainers] = useState<Record<number, HTMLDivElement | null>>({});
+  const compareRefCbCache = useRef<Map<number, (el: HTMLDivElement | null) => void>>(new Map());
+  const getCompareRefCb = useCallback((threadIndex: number) => {
+    const existing = compareRefCbCache.current.get(threadIndex);
+    if (existing) return existing;
+    const cb = (el: HTMLDivElement | null) => {
+      setCompareContainers(prev => {
+        if (prev[threadIndex] === el) return prev;
+        return { ...prev, [threadIndex]: el };
+      });
+    };
+    compareRefCbCache.current.set(threadIndex, cb);
+    return cb;
+  }, []);
 
   // New state to track the scrollHeight of the main chat
   const [chatHeight, setChatHeight] = useState(0);
@@ -445,7 +460,7 @@ const ChatBody = memo(function ChatBody({
                               onChangeCompareBase={(comparedIndex) => onChangeThreadCompareBase(threadIndex, comparedIndex)}
                               versions={thread.versions}
                               comparedVersionIndex={thread.comparedVersionIndex}
-                              compareSidebarContainer={compareSidebarRefs.current.get(threadIndex) ?? null}
+                              compareSidebarContainer={compareContainers[threadIndex] ?? null}
                             />
                           )}
                           {processedCurrent.enriched && processedCurrent.activeSources.length > 0 && (
@@ -479,18 +494,11 @@ const ChatBody = memo(function ChatBody({
                 the body's vertical thread stack so absolute-positioned compare
                 blocks align with their paired body blocks. */}
             <div className="mt-6 space-y-4">
-              {threads.map((thread, threadIndex) => (
+              {threads.map((_thread, threadIndex) => (
                 <div
                   key={`compare-sidebar-thread-${threadIndex}`}
                   id={`compare-sidebar-thread-${threadIndex}`}
-                  ref={(el) => {
-                    const prev = compareSidebarRefs.current.get(threadIndex);
-                    if (prev !== el) {
-                      compareSidebarRefs.current.set(threadIndex, el);
-                      // Nudge ChatAnswer to re-render now that its portal target exists.
-                      if (thread.showCompare) setCompareSidebarTick((t) => t + 1);
-                    }
-                  }}
+                  ref={getCompareRefCb(threadIndex)}
                   className="relative"
                 />
               ))}
