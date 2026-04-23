@@ -837,8 +837,9 @@ export default function MultipleSourcesExercise() {
                                   </div>
                                 </div>
 
-                                {/* Converging arrows — embeddings to output */}
-                                <div className="relative h-12">
+                                {/* Converging arrows — embeddings merge into one */}
+                                <div className="relative" style={{ height: 48 }}>
+                                  {/* Per-column arrows down from embeddings */}
                                   <div
                                     className="grid gap-3 absolute inset-x-0 top-0 px-3"
                                     style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
