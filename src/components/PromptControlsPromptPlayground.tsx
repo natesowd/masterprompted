@@ -238,8 +238,9 @@ export default function PromptControls({
     const isAnyParameterSet = Object.values(parameters).some(p => p !== "");
 
     return (
-        <div className={cn("bg-surface-200 flex flex-col overflow-hidden h-fit [&_*]:!font-heading [&_textarea]:!font-['Manrope']", className)}>
-            <div className="px-4 pb-4 pt-3 flex flex-col gap-1 min-h-0">
+        <div className={cn("bg-surface-200 flex flex-col overflow-hidden h-full [&_*]:!font-heading [&_textarea]:!font-['Manrope']", className)}>
+            {/* Scrollable area: chatbox + parameters */}
+            <div className="flex-1 min-h-0 px-4 pt-3 flex flex-col gap-1 overflow-y-auto">
                 {/* Chatbox */}
                 <div id="prompt-controls-chatbox" className="mb-2">
                     <Chatbox
@@ -268,7 +269,7 @@ export default function PromptControls({
                 </div>
 
                 {/* Parameters area */}
-                <div className="flex-initial flex flex-col justify-end min-h-0 overflow-y-auto">
+                <div className="flex flex-col">
                     <div className="flex items-center gap-1.5 mt-2 mb-1">
                         <h3 className="font-bold text-foreground text-lg">{t('components.promptControls.title')}</h3>
                         <Popover open={titlePopoverOpen} onOpenChange={setTitlePopoverOpen}>
@@ -287,7 +288,7 @@ export default function PromptControls({
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <div id='parameters' className="relative overflow-auto">
+                    <div id='parameters' className="relative">
                         <Parameter
                             parameterTitle={t('components.promptControls.specificity.title')}
                             parameterKey="specificity"
@@ -336,24 +337,22 @@ export default function PromptControls({
                             infoText={t('components.promptControls.bias.info')}
                         />
                     </div>
-
-                    <div className="flex py-3 items-stretch">
-                        <Button
-                            onClick={handleSubmitClick}
-                            variant="secondary"
-                            size="lg"
-                            className="flex-1 min-h-[48px] leading-tight whitespace-normal text-center font-heading font-semibold bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white"
-                            disabled={buttonMode === 'submit' ? disableSend : disableOptimize}
-                        >
-                            {buttonMode === 'submit'
-                                ? t('components.promptControls.sendPrompt')
-                                : t('components.promptControls.sendOptimizedPrompt')}
-                        </Button>
-                    </div>
-                    <p className="text-[10px] leading-snug text-muted-foreground/70 text-left">
-                        LLMs used in the creation of prompt optimizations and generated outputs include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
-                    </p>
                 </div>
+            </div>
+
+            {/* Sticky send button footer */}
+            <div className="flex-shrink-0 px-4 py-3 bg-surface-200 border-t border-border/40 flex items-stretch">
+                <Button
+                    onClick={handleSubmitClick}
+                    variant="secondary"
+                    size="lg"
+                    className="flex-1 min-h-[48px] leading-tight whitespace-normal text-center font-heading font-semibold bg-brand-tertiary-500 hover:bg-brand-tertiary-600 text-white"
+                    disabled={buttonMode === 'submit' ? disableSend : disableOptimize}
+                >
+                    {buttonMode === 'submit'
+                        ? t('components.promptControls.sendPrompt')
+                        : t('components.promptControls.sendOptimizedPrompt')}
+                </Button>
             </div>
 
             <Dialog open={walkthroughOpen} onOpenChange={setWalkthroughOpen}>
