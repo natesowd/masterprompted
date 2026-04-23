@@ -45,9 +45,12 @@ export type ThreadVersion = {
 export type Thread = {
   versions: ThreadVersion[];
   currentIndex: number;
+  /** @deprecated archived in favor of showCompare; retained for rollback */
   showDiff?: boolean;
   showEvaluation?: boolean;
   evaluations?: VersionEvaluation[];
+  showCompare?: boolean;
+  comparedVersionIndex?: number;
 };
 
 export type ParsedFile = {
@@ -137,7 +140,41 @@ const PromptPlayground = () => {
       next[threadIndex] = {
         ...next[threadIndex],
         showEvaluation: checked,
-        showDiff: checked ? false : next[threadIndex].showDiff
+        showDiff: checked ? false : next[threadIndex].showDiff,
+        showCompare: checked ? false : next[threadIndex].showCompare,
+      };
+      return next;
+    });
+  }, []);
+
+  const handleThreadCompareToggle = useCallback((threadIndex: number, comparedIndex?: number) => {
+    setThreads(prev => {
+      const next = [...prev];
+      const thread = next[threadIndex];
+      if (!thread) return prev;
+      const turningOn = !thread.showCompare;
+      next[threadIndex] = {
+        ...thread,
+        showCompare: turningOn,
+        comparedVersionIndex: turningOn ? comparedIndex : thread.comparedVersionIndex,
+        showEvaluation: turningOn ? false : thread.showEvaluation,
+        showDiff: turningOn ? false : thread.showDiff,
+      };
+      return next;
+    });
+  }, []);
+
+  const handleThreadCompareBaseChange = useCallback((threadIndex: number, comparedIndex: number) => {
+    setThreads(prev => {
+      const next = [...prev];
+      const thread = next[threadIndex];
+      if (!thread) return prev;
+      next[threadIndex] = {
+        ...thread,
+        showCompare: true,
+        comparedVersionIndex: comparedIndex,
+        showEvaluation: false,
+        showDiff: false,
       };
       return next;
     });
@@ -961,6 +998,8 @@ const PromptPlayground = () => {
               onNextVersion={handleNextVersion}
               onToggleThreadDiff={handleThreadDiffToggle}
               onToggleThreadEvaluation={handleThreadEvaluationToggle}
+              onToggleThreadCompare={handleThreadCompareToggle}
+              onChangeThreadCompareBase={handleThreadCompareBaseChange}
               onRequestControlPanelHelp={() => setShowControlPanelPopover(true)}
             />
           </div>

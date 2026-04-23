@@ -16,17 +16,20 @@
  * ```
  */
 
-import { Minus, CircleQuestionMark, Loader2 } from "lucide-react";
+import { Minus, CircleQuestionMark, Loader2, GitCompare } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useLayoutEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { useLayoutEffect, useRef, useState } from "react";
 import RichText from "@/components/RichText.tsx";
 import { diffWordsWithNewlineProtection, DiffPart } from "@/lib/diff";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { VersionEvaluation } from "@/pages/PromptPlayground";
+import { VersionEvaluation, ThreadVersion } from "@/pages/PromptPlayground";
 import { renderTextWithFlags } from "@/lib/evaluationRenderer";
+import CompareView from "@/components/CompareView";
+import CompareBasePickerModal from "@/components/CompareBasePickerModal";
 
 const answerVariants = cva(
   "mb-20 w-full",
@@ -65,9 +68,9 @@ type ChatAnswerProps = VariantProps<typeof answerVariants> & {
   currentIndex?: number;
   /** Thread index for unique IDs */
   threadIndex: number;
-  /** Whether to show diff visualization */
+  /** @deprecated archived in favor of showCompare */
   showDiff: boolean;
-  /** Callback when diff toggle is changed */
+  /** @deprecated archived in favor of onToggleCompare */
   onToggleDiff: (checked: boolean) => void;
   /** Whether to show evaluation flags */
   showEvaluation: boolean;
@@ -85,8 +88,20 @@ type ChatAnswerProps = VariantProps<typeof answerVariants> & {
   inlineCommentIds: Set<string>;
   /** Callback when comment is clicked */
   onCommentClick: (id: string) => void;
-  /** Callback to toggle diff help */
+  /** @deprecated archived in favor of compare */
   toggleDiffHelp: () => void;
+  /** Whether compare view is active */
+  showCompare: boolean;
+  /** Callback to toggle compare; pass comparedIndex to open with a specific base, undefined to close */
+  onToggleCompare: (comparedIndex?: number) => void;
+  /** Callback when user picks a different base version from the modal */
+  onChangeCompareBase: (comparedIndex: number) => void;
+  /** Versions of the thread — used for the base picker modal previews */
+  versions: ThreadVersion[];
+  /** Raw compared answer text to diff against current */
+  comparedVersionIndex?: number;
+  /** DOM element (sidebar container) to portal the compare sidebar into */
+  compareSidebarContainer: HTMLElement | null;
 };
 
 const ChatAnswer = ({
@@ -105,14 +120,51 @@ const ChatAnswer = ({
   inlineCommentIds,
   onCommentClick,
   toggleDiffHelp,
+  showCompare,
+  onToggleCompare,
+  onChangeCompareBase,
+  versions,
+  comparedVersionIndex,
+  compareSidebarContainer,
   variant
 }: ChatAnswerProps) => {
   const { t } = useLanguage();
   const markerRefs = useRef<Map<string, HTMLElement | null>>(new Map());
+  const [showBasePicker, setShowBasePicker] = useState(false);
   const formattedText = text.replace(/\\n/g, '\n');
 
   const canShowDiff = answerArray.length > 1 && currentIndex > 0;
+  const canCompare = versions.length > 1;
   const originalAnswer = canShowDiff ? answerArray[0].replace(/\\n/g, '\n') : "";
+
+  const resolvedComparedIndex = (() => {
+    if (comparedVersionIndex != null && comparedVersionIndex !== currentIndex) return comparedVersionIndex;
+    // Default pick: the other version when there are exactly 2.
+    if (versions.length === 2) return currentIndex === 0 ? 1 : 0;
+    return null;
+  })();
+  const comparedText = resolvedComparedIndex != null
+    ? (versions[resolvedComparedIndex]?.answer ?? "").replace(/\\n/g, '\n')
+    : "";
+
+  const handleCompareClick = () => {
+    if (!canCompare) return;
+    if (showCompare) {
+      onToggleCompare(undefined);
+      return;
+    }
+    if (versions.length === 2) {
+      onToggleCompare(currentIndex === 0 ? 1 : 0);
+    } else {
+      setShowBasePicker(true);
+    }
+  };
+
+  const handlePickBase = (idx: number) => {
+    setShowBasePicker(false);
+    if (showCompare) onChangeCompareBase(idx);
+    else onToggleCompare(idx);
+  };
 
   const diffResult: DiffPart[] = showDiff && canShowDiff
     ? diffWordsWithNewlineProtection(originalAnswer, formattedText)
@@ -232,6 +284,9 @@ const ChatAnswer = ({
     <div className={cn(answerVariants({ variant }))}>
       <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
         <div className="flex items-center gap-4">
+          {/* LEGACY: "Show Changes" switch archived in favor of the Compare button below.
+              Keep this block for rollback — reinstate by uncommenting and re-wiring the
+              archived onToggleDiff path. Do not delete.
           <div className="flex items-center space-x-2" id='show-diff-switch'>
             <Switch
               id={`show-diff-${threadIndex}`}
@@ -250,6 +305,19 @@ const ChatAnswer = ({
                 </button>
               )}
             </Label>
+          </div>
+          */}
+          <div className="flex items-center space-x-2" id="compare-button">
+            <Button
+              size="sm"
+              variant={showCompare ? "default" : "outline"}
+              disabled={!canCompare}
+              onClick={handleCompareClick}
+              className="h-8"
+            >
+              <GitCompare className="h-4 w-4 mr-1.5" />
+              {t('components.chatAnswer.compare')}
+            </Button>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -271,14 +339,26 @@ const ChatAnswer = ({
           </div>
         </div>
 
-        {showDiff && canShowDiff && (
+        {showCompare && resolvedComparedIndex != null && (
           <div className="flex items-center gap-3 text-xs px-2">
             <div className="flex items-center gap-1">
-              <span className={cn(diffPartVariants({ type: "added" }))}>{t('components.chatAnswer.added')}</span>
+              <span className="px-1.5 py-0.5 rounded bg-green-100 text-green-800 border border-green-300">
+                {t('components.compareView.currentLegend')}
+              </span>
             </div>
             <div className="flex items-center gap-1">
-              <span className={cn(diffPartVariants({ type: "removed" }))}>{t('components.chatAnswer.removed')}</span>
+              <span className="px-1.5 py-0.5 rounded bg-red-100 text-red-800 border border-red-300">
+                {t('components.compareView.comparedLegend')} v{resolvedComparedIndex + 1}
+              </span>
             </div>
+            {versions.length > 2 && (
+              <button
+                onClick={() => setShowBasePicker(true)}
+                className="underline text-muted-foreground hover:text-foreground"
+              >
+                {t('components.chatAnswer.changeBase')}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -286,12 +366,28 @@ const ChatAnswer = ({
       <div id="chat-body" className="prose max-w-none text-foreground leading-relaxed break-words">
         {showEvaluation ? (
           renderEvaluation()
+        ) : showCompare && resolvedComparedIndex != null ? (
+          <CompareView
+            currentText={formattedText}
+            comparedText={comparedText}
+            threadIndex={threadIndex}
+            scrollContainerRef={scrollContainerRef}
+            sidebarContainer={compareSidebarContainer}
+          />
         ) : showDiff && canShowDiff ? (
           renderDiff()
         ) : (
           <RichText text={formattedText} prose={false} />
         )}
       </div>
+
+      <CompareBasePickerModal
+        open={showBasePicker}
+        versions={versions}
+        currentIndex={currentIndex}
+        onPick={handlePickBase}
+        onClose={() => setShowBasePicker(false)}
+      />
     </div>
   );
 };

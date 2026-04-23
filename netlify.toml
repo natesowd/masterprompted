@@ -10,6 +10,10 @@
   path = "/api/web-search"
   function = "web-search"
 
+[[edge_functions]]
+  path = "/api/embeddings"
+  function = "embeddings"
+
 [dev]
   command = "npm run dev"
   targetPort = 8080

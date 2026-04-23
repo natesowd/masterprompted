@@ -111,6 +111,8 @@ const ChatBody = memo(function ChatBody({
   onNextVersion,
   onToggleThreadDiff,
   onToggleThreadEvaluation,
+  onToggleThreadCompare,
+  onChangeThreadCompareBase,
   onRequestControlPanelHelp,
   uploadedFiles = [],
 }: {
@@ -119,6 +121,8 @@ const ChatBody = memo(function ChatBody({
   onNextVersion: (threadIndex: number) => void;
   onToggleThreadDiff: (threadIndex: number, checked: boolean) => void;
   onToggleThreadEvaluation: (threadIndex: number, checked: boolean) => void;
+  onToggleThreadCompare: (threadIndex: number, comparedIndex?: number) => void;
+  onChangeThreadCompareBase: (threadIndex: number, comparedIndex: number) => void;
   onRequestControlPanelHelp: () => void;
   uploadedFiles?: ParsedFile[];
 }) {
@@ -133,6 +137,9 @@ const ChatBody = memo(function ChatBody({
   const [commentPositions, setCommentPositions] = useState<Record<string, number>>({});
   const [inlineCommentIds, setInlineCommentIds] = useState<Set<string>>(() => new Set());
   const [showDiffPopover, setShowDiffPopover] = useState(false);
+  // Per-thread sidebar containers; CompareView portals its sidebar blocks into these.
+  const compareSidebarRefs = useRef<Map<number, HTMLDivElement | null>>(new Map());
+  const [, setCompareSidebarTick] = useState(0);
 
   // New state to track the scrollHeight of the main chat
   const [chatHeight, setChatHeight] = useState(0);
@@ -433,6 +440,12 @@ const ChatBody = memo(function ChatBody({
                               inlineCommentIds={inlineCommentIds}
                               onCommentClick={handleCommentClick}
                               toggleDiffHelp={handleToggleDiffHelp}
+                              showCompare={Boolean(thread.showCompare)}
+                              onToggleCompare={(comparedIndex) => onToggleThreadCompare(threadIndex, comparedIndex)}
+                              onChangeCompareBase={(comparedIndex) => onChangeThreadCompareBase(threadIndex, comparedIndex)}
+                              versions={thread.versions}
+                              comparedVersionIndex={thread.comparedVersionIndex}
+                              compareSidebarContainer={compareSidebarRefs.current.get(threadIndex) ?? null}
                             />
                           )}
                           {processedCurrent.enriched && processedCurrent.activeSources.length > 0 && (
@@ -462,6 +475,26 @@ const ChatBody = memo(function ChatBody({
                 minHeight={chatHeight}
               />
             )}
+            {/* Per-thread portal targets for CompareView's sidebar blocks. Mirrors
+                the body's vertical thread stack so absolute-positioned compare
+                blocks align with their paired body blocks. */}
+            <div className="mt-6 space-y-4">
+              {threads.map((thread, threadIndex) => (
+                <div
+                  key={`compare-sidebar-thread-${threadIndex}`}
+                  id={`compare-sidebar-thread-${threadIndex}`}
+                  ref={(el) => {
+                    const prev = compareSidebarRefs.current.get(threadIndex);
+                    if (prev !== el) {
+                      compareSidebarRefs.current.set(threadIndex, el);
+                      // Nudge ChatAnswer to re-render now that its portal target exists.
+                      if (thread.showCompare) setCompareSidebarTick((t) => t + 1);
+                    }
+                  }}
+                  className="relative"
+                />
+              ))}
+            </div>
           </div>
           <div className="w-[2.5rem] flex-none flex flex-col items-end gap-4 relative">
             <button className="p-2 rounded-full hover:bg-muted/50" onClick={onRequestControlPanelHelp}>
