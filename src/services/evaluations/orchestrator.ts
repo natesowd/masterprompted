@@ -12,6 +12,58 @@ import { runClaimsMatchPipeline } from "./claimsPipeline";
 import { webSearchClaim } from "./webSearchService";
 
 /**
+ * Resolve overlapping spans per the product rules:
+ *  - claim_match and web_search spans come from the same claim_extract source
+ *    and are expected to have identical ranges when they match the same claim.
+ *    This is treated as an invariant — a mismatch is logged but not repaired.
+ *  - A fallacy span that overlaps any snippet (claim_match/web_search) is
+ *    reattached to the first overlapping snippet's range, so fallacy and
+ *    snippet share the same merged region and a single flag icon.
+ *  - A fallacy span that doesn't overlap any snippet is kept as-is.
+ *  - Fallacy spans among themselves are assumed not to overlap.
+ */
+function normalizeSpanOverlaps(spans: EvaluationSpan[]): EvaluationSpan[] {
+  const snippetSpans = spans.filter(s => s.source === "claim_match" || s.source === "web_search");
+  const fallacySpans = spans.filter(s => s.source === "fallacy");
+
+  // Invariant check: matched claim_match/web_search pairs (same segment) should align.
+  const bySegment = new Map<string, EvaluationSpan[]>();
+  for (const s of snippetSpans) {
+    const key = s.segment;
+    if (!bySegment.has(key)) bySegment.set(key, []);
+    bySegment.get(key)!.push(s);
+  }
+  for (const [, group] of bySegment) {
+    if (group.length > 1) {
+      const first = group[0];
+      for (const other of group.slice(1)) {
+        if (other.start !== first.start || other.end !== first.end) {
+          console.warn(
+            `Snippet invariant violated: ${first.source}(${first.start},${first.end}) vs ${other.source}(${other.start},${other.end}) for segment "${first.segment.slice(0, 40)}"`,
+          );
+        }
+      }
+    }
+  }
+
+  // Sort snippets by start so "first overlapping" is deterministic.
+  const sortedSnippets = [...snippetSpans].sort((a, b) => a.start - b.start || a.end - b.end);
+
+  const adjustedFallacies = fallacySpans.map(f => {
+    const overlap = sortedSnippets.find(s => f.start < s.end && f.end > s.start);
+    if (!overlap) return f;
+    return {
+      ...f,
+      start: overlap.start,
+      end: overlap.end,
+      segment: overlap.segment,
+    };
+  });
+
+  return [...snippetSpans, ...adjustedFallacies].sort((a, b) => a.start - b.start);
+}
+
+/**
  * Run all evaluation pipelines on the given text.
  *
  * @param text - The full answer text to analyze
@@ -66,6 +118,8 @@ export async function runAllEvaluations(
       ? "success"
       : "error";
 
+  // Raw spans are kept unnormalized in `result.spans` so incremental web_search
+  // additions below can reason about them; normalization is applied on emit.
   const allSpans = [...fallacySpans, ...claimsMatchSpans].sort((a, b) => a.start - b.start);
 
   const result: EvaluationResult = {
@@ -75,7 +129,7 @@ export async function runAllEvaluations(
   };
 
   // Emit Phase 1 results so UI can show them immediately
-  onUpdate?.({ ...result, spans: [...result.spans] });
+  onUpdate?.({ ...result, spans: normalizeSpanOverlaps(result.spans) });
 
   // Phase 2: Run web_search sequentially for each unique claim text,
   // then apply the result to all sub-snippets sharing that claim.
@@ -125,7 +179,7 @@ export async function runAllEvaluations(
           result.spans.push(newSpan);
         }
         result.spans.sort((a, b) => a.start - b.start);
-        onUpdate?.({ ...result, spans: [...result.spans] });
+        onUpdate?.({ ...result, spans: normalizeSpanOverlaps(result.spans) });
       }
     } catch (err) {
       console.error(`Web search failed for claim: "${claimText.slice(0, 60)}..."`, err);
@@ -134,7 +188,8 @@ export async function runAllEvaluations(
 
   // All web_search calls done
   result.webSearchPending = false;
-  onUpdate?.({ ...result, spans: [...result.spans] });
+  const finalized: EvaluationResult = { ...result, spans: normalizeSpanOverlaps(result.spans) };
+  onUpdate?.(finalized);
 
-  return result;
+  return finalized;
 }

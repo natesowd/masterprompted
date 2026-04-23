@@ -17,8 +17,10 @@ import { getFallacyExplanation } from "@/services/evaluations/fallacyService";
 interface MergedRegion {
   start: number;
   end: number;
-  /** Indices into the original spans array for this paragraph */
+  /** Local indices into this paragraph's intersectingSpans array */
   spanIndices: number[];
+  /** Indices into the caller-provided (global) spans array */
+  originalSpanIndices: number[];
 }
 
 /**
@@ -26,12 +28,12 @@ interface MergedRegion {
  * Each region collects the indices of all contributing spans.
  */
 function mergeOverlappingSpans(
-  spans: Array<{ start: number; end: number }>,
+  spans: Array<{ start: number; end: number; origIdx: number }>,
 ): MergedRegion[] {
   if (spans.length === 0) return [];
 
   const indexed = spans
-    .map((s, i) => ({ start: s.start, end: s.end, idx: i }))
+    .map((s, i) => ({ start: s.start, end: s.end, idx: i, origIdx: s.origIdx }))
     .sort((a, b) => a.start - b.start || a.end - b.end);
 
   const merged: MergedRegion[] = [];
@@ -39,6 +41,7 @@ function mergeOverlappingSpans(
     start: indexed[0].start,
     end: indexed[0].end,
     spanIndices: [indexed[0].idx],
+    originalSpanIndices: [indexed[0].origIdx],
   };
 
   for (let i = 1; i < indexed.length; i++) {
@@ -47,9 +50,10 @@ function mergeOverlappingSpans(
       // Strictly overlapping — extend region
       current.end = Math.max(current.end, s.end);
       current.spanIndices.push(s.idx);
+      current.originalSpanIndices.push(s.origIdx);
     } else {
       merged.push(current);
-      current = { start: s.start, end: s.end, spanIndices: [s.idx] };
+      current = { start: s.start, end: s.end, spanIndices: [s.idx], originalSpanIndices: [s.origIdx] };
     }
   }
   merged.push(current);
@@ -97,6 +101,11 @@ export function renderTextWithFlags(
   const paragraphMatches = text.split(/(\n\s*\n)/);
   let globalOffset = 0;
 
+  // Track which original span indices have already rendered their icon.
+  // Ensures a span that crosses paragraph boundaries only shows the flag
+  // icon in the first paragraph it appears in.
+  const globallyShownSpans = new Set<number>();
+
   return paragraphMatches
     .map((content, index) => {
       const pStart = globalOffset;
@@ -114,13 +123,16 @@ export function renderTextWithFlags(
       const gutterLen = gutter.length;
       const actualText = content.slice(gutterLen);
 
-      // Identify spans for this paragraph, adjusted relative to actualText
+      // Identify spans for this paragraph, adjusted relative to actualText.
+      // Preserve the original index so we can track icon visibility across paragraphs.
       const intersectingSpans = spans
-        .filter((s) => s.start < pEnd && s.end > pStart)
-        .map((s) => ({
-          ...s,
-          start: Math.max(0, s.start - pStart - gutterLen),
-          end: Math.min(actualText.length, s.end - pStart - gutterLen),
+        .map((s, origIdx) => ({ span: s, origIdx }))
+        .filter(({ span }) => span.start < pEnd && span.end > pStart)
+        .map(({ span, origIdx }) => ({
+          ...span,
+          origIdx,
+          start: Math.max(0, span.start - pStart - gutterLen),
+          end: Math.min(actualText.length, span.end - pStart - gutterLen),
         }))
         .filter((s) => s.start < s.end);
 
@@ -195,9 +207,18 @@ export function renderTextWithFlags(
               spanMap,
             );
 
-            // Only show icon on the first text chunk of each region
+            // Only show icon on the first text chunk of each region, and only
+            // if at least one of the region's underlying spans hasn't already
+            // had its icon rendered in an earlier paragraph.
             const isFirstChunk = !regionIconShown.has(activeRegionIdx);
-            if (isFirstChunk) regionIconShown.add(activeRegionIdx);
+            const hasUnseenSpan = region.originalSpanIndices.some(
+              (oi) => !globallyShownSpans.has(oi),
+            );
+            const showIcon = isFirstChunk && hasUnseenSpan;
+            if (isFirstChunk) {
+              regionIconShown.add(activeRegionIdx);
+              region.originalSpanIndices.forEach((oi) => globallyShownSpans.add(oi));
+            }
 
             // Re-wrap in active tags for formatting continuity
             let wrappedPart = part;
@@ -216,7 +237,7 @@ export function renderTextWithFlags(
                 evaluationFactor="factual_accuracy"
                 explanations={explanationEntries}
                 severity="error"
-                showIcon={isFirstChunk}
+                showIcon={showIcon}
               />,
             );
           } else {

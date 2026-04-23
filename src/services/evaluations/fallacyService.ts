@@ -98,21 +98,28 @@ export async function checkFallacies(text: string): Promise<EvaluationSpan[] | n
 
     // The API often returns start/end covering the entire text even though
     // the segment field is a specific substring. Relocate each segment in
-    // the source text to get accurate positions.
-    return rawSpans.map(span => {
-      const range = findSnippetRange(text, span.segment);
-      if (range) {
-        return {
-          start: range.start,
-          end: range.end,
-          segment: text.slice(range.start, range.end),
-          confidence: span.confidence,
-          value: span.value,
-          source: "fallacy" as const,
-        };
+    // the source text to get accurate positions. If the segment can't be
+    // located or is too short/empty to trust, skip it entirely — falling back
+    // to the API positions would highlight the whole output.
+    const MIN_SEGMENT_LEN = 3;
+    return rawSpans.flatMap<EvaluationSpan>(span => {
+      if (!span.segment || span.segment.trim().length < MIN_SEGMENT_LEN) {
+        console.warn(`Fallacy span dropped: segment too short (${JSON.stringify(span.segment)})`);
+        return [];
       }
-      // Fallback: trust the API positions if segment can't be located
-      return { ...span, source: "fallacy" as const };
+      const range = findSnippetRange(text, span.segment);
+      if (!range) {
+        console.warn(`Fallacy span dropped: segment not found in text (${JSON.stringify(span.segment.slice(0, 60))})`);
+        return [];
+      }
+      return [{
+        start: range.start,
+        end: range.end,
+        segment: text.slice(range.start, range.end),
+        confidence: span.confidence,
+        value: span.value,
+        source: "fallacy" as const,
+      }];
     });
   } catch (error) {
     console.error("checkFallacies error:", error);
