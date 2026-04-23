@@ -919,8 +919,8 @@ const PromptPlayground = () => {
       <Header onLanguageChange={setPageLanguage} />
       <main className="flex-1 min-h-0 flex flex-col">
         <div className="flex flex-1 min-h-0 max-w-7xl mx-auto w-full gap-[clamp(0px,1vw,1rem)]">
-          <aside className="w-[clamp(16rem,22vw,20rem)] flex-shrink-0 bg-surface-200 2xl:bg-transparent flex items-start justify-center overflow-y-auto overflow-x-hidden 2xl:pb-[clamp(0.5rem,1vh,1rem)]">
-            <div className="w-[264px] pt-[clamp(0.75rem,2vh,1.5rem)] pb-[clamp(0.5rem,1vh,1rem)] 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72">
+          <aside className="w-[clamp(16rem,22vw,20rem)] flex-shrink-0 bg-surface-200 2xl:bg-transparent flex items-stretch justify-center overflow-hidden 2xl:py-[clamp(0.5rem,1vh,1rem)]">
+            <div className="w-[264px] 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72 flex flex-col min-h-0 flex-1">
               <PromptControls {...{
                 parameters,
                 onParameterChange: handleParameterChange,

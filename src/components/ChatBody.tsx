@@ -343,7 +343,7 @@ const ChatBody = memo(function ChatBody({
 
   return (
     <div className="w-full max-w-6xl min-w-0 flex flex-col flex-1 min-h-0 relative">
-      <div className="flex h-full">
+      <div className="flex flex-1 min-h-0">
         <div className="flex-1 min-w-0 flex flex-col h-full relative">
           <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
             <div className="mt-6 space-y-4 2xl:max-w-[700px]">
@@ -470,6 +470,12 @@ const ChatBody = memo(function ChatBody({
             <EvaluationPanel initialIsOpen={false} canClose={true} />
           </div>
         </div>
+      </div>
+      {/* Sticky LLM disclaimer footer */}
+      <div className="flex-shrink-0 px-4 py-2 border-t border-border/40 bg-background/80 backdrop-blur-sm">
+        <p className="text-[10px] leading-snug text-muted-foreground/70 text-center">
+          LLMs used in the creation of prompt optimizations and generated outputs include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+        </p>
       </div>
       {showDiffPopover && (
         <PopoverSeries
