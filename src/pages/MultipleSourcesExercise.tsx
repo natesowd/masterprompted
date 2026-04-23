@@ -804,7 +804,40 @@ export default function MultipleSourcesExercise() {
                                   </div>
                                 </div>
 
-                                {/* Converging arrows — each extraction has its own arrow that converges to the output */}
+                                {/* Arrows: Extraction → Embeddings */}
+                                <div
+                                  className="grid gap-3 px-3"
+                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
+                                >
+                                  {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
+                                    <div key={doc.id} className="flex justify-center">
+                                      <ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" />
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* Vector Embeddings row */}
+                                <div
+                                  className="grid gap-3"
+                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
+                                >
+                                  {diagramSelectedDocs.map((doc, i) => (
+                                    <div key={doc.id} className="rounded-lg border-2 border-brand-tertiary-500/20 bg-brand-tertiary-500/5 p-2 max-h-[80px] overflow-y-auto">
+                                      <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Embedding</p>
+                                      <p className="text-[10px] text-muted-foreground font-mono leading-tight break-all">
+                                        [{(0.12 + i * 0.23).toFixed(2)}, {(-0.45 + i * 0.11).toFixed(2)}, {(0.78 - i * 0.19).toFixed(2)}, {(0.33 + i * 0.07).toFixed(2)}, {(-0.21 + i * 0.15).toFixed(2)}, …]
+                                      </p>
+                                    </div>
+                                  ))}
+                                  <div className="rounded-lg border-2 border-dashed border-brand-tertiary-500/20 bg-brand-tertiary-500/5 p-2 max-h-[80px] overflow-y-auto">
+                                    <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Embedding</p>
+                                    <p className="text-[10px] text-muted-foreground font-mono leading-tight break-all">
+                                      [0.67, -0.12, 0.89, 0.04, -0.56, …]
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Converging arrows — embeddings to output */}
                                 <div className="relative h-12">
                                   <div
                                     className="grid gap-3 absolute inset-x-0 top-0 px-3"

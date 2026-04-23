@@ -916,7 +916,7 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
             <div className="w-full px-2 md:px-0 md:w-[264px] pt-4 pb-4 2xl:pt-0 2xl:pb-0 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72 flex flex-col">
 
               {/* ── User / System tabs ── */}
-              <div className="px-4 pt-3 pb-1 [&_*]:!font-heading" data-feature="tab-toggle">
+              <div className="px-2 pt-3 pb-1 [&_*]:!font-heading" data-feature="tab-toggle">
                 <ToggleGroup
                   type="single"
                   value={controlTab}
@@ -939,7 +939,7 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
                 <div className="flex-1 flex flex-col overflow-y-auto">
                   {/* Few-shot examples */}
                   {fewShotExamples.length > 0 && (
-                    <div className="px-4 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
+                    <div className="px-2 pb-2 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
                       <div className="flex items-center gap-1.5 mb-1.5">
                         <h3 className="font-bold text-foreground text-lg">
                           Examples ({fewShotExamples.length})
@@ -1000,7 +1000,7 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
               {/* SYSTEM tab                                    */}
               {/* ============================================ */}
               {controlTab === "system" && (
-                <div className="flex-1 flex flex-col overflow-y-auto px-4 pb-4 pt-2 gap-3 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
+                <div className="flex-1 flex flex-col overflow-y-auto px-2 pb-4 pt-2 gap-3 [&_*]:!font-heading [&_textarea]:!font-['Manrope']">
 
                   {/* System Prompt */}
                   <div data-feature="system-prompt">
