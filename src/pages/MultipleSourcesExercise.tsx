@@ -439,7 +439,7 @@ export default function MultipleSourcesExercise() {
   const [selected, setSelected] = useState<Set<string>>(new Set(["doc-1"]));
   const [snippetsOpen, setSnippetsOpen] = useState(true);
   /* Top-level view: "exercise" (original) or "how-it-works" (block diagram) */
-  const [topView, setTopView] = useState<"exercise" | "how-it-works">("exercise");
+  const [topView, setTopView] = useState<"exercise" | "how-it-works">("how-it-works");
   /* Inside "how-it-works": which route has the user chosen? */
   // Note: how-it-works view always shows the LLM RAG diagram (no route chooser)
   /* Separate doc selection for the LLM diagram (independent from exercise) */
@@ -537,6 +537,8 @@ export default function MultipleSourcesExercise() {
                 </h2>
 
                 {/* Top-level view toggle */}
+                {/* View toggle — exercise hidden for now */}
+                {/*
                 <div className="mb-5">
                   <ToggleGroup
                     type="single"
@@ -554,6 +556,7 @@ export default function MultipleSourcesExercise() {
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
+                */}
 
                 {/* ── Exercise sidebar ── */}
                 {topView === "exercise" && (

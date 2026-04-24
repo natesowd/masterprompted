@@ -530,7 +530,7 @@ function useStructHint() {
 
 export default function LLMTrainingExercise() {
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<"structural" | "interactive" | "train">("structural");
+  const [viewMode, setViewMode] = useState<"structural" | "interactive" | "train">("train");
   const [selectedPair, setSelectedPair] = useState<string>(INPUT_OUTPUT_PAIRS[0].id);
   const [activeStruct, setActiveStruct] = useState<StructGroup | null>(null);
   const { show: showHint, dismiss: dismissHint } = useStructHint();
@@ -737,6 +737,7 @@ export default function LLMTrainingExercise() {
                 </p>
 
                 {/* View mode toggle */}
+                {/* View mode toggle — Observe and Edit hidden for now */}
                 <div className="mb-4">
                   <ToggleGroup
                     type="single"
@@ -744,14 +745,14 @@ export default function LLMTrainingExercise() {
                     onValueChange={(v) => v && setViewMode(v as typeof viewMode)}
                     className="w-full"
                   >
-                    <ToggleGroupItem value="structural" className="flex-1 gap-1.5 text-xs">
+                    {/* <ToggleGroupItem value="structural" className="flex-1 gap-1.5 text-xs">
                       <Eye className="h-3.5 w-3.5" />
                       Observe
                     </ToggleGroupItem>
                     <ToggleGroupItem value="interactive" className="flex-1 gap-1.5 text-xs">
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
-                    </ToggleGroupItem>
+                    </ToggleGroupItem> */}
                     <ToggleGroupItem value="train" className="flex-1 gap-1.5 text-xs">
                       <GraduationCap className="h-3.5 w-3.5" />
                       Train
