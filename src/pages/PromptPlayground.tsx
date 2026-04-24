@@ -18,7 +18,7 @@ const NO_CHANGE_VALUE = "no-change";
 //   ? "/api/chat"
 //   : "https://luxury-blini-3336bb.netlify.app/api/chat";
 // const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
-const NETLIFY_CHAT_URL = "https://69dcafb26499a614437a4607--luxury-blini-3336bb.netlify.app/api/chat"
+const NETLIFY_CHAT_URL = "https://69ea27f2e6a980166f5c5124--luxury-blini-3336bb.netlify.app/api/chat"
 
 export type Parameters = {
   specificity: string;
