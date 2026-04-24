@@ -756,45 +756,44 @@ export default function MultipleSourcesExercise() {
                             </div>
                           </>)}
 
-                          {/* Arrow */}
-                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+                          {/* Rows 3–5 only shown when documents are present */}
+                          {diagramSelectedDocs.length > 0 && (<>
+                            {/* Arrow */}
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
 
-                          {/* Row 3: Query vector (parallelogram) + Vector store (cylinder) */}
-                          <div className="grid grid-cols-2 gap-3">
-                            {/* Query vector — parallelogram (data) */}
-                            <div className="border-2 border-border bg-muted/20 overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
-                              <div className="p-3 text-center" style={{ transform: 'skewX(10deg)' }}>
-                                <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Query vector</p>
-                                <p className="text-[10px] text-muted-foreground font-mono">[0.12, -0.45, 0.78, …]</p>
+                            {/* Row 3: Query vector (parallelogram) + Vector store (cylinder) */}
+                            <div className="grid grid-cols-2 gap-3">
+                              {/* Query vector — parallelogram (data) */}
+                              <div className="border-2 border-border bg-muted/20 overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
+                                <div className="p-3 text-center" style={{ transform: 'skewX(10deg)' }}>
+                                  <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Query vector</p>
+                                  <p className="text-[10px] text-muted-foreground font-mono">[0.12, -0.45, 0.78, …]</p>
+                                </div>
+                              </div>
+                              {/* Vector store — cylinder (database/storage) */}
+                              <div className="border-2 border-border bg-muted/20 p-3 text-center flex flex-col items-center justify-center" style={{ borderRadius: '8px 8px 8px 8px / 40px 40px 40px 40px', minHeight: '64px' }}>
+                                <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Vector store</p>
+                                <p className="text-[10px] text-muted-foreground font-mono">
+                                  {`${diagramSelectedDocs.length} document${diagramSelectedDocs.length > 1 ? "s" : ""} indexed`}
+                                </p>
                               </div>
                             </div>
-                            {/* Vector store — cylinder (database/storage) */}
-                            <div className="border-2 border-border bg-muted/20 p-3 text-center flex flex-col items-center justify-center" style={{ borderRadius: '8px 8px 8px 8px / 40px 40px 40px 40px', minHeight: '64px' }}>
-                              <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Vector store</p>
-                              <p className="text-[10px] text-muted-foreground font-mono">
-                                {diagramSelectedDocs.length === 0 ? "Empty" : `${diagramSelectedDocs.length} document${diagramSelectedDocs.length > 1 ? "s" : ""} indexed`}
+
+                            {/* Arrow */}
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                            {/* Row 4: Retrieval — process rectangle */}
+                            <div className="rounded border-2 border-border bg-muted/20 p-3 text-center">
+                              <p className="text-sm font-heading font-semibold text-foreground">Retrieval</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">
+                                {`Matching query against ${diagramSelectedDocs.length} document${diagramSelectedDocs.length > 1 ? "s" : ""}`}
                               </p>
                             </div>
-                          </div>
 
-                          {/* Arrow */}
-                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+                            {/* Arrow */}
+                            <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
 
-                          {/* Row 4: Retrieval — process rectangle */}
-                          <div className="rounded border-2 border-border bg-muted/20 p-3 text-center">
-                            <p className="text-sm font-heading font-semibold text-foreground">Retrieval</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">
-                              {diagramSelectedDocs.length === 0
-                                ? "No documents to retrieve from"
-                                : `Matching query against ${diagramSelectedDocs.length} document${diagramSelectedDocs.length > 1 ? "s" : ""}`}
-                            </p>
-                          </div>
-
-                          {/* Arrow */}
-                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
-
-                          {/* Row 5: Snippets — parallelograms (data/IO) */}
-                          {diagramSelectedDocs.length > 0 ? (
+                            {/* Row 5: Snippets — parallelograms (data/IO) */}
                             <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(diagramSelectedDocs.length, 3)}, minmax(0, 1fr))` }}>
                               {diagramSelectedDocs.map((doc, i) => (
                                 <div key={doc.id} className="border-2 border-border bg-white max-h-[80px] overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
@@ -805,11 +804,7 @@ export default function MultipleSourcesExercise() {
                                 </div>
                               ))}
                             </div>
-                          ) : (
-                            <div className="border-2 border-dashed border-border bg-white p-3 text-center overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
-                              <p className="text-[11px] text-muted-foreground italic" style={{ transform: 'skewX(10deg)' }}>No snippets — nothing was retrieved</p>
-                            </div>
-                          )}
+                          </>)}
 
                           {/* Arrow */}
                           <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
