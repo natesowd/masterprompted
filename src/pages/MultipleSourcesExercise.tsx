@@ -702,184 +702,159 @@ export default function MultipleSourcesExercise() {
                           </p>
                         </div>
 
-                        {/* ── LLM block diagram (RAG flow) ── */}
-                        <div className="flex-1 space-y-0">
+                        {/* ── RAG pipeline block diagram ── */}
+                        <div className="flex-1 space-y-3">
 
-                            {/* Drop zone — sources row */}
-                            <div>
-                              <div
-                                onDragOver={handleDropZoneDragOver}
-                                onDragLeave={handleDropZoneDragLeave}
-                                onDrop={handleDropZoneDrop}
-                                 className={cn(
-                                  "min-h-[110px] rounded-lg p-3 transition-colors",
-                                  isDragOver ? "bg-brand-tertiary-500/10" : ""
-                                )}
-                              >
-                                {diagramSelectedDocs.length === 0 && (
-                                  <p className="text-[11px] text-muted-foreground italic text-center mb-2">
-                                    Drag a document here to add it as a source. Without one, the LLM relies only on its training data.
-                                  </p>
-                                )}
-                                <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}>
-                                  {/* Per-column pipeline: Source → arrow → Extraction */}
-                                  {diagramSelectedDocs.map((doc) => (
-                                    <div key={doc.id} className="flex flex-col items-stretch">
-                                      {/* Source block */}
-                                      <div className="rounded-lg border-2 border-brand-tertiary-500/40 bg-white p-3 relative">
-                                        <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Source</p>
-                                        <button
-                                          type="button"
-                                          onClick={() => removeDiagramDoc(doc.id)}
-                                          className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-muted-foreground text-[10px] leading-none"
-                                          aria-label="Remove"
-                                        >
-                                          ×
-                                        </button>
-                                        <div className="flex items-center gap-1.5 mb-1 pr-4">
-                                          <FileText className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                                          <span className="text-xs font-semibold text-foreground">{doc.title}</span>
-                                        </div>
-                                        <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                          {SNIPPETS_BY_DOC[doc.id]?.[0]?.paragraphs[0] || ""}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  ))}
-                                  {/* Locked training database — always present */}
-                                  <div className="flex flex-col items-stretch">
-                                    <div className="rounded-lg border-2 border-dashed border-brand-tertiary-500/40 bg-brand-tertiary-500/5 p-3">
-                                      <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Source</p>
-                                      <div className="flex items-center gap-1.5 mb-1">
-                                        <Database className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                                        <span className="text-xs font-semibold text-foreground">Training Database</span>
-                                        <Lock className="h-3 w-3 text-muted-foreground/50 ml-auto" />
-                                      </div>
-                                      <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                        {LLM_DATABASE_SNIPPET}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
+                          {/* Row 1: Query + Documents */}
+                          <div
+                            onDragOver={handleDropZoneDragOver}
+                            onDragLeave={handleDropZoneDragLeave}
+                            onDrop={handleDropZoneDrop}
+                            className={cn("rounded-lg p-3 transition-colors", isDragOver ? "bg-brand-tertiary-500/10" : "")}
+                          >
+                            <div className="flex gap-3">
+                              {/* Query block */}
+                              <div className="rounded-lg border-2 border-blue-300 bg-blue-50 p-3 w-32 flex-shrink-0">
+                                <p className="text-[9px] font-heading font-semibold text-blue-600 uppercase tracking-wider mb-1">Query</p>
+                                <p className="text-[11px] text-foreground leading-relaxed">
+                                  Who holds the most responsibility?
+                                </p>
                               </div>
+                              {/* Document blocks */}
+                              {diagramSelectedDocs.map((doc) => (
+                                <div key={doc.id} className="rounded-lg border-2 border-border bg-muted/30 p-3 flex-1 min-w-0 relative">
+                                  <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Document</p>
+                                  <button type="button" onClick={() => removeDiagramDoc(doc.id)} className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-muted-foreground text-[10px] leading-none" aria-label="Remove">×</button>
+                                  <p className="text-xs font-semibold text-foreground pr-4 line-clamp-1">{doc.title}</p>
+                                </div>
+                              ))}
+                              {diagramSelectedDocs.length === 0 && (
+                                <div className="rounded-lg border-2 border-dashed border-border bg-muted/10 p-3 flex-1 flex items-center justify-center">
+                                  <p className="text-[11px] text-muted-foreground italic">Drag documents here</p>
+                                </div>
+                              )}
                             </div>
-
-                            {/* Per-block arrows down to extraction */}
-                            <>
-                                <div
-                                  className="grid gap-3 px-3"
-                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
-                                >
-                                  {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
-                                    <div key={doc.id} className="flex justify-center">
-                                      <ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" />
-                                    </div>
-                                  ))}
-                                </div>
-
-                                {/* Extraction row — one box per source */}
-                                <div
-                                  className="grid gap-3"
-                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
-                                >
-                                  {diagramSelectedDocs.map((doc) => (
-                                    <div key={doc.id} className="rounded-lg border-2 border-brand-tertiary-500/30 bg-brand-tertiary-500/5 p-2.5 max-h-[100px] overflow-y-auto">
-                                      <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Extracted</p>
-                                      <p className="text-[11px] text-foreground leading-relaxed italic">
-                                        {LLM_EXTRACTIONS[doc.id]}
-                                      </p>
-                                    </div>
-                                  ))}
-                                  <div className="rounded-lg border-2 border-dashed border-brand-tertiary-500/30 bg-brand-tertiary-500/5 p-2.5 max-h-[100px] overflow-y-auto">
-                                    <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Extracted</p>
-                                    <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                                      "AI ethics" · "journalism standards" · "public trust" · …
-                                    </p>
-                                  </div>
-                                </div>
-
-                                {/* Arrows: Extraction → Embeddings */}
-                                <div
-                                  className="grid gap-3 px-3"
-                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
-                                >
-                                  {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
-                                    <div key={doc.id} className="flex justify-center">
-                                      <ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" />
-                                    </div>
-                                  ))}
-                                </div>
-
-                                {/* Vector Embeddings row */}
-                                <div
-                                  className="grid gap-3"
-                                  style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
-                                >
-                                  {diagramSelectedDocs.map((doc, i) => (
-                                    <div key={doc.id} className="rounded-lg border-2 border-brand-tertiary-500/20 bg-brand-tertiary-500/5 p-2 max-h-[80px] overflow-y-auto">
-                                      <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Embedding</p>
-                                      <p className="text-[10px] text-muted-foreground font-mono leading-tight break-all">
-                                        [{(0.12 + i * 0.23).toFixed(2)}, {(-0.45 + i * 0.11).toFixed(2)}, {(0.78 - i * 0.19).toFixed(2)}, {(0.33 + i * 0.07).toFixed(2)}, {(-0.21 + i * 0.15).toFixed(2)}, …]
-                                      </p>
-                                    </div>
-                                  ))}
-                                  <div className="rounded-lg border-2 border-dashed border-brand-tertiary-500/20 bg-brand-tertiary-500/5 p-2 max-h-[80px] overflow-y-auto">
-                                    <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Embedding</p>
-                                    <p className="text-[10px] text-muted-foreground font-mono leading-tight break-all">
-                                      [0.67, -0.12, 0.89, 0.04, -0.56, …]
-                                    </p>
-                                  </div>
-                                </div>
-
-                                {/* Converging arrows — embeddings merge into one */}
-                                <div className="relative" style={{ height: 48 }}>
-                                  {/* Per-column arrows down from embeddings */}
-                                  <div
-                                    className="grid gap-3 absolute inset-x-0 top-0 px-3"
-                                    style={{ gridTemplateColumns: `repeat(${diagramSelectedDocs.length + 1}, minmax(0, 1fr))` }}
-                                  >
-                                    {[...diagramSelectedDocs, { id: "_db" } as any].map((doc) => (
-                                      <div key={doc.id} className="flex justify-center">
-                                        <ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" />
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-
-                                {/* Output */}
-                                {(() => {
-                                  const key = Array.from(diagramDocs).sort().join(",");
-                                  const merged = LLM_MERGED_OUTPUTS[key];
-                                  if (diagramSelectedDocs.length === 0) {
-                                    return (
-                                      <div className="rounded-lg border-2 border-brand-tertiary-500/40 bg-white p-4">
-                                        <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Output</p>
-                                        <p className="text-sm text-foreground leading-relaxed">
-                                          With no source documents, the LLM answers entirely from its training data. There's nothing to ground the response in — so claims can't be verified, and the model may hallucinate facts that sound plausible but aren't supported by any specific source.
-                                        </p>
-                                      </div>
-                                    );
-                                  }
-                                  if (!merged) {
-                                    return (
-                                      <div className="rounded-lg border-2 border-brand-tertiary-500/40 bg-white p-4">
-                                        <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Output</p>
-                                        <p className="text-sm text-muted-foreground italic">
-                                          Add more documents to see how the LLM merges them.
-                                        </p>
-                                      </div>
-                                    );
-                                  }
-                                  return (
-                                    <div className="rounded-lg border-2 border-brand-tertiary-500/40 bg-white p-4">
-                                      <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Output</p>
-                                      <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
-                                    </div>
-                                    );
-                                  })()}
-                              </>
                           </div>
 
+                          {/* Arrow */}
+                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                          {/* Row 2: Vector Embedding — error-prone */}
+                          <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-4 text-center">
+                            <p className="text-sm font-heading font-bold text-foreground">Vector embedding</p>
+                            <p className="text-xs text-amber-700 mt-1">⚠ Error-prone: semantic drift</p>
+                            {diagramSelectedDocs.length > 1 && (
+                              <p className="text-[10px] text-amber-600 mt-0.5">
+                                {diagramSelectedDocs.length} documents × embedding = {diagramSelectedDocs.length}× chance of meaning loss
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Arrow */}
+                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                          {/* Row 3: Query vector + Vector store */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="rounded-lg border-2 border-border bg-muted/20 p-3 text-center">
+                              <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Query vector</p>
+                              <p className="text-[10px] text-muted-foreground font-mono">[0.12, -0.45, 0.78, …]</p>
+                            </div>
+                            <div className="rounded-lg border-2 border-border bg-muted/20 p-3 text-center">
+                              <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Vector store</p>
+                              <p className="text-[10px] text-muted-foreground font-mono">
+                                {diagramSelectedDocs.length === 0 ? "Empty" : `${diagramSelectedDocs.length} document${diagramSelectedDocs.length > 1 ? "s" : ""} indexed`}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Arrow */}
+                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                          {/* Row 4: Retrieval */}
+                          <div className="rounded-lg border-2 border-border bg-muted/20 p-3 text-center">
+                            <p className="text-sm font-heading font-semibold text-foreground">Retrieval</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              {diagramSelectedDocs.length === 0
+                                ? "No documents to retrieve from"
+                                : `Matching query against ${diagramSelectedDocs.length} document${diagramSelectedDocs.length > 1 ? "s" : ""}`}
+                            </p>
+                          </div>
+
+                          {/* Arrow */}
+                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                          {/* Row 5: Snippets */}
+                          {diagramSelectedDocs.length > 0 ? (
+                            <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(diagramSelectedDocs.length, 3)}, minmax(0, 1fr))` }}>
+                              {diagramSelectedDocs.map((doc, i) => (
+                                <div key={doc.id} className="rounded-lg border-2 border-border bg-white p-2.5 max-h-[80px] overflow-y-auto">
+                                  <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-1">Snippet {i + 1}</p>
+                                  <p className="text-[11px] text-foreground leading-relaxed italic">{LLM_EXTRACTIONS[doc.id] || "…"}</p>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="rounded-lg border-2 border-dashed border-border bg-white p-3 text-center">
+                              <p className="text-[11px] text-muted-foreground italic">No snippets — nothing was retrieved</p>
+                            </div>
+                          )}
+
+                          {/* Arrow */}
+                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                          {/* Row 6: Prompt assembly — error-prone */}
+                          <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-4 text-center">
+                            <p className="text-sm font-heading font-bold text-foreground">Prompt assembly</p>
+                            <p className="text-xs text-amber-700 mt-1">⚠ Error-prone: context conflicts</p>
+                            {diagramSelectedDocs.length > 1 && (
+                              <p className="text-[10px] text-amber-600 mt-0.5">
+                                {diagramSelectedDocs.length} snippets + query merged — conflicting sources can confuse the LLM
+                              </p>
+                            )}
+                            {diagramSelectedDocs.length === 0 && (
+                              <p className="text-[10px] text-amber-600 mt-0.5">Query with no context — LLM relies on training data alone</p>
+                            )}
+                          </div>
+
+                          {/* Arrow */}
+                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                          {/* Row 7: LLM generation */}
+                          <div className="rounded-lg border-2 border-border bg-muted/20 p-3 text-center">
+                            <p className="text-sm font-heading font-semibold text-foreground">LLM generation</p>
+                          </div>
+
+                          {/* Arrow */}
+                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
+
+                          {/* Row 8: Output */}
+                          {(() => {
+                            const key = Array.from(diagramDocs).sort().join(",");
+                            const merged = LLM_MERGED_OUTPUTS[key];
+                            if (diagramSelectedDocs.length === 0) {
+                              return (
+                                <div className="rounded-lg border-2 border-brand-tertiary-500/40 bg-white p-4">
+                                  <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Output</p>
+                                  <p className="text-sm text-foreground leading-relaxed">With no source documents, the LLM answers entirely from training data. Claims can't be verified and the model may hallucinate.</p>
+                                </div>
+                              );
+                            }
+                            if (!merged) {
+                              return (
+                                <div className="rounded-lg border-2 border-brand-tertiary-500/40 bg-white p-4">
+                                  <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Output</p>
+                                  <p className="text-sm text-muted-foreground italic">Select a valid document combination to see the output.</p>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div className="rounded-lg border-2 border-brand-tertiary-500/40 bg-white p-4">
+                                <p className="text-[9px] font-heading font-semibold text-brand-tertiary-500 uppercase tracking-wider mb-1">Output</p>
+                                <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
+                              </div>
+                            );
+                          })()}
+                        </div>
                         {/* Navigation */}
                         <div className="mt-8 flex items-center gap-3">
                           <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
