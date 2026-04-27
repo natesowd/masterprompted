@@ -74,63 +74,56 @@ function HallucinationRiskBadge({ children }: { children: React.ReactNode }) {
 /*  3D vector-space diagram — shown on hover/click inside embedding    */
 /* ------------------------------------------------------------------ */
 function VectorSpaceGraph() {
+  const f = "'Barlow Semi Condensed', sans-serif";
   return (
-    <div className="bg-white rounded-md border border-amber-200 p-3">
-      <p className="text-[10px] font-heading font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">
-        3D vector space (simplified)
-      </p>
-      <svg viewBox="0 0 300 200" className="w-full" role="img" aria-label="3D vector space with XYZ axes showing semantic directions">
-        {/* Origin */}
-        {/* Z axis — vertical (up) */}
-        <line x1="80" y1="160" x2="80" y2="20" stroke="#94a3b8" strokeWidth="1.5" />
-        <polygon points="80,15 76,25 84,25" fill="#94a3b8" />
-        <text x="64" y="15" fontSize="10" fontWeight="600" fill="#475569">Z</text>
-        {/* X axis — horizontal right */}
-        <line x1="80" y1="160" x2="280" y2="160" stroke="#94a3b8" strokeWidth="1.5" />
-        <polygon points="285,160 275,156 275,164" fill="#94a3b8" />
-        <text x="284" y="154" fontSize="10" fontWeight="600" fill="#475569">X</text>
-        {/* Y axis — diagonal depth */}
-        <line x1="80" y1="160" x2="30" y2="185" stroke="#94a3b8" strokeWidth="1.5" />
-        <polygon points="26,187 36,182 32,190" fill="#94a3b8" />
-        <text x="15" y="195" fontSize="10" fontWeight="600" fill="#475569">Y</text>
-
-        {/* Cluster: Ethics (upper-left area) */}
-        <ellipse cx="120" cy="60" rx="40" ry="24" fill="#fef3c7" fillOpacity="0.6" stroke="#f59e0b" strokeOpacity="0.4" strokeDasharray="3 3" />
-        <circle cx="108" cy="55" r="3.5" fill="#f59e0b" />
-        <text x="114" y="58" fontSize="8" fill="#92400e">ethics</text>
-        <circle cx="130" cy="65" r="3.5" fill="#f59e0b" />
-        <text x="136" y="68" fontSize="8" fill="#92400e">duty</text>
-        <circle cx="115" cy="75" r="3" fill="#f59e0b" fillOpacity="0.5" />
-        <text x="121" y="78" fontSize="7" fill="#92400e" opacity="0.7">fairness</text>
-
-        {/* Cluster: AI / tech (right area) */}
-        <ellipse cx="230" cy="90" rx="42" ry="24" fill="#dbeafe" fillOpacity="0.6" stroke="#3b82f6" strokeOpacity="0.4" strokeDasharray="3 3" />
-        <circle cx="218" cy="85" r="3.5" fill="#3b82f6" />
-        <text x="224" y="88" fontSize="8" fill="#1e40af">AI</text>
-        <circle cx="245" cy="95" r="3.5" fill="#3b82f6" />
-        <text x="251" y="98" fontSize="8" fill="#1e40af">model</text>
-        <circle cx="222" cy="100" r="3" fill="#3b82f6" fillOpacity="0.5" />
-        <text x="228" y="103" fontSize="7" fill="#1e40af" opacity="0.7">training</text>
-
-        {/* Cluster: Journalism (lower-center) */}
-        <ellipse cx="170" cy="140" rx="42" ry="18" fill="#dcfce7" fillOpacity="0.6" stroke="#22c55e" strokeOpacity="0.4" strokeDasharray="3 3" />
-        <circle cx="155" cy="136" r="3.5" fill="#22c55e" />
-        <text x="161" y="139" fontSize="8" fill="#15803d">news</text>
-        <circle cx="185" cy="142" r="3.5" fill="#22c55e" />
-        <text x="191" y="145" fontSize="8" fill="#15803d">media</text>
-
-        {/* Query vector — arrow from origin toward ethics cluster */}
-        <line x1="80" y1="160" x2="112" y2="78" stroke="#0ea5e9" strokeWidth="2" markerEnd="url(#arrowQ)" />
+    <div className="rounded border border-border/40 p-3 my-3">
+      <svg viewBox="0 0 280 180" className="w-full" role="img" aria-label="3D vector space with semantic clusters">
         <defs>
-          <marker id="arrowQ" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-            <path d="M0,0 L8,4 L0,8 Z" fill="#0ea5e9" />
+          <marker id="axisEnd" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,1 L5,3 L0,5" fill="none" stroke="#149870" strokeWidth="0.8" />
+          </marker>
+          <marker id="queryEnd" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,1 L6,3.5 L0,6" fill="none" stroke="#149870" strokeWidth="1" />
           </marker>
         </defs>
-        <text x="92" y="112" fontSize="8" fontWeight="700" fill="#0369a1">query</text>
-        <text x="92" y="122" fontSize="8" fontWeight="700" fill="#0369a1">vector</text>
+
+        {/* Axes */}
+        <line x1="60" y1="150" x2="60" y2="18" stroke="#149870" strokeWidth="0.5" strokeOpacity="0.35" markerEnd="url(#axisEnd)" />
+        <line x1="60" y1="150" x2="260" y2="150" stroke="#149870" strokeWidth="0.5" strokeOpacity="0.35" markerEnd="url(#axisEnd)" />
+        <line x1="60" y1="150" x2="22" y2="172" stroke="#149870" strokeWidth="0.5" strokeOpacity="0.35" markerEnd="url(#axisEnd)" />
+
+        <text x="55" y="14" fontSize="8" fontFamily={f} fontWeight="500" fill="#149870" opacity="0.5" textAnchor="end">z</text>
+        <text x="264" y="148" fontSize="8" fontFamily={f} fontWeight="500" fill="#149870" opacity="0.5">x</text>
+        <text x="16" y="178" fontSize="8" fontFamily={f} fontWeight="500" fill="#149870" opacity="0.5">y</text>
+
+        {/* Ethics cluster */}
+        <circle cx="100" cy="52" r="2.5" fill="#149870" opacity="0.6" />
+        <text x="106" y="55" fontSize="8" fontFamily={f} fontWeight="500" fill="#0A4D3A" opacity="0.75">ethics</text>
+        <circle cx="120" cy="64" r="2" fill="#149870" opacity="0.4" />
+        <text x="126" y="67" fontSize="8" fontFamily={f} fontWeight="400" fill="#0A4D3A" opacity="0.55">duty</text>
+        <circle cx="106" cy="74" r="1.5" fill="#149870" opacity="0.25" />
+        <text x="112" y="77" fontSize="7" fontFamily={f} fontWeight="400" fill="#0A4D3A" opacity="0.4">fairness</text>
+
+        {/* AI / tech cluster */}
+        <circle cx="200" cy="76" r="2.5" fill="#149870" opacity="0.6" />
+        <text x="206" y="79" fontSize="8" fontFamily={f} fontWeight="500" fill="#0A4D3A" opacity="0.75">AI</text>
+        <circle cx="222" cy="88" r="2" fill="#149870" opacity="0.4" />
+        <text x="228" y="91" fontSize="8" fontFamily={f} fontWeight="400" fill="#0A4D3A" opacity="0.55">model</text>
+        <circle cx="208" cy="98" r="1.5" fill="#149870" opacity="0.25" />
+        <text x="214" y="101" fontSize="7" fontFamily={f} fontWeight="400" fill="#0A4D3A" opacity="0.4">training</text>
+
+        {/* Journalism cluster */}
+        <circle cx="148" cy="124" r="2.5" fill="#149870" opacity="0.6" />
+        <text x="154" y="127" fontSize="8" fontFamily={f} fontWeight="500" fill="#0A4D3A" opacity="0.75">news</text>
+        <circle cx="178" cy="132" r="2" fill="#149870" opacity="0.4" />
+        <text x="184" y="135" fontSize="8" fontFamily={f} fontWeight="400" fill="#0A4D3A" opacity="0.55">media</text>
+
+        {/* Query vector */}
+        <line x1="60" y1="150" x2="103" y2="68" stroke="#149870" strokeWidth="1.2" markerEnd="url(#queryEnd)" />
+        <text x="70" y="110" fontSize="8" fontFamily={f} fontWeight="600" fill="#149870" opacity="0.85">query vector</text>
       </svg>
-      <p className="text-[10px] text-muted-foreground italic text-center mt-1">
-        Each axis captures a dimension of meaning. The query vector points toward the most semantically similar cluster.
+      <p className="text-[10px] font-heading text-muted-foreground text-center mt-1">
+        Similar meanings cluster together. The query vector points toward the nearest match.
       </p>
     </div>
   );
