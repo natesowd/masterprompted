@@ -8,7 +8,7 @@ import TextFlag from "@/components/TextFlag";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, ArrowRight, File, Paperclip, ChevronDown, ChevronUp, Bot, Database, FileText, ArrowDown, Lock, Eye, Layers, Info } from "lucide-react";
+import { ArrowLeft, ArrowRight, File, Paperclip, ChevronDown, ChevronUp, Bot, Database, FileText, ArrowDown, Lock, Eye, Layers, Info, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -32,6 +32,38 @@ function InfoPopover({ children, side = "right" }: { children: React.ReactNode; 
         onMouseEnter={enter}
         onMouseLeave={leave}
       >
+        {children}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  HallucinationRiskBadge — red corner badge with hover/click info    */
+/* ------------------------------------------------------------------ */
+function HallucinationRiskBadge({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const enter = () => { if (timeout.current) clearTimeout(timeout.current); setOpen(true); };
+  const leave = () => { timeout.current = setTimeout(() => setOpen(false), 150); };
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild onMouseEnter={enter} onMouseLeave={leave}>
+        <button
+          type="button"
+          aria-label="Hallucination risk"
+          className="absolute -top-2.5 -right-2.5 z-10 h-6 w-6 rounded-full bg-red-500 text-white shadow-md flex items-center justify-center hover:bg-red-600 transition-colors"
+        >
+          <AlertTriangle className="h-3.5 w-3.5" strokeWidth={2.5} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="right"
+        className="max-w-xs bg-red-600 text-white rounded-xl shadow-lg px-4 py-3 text-xs font-medium border-none leading-relaxed z-[100] space-y-2"
+        onMouseEnter={enter}
+        onMouseLeave={leave}
+      >
+        <p className="font-heading font-bold uppercase tracking-wider text-[10px] opacity-90">Hallucination risk</p>
         {children}
       </PopoverContent>
     </Popover>
@@ -179,6 +211,7 @@ interface FlagDef {
   text: string;
   explanation: string;
   severity?: "error" | "warning" | "info" | "success";
+  evaluationFactor?: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
 }
 
 /* ── Output difference flags ── */
@@ -254,7 +287,7 @@ function renderFlaggedResponse(
         <TextFlag
           key={`line-${lineIdx}-f${i}`}
           text={flag.text}
-          evaluationFactor="factual_accuracy"
+          evaluationFactor={flag.evaluationFactor ?? "factual_accuracy"}
           explanation={flag.explanation}
           severity={flag.severity ?? "error"}
         />,
@@ -524,6 +557,61 @@ const LLM_MERGED_OUTPUTS: Record<string, { text: string; issues: string[] }> = {
   },
 };
 
+/* ── Bias flags on merged outputs ── */
+/* Highlights consensus, majority, and attribution biases that arise when the LLM merges multiple sources */
+const MERGED_OUTPUT_FLAGS: Record<string, FlagDef[]> = {
+  "doc-1,doc-2": [
+    {
+      text: "the gatekeepers of accuracy and fairness in the age of AI",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** The model generalises 'scrutinise products for biases' (Doc 1) and 'editorial oversight mechanisms' (Doc 2) into a single broad claim. The specific differences between the two documents — and the contradictions or nuances — get flattened into one tidy phrase.",
+    },
+    {
+      text: "Regulators and policymakers also bear responsibility",
+      severity: "error",
+      evaluationFactor: "bias",
+      explanation: "**Attribution bias.** This claim is attributed implicitly to the merged source set, but neither retrieved snippet mentions regulators or policymakers. When the model lacks support, attributions become shaky and confidently invented.",
+    },
+  ],
+  "doc-1,doc-3": [
+    {
+      text: "DW exemplifies this",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** The model treats Doc 1's general AI strategy and Doc 3's DW-specific guidelines as parts of one unified narrative. Where the documents differ in scope and emphasis, that contrast gets smoothed away.",
+    },
+  ],
+  "doc-2,doc-3": [
+    {
+      text: "DW's internal guidelines demonstrate this in practice",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** The model presents Doc 2's governance frameworks and Doc 3's internal guidelines as causally linked, even though neither document references the other. Convergent framing hides where the sources actually diverge.",
+    },
+  ],
+  "doc-1,doc-2,doc-3": [
+    {
+      text: "Combined with governance frameworks from ethics boards, the industry is moving toward responsible AI adoption",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** A confident summary statement that generalises across all three documents. Differences in tone, region, and specific recommendations are dropped to produce a tidy industry-wide narrative.",
+    },
+    {
+      text: "Their journalists control all applications and review everything before publication",
+      severity: "error",
+      evaluationFactor: "bias",
+      explanation: "**Attribution bias.** Attributed to DW, but the source snippet only mentions 'labelling AI-assisted content' and prohibiting 'fully automated publishing' — never 'control all applications'. As source support thins, attributions grow shaky.",
+    },
+    {
+      text: "DW is firmly committed to journalism produced by people",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Majority bias.** This single-source claim from Doc 3 is the only one that survives prominently — but other equally important single-source details (e.g. Doc 1's lobbying for regulation, Doc 2's transparency obligations to audiences) get dropped because they're not echoed across documents.",
+    },
+  ],
+};
+
 /* ------------------------------------------------------------------ */
 /* ── Page ── */
 /* ------------------------------------------------------------------ */
@@ -791,7 +879,7 @@ export default function MultipleSourcesExercise() {
                       <div className="bg-background rounded-xl p-8 flex-1 flex flex-col min-h-0" style={{ maxHeight: 'calc(100vh - 180px)' }}>
 
                         {/* ── RAG pipeline block diagram (scrollable) ── */}
-                        <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-2">
+                        <div className="flex-1 min-h-0 overflow-y-auto space-y-3 px-4 py-2">
 
                           {/* Row 0: Query — full-width prompt banner */}
                           <div className="border-2 border-blue-300 bg-blue-50 overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
@@ -849,34 +937,33 @@ export default function MultipleSourcesExercise() {
                           {/* Vector Embedding block — only shown when documents are present */}
                           {diagramSelectedDocs.length > 0 && (<>
                             <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
-                            <div className="rounded border-2 border-amber-400 bg-amber-50 p-4">
+                            <div className="relative rounded border-2 border-border bg-muted/20 p-4">
+                              <HallucinationRiskBadge>
+                                <p>Nuance and domain-specific phrasing can drift during translation into vectors, so the wrong snippets may be retrieved.</p>
+                                {diagramSelectedDocs.length > 1 && (
+                                  <p>{diagramSelectedDocs.length} documents × embedding = {diagramSelectedDocs.length}× chance of meaning loss.</p>
+                                )}
+                              </HallucinationRiskBadge>
                               <div className="text-center mb-3">
                                 <div className="flex items-center justify-center gap-1.5">
                                   <p className="text-sm font-heading font-bold text-foreground">Vector embedding</p>
                                   <InfoPopover>
                                     <p className="font-semibold">Vector embedding</p>
                                     <p>Each document and the query are converted into numerical vectors that capture meaning. Similar meanings end up near each other in this space.</p>
-                                    <p className="opacity-90">⚠ Hallucination risk: nuance and domain-specific phrasing can drift during translation, so retrieval may pull the wrong snippets.</p>
                                   </InfoPopover>
                                 </div>
-                                <p className="text-xs text-amber-700 mt-1">⚠ Error-prone: semantic drift</p>
-                                {diagramSelectedDocs.length > 1 && (
-                                  <p className="text-[10px] text-amber-600 mt-0.5">
-                                    {diagramSelectedDocs.length} documents × embedding = {diagramSelectedDocs.length}× chance of meaning loss
-                                  </p>
-                                )}
                               </div>
                               <button
                                 type="button"
                                 onClick={() => setShowEmbeddingGraph(!showEmbeddingGraph)}
-                                className="text-[11px] text-amber-700 hover:text-amber-900 underline underline-offset-2 transition-colors my-1"
+                                className="text-[11px] text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors my-1"
                               >
                                 {showEmbeddingGraph ? "Hide vector space diagram" : "Show vector space diagram"}
                               </button>
                               {showEmbeddingGraph && <VectorSpaceGraph />}
                               <div className="grid grid-cols-2 gap-3 mt-3">
                                 {/* Query vector — parallelogram (data) */}
-                                <div className="border-2 border-amber-300 bg-white overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
+                                <div className="border-2 border-border bg-white overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
                                   <div className="p-3 text-center" style={{ transform: 'skewX(10deg)' }}>
                                     <div className="flex items-center justify-center gap-1 mb-1">
                                       <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Query vector</p>
@@ -889,7 +976,7 @@ export default function MultipleSourcesExercise() {
                                   </div>
                                 </div>
                                 {/* Vector store — cylinder (database/storage) */}
-                                <div className="border-2 border-amber-300 bg-white p-3 text-center flex flex-col items-center justify-center" style={{ borderRadius: '8px 8px 8px 8px / 40px 40px 40px 40px', minHeight: '64px' }}>
+                                <div className="border-2 border-border bg-white p-3 text-center flex flex-col items-center justify-center" style={{ borderRadius: '8px 8px 8px 8px / 40px 40px 40px 40px', minHeight: '64px' }}>
                                   <div className="flex items-center justify-center gap-1 mb-1">
                                     <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Vector store</p>
                                     <InfoPopover>
@@ -927,17 +1014,15 @@ export default function MultipleSourcesExercise() {
                               </div>
                               <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(diagramSelectedDocs.length, 3)}, minmax(0, 1fr))` }}>
                                 {diagramSelectedDocs.map((doc, i) => (
-                                  <div key={doc.id} className="border-2 border-border bg-white max-h-[80px] overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
-                                    <div className="p-2.5 overflow-y-auto max-h-[80px]" style={{ transform: 'skewX(10deg)' }}>
-                                      <div className="flex items-center justify-between gap-1 mb-1">
-                                        <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Snippet {i + 1}</p>
-                                        <InfoPopover>
-                                          <p className="font-semibold">Snippet</p>
-                                          <p>An extract pulled from the source document. The LLM only sees this excerpt, so any context outside it is lost.</p>
-                                        </InfoPopover>
-                                      </div>
-                                      <p className="text-[11px] text-foreground leading-relaxed italic">{LLM_EXTRACTIONS[doc.id] || "…"}</p>
+                                  <div key={doc.id} className="rounded border-2 border-border bg-white p-2.5 max-h-[80px] overflow-y-auto">
+                                    <div className="flex items-center justify-between gap-1 mb-1">
+                                      <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Snippet {i + 1}</p>
+                                      <InfoPopover>
+                                        <p className="font-semibold">Snippet</p>
+                                        <p>An extract pulled from the source document. The LLM only sees this excerpt, so any context outside it is lost.</p>
+                                      </InfoPopover>
                                     </div>
+                                    <p className="text-[11px] text-foreground leading-relaxed italic">{LLM_EXTRACTIONS[doc.id] || "…"}</p>
                                   </div>
                                 ))}
                               </div>
@@ -948,24 +1033,23 @@ export default function MultipleSourcesExercise() {
                           <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
 
                           {/* Row 6: Prompt assembly + LLM generation — combined process rectangle */}
-                          <div className="rounded border-2 border-amber-400 bg-amber-50 p-4 text-center">
+                          <div className="relative rounded border-2 border-border bg-muted/20 p-4 text-center">
+                            <HallucinationRiskBadge>
+                              <p>Conflicting sources can confuse the model, and when context is thin it falls back on training data — producing fluent but unverifiable claims.</p>
+                              {diagramSelectedDocs.length > 1 && (
+                                <p>{diagramSelectedDocs.length} snippets + query merged — the more sources, the higher the chance of conflict.</p>
+                              )}
+                              {diagramSelectedDocs.length === 0 && (
+                                <p>Query with no context — the LLM relies on training data alone, which can be outdated or wrong.</p>
+                              )}
+                            </HallucinationRiskBadge>
                             <div className="flex items-center justify-center gap-1.5">
                               <p className="text-sm font-heading font-bold text-foreground">Prompt assembly &amp; LLM generation</p>
                               <InfoPopover>
                                 <p className="font-semibold">Prompt assembly &amp; LLM generation</p>
                                 <p>Snippets and the query are merged into one prompt and sent to the LLM, which generates a response token-by-token.</p>
-                                <p className="opacity-90">⚠ Hallucination risk: conflicting sources can confuse the model, and when context is thin it falls back on training data — producing fluent but unverifiable claims.</p>
                               </InfoPopover>
                             </div>
-                            <p className="text-xs text-amber-700 mt-1">⚠ Error-prone: context conflicts</p>
-                            {diagramSelectedDocs.length > 1 && (
-                              <p className="text-[10px] text-amber-600 mt-0.5">
-                                {diagramSelectedDocs.length} snippets + query merged — conflicting sources can confuse the LLM
-                              </p>
-                            )}
-                            {diagramSelectedDocs.length === 0 && (
-                              <p className="text-[10px] text-amber-600 mt-0.5">Query with no context — LLM relies on training data alone</p>
-                            )}
                           </div>
 
                           {/* Arrow */}
@@ -1005,11 +1089,11 @@ export default function MultipleSourcesExercise() {
                               );
                             }
                             return (
-                              <div className="border-2 border-brand-tertiary-500/40 bg-white overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
-                                <div className="p-4" style={{ transform: 'skewX(10deg)' }}>
-                                  {outputHeader}
-                                  <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
-                                </div>
+                              <div className="rounded border-2 border-brand-tertiary-500/40 bg-white p-4">
+                                {outputHeader}
+                                <p className="text-sm text-foreground leading-relaxed">
+                                  {renderFlaggedResponse(merged.text, MERGED_OUTPUT_FLAGS[key] || [])}
+                                </p>
                               </div>
                             );
                           })()}
