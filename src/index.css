@@ -273,6 +273,12 @@ All colors MUST be HSL.
     /* blue-200 */
   }
 
+  /* External citations ([N*]) get an amber tint so users can distinguish them
+     from internal citations at a glance. */
+  .inline-citation--external {
+    background-color: #b58523;
+  }
+
   /* ── Inline citation custom tooltip ── */
   .inline-citation-tooltip {
     visibility: hidden;
@@ -296,7 +302,9 @@ All colors MUST be HSL.
     width: max-content;
     text-align: center;
     transition: opacity 0.15s ease, visibility 0.15s ease;
-    z-index: 50;
+    /* High z-index so the JS-promoted (position: fixed) tooltip layers above
+       any sibling content in the chat container's stacking context. */
+    z-index: 9999;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
@@ -317,6 +325,20 @@ All colors MUST be HSL.
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* While the answer is still streaming, the inner HTML rebuilds on every token,
+     which causes the tooltip to flicker on hover. Suppress it entirely until the
+     stream finishes. */
+  .is-streaming .inline-citation-button:hover .inline-citation-tooltip,
+  .is-streaming .inline-citation-button:focus .inline-citation-tooltip,
+  .is-streaming .inline-citation-button:focus-within .inline-citation-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .is-streaming .inline-citation-button {
+    cursor: default;
   }
 
   .citation-tooltip-link {

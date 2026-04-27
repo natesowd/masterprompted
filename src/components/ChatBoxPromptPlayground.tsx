@@ -150,6 +150,37 @@ const Chatbox = ({
   // Local state to trigger a one-shot bounce animation when an external "animationKey" changes
   const [isBouncing, setIsBouncing] = useState(false);
 
+  // Track the user's manual resize so the chatbox keeps its size across content
+  // swaps (e.g. textarea -> skeleton during optimization). Without this, switching
+  // inner elements with different min-heights causes the container to grow/shrink.
+  const [manualSize, setManualSize] = useState<{ width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    if (autoResize) return;
+    const el = containerRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (!containerRef.current) return;
+        const next = {
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight,
+        };
+        setManualSize(prev =>
+          prev && prev.width === next.width && prev.height === next.height ? prev : next
+        );
+      });
+    });
+    observer.observe(el);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [autoResize]);
+
   const handleSubmit = (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
@@ -262,27 +293,33 @@ const Chatbox = ({
           </TooltipContent>
         </Tooltip>
       )}
-      {onToggleWebSearch && (
-        <Tooltip delayDuration={200}>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "rounded-full h-4 w-4 flex-shrink-0",
-                webSearchEnabled && "bg-blue-100"
-              )}
-              type="button"
-              onClick={onToggleWebSearch}
-            >
-              <Globe className={cn("h-4 w-4", webSearchEnabled ? "text-blue-600" : "text-muted-foreground")} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="px-3 py-1.5 text-xs">
-            {webSearchEnabled ? "Disable web search" : "Enable web search"}
-          </TooltipContent>
-        </Tooltip>
-      )}
+      {onToggleWebSearch && (() => {
+        const hasFiles = files.length > 0;
+        return (
+          <Tooltip delayDuration={200}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "rounded-full h-4 w-4 flex-shrink-0",
+                  webSearchEnabled && !hasFiles && "bg-blue-100"
+                )}
+                type="button"
+                disabled={hasFiles}
+                onClick={onToggleWebSearch}
+              >
+                <Globe className={cn("h-4 w-4", hasFiles ? "text-muted-foreground/30" : webSearchEnabled ? "text-blue-600" : "text-muted-foreground")} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="px-3 py-1.5 text-xs">
+              {hasFiles
+                ? "Web search is unavailable while a PDF is attached"
+                : webSearchEnabled ? "Disable web search" : "Enable web search"}
+            </TooltipContent>
+          </Tooltip>
+        );
+      })()}
       <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>
           <Button
@@ -341,7 +378,10 @@ const Chatbox = ({
       style={{
         resize: autoResize ? 'none' : 'both',
         overflow: autoResize ? 'visible' : 'auto',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        ...(manualSize && !autoResize
+          ? { width: `${manualSize.width}px`, height: `${manualSize.height}px` }
+          : {})
       }}
       aria-roledescription="Resizable chatbox">
 
@@ -378,7 +418,7 @@ const Chatbox = ({
       {waitingforOptimization &&
         <div
           className={cn(
-            "border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 py-4 text-lg leading-relaxed text-card-foreground font-['Manrope'] flex-1 h-full min-h-[140px] resize-none overflow-y-auto",
+            "border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 py-2 mt-2 mb-2 pl-4 leading-relaxed text-card-foreground font-['Manrope'] text-md resize-none mx-0 flex-1 h-full min-h-0 overflow-y-auto",
             hideSubmitButton ? "pr-4" : "pr-16"
           )}>
           <Skeleton className="mt-2 h-4 w-[180px]" />
