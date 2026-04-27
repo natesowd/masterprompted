@@ -809,9 +809,9 @@ export default function MultipleSourcesExercise() {
                           {/* Arrow */}
                           <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
 
-                          {/* Row 6: Prompt assembly — process rectangle (error-prone) */}
+                          {/* Row 6: Prompt assembly + LLM generation — combined process rectangle */}
                           <div className="rounded border-2 border-amber-400 bg-amber-50 p-4 text-center">
-                            <p className="text-sm font-heading font-bold text-foreground">Prompt assembly</p>
+                            <p className="text-sm font-heading font-bold text-foreground">Prompt assembly &amp; LLM generation</p>
                             <p className="text-xs text-amber-700 mt-1">⚠ Error-prone: context conflicts</p>
                             {diagramSelectedDocs.length > 1 && (
                               <p className="text-[10px] text-amber-600 mt-0.5">
@@ -821,14 +821,6 @@ export default function MultipleSourcesExercise() {
                             {diagramSelectedDocs.length === 0 && (
                               <p className="text-[10px] text-amber-600 mt-0.5">Query with no context — LLM relies on training data alone</p>
                             )}
-                          </div>
-
-                          {/* Arrow */}
-                          <div className="flex justify-center"><ArrowDown className="h-5 w-5 text-brand-tertiary-500/50" /></div>
-
-                          {/* Row 7: LLM generation — process rectangle */}
-                          <div className="rounded border-2 border-border bg-muted/20 p-3 text-center">
-                            <p className="text-sm font-heading font-semibold text-foreground">LLM generation</p>
                           </div>
 
                           {/* Arrow */}
