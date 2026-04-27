@@ -7,6 +7,7 @@
  */
 
 import { fetchWithRetry } from "../evaluations/fetchWithRetry";
+import { apiUrl } from "@/lib/apiBase";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,12 +32,10 @@ export interface ChatDocument {
 }
 
 // ---------------------------------------------------------------------------
-// Search endpoint — mirrors NETLIFY_CHAT_URL pattern
+// Search endpoint
 // ---------------------------------------------------------------------------
 
-// const NETLIFY_SEARCH_URL =
-//   "https://luxury-blini-3336bb.netlify.app/api/web-search";
-const NETLIFY_SEARCH_URL = "https://69ea27f2e6a980166f5c5124--luxury-blini-3336bb.netlify.app/api/web-search"
+const NETLIFY_SEARCH_URL = apiUrl("/api/web-search");
 
 // ---------------------------------------------------------------------------
 // Functions

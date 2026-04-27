@@ -96,19 +96,19 @@ export function applyInlineFormatting(raw: string, diff: boolean, isInline: bool
         return `<button tabindex="0" class="inline-citation-button"><span class="inline-citation">${num}</span><span class="inline-citation-tooltip"><a href="${url}" target="_blank" rel="noopener noreferrer" class="citation-tooltip-link">${name}</a></span></button>`;
       }
     );
-    // Plain citations: [1], [2], [1, p.5], [1, Section 3], [3][4] etc.
+    // Plain citations with the new asterisk-external + optional-title scheme:
+    //   [N]            — internal citation
+    //   [N*]           — external citation (asterisk after the number)
+    //   [N, Title]     — internal citation, tooltip shows Title
+    //   [N*, Title]    — external citation, tooltip shows Title
     html = html.replace(
-      /\[(\d{1,3}(?:,\s*(?:p\.\s*\d+|[Ss]ection\s+[\w.]+))?)\]/g,
-      '<button tabindex="0" class="inline-citation-button"><span class="inline-citation">$1</span><span class="inline-citation-tooltip">Citation [$1]</span></button>'
-    );
-
-    // External knowledge marker: [External] or [External: source description]
-    html = html.replace(
-      /\[External(?::\s*([^\]]*))?\]/gi,
-      (_match, source) => {
-        const label = source ? `External: ${source}` : 'External';
-        const title = source ? `External source: ${source}` : 'External knowledge (not from uploaded documents)';
-        return `<sup class="inline-flex items-center justify-center px-[4px] h-[1.1em] text-[0.6em] font-semibold leading-none rounded bg-amber-100 text-amber-700 border border-amber-200 cursor-default align-super" title="${title}">${label}</sup>`;
+      /\[(\d{1,3})(\*?)(?:,\s*([^\]]+))?\]/g,
+      (_match, num: string, ext: string, title?: string) => {
+        const isExternal = ext === '*';
+        const badgeText = isExternal ? `${num}*` : num;
+        const tooltipText = title ? title.trim() : `Citation [${num}${ext}]`;
+        const badgeClass = isExternal ? 'inline-citation inline-citation--external' : 'inline-citation';
+        return `<button tabindex="0" class="inline-citation-button"><span class="${badgeClass}">${badgeText}</span><span class="inline-citation-tooltip">${tooltipText}</span></button>`;
       }
     );
 

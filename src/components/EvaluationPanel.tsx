@@ -22,12 +22,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const panelVariants = cva(
-  "bg-transparent px-4 py-4",
+  "bg-transparent py-2",
   {
     variants: {
       size: {
         default: "w-[20rem]",
-        compact: "w-[16rem]",
+        compact: "w-[18rem]",
         expanded: "w-[24rem]"
       },
       state: {
@@ -128,19 +128,30 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
   return (
     <div className="relative z-20 [&_*]:!font-heading">
       <div className={cn(panelVariants({ size, state: "open" }))}>
-        {isPanelOpen ? (
-          <>
-            {/* Header with title and collapse arrow */}
-            <button
-              type="button"
-              onClick={() => { setIsPanelOpen(false); onClose?.(); }}
-              className="w-full flex items-center gap-2 text-base font-semibold font-heading text-card-foreground mb-2"
-            >
-              <span>{t('components.evaluationPanel.title')}</span>
-              <ChevronUp className="h-5 w-5 text-muted-foreground" />
-            </button>
+        {/* Single header toggle — same layout regardless of state, only the
+            chevron flips. */}
+        <button
+          type="button"
+          onClick={() => {
+            const next = !isPanelOpen;
+            setIsPanelOpen(next);
+            if (!next) onClose?.();
+          }}
+          className={cn(
+            "w-full flex justify-between items-center gap-2 text-base font-semibold font-heading text-card-foreground",
+            isPanelOpen && "mb-2"
+          )}
+        >
+          <span>{t('components.evaluationPanel.title')}</span>
+          {isPanelOpen ? (
+            <ChevronUp className="h-5 w-5 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+          )}
+        </button>
 
-            <div className="space-y-3 mt-4">
+        {isPanelOpen && (
+          <div className="space-y-3 mt-4">
             {evaluationCriteria.map((criterion) => (
               <Collapsible
                 key={criterion.id}
@@ -162,7 +173,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
                           <criterion.icon className="h-4 w-4 text-muted-foreground" />
                         </span>
                       )}
-                      <span className="text-sm font-medium text-foreground">{criterion.label}</span>
+                      <span className="text-sm text-nowrap font-medium text-foreground">{criterion.label}</span>
                     </div>
                     <ChevronDown
                       className={cn(
@@ -180,16 +191,6 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
               </Collapsible>
             ))}
           </div>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setIsPanelOpen(true)}
-            className="w-full flex items-center gap-2 text-base font-semibold font-heading text-card-foreground"
-          >
-            <span>{t('components.evaluationPanel.title')}</span>
-            <ChevronDown className="h-5 w-5 text-muted-foreground" />
-          </button>
         )}
       </div>
     </div>

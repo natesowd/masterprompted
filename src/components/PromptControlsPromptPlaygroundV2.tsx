@@ -356,7 +356,7 @@ export default function PromptControls({
                         </Button>
                     </div>
                     <p className="text-[10px] leading-snug text-muted-foreground/70 text-left">
-                        LLMs used in the creation of prompt optimizations and generated outputs include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+                        LLMs used in the creation of prompt optimizations and generated outputs include: GPT-OSS-20B, Llama 3.3 70B, and all-MiniLM-L6-v2 (LM feature extractor)
                     </p>
                 </div>
             </div>

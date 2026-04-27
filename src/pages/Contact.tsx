@@ -39,7 +39,7 @@ const Contact = () => {
   });
 
   const onSubmit = (data: ContactFormValues) => {
-    const mailtoLink = `mailto:eipcm@eipcm.org?subject=${encodeURIComponent(data.subject)}&body=${encodeURIComponent(
+    const mailtoLink = `mailto:prompted.issues@eipcm.org?subject=${encodeURIComponent(data.subject)}&body=${encodeURIComponent(
       `Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`
     )}`;
     
@@ -71,7 +71,7 @@ const Contact = () => {
                     href="mailto:eipcm@eipcm.org" 
                     className="text-primary hover:underline font-medium"
                   >
-                    eipcm@eipcm.org
+                    prompted.issues@eipcm.org
                   </a>
                 </p>
               </div>

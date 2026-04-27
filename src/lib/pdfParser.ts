@@ -34,11 +34,14 @@ if (typeof ReadableStream !== 'undefined' && !((ReadableStream.prototype as any)
 }
 
 /**
- * Extracts all text content from a PDF file.
+ * Extracts all text content from a PDF file, plus the document's metadata title
+ * (if present). Surfacing the title separately lets the LLM cite the document
+ * by its real name instead of just the file name.
+ *
  * @param file The PDF file to parse.
- * @returns A promise that resolves to the extracted text.
+ * @returns A promise that resolves to the extracted text and optional title.
  */
-export async function extractTextFromPDF(file: File): Promise<string> {
+export async function extractTextFromPDF(file: File): Promise<{ text: string; title?: string }> {
     const arrayBuffer = await file.arrayBuffer();
     const loadingTask = pdfjs.getDocument({
         data: arrayBuffer,
@@ -46,6 +49,22 @@ export async function extractTextFromPDF(file: File): Promise<string> {
         disableRange: true
     });
     const pdf = await loadingTask.promise;
+
+    // Best-effort: read the PDF's embedded title from its metadata.
+    // Skip generic placeholders that authoring tools set by default.
+    let title: string | undefined;
+    try {
+        const meta = await pdf.getMetadata();
+        const infoTitle: unknown = (meta as any)?.info?.Title;
+        if (typeof infoTitle === 'string') {
+            const cleaned = infoTitle.trim();
+            if (cleaned && !/^(microsoft\s+word|untitled|document\d*|.*\.(docx?|pdf))$/i.test(cleaned)) {
+                title = cleaned;
+            }
+        }
+    } catch {
+        // Metadata read failed — leave title undefined.
+    }
 
     let fullText = '';
 
@@ -63,5 +82,5 @@ export async function extractTextFromPDF(file: File): Promise<string> {
         }
     }
 
-    return fullText.trim();
+    return { text: fullText.trim(), title };
 }

@@ -20,6 +20,7 @@ import { Minus, CircleQuestionMark, Loader2, GitCompare } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLayoutEffect, useRef, useState } from "react";
 import RichText from "@/components/RichText.tsx";
 import { diffWordsWithNewlineProtection, DiffPart } from "@/lib/diff";
@@ -52,8 +53,8 @@ const diffPartVariants = cva(
     variants: {
       type: {
         added: "bg-green-200 text-green-800",
-        removed: "bg-red-200/60 text-red-800 line-through",
-        removedButton: "inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+        removed: "bg-blue-200/60 text-blue-800 line-through",
+        removedButton: "inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-blue-600 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer"
       }
     }
   }
@@ -102,6 +103,10 @@ type ChatAnswerProps = VariantProps<typeof answerVariants> & {
   comparedVersionIndex?: number;
   /** DOM element (sidebar container) to portal the compare sidebar into */
   compareSidebarContainer: HTMLElement | null;
+  /** True while the answer is still streaming — suppresses citation tooltips that would otherwise flicker on re-renders. */
+  isStreaming?: boolean;
+  /** True while waiting for the first response token — renders a skeleton inside the body so the header is visible above it. */
+  pending?: boolean;
 };
 
 const ChatAnswer = ({
@@ -126,6 +131,8 @@ const ChatAnswer = ({
   versions,
   comparedVersionIndex,
   compareSidebarContainer,
+  isStreaming = false,
+  pending = false,
   variant
 }: ChatAnswerProps) => {
   const { t } = useLanguage();
@@ -311,7 +318,7 @@ const ChatAnswer = ({
             <Button
               size="sm"
               variant={showCompare ? "default" : "outline"}
-              disabled={!canCompare}
+              disabled={!canCompare || isStreaming || pending}
               onClick={handleCompareClick}
               className="h-8"
             >
@@ -347,7 +354,7 @@ const ChatAnswer = ({
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="px-1.5 py-0.5 rounded bg-red-100 text-red-800 border border-red-300">
+              <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-300">
                 {t('components.compareView.comparedLegend')} v{resolvedComparedIndex + 1}
               </span>
             </div>
@@ -363,8 +370,13 @@ const ChatAnswer = ({
         )}
       </div>
 
-      <div id="chat-body" className="prose max-w-none text-foreground leading-relaxed break-words">
-        {showEvaluation ? (
+      <div id="chat-body" className={cn("prose max-w-none text-foreground leading-relaxed break-words", isStreaming && "is-streaming")}>
+        {pending ? (
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[500px] max-w-full" />
+            <Skeleton className="h-4 w-[300px] max-w-full" />
+          </div>
+        ) : showEvaluation ? (
           renderEvaluation()
         ) : showCompare && resolvedComparedIndex != null ? (
           <CompareView

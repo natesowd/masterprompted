@@ -13,12 +13,9 @@ import { runWebSearchRAG } from "@/services/webSearch";
 import type { WebSearchResult } from "@/services/webSearch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { apiUrl } from "@/lib/apiBase";
 const NO_CHANGE_VALUE = "no-change";
-// const NETLIFY_CHAT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-//   ? "/api/chat"
-//   : "https://luxury-blini-3336bb.netlify.app/api/chat";
-// const NETLIFY_CHAT_URL = "https://luxury-blini-3336bb.netlify.app/api/chat";
-const NETLIFY_CHAT_URL = "https://69ea27f2e6a980166f5c5124--luxury-blini-3336bb.netlify.app/api/chat"
+const NETLIFY_CHAT_URL = apiUrl("/api/chat");
 
 export type Parameters = {
   specificity: string;
@@ -41,6 +38,8 @@ export type ThreadVersion = {
   searchStatus?: 'idle' | 'searching' | 'streaming' | 'complete' | 'error';
   webSearchEnabled?: boolean;
   fileNames?: string[];
+  /** True once the answer stream has finished (both standard and web-search flows). */
+  streamComplete?: boolean;
 };
 export type Thread = {
   versions: ThreadVersion[];
@@ -62,6 +61,8 @@ export type ParsedFile = {
   isUploading?: boolean;
   isSummarized?: boolean;
   originalTokenCount?: number;
+  /** PDF metadata title (if present) — gives the LLM a real document title to cite. */
+  documentTitle?: string;
 };
 const PromptPlayground = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -303,7 +304,7 @@ const PromptPlayground = () => {
                 const thread = copy[threadIndex];
                 if (!thread?.versions[versionIndex]) return prev;
                 const versions = [...thread.versions];
-                versions[versionIndex] = { ...versions[versionIndex], answer: fullAnswer, searchStatus: "complete" };
+                versions[versionIndex] = { ...versions[versionIndex], answer: fullAnswer, searchStatus: "complete", streamComplete: true };
                 copy[threadIndex] = { ...thread, versions };
                 return copy;
               });
@@ -320,7 +321,7 @@ const PromptPlayground = () => {
                 const errorMsg = current.answer
                   ? `${current.answer}\n\n[[ERROR: [STREAM_FAILED - ${err.message}]]]`
                   : `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`;
-                versions[versionIndex] = { ...versions[versionIndex], answer: errorMsg, searchStatus: "complete" };
+                versions[versionIndex] = { ...versions[versionIndex], answer: errorMsg, searchStatus: "complete", streamComplete: true };
                 copy[threadIndex] = { ...thread, versions };
                 return copy;
               });
@@ -372,7 +373,9 @@ const PromptPlayground = () => {
             if (!thread?.versions[versionIndex]) return prev;
             const versions = [...thread.versions];
             if (!versions[versionIndex].answer || versions[versionIndex].answer!.length < 5) {
-              versions[versionIndex] = { ...versions[versionIndex], answer: `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`, searchStatus: "error" };
+              versions[versionIndex] = { ...versions[versionIndex], answer: `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`, searchStatus: "error", streamComplete: true };
+            } else {
+              versions[versionIndex] = { ...versions[versionIndex], streamComplete: true };
             }
             const evaluations = [...(thread.evaluations || [])];
             evaluations[versionIndex] = { loading: false, error: true, data: null };
@@ -391,15 +394,26 @@ const PromptPlayground = () => {
         ? `You are a document analysis assistant. You have been provided with one or more reference documents. Follow these rules strictly:
 
 1. BASE YOUR ANSWERS ON THE PROVIDED DOCUMENTS. When the user's question relates to topics covered in the documents, your answer must be drawn from the document content. Do not supplement with outside knowledge unless the document is insufficient to answer the question.
-2. CITE WITH NUMBERED REFERENCES. When referencing specific facts, statistics, names, or claims from a document, place an inline citation immediately after the claim using the format [1], [2], etc., where the number corresponds to the document index. If citing a specific section, use [1, p.X] or [1, Section Y].
-3. DISTINGUISH SOURCES. If you must use knowledge beyond the documents (because the documents do not address the question), mark the claim with [External] and briefly note the source if known.
-4. NEVER FABRICATE DOCUMENT CONTENT. If you cannot find specific information in the provided documents, say so. Do not guess or paraphrase loosely — accuracy is more important than completeness.
-5. PRESERVE PRECISION. Reproduce names, dates, numbers, and statistics exactly as they appear in the documents. Do not round, approximate, or restate figures unless asked.
-6. WHEN IN DOUBT, QUOTE. If uncertain whether your recollection of a document detail is exact, quote the relevant passage directly rather than paraphrasing.`
+
+2. SEQUENTIAL CITATION NUMBERING (SHARED ACROSS ALL SOURCES). Every distinct source you cite — internal (from the provided documents) or external (from outside knowledge) — gets its own UNIQUE number in a SINGLE shared sequence, in the order each source first appears in your answer. Examples of correct numbering: [1], [2*], [3], [4*]. Examples of INCORRECT numbering: [1], [1*] (an internal and external source must NEVER share the same number); [1], [2], [1] (do not reuse a number for what is later treated as a different source).
+
+3. INTERNAL vs EXTERNAL MARKER. Internal citations have NO suffix: [1], [2]. External citations have an asterisk after the number: [3*], [4*]. The asterisk is the ONLY thing that distinguishes them — they share the same numbering sequence (see rule 2).
+
+4. EVERY IN-LINE CITATION MUST INCLUDE A TITLE. The format is [N, Title] for internal and [N*, Title] for external. The title goes after the comma and before the closing bracket. For internal sources, use the title shown in the document header you were given (e.g. "Annual Report 2024"); if the document header only contains a file name, use that file name as the title. For external sources, use the publication / paper / page name. Examples: [1, Annual Report 2024], [2*, NIH Clinical Guidelines], [3, MyDoc.pdf]. NEVER omit the title.
+
+5. REFERENCES SECTION. If your answer contains any in-line citations, include a numbered "References" section at the end listing every cited source. Each reference should match its in-line number and title exactly. Don't use brackets: start each reference with e.g. "1. Reference", NOT "[1]. Reference".
+
+6. NEVER FABRICATE DOCUMENT CONTENT. If you cannot find specific information in the provided documents, say so. Do not guess or paraphrase loosely — accuracy is more important than completeness.
+
+7. PRESERVE PRECISION. Reproduce names, dates, numbers, and statistics exactly as they appear in the documents. Do not round, approximate, or restate figures unless asked.
+
+8. WHEN IN DOUBT, QUOTE. If uncertain whether your recollection of a document detail is exact, quote the relevant passage directly rather than paraphrasing.`
         : "You are a helpful assistant.";
 
       // Build documents array — the edge function injects these into the
       // system message as numbered references for the model to cite.
+      // We pass the PDF's metadata title (if available) alongside the file name
+      // so the model has a citable, human-readable title.
       const documents = uploadedFiles.length > 0
         ? uploadedFiles.map((file, idx) => {
           const useSum = useSummaryForOutput && !!file.summary;
@@ -407,9 +421,12 @@ const PromptPlayground = () => {
           const titleSuffix = useSum
             ? ` [summary of ~${file.originalTokenCount} tokens]`
             : "";
+          const baseTitle = file.documentTitle
+            ? `${file.documentTitle} (${file.name})`
+            : file.name;
           return {
             id: `doc-${idx + 1}`,
-            data: { title: `${file.name}${titleSuffix}`, text },
+            data: { title: `${baseTitle}${titleSuffix}`, text },
           };
         })
         : undefined;
@@ -558,7 +575,11 @@ const PromptPlayground = () => {
           if (!thread?.evaluations) return prev;
           const evaluations = [...thread.evaluations];
           evaluations[versionIndex] = { loading: true, error: false, data: null };
-          copy[threadIndex] = { ...thread, evaluations };
+          const versions = [...thread.versions];
+          if (versions[versionIndex]) {
+            versions[versionIndex] = { ...versions[versionIndex], streamComplete: true };
+          }
+          copy[threadIndex] = { ...thread, evaluations, versions };
           return copy;
         });
         try {
@@ -605,7 +626,9 @@ const PromptPlayground = () => {
 
           const versions = [...thread.versions];
           if (!versions[versionIndex].answer || versions[versionIndex].answer.length < 5) {
-            versions[versionIndex] = { ...versions[versionIndex], answer: errorMessage };
+            versions[versionIndex] = { ...versions[versionIndex], answer: errorMessage, streamComplete: true };
+          } else {
+            versions[versionIndex] = { ...versions[versionIndex], streamComplete: true };
           }
 
           const evaluations = [...(thread.evaluations || [])];
@@ -722,6 +745,10 @@ const PromptPlayground = () => {
 
     if (pdfs.length === 0) return;
 
+    // Web search and PDF attachments are mutually exclusive — turn web search off
+    // if it happened to be enabled when a PDF arrives.
+    setWebSearchEnabled(false);
+
     const { extractTextFromPDF } = await import('@/lib/pdfParser');
 
     console.log(`Starting upload/parse for ${pdfs.length} PDF(s)`);
@@ -732,8 +759,8 @@ const PromptPlayground = () => {
       setUploadedFiles(prev => [...prev, { name: file.name, content: '', rawContent: '', size: 0, isUploading: true }]);
 
       try {
-        const text = await extractTextFromPDF(file);
-        console.log(`Successfully parsed ${file.name}, extracted ${text.length} characters.`);
+        const { text, title: pdfTitle } = await extractTextFromPDF(file);
+        console.log(`Successfully parsed ${file.name}, extracted ${text.length} characters${pdfTitle ? `; PDF title: "${pdfTitle}"` : ''}.`);
 
         const rawTokens = Math.ceil(text.length / 3.5);
         console.log(`Estimated tokens for "${file.name}": ${rawTokens} (Chars: ${text.length}).`);
@@ -791,6 +818,7 @@ const PromptPlayground = () => {
               isUploading: false,
               isSummarized,
               originalTokenCount: isSummarized ? rawTokens : undefined,
+              documentTitle: pdfTitle,
             }
             : f
         ));
@@ -808,6 +836,14 @@ const PromptPlayground = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
     setFileOrSearchDirty(true);
   }, []);
+
+  // Hold the latest handlePromptOptimize in a ref so the parameters-driven
+  // optimization effect only fires on actual parameter changes — not when the
+  // callback's identity changes (e.g. on file upload, which updates its deps).
+  const handlePromptOptimizeRef = useRef(handlePromptOptimize);
+  useEffect(() => {
+    handlePromptOptimizeRef.current = handlePromptOptimize;
+  }, [handlePromptOptimize]);
 
   useEffect(() => {
     if (!currentPrompt.trim() && !editingText.trim()) return;
@@ -830,10 +866,11 @@ const PromptPlayground = () => {
           setOptimizePulse(prev => prev + 1);
           return;
         }
-        handlePromptOptimize(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
+        handlePromptOptimizeRef.current(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
       }
     }
-  }, [parameters, handlePromptOptimize]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parameters]);
 
   const handleUndo = () => {
     if (!previousPrompt) return;
@@ -955,7 +992,7 @@ const PromptPlayground = () => {
     <div className="h-[100dvh] overflow-hidden bg-background flex flex-col">
       <Header onLanguageChange={setPageLanguage} />
       <main className="flex-1 min-h-0 flex flex-col">
-        <div className="flex flex-1 min-h-0 max-w-7xl mx-auto w-full gap-[clamp(0px,1vw,1rem)]">
+        <div className="flex flex-1 min-h-0 max-w-[clamp(600px,95vw,1800px)] mx-auto w-full gap-[clamp(0px,1vw,1rem)]">
           <aside className="w-[clamp(16rem,22vw,20rem)] flex-shrink-0 bg-surface-200 2xl:bg-transparent flex items-stretch justify-center overflow-hidden 2xl:py-[clamp(0.5rem,1vh,1rem)]">
             <div className="w-[264px] 2xl:bg-card 2xl:border 2xl:border-border 2xl:rounded-lg 2xl:shadow-sm 2xl:overflow-hidden 2xl:w-72 flex flex-col min-h-0 flex-1">
               <PromptControls {...{
@@ -990,7 +1027,7 @@ const PromptPlayground = () => {
               }} />
             </div>
           </aside>
-          <div className="flex-1 min-w-0 min-h-0 px-[clamp(0.75rem,2vw,1.5rem)] py-[clamp(0.5rem,1.5vh,1rem)] flex flex-col overflow-hidden">
+          <div className="flex-1 min-w-0 min-h-0 px-[clamp(0.75rem,1vw,1.5rem)] py-[clamp(0.5rem,1.5vh,1rem)] flex flex-col overflow-hidden">
             <ChatBody
               threads={threads}
               uploadedFiles={uploadedFiles}

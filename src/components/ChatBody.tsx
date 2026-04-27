@@ -6,7 +6,6 @@ import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import { CircleQuestionMark, Minus } from "lucide-react";
 import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Thread, ParsedFile } from "@/pages/PromptPlayground";
@@ -18,21 +17,21 @@ import type { WebSearchResult } from "@/services/webSearch/webSearchClient";
 // Helper to process citations: renumber and filter sources to match only what appears in text
 function processCitations(text: string, sources?: WebSearchResult[]) {
   if (!text || !sources || sources.length === 0) return { enriched: text, activeSources: sources || [] };
-  
+
   let enriched = text;
   const activeSources: WebSearchResult[] = [];
   const sourceMap = new Map(sources.map(s => [s.position, s]));
-  
+
   // Match any digits that appear inside square brackets.
   // This correctly isolates '1', '2', '3', '6' from strings like "[1, 2, 3, 6]" or "[1][2]".
   const matches = Array.from(text.matchAll(/\[(.*?)\]/g));
   const usedPositions = new Set<number>();
-  
+
   for (const match of matches) {
     const bracketContent = match[1];
     // Skip if it's already an enriched format
     if (bracketContent.includes('|||')) continue;
-    
+
     // Find all numbers within this bracket
     const numbers = bracketContent.match(/\d+/g);
     if (numbers) {
@@ -50,7 +49,7 @@ function processCitations(text: string, sources?: WebSearchResult[]) {
 
   const usedArray = Array.from(usedPositions).sort((a, b) => a - b);
   const remapping = new Map<number, number>();
-  
+
   usedArray.forEach((oldNum, idx) => {
     const newNum = idx + 1;
     remapping.set(oldNum, newNum);
@@ -65,10 +64,10 @@ function processCitations(text: string, sources?: WebSearchResult[]) {
   enriched = enriched.replace(/\[((?:\d+(?:,\s*)?)+)\]/g, (fullMatch, innerContent) => {
     // If it's already enriched, skip
     if (innerContent.includes('|||')) return fullMatch;
-    
+
     let isModified = false;
     let rewrittenTags = '';
-    
+
     // Process each number and build individual enriched tags
     const numbers = innerContent.match(/\d+/g);
     if (!numbers) return fullMatch;
@@ -165,13 +164,13 @@ const ChatBody = memo(function ChatBody({
       if (!thread.showDiff || thread.currentIndex === 0) return;
       const vCurrent = thread.versions[thread.currentIndex];
       const vOriginal = thread.versions[0];
-      
+
       const currentAnswerRaw = vCurrent.answer?.replace(/\\n/g, "\n") ?? "";
       const originalAnswerRaw = vOriginal.answer?.replace(/\\n/g, "\n") ?? "";
-      
+
       const currentAnswer = processCitations(currentAnswerRaw, vCurrent.webSearchSources).enriched;
       const originalAnswer = processCitations(originalAnswerRaw, vOriginal.webSearchSources).enriched;
-      
+
       const diffResult = diffWordsWithNewlineProtection(originalAnswer, currentAnswer);
       diffResult.forEach((part, index) => {
         if (part.removed) {
@@ -325,8 +324,8 @@ const ChatBody = memo(function ChatBody({
   }, []);
 
   const handleHoverComment = useCallback((id: string | null) => {
-    const HIGHLIGHT_COMMENT_CLASSES = ["bg-red-200"];
-    const HIGHLIGHT_ICON_CLASSES = ["bg-red-600", "text-white"];
+    const HIGHLIGHT_COMMENT_CLASSES = ["bg-blue-200"];
+    const HIGHLIGHT_ICON_CLASSES = ["bg-blue-600", "text-white"];
 
     if (lastHoveredId.current) {
       const lastIconEl = document.getElementById(lastHoveredId.current);
@@ -363,12 +362,57 @@ const ChatBody = memo(function ChatBody({
 
   const handleToggleDiffHelp = useCallback(() => setShowDiffPopover(true), []);
 
+  // Position citation tooltips with `position: fixed` on hover/focus so they
+  // escape the chat container's overflow clipping. Citations live inside
+  // dangerouslySetInnerHTML, so we use event delegation on the document.
+  useEffect(() => {
+    const positionTooltip = (button: HTMLElement) => {
+      const tooltip = button.querySelector<HTMLElement>('.inline-citation-tooltip');
+      if (!tooltip) return;
+      const rect = button.getBoundingClientRect();
+
+      // Reset and place above the button, anchored to viewport.
+      tooltip.style.position = 'fixed';
+      tooltip.style.top = 'auto';
+      tooltip.style.bottom = `${window.innerHeight - rect.top + 6}px`;
+      tooltip.style.left = `${rect.left + rect.width / 2}px`;
+      tooltip.style.transform = 'translateX(-50%)';
+
+      // After layout, nudge horizontally if the tooltip would overflow the viewport.
+      requestAnimationFrame(() => {
+        const tipRect = tooltip.getBoundingClientRect();
+        const margin = 8;
+        let shiftX = 0;
+        if (tipRect.left < margin) shiftX = margin - tipRect.left;
+        else if (tipRect.right > window.innerWidth - margin) shiftX = (window.innerWidth - margin) - tipRect.right;
+        if (shiftX !== 0) {
+          tooltip.style.transform = `translateX(calc(-50% + ${shiftX}px))`;
+        }
+      });
+    };
+
+    const handleEnter = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest) return;
+      const button = target.closest<HTMLElement>('.inline-citation-button');
+      if (!button) return;
+      positionTooltip(button);
+    };
+
+    document.addEventListener('mouseover', handleEnter);
+    document.addEventListener('focusin', handleEnter);
+    return () => {
+      document.removeEventListener('mouseover', handleEnter);
+      document.removeEventListener('focusin', handleEnter);
+    };
+  }, []);
+
   return (
     <div className="w-full max-w-6xl min-w-0 flex flex-col flex-1 min-h-0 relative">
       <div className="flex flex-1 min-h-0">
         <div className="flex-1 min-w-0 flex flex-col h-full relative">
-          <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
-            <div className="mt-6 space-y-4 2xl:max-w-[700px]">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden" ref={chatContainerRef}>
+            <div className="mt-6 pr-4 space-y-4 2xl:max-w-[700px]">
               {threads.length === 0 && (
                 <div className="space-y-4 select-none pointer-events-none opacity-40">
                   {/* Faint prompt placeholder */}
@@ -404,17 +448,19 @@ const ChatBody = memo(function ChatBody({
                     {current.searchStatus === "error" && !current.answer && (
                       <WebSearchStatus status="error" />
                     )}
-                    {!current.answer && !current.searchStatus && (
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-[500px]" />
-                        <Skeleton className="h-4 w-[300px]" />
-                      </div>
-                    )}
                     {(() => {
                       const processedCurrent = processCitations(current.answer ?? "", current.webSearchSources);
+                      const hasAnswer = Boolean(current.answer);
+                      const isStreaming = hasAnswer && !current.streamComplete;
+                      // Standard pending = submission landed but no first token yet AND no
+                      // web-search status indicator is occupying the slot. In that case we
+                      // still render ChatAnswer (so the toggles header is visible) and let
+                      // it draw a skeleton inside its body.
+                      const isPending = !hasAnswer && !current.searchStatus;
+                      const shouldRenderAnswer = hasAnswer || isPending;
                       return (
                         <>
-                          {current.answer && (
+                          {shouldRenderAnswer && (
                             <ChatAnswer
                               text={processedCurrent.enriched}
                               answerArray={thread.versions.map(v => processCitations(v.answer ?? "", v.webSearchSources).enriched)}
@@ -437,9 +483,11 @@ const ChatBody = memo(function ChatBody({
                               versions={thread.versions}
                               comparedVersionIndex={thread.comparedVersionIndex}
                               compareSidebarContainer={compareContainers[threadIndex] ?? null}
+                              isStreaming={isStreaming}
+                              pending={isPending}
                             />
                           )}
-                          {processedCurrent.enriched && processedCurrent.activeSources.length > 0 && (
+                          {!isStreaming && !isPending && processedCurrent.enriched && processedCurrent.activeSources.length > 0 && (
                             <WebSearchReferences sources={processedCurrent.activeSources} />
                           )}
                         </>
@@ -453,8 +501,19 @@ const ChatBody = memo(function ChatBody({
             <div className="h-[60vh] flex-none" />
           </div>
         </div>
-        <div className="flex-none w-[calc(18rem+2.5rem)] h-full flex">
-          <div id="removed-text-sidebar" className="flex-1 max-h-[60vh] overflow-y-hidden relative z-0" ref={sidebarRef}>
+        <div className="flex-none w-[calc(18rem+2.5rem)] h-full flex flex-col">
+          {/* Top row: help button + EvaluationPanel side by side.
+              `items-start` keeps both anchored to the top of the row, so when
+              the panel expands it pushes the sidebar below it instead of
+              re-centering and dragging the help button down. */}
+          <div className="flex items-start justify-between gap-3 pt-2 pb-3 relative z-20">
+            <EvaluationPanel initialIsOpen={false} canClose={true} size="compact" />
+            <button className="p-2 rounded-full hover:bg-muted/50" onClick={onRequestControlPanelHelp}>
+              <CircleQuestionMark className="h-6 w-6 text-muted-foreground" />
+            </button>
+          </div>
+          {/* Sidebar below */}
+          <div id="removed-text-sidebar" className="flex-1 min-h-0 overflow-y-hidden relative z-0" ref={sidebarRef}>
             {activeComments.length > 0 && (
               <RemovedTextSidebar
                 comments={activeComments}
@@ -480,18 +539,12 @@ const ChatBody = memo(function ChatBody({
               ))}
             </div>
           </div>
-          <div className="w-[2.5rem] flex-none flex flex-col items-end gap-4 relative z-20">
-            <button className="p-2 rounded-full hover:bg-muted/50" onClick={onRequestControlPanelHelp}>
-              <CircleQuestionMark className="h-6 w-6 text-muted-foreground" />
-            </button>
-            <EvaluationPanel initialIsOpen={false} canClose={true} />
-          </div>
         </div>
       </div>
       {/* Sticky LLM disclaimer footer */}
       <div className="flex-shrink-0 px-4 py-2 border-t border-border/40 bg-background/80 backdrop-blur-sm">
         <p className="text-[10px] leading-snug text-muted-foreground/70 text-center">
-          LLMs used in the creation of prompt optimizations and generated outputs include: Mistral, Claude, Chat GPT &amp; Llama 3.1 8B (open source)
+          LLMs used in the creation of prompt optimizations and generated outputs include: GPT-OSS-20B, Llama 3.3 70B, and all-MiniLM-L6-v2 (LM feature extractor)
         </p>
       </div>
       {showDiffPopover && (
@@ -508,7 +561,7 @@ const ChatBody = memo(function ChatBody({
                   </span>
                   {` ${t("components.popoverSeries.diff.addedNote")} `}
                   <button
-                    className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-red-600 text-red-700 hover:bg-red-600 hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center align-middle h-[1.25em] w-[1.25em] mx-0.5 border-2 rounded-sm border-blue-600 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors"
                     aria-label={t("components.popoverSeries.diff.showRemovedAria")}
                   >
                     <Minus className="h-3.5 w-3.5" />
@@ -523,7 +576,7 @@ const ChatBody = memo(function ChatBody({
               side: "left",
               content: (
                 <span>
-                  <span className="text-red-900 line-through px-1.5 py-0.5 rounded-md border border-red-200">
+                  <span className="text-blue-900 line-through px-1.5 py-0.5 rounded-md border border-blue-200">
                     {t("components.popoverSeries.diff.removedTextLabel")}
                   </span>
                   {` ${t("components.popoverSeries.diff.removedTextNote")}`}
