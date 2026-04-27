@@ -211,6 +211,7 @@ interface FlagDef {
   text: string;
   explanation: string;
   severity?: "error" | "warning" | "info" | "success";
+  evaluationFactor?: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
 }
 
 /* ── Output difference flags ── */
@@ -286,7 +287,7 @@ function renderFlaggedResponse(
         <TextFlag
           key={`line-${lineIdx}-f${i}`}
           text={flag.text}
-          evaluationFactor="factual_accuracy"
+          evaluationFactor={flag.evaluationFactor ?? "factual_accuracy"}
           explanation={flag.explanation}
           severity={flag.severity ?? "error"}
         />,
@@ -554,6 +555,61 @@ const LLM_MERGED_OUTPUTS: Record<string, { text: string; issues: string[] }> = {
       "Information from 3 sources + training data blended with no attribution",
     ],
   },
+};
+
+/* ── Bias flags on merged outputs ── */
+/* Highlights consensus, majority, and attribution biases that arise when the LLM merges multiple sources */
+const MERGED_OUTPUT_FLAGS: Record<string, FlagDef[]> = {
+  "doc-1,doc-2": [
+    {
+      text: "the gatekeepers of accuracy and fairness in the age of AI",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** The model generalises 'scrutinise products for biases' (Doc 1) and 'editorial oversight mechanisms' (Doc 2) into a single broad claim. The specific differences between the two documents — and the contradictions or nuances — get flattened into one tidy phrase.",
+    },
+    {
+      text: "Regulators and policymakers also bear responsibility",
+      severity: "error",
+      evaluationFactor: "bias",
+      explanation: "**Attribution bias.** This claim is attributed implicitly to the merged source set, but neither retrieved snippet mentions regulators or policymakers. When the model lacks support, attributions become shaky and confidently invented.",
+    },
+  ],
+  "doc-1,doc-3": [
+    {
+      text: "DW exemplifies this",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** The model treats Doc 1's general AI strategy and Doc 3's DW-specific guidelines as parts of one unified narrative. Where the documents differ in scope and emphasis, that contrast gets smoothed away.",
+    },
+  ],
+  "doc-2,doc-3": [
+    {
+      text: "DW's internal guidelines demonstrate this in practice",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** The model presents Doc 2's governance frameworks and Doc 3's internal guidelines as causally linked, even though neither document references the other. Convergent framing hides where the sources actually diverge.",
+    },
+  ],
+  "doc-1,doc-2,doc-3": [
+    {
+      text: "Combined with governance frameworks from ethics boards, the industry is moving toward responsible AI adoption",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Consensus bias.** A confident summary statement that generalises across all three documents. Differences in tone, region, and specific recommendations are dropped to produce a tidy industry-wide narrative.",
+    },
+    {
+      text: "Their journalists control all applications and review everything before publication",
+      severity: "error",
+      evaluationFactor: "bias",
+      explanation: "**Attribution bias.** Attributed to DW, but the source snippet only mentions 'labelling AI-assisted content' and prohibiting 'fully automated publishing' — never 'control all applications'. As source support thins, attributions grow shaky.",
+    },
+    {
+      text: "DW is firmly committed to journalism produced by people",
+      severity: "warning",
+      evaluationFactor: "bias",
+      explanation: "**Majority bias.** This single-source claim from Doc 3 is the only one that survives prominently — but other equally important single-source details (e.g. Doc 1's lobbying for regulation, Doc 2's transparency obligations to audiences) get dropped because they're not echoed across documents.",
+    },
+  ],
 };
 
 /* ------------------------------------------------------------------ */
@@ -958,17 +1014,15 @@ export default function MultipleSourcesExercise() {
                               </div>
                               <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(diagramSelectedDocs.length, 3)}, minmax(0, 1fr))` }}>
                                 {diagramSelectedDocs.map((doc, i) => (
-                                  <div key={doc.id} className="border-2 border-border bg-white max-h-[80px] overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
-                                    <div className="p-2.5 overflow-y-auto max-h-[80px]" style={{ transform: 'skewX(10deg)' }}>
-                                      <div className="flex items-center justify-between gap-1 mb-1">
-                                        <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Snippet {i + 1}</p>
-                                        <InfoPopover>
-                                          <p className="font-semibold">Snippet</p>
-                                          <p>An extract pulled from the source document. The LLM only sees this excerpt, so any context outside it is lost.</p>
-                                        </InfoPopover>
-                                      </div>
-                                      <p className="text-[11px] text-foreground leading-relaxed italic">{LLM_EXTRACTIONS[doc.id] || "…"}</p>
+                                  <div key={doc.id} className="rounded border-2 border-border bg-white p-2.5 max-h-[80px] overflow-y-auto">
+                                    <div className="flex items-center justify-between gap-1 mb-1">
+                                      <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Snippet {i + 1}</p>
+                                      <InfoPopover>
+                                        <p className="font-semibold">Snippet</p>
+                                        <p>An extract pulled from the source document. The LLM only sees this excerpt, so any context outside it is lost.</p>
+                                      </InfoPopover>
                                     </div>
+                                    <p className="text-[11px] text-foreground leading-relaxed italic">{LLM_EXTRACTIONS[doc.id] || "…"}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1035,11 +1089,11 @@ export default function MultipleSourcesExercise() {
                               );
                             }
                             return (
-                              <div className="border-2 border-brand-tertiary-500/40 bg-white overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
-                                <div className="p-4" style={{ transform: 'skewX(10deg)' }}>
-                                  {outputHeader}
-                                  <p className="text-sm text-foreground leading-relaxed">{merged.text}</p>
-                                </div>
+                              <div className="rounded border-2 border-brand-tertiary-500/40 bg-white p-4">
+                                {outputHeader}
+                                <p className="text-sm text-foreground leading-relaxed">
+                                  {renderFlaggedResponse(merged.text, MERGED_OUTPUT_FLAGS[key] || [])}
+                                </p>
                               </div>
                             );
                           })()}
