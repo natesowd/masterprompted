@@ -82,30 +82,19 @@ function VectorSpaceSVG({ compact = false, idSuffix = "" }: { compact?: boolean;
 
   if (compact) {
     return (
-      <svg viewBox="0 0 100 80" className="w-full h-full" role="img" aria-label="Vector space">
-        <defs>
-          <marker id={`${axisId}-c`} markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
-            <path d="M0,0.5 L3,2 L0,3.5" fill="none" stroke={g} strokeWidth="0.6" />
-          </marker>
-          <marker id={`${queryId}-c`} markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-            <path d="M0,0.5 L4,2.5 L0,4.5" fill="none" stroke={g} strokeWidth="0.8" />
-          </marker>
-        </defs>
+      <svg viewBox="0 0 80 64" className="w-full h-full" role="img" aria-label="Vector space axes with data points">
         {/* Axes */}
-        <line x1="20" y1="65" x2="20" y2="8" stroke={g} strokeWidth="0.5" strokeOpacity="0.3" markerEnd={`url(#${axisId}-c)`} />
-        <line x1="20" y1="65" x2="92" y2="65" stroke={g} strokeWidth="0.5" strokeOpacity="0.3" markerEnd={`url(#${axisId}-c)`} />
-        <line x1="20" y1="65" x2="8" y2="74" stroke={g} strokeWidth="0.5" strokeOpacity="0.3" markerEnd={`url(#${axisId}-c)`} />
-        {/* Points */}
-        <circle cx="38" cy="24" r="2" fill={g} opacity="0.5" />
-        <circle cx="45" cy="30" r="1.5" fill={g} opacity="0.35" />
-        <circle cx="34" cy="34" r="1.5" fill={g} opacity="0.35" />
-        <circle cx="70" cy="38" r="2" fill={g} opacity="0.5" />
-        <circle cx="78" cy="44" r="1.5" fill={g} opacity="0.35" />
-        <circle cx="55" cy="54" r="2" fill={g} opacity="0.5" />
-        <circle cx="64" cy="58" r="1.5" fill={g} opacity="0.35" />
-        {/* Query arrow pointing to a specific point */}
-        <line x1="20" y1="65" x2="36" y2="26" stroke={g} strokeWidth="1" markerEnd={`url(#${queryId}-c)`} />
-        <circle cx="38" cy="24" r="3.5" fill="none" stroke={g} strokeWidth="0.6" strokeOpacity="0.5" />
+        <line x1="16" y1="52" x2="16" y2="6" stroke={g} strokeWidth="0.5" strokeOpacity="0.35" />
+        <line x1="16" y1="52" x2="74" y2="52" stroke={g} strokeWidth="0.5" strokeOpacity="0.35" />
+        <line x1="16" y1="52" x2="6" y2="60" stroke={g} strokeWidth="0.5" strokeOpacity="0.35" />
+        {/* Dots */}
+        <circle cx="30" cy="18" r="2" fill={g} opacity="0.5" />
+        <circle cx="38" cy="24" r="1.5" fill={g} opacity="0.35" />
+        <circle cx="26" cy="28" r="1.5" fill={g} opacity="0.3" />
+        <circle cx="56" cy="30" r="2" fill={g} opacity="0.5" />
+        <circle cx="64" cy="36" r="1.5" fill={g} opacity="0.35" />
+        <circle cx="44" cy="42" r="2" fill={g} opacity="0.45" />
+        <circle cx="52" cy="46" r="1.5" fill={g} opacity="0.3" />
       </svg>
     );
   }
@@ -888,6 +877,9 @@ export default function MultipleSourcesExercise() {
                           <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
                             <ArrowLeft className="!h-5 !w-5" />
                           </Button>
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            Takeaways <ArrowRight className="-mr-2 !h-6 !w-6" />
+                          </Button>
                           {/* Uncomment to restore PP v2 flow:
                           <Button variant="outline" size="lg" onClick={() => navigate("/playground-v2?from=ms")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
                             Try it in the Prompt Playground <ArrowRight className="-mr-2 !h-6 !w-6" />
@@ -934,24 +926,46 @@ export default function MultipleSourcesExercise() {
                             onDrop={handleDropZoneDrop}
                             className={cn("rounded-lg p-3 transition-colors", isDragOver ? "bg-brand-tertiary-500/10" : "")}
                           >
-                            <div className="flex flex-wrap justify-center gap-3">
+                            <div className="flex justify-center gap-3 overflow-x-auto">
                               {/* Document blocks — parallelograms (data/IO) */}
                               {diagramSelectedDocs.map((doc) => (
-                                <div key={doc.id} className="border-2 border-border bg-muted/30 overflow-hidden max-w-[260px]" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
-                                  <div className="p-3" style={{ transform: 'skewX(10deg)' }}>
-                                    <div className="flex items-start justify-between gap-2">
-                                      <div className="flex items-center gap-1 mb-1">
-                                        <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Document</p>
-                                        <InfoPopover>
-                                          <p className="font-semibold">Document</p>
-                                          <p>Source material the LLM can ground its answer in. Without documents, the model falls back on its training data alone.</p>
-                                        </InfoPopover>
+                                <Dialog key={doc.id}>
+                                  <div className="border-2 border-border bg-muted/30 overflow-hidden max-w-[260px] flex-shrink-0" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
+                                    <div className="p-3" style={{ transform: 'skewX(10deg)' }}>
+                                      <div className="flex items-start justify-between gap-2">
+                                        <div className="flex items-center gap-1 mb-1">
+                                          <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Document</p>
+                                          <InfoPopover>
+                                            <p className="font-semibold">Document</p>
+                                            <p>Source material the LLM can ground its answer in. Without documents, the model falls back on its training data alone.</p>
+                                          </InfoPopover>
+                                        </div>
+                                        <button type="button" onClick={(e) => { e.stopPropagation(); removeDiagramDoc(doc.id); }} className="h-4 w-4 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-muted-foreground text-[10px] leading-none flex-shrink-0" aria-label="Remove">×</button>
                                       </div>
-                                      <button type="button" onClick={() => removeDiagramDoc(doc.id)} className="h-4 w-4 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-muted-foreground text-[10px] leading-none flex-shrink-0" aria-label="Remove">×</button>
+                                      <DialogTrigger asChild>
+                                        <button type="button" className="text-left w-full">
+                                          <p className="text-xs font-semibold text-foreground line-clamp-1 hover:underline underline-offset-2 cursor-pointer">{doc.title}</p>
+                                        </button>
+                                      </DialogTrigger>
                                     </div>
-                                    <p className="text-xs font-semibold text-foreground line-clamp-1">{doc.title}</p>
                                   </div>
-                                </div>
+                                  <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+                                    <div className="space-y-3 pt-2">
+                                      <div>
+                                        <p className="text-[10px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">{doc.source} · {doc.date}</p>
+                                        <p className="text-base font-heading font-bold text-foreground mt-1">{doc.title}</p>
+                                      </div>
+                                      {SNIPPETS_BY_DOC[doc.id]?.map((snippet, si) => (
+                                        <div key={si} className="space-y-2">
+                                          <p className="text-sm font-semibold text-foreground">{snippet.title}</p>
+                                          {snippet.paragraphs.map((para, pi) => (
+                                            <p key={pi} className="text-sm text-muted-foreground leading-relaxed">{para}</p>
+                                          ))}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
                               ))}
                               {diagramSelectedDocs.length === 0 && (
                                 <div className="border-2 border-dashed border-border bg-muted/10 flex items-center justify-center overflow-hidden" style={{ transform: 'skewX(-10deg)', borderRadius: '4px', minHeight: '56px', minWidth: '180px' }}>
@@ -981,7 +995,7 @@ export default function MultipleSourcesExercise() {
                                     </InfoPopover>
                                   </div>
                                 </div>
-                                <div className="flex flex-wrap justify-center items-stretch gap-3 mt-3">
+                                <div className="flex justify-center items-stretch gap-3 mt-3">
                                   {/* Query vector — parallelogram (data) with mini vector graph */}
                                   <div className="border-2 border-border bg-white overflow-hidden relative w-[180px]" style={{ transform: 'skewX(-10deg)', borderRadius: '4px' }}>
                                     <div className="p-3" style={{ transform: 'skewX(10deg)' }}>
@@ -1063,9 +1077,9 @@ export default function MultipleSourcesExercise() {
                                     {`Matched against ${diagramSelectedDocs.length} document${diagramSelectedDocs.length > 1 ? "s" : ""} → top snippet${diagramSelectedDocs.length > 1 ? "s" : ""}`}
                                   </p>
                                 </div>
-                                <div className="flex flex-wrap justify-center items-stretch gap-3">
+                                <div className="flex justify-center items-stretch gap-3 overflow-x-auto">
                                   {diagramSelectedDocs.map((doc, i) => (
-                                    <div key={doc.id} className="rounded border-2 border-border bg-white p-2.5 max-h-[80px] w-[220px] overflow-y-auto">
+                                    <div key={doc.id} className="rounded border-2 border-border bg-white p-2.5 max-h-[80px] w-[220px] flex-shrink-0 overflow-y-auto">
                                       <div className="flex items-center justify-between gap-1 mb-1">
                                         <p className="text-[9px] font-heading font-semibold text-muted-foreground uppercase tracking-wider">Snippet {i + 1}</p>
                                         <InfoPopover>
@@ -1158,6 +1172,9 @@ export default function MultipleSourcesExercise() {
                         <div className="mt-6 flex items-center gap-3 flex-shrink-0">
                           <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources")} className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
                             <ArrowLeft className="!h-5 !w-5" />
+                          </Button>
+                          <Button variant="outline" size="lg" onClick={() => navigate("/module/multiple-sources/takeaways")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
+                            Takeaways <ArrowRight className="-mr-2 !h-6 !w-6" />
                           </Button>
                           {/* Uncomment to restore PP v2 flow:
                           <Button variant="outline" size="lg" onClick={() => navigate("/playground-v2?from=ms")} className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10">
