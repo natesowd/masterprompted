@@ -22,7 +22,7 @@ const Landing = () => {
 
   const handleStartDebunker = () => {
     // Use a full page navigation for an external URL instead of react-router's navigate
-    window.location.assign("https://dh-hetzner.fbk.eu/aicode-v2/");
+    window.location.assign("https://dh-hetzner.fbk.eu/aicode-v3/");
   };
 
   const handleWatchTrailer = () => {

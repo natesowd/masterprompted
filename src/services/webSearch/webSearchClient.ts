@@ -36,7 +36,7 @@ export interface ChatDocument {
 
 // const NETLIFY_SEARCH_URL =
 //   "https://luxury-blini-3336bb.netlify.app/api/web-search";
-const NETLIFY_SEARCH_URL = "https://69dcafb26499a614437a4607--luxury-blini-3336bb.netlify.app/api/web-search"
+const NETLIFY_SEARCH_URL = "https://69ea27f2e6a980166f5c5124--luxury-blini-3336bb.netlify.app/api/web-search"
 
 // ---------------------------------------------------------------------------
 // Functions

@@ -138,8 +138,23 @@ const ChatBody = memo(function ChatBody({
   const [inlineCommentIds, setInlineCommentIds] = useState<Set<string>>(() => new Set());
   const [showDiffPopover, setShowDiffPopover] = useState(false);
   // Per-thread sidebar containers; CompareView portals its sidebar blocks into these.
-  const compareSidebarRefs = useRef<Map<number, HTMLDivElement | null>>(new Map());
-  const [, setCompareSidebarTick] = useState(0);
+  // Held in state so a child re-render is triggered once the portal target mounts,
+  // but ref callbacks must be stable across renders (inline callbacks cause null/el
+  // flap → infinite loop).
+  const [compareContainers, setCompareContainers] = useState<Record<number, HTMLDivElement | null>>({});
+  const compareRefCbCache = useRef<Map<number, (el: HTMLDivElement | null) => void>>(new Map());
+  const getCompareRefCb = useCallback((threadIndex: number) => {
+    const existing = compareRefCbCache.current.get(threadIndex);
+    if (existing) return existing;
+    const cb = (el: HTMLDivElement | null) => {
+      setCompareContainers(prev => {
+        if (prev[threadIndex] === el) return prev;
+        return { ...prev, [threadIndex]: el };
+      });
+    };
+    compareRefCbCache.current.set(threadIndex, cb);
+    return cb;
+  }, []);
 
   // New state to track the scrollHeight of the main chat
   const [chatHeight, setChatHeight] = useState(0);
@@ -364,30 +379,6 @@ const ChatBody = memo(function ChatBody({
                       </p>
                     </div>
                   </div>
-                  {/* Faint answer placeholder with toggles and line */}
-                  <div className="mb-20 w-full">
-                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center space-x-2">
-                          <Switch disabled />
-                          <Label className="text-sm text-muted-foreground opacity-50">
-                            {t('components.chatAnswer.showChanges')}
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Switch disabled />
-                          <Label className="text-sm text-muted-foreground opacity-50">
-                            {t('components.chatAnswer.showEvaluation')}
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="prose max-w-none">
-                      <p className="text-foreground leading-relaxed text-sm italic">
-                        {t('components.chatBody.outputPlaceholder')}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               )}
               {threads.map((thread, threadIndex) => {
@@ -445,7 +436,7 @@ const ChatBody = memo(function ChatBody({
                               onChangeCompareBase={(comparedIndex) => onChangeThreadCompareBase(threadIndex, comparedIndex)}
                               versions={thread.versions}
                               comparedVersionIndex={thread.comparedVersionIndex}
-                              compareSidebarContainer={compareSidebarRefs.current.get(threadIndex) ?? null}
+                              compareSidebarContainer={compareContainers[threadIndex] ?? null}
                             />
                           )}
                           {processedCurrent.enriched && processedCurrent.activeSources.length > 0 && (
@@ -463,7 +454,7 @@ const ChatBody = memo(function ChatBody({
           </div>
         </div>
         <div className="flex-none w-[calc(18rem+2.5rem)] h-full flex">
-          <div id="removed-text-sidebar" className="flex-1 h-full overflow-y-hidden" ref={sidebarRef}>
+          <div id="removed-text-sidebar" className="flex-1 max-h-[60vh] overflow-y-hidden relative z-0" ref={sidebarRef}>
             {activeComments.length > 0 && (
               <RemovedTextSidebar
                 comments={activeComments}
@@ -479,24 +470,17 @@ const ChatBody = memo(function ChatBody({
                 the body's vertical thread stack so absolute-positioned compare
                 blocks align with their paired body blocks. */}
             <div className="mt-6 space-y-4">
-              {threads.map((thread, threadIndex) => (
+              {threads.map((_thread, threadIndex) => (
                 <div
                   key={`compare-sidebar-thread-${threadIndex}`}
                   id={`compare-sidebar-thread-${threadIndex}`}
-                  ref={(el) => {
-                    const prev = compareSidebarRefs.current.get(threadIndex);
-                    if (prev !== el) {
-                      compareSidebarRefs.current.set(threadIndex, el);
-                      // Nudge ChatAnswer to re-render now that its portal target exists.
-                      if (thread.showCompare) setCompareSidebarTick((t) => t + 1);
-                    }
-                  }}
+                  ref={getCompareRefCb(threadIndex)}
                   className="relative"
                 />
               ))}
             </div>
           </div>
-          <div className="w-[2.5rem] flex-none flex flex-col items-end gap-4 relative">
+          <div className="w-[2.5rem] flex-none flex flex-col items-end gap-4 relative z-20">
             <button className="p-2 rounded-full hover:bg-muted/50" onClick={onRequestControlPanelHelp}>
               <CircleQuestionMark className="h-6 w-6 text-muted-foreground" />
             </button>
