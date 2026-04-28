@@ -6,6 +6,7 @@ import EvaluationPanel from "@/components/EvaluationPanel";
 import ChatPrompt from "@/components/ChatPrompt";
 import FeatureHighlight from "@/components/FeatureHighlight";
 import SectionFlag from "@/components/SectionFlag";
+import TextFlag from "@/components/TextFlag";
 import RichText from "@/components/RichText";
 
 import { Button } from "@/components/ui/button";
@@ -486,6 +487,100 @@ const TRAINED_OUTPUT_STAGES: string[] = [
   `**AI Act Article Outline**\n\n**Introduction**\n• What is the EU AI Act and why it matters\n• Timeline: from proposal to enforcement (2021-2025)\n• First comprehensive AI regulation globally\n\n**Key Provisions**\n• Risk-based approach: prohibited, high-risk, limited-risk, and minimal-risk AI systems\n• Prohibited AI practices (social scoring, emotion recognition in workplaces/schools, etc.)\n• Requirements for high-risk AI systems (documentation, transparency, human oversight)\n• Foundation model regulations for powerful AI systems\n\n**Compliance Requirements**\n• Conformity assessments and CE marking\n• Risk management systems and quality management\n• Data governance and record-keeping obligations\n• Human oversight requirements\n\n**Enforcement and Penalties**\n• National supervisory authorities\n• Fines up to €35 million or 7% of global turnover\n• Phased implementation timeline through 2027\n\n**Industry Impact**\n• Effects on AI developers and deployers\n• Compliance costs and market access\n• Innovation vs. regulation balance\n• Global influence on AI governance\n\n**Conclusion**\n• Significance for the future of AI regulation\n• Potential model for other jurisdictions\n• Challenges and opportunities ahead\n\n_Would you like me to expand on any particular section or adjust the focus of the outline?_`,
 ];
 
+/* ── Training output flags per level ── */
+interface TrainFlag {
+  text: string;
+  explanation: string;
+  severity?: "error" | "warning" | "info" | "success";
+  evaluationFactor?: "factual_accuracy" | "relevance" | "voice" | "bias" | "plagiarism";
+}
+
+const TRAINING_OUTPUT_FLAGS: Record<number, TrainFlag[]> = {
+  0: [
+    { text: "It covers different kinds of AI systems and has rules about what's allowed and what isn't.", evaluationFactor: "relevance", severity: "error", explanation: "Too vague to be useful in an outline — a journalist can't structure an article around 'different kinds' and 'rules'. An outline should name the risk categories and key provisions." },
+    { text: "There are penalties for not following the rules.", evaluationFactor: "relevance", severity: "warning", explanation: "States the obvious without specifics. An outline should note the penalty range (up to €35M / 7% global turnover) so the journalist knows what to research." },
+    { text: "The regulation was proposed a few years ago and has been in development.", evaluationFactor: "factual_accuracy", severity: "error", explanation: "Imprecise. The Act was proposed in April 2021 and entered into force in August 2024. An outline with vague dates will lead to vague reporting." },
+    { text: "It will be implemented over several years.", evaluationFactor: "factual_accuracy", severity: "warning", explanation: "Vague. The Act has a phased rollout: prohibited practices by Feb 2025, high-risk obligations by Aug 2026, full enforcement by Aug 2027. An outline should include these milestones." },
+    { text: "Companies need to comply with it.", evaluationFactor: "relevance", severity: "error", explanation: "Adds nothing — every regulation requires compliance. This wastes a line in the outline that could point the journalist toward a real angle." },
+  ],
+  1: [
+    { text: "reaching enforcement by 2025", evaluationFactor: "factual_accuracy", severity: "warning", explanation: "Oversimplified. Enforcement is phased through 2027. An outline that collapses this into one year will misdirect the journalist's framing of deadlines." },
+    { text: "certain emotion recognition uses", evaluationFactor: "factual_accuracy", severity: "warning", explanation: "'Certain' is too vague for an outline. The Act specifically prohibits real-time emotion recognition in workplaces and educational institutions — the outline should name these." },
+    { text: "with implications for compliance costs, innovation, and global AI governance", evaluationFactor: "relevance", severity: "warning", explanation: "Generic. An outline should point toward specific angles — e.g. SME burden estimates, innovation sandbox provisions, or the Brussels Effect on other regulators." },
+  ],
+  2: [
+    { text: "covering its timeline from proposal to enforcement (2021-2025) and why it matters", evaluationFactor: "factual_accuracy", severity: "warning", explanation: "The 2021-2025 range omits the phased rollout through 2027. An outline that gets the timeline wrong will shape a flawed article structure." },
+    { text: "Foundation models also regulated.", evaluationFactor: "voice", severity: "warning", explanation: "Sentence fragment with no detail. The outline should at least note the transparency and copyright compliance obligations for general-purpose AI models so the journalist knows what to cover." },
+    { text: "Challenges and opportunities ahead.", evaluationFactor: "relevance", severity: "warning", explanation: "Generic placeholder. A useful outline would name specific challenges (regulatory arbitrage, SME compliance burden) to give the journalist concrete sections to develop." },
+  ],
+  3: [
+    { text: "Conformity assessments and CE marking. Risk management systems and quality management. Data governance and record-keeping obligations. Human oversight requirements.", evaluationFactor: "voice", severity: "warning", explanation: "Inconsistent formatting: this section uses full sentences while all other sections use bullet points. An outline with mixed structures makes it harder to turn into a consistent article." },
+    { text: "Effects on AI developers and deployers, compliance costs and market access, innovation vs. regulation balance, global influence on AI governance.", evaluationFactor: "voice", severity: "warning", explanation: "Comma-separated prose rather than bullets. Inconsistent with the rest of the outline — a journalist following this structure would produce uneven sections." },
+  ],
+  4: [
+    { text: "Would you like me to expand on any particular section or adjust the focus of the outline?", evaluationFactor: "voice", severity: "info", explanation: "AI assistant phrasing — not part of the outline. Should be removed before handing the outline to a journalist, as it could be mistakenly included in the draft." },
+  ],
+};
+
+function renderFlaggedTrainOutput(text: string, flags: TrainFlag[]): React.ReactNode {
+  const lines = text.split("\n");
+  const result: React.ReactNode[] = [];
+
+  lines.forEach((line, lineIdx) => {
+    if (lineIdx > 0) result.push(<br key={`br-${lineIdx}`} />);
+    if (!line.trim()) return;
+
+    const isBold = line.startsWith("**") && line.endsWith("**");
+    const isItalic = line.startsWith("_") && line.endsWith("_");
+    const isBullet = line.startsWith("•");
+
+    let content = line;
+    if (isBold) content = line.slice(2, -2);
+    if (isItalic) content = line.slice(1, -1);
+    if (isBullet) content = line.slice(2);
+
+    const lineFlags = flags
+      .map((f) => ({ ...f, index: content.indexOf(f.text) }))
+      .filter((f) => f.index !== -1)
+      .sort((a, b) => a.index - b.index);
+
+    let inner: React.ReactNode;
+    if (lineFlags.length === 0) {
+      inner = content;
+    } else {
+      const parts: React.ReactNode[] = [];
+      let last = 0;
+      lineFlags.forEach((flag, i) => {
+        if (flag.index > last) parts.push(<span key={`t${i}`}>{content.slice(last, flag.index)}</span>);
+        parts.push(
+          <TextFlag
+            key={`f${i}`}
+            text={flag.text}
+            evaluationFactor={flag.evaluationFactor ?? "factual_accuracy"}
+            explanation={flag.explanation}
+            severity={flag.severity ?? "error"}
+          />
+        );
+        last = flag.index + flag.text.length;
+      });
+      if (last < content.length) parts.push(<span key="end">{content.slice(last)}</span>);
+      inner = <>{parts}</>;
+    }
+
+    if (isBold) {
+      result.push(<strong key={`line-${lineIdx}`} className="font-bold">{inner}</strong>);
+    } else if (isItalic) {
+      result.push(<em key={`line-${lineIdx}`} className="italic text-muted-foreground">{inner}</em>);
+    } else if (isBullet) {
+      result.push(<span key={`line-${lineIdx}`}>• {inner}</span>);
+    } else {
+      result.push(<span key={`line-${lineIdx}`}>{inner}</span>);
+    }
+  });
+
+  return <>{result}</>;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Structural highlight groups                                        */
 /* ------------------------------------------------------------------ */
@@ -737,7 +832,7 @@ export default function LLMTrainingExercise() {
                 </p>
 
                 {/* View mode toggle */}
-                {/* View mode toggle — Observe and Edit hidden for now */}
+                {/* View mode toggle — hidden for now (only Train active)
                 <div className="mb-4">
                   <ToggleGroup
                     type="single"
@@ -745,20 +840,21 @@ export default function LLMTrainingExercise() {
                     onValueChange={(v) => v && setViewMode(v as typeof viewMode)}
                     className="w-full"
                   >
-                    {/* <ToggleGroupItem value="structural" className="flex-1 gap-1.5 text-xs">
+                    <ToggleGroupItem value="structural" className="flex-1 gap-1.5 text-xs">
                       <Eye className="h-3.5 w-3.5" />
                       Observe
                     </ToggleGroupItem>
                     <ToggleGroupItem value="interactive" className="flex-1 gap-1.5 text-xs">
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
-                    </ToggleGroupItem> */}
+                    </ToggleGroupItem>
                     <ToggleGroupItem value="train" className="flex-1 gap-1.5 text-xs">
                       <GraduationCap className="h-3.5 w-3.5" />
                       Train
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
+                */}
 
                 {/* ── Structural view sidebar ── */}
                 {viewMode === "structural" && (
@@ -1412,8 +1508,8 @@ export default function LLMTrainingExercise() {
                                "Well-trained"}
                             </span>
                           </div>
-                          <div className="prose max-w-none text-foreground leading-relaxed text-base">
-                            <RichText text={TRAINED_OUTPUT_STAGES[trainingLevel]} prose={false} />
+                          <div className="prose max-w-none text-foreground leading-relaxed text-base whitespace-pre-line">
+                            {renderFlaggedTrainOutput(TRAINED_OUTPUT_STAGES[trainingLevel], TRAINING_OUTPUT_FLAGS[trainingLevel] || [])}
                           </div>
                         </div>
                       )}
