@@ -19,7 +19,7 @@ export interface BlockPair {
 }
 
 // greedy unique-matches
-export function uniqueMatches(
+export function bestMatches(
   currentVecs: number[][],
   comparedVecs: number[][],
   threshold = 0.55,
