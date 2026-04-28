@@ -38,14 +38,26 @@ const Contact = () => {
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
-    const mailtoLink = `mailto:prompted.issues@eipcm.org?subject=${encodeURIComponent(data.subject)}&body=${encodeURIComponent(
-      `Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`
-    )}`;
-    
-    window.location.href = mailtoLink;
-    toast.success("Opening your email client...");
-    form.reset();
+  const onSubmit = async (data: ContactFormValues) => {
+    try {
+      const body = new URLSearchParams({
+        "form-name": "contact",
+        ...data,
+      }).toString();
+
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
+      });
+
+      if (!response.ok) throw new Error(`Submission failed: ${response.status}`);
+
+      toast.success("Message sent! We'll get back to you soon.");
+      form.reset();
+    } catch (error) {
+      toast.error("Failed to send message. Please try again or email us directly.");
+    }
   };
 
   return (
