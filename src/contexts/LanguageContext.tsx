@@ -401,8 +401,8 @@ d) Perform a "Delta Check": Remove any edits that are stylistic rather than func
       compareView: {
         loading: 'Mapping semantic blocks…',
         error: 'Comparison failed',
-        currentLegend: 'Current',
-        comparedLegend: 'Compared',
+        currentLegend: 'Current Output',
+        comparedLegend: 'Output',
         noMatch: 'No close match',
         swapAria: 'Click to swap with counterpart',
       },

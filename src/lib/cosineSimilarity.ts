@@ -18,38 +18,47 @@ export interface BlockPair {
   score: number;
 }
 
-// Greedy best-match: for each current block, pick the compared block with
-// the highest cosine score. Compared blocks aren't reserved, so two current
-// blocks can map to the same compared block — acceptable for a diff UX
-// where the goal is "which compared thought is this closest to."
-export function bestMatches(
+// greedy unique-matches
+export function uniqueMatches(
   currentVecs: number[][],
   comparedVecs: number[][],
   threshold = 0.55,
 ): BlockPair[] {
   const pairs: BlockPair[] = [];
-  if (comparedVecs.length === 0) {
-    for (let i = 0; i < currentVecs.length; i++) {
-      pairs.push({ currentIdx: i, comparedIdx: null, score: 0 });
-    }
-    return pairs;
-  }
+  const usedCompared = new Set<number>();
+  const assignedCurrent = new Set<number>();
+
+  // 1. Pre-calculate all possible combinations
+  const candidates: { i: number; j: number; score: number }[] = [];
 
   for (let i = 0; i < currentVecs.length; i++) {
-    let bestIdx = -1;
-    let bestScore = -Infinity;
     for (let j = 0; j < comparedVecs.length; j++) {
-      const s = cosine(currentVecs[i], comparedVecs[j]);
-      if (s > bestScore) {
-        bestScore = s;
-        bestIdx = j;
+      const score = cosine(currentVecs[i], comparedVecs[j]);
+      if (score >= threshold) {
+        candidates.push({ i, j, score });
       }
     }
-    if (bestIdx === -1 || bestScore < threshold) {
-      pairs.push({ currentIdx: i, comparedIdx: null, score: bestScore });
-    } else {
-      pairs.push({ currentIdx: i, comparedIdx: bestIdx, score: bestScore });
+  }
+
+  // 2. Sort candidates by score descending (highest quality matches first)
+  candidates.sort((a, b) => b.score - a.score);
+
+  // 3. Assign matches greedily
+  for (const { i, j, score } of candidates) {
+    if (!assignedCurrent.has(i) && !usedCompared.has(j)) {
+      pairs.push({ currentIdx: i, comparedIdx: j, score });
+      assignedCurrent.add(i);
+      usedCompared.add(j);
     }
   }
-  return pairs;
+
+  // 4. Fill in remaining current blocks that didn't find a unique match
+  for (let i = 0; i < currentVecs.length; i++) {
+    if (!assignedCurrent.has(i)) {
+      pairs.push({ currentIdx: i, comparedIdx: null, score: 0 });
+    }
+  }
+
+  // 5. Maintain original order of currentIdx for UI consistency
+  return pairs.sort((a, b) => a.currentIdx - b.currentIdx);
 }

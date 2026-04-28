@@ -12,7 +12,7 @@ interface Props {
   threadIndex: number;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   sidebarContainer: HTMLElement | null;
-  onHeightChange?: (height: number) => void; // <-- 1. Add this line
+  onHeightChange?: (height: number) => void; 
 }
 
 const PADDING_BETWEEN_BLOCKS = 8;
@@ -27,7 +27,7 @@ const CompareView = ({
   threadIndex,
   scrollContainerRef,
   sidebarContainer,
-  onHeightChange, // <-- 2. Destructure it here
+  onHeightChange, 
 }: Props) => {
   const { t } = useLanguage();
   const anchors = useRelationalAnchors(currentText, comparedText, true);
@@ -231,7 +231,7 @@ const CompareView = ({
             )}
             aria-label={comparedBlock ? t("components.compareView.swapAria") : undefined}
           >
-            <RichText text={displayBlock.text} inline diff />
+            <RichText text={displayBlock.text} inline />
           </div>
         );
       })}
@@ -277,7 +277,7 @@ const CompareView = ({
           >
             {/* Multi-line ellipsis preview — content shrinks to ~3 lines. */}
             <div className="line-clamp-3">
-              <RichText text={displayBlock.text} inline diff />
+              <RichText text={displayBlock.text} inline  />
             </div>
           </div>
         );
