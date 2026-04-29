@@ -158,7 +158,7 @@ const NO_EXAMPLES_OUTPUT = "AI is being regulated by the European Union with a n
 
 export default function LLMTrainingFewShot() {
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<"voice" | "examples">("voice");
+  const [viewMode, setViewMode] = useState<"voice" | "examples">("examples");
   const [selectedOption, setSelectedOption] = useState<"off" | "on">("off");
   const [selectedExamples, setSelectedExamples] = useState<Set<string>>(new Set());
 
@@ -232,7 +232,7 @@ export default function LLMTrainingFewShot() {
                   }
                 </p>
 
-                {/* View mode toggle */}
+                {/* View mode toggle — DW Voice hidden for now
                 <div className="mb-4">
                   <ToggleGroup
                     type="single"
@@ -250,6 +250,7 @@ export default function LLMTrainingFewShot() {
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
+                */}
 
                 {/* ── DW Voice view sidebar ── */}
                 {viewMode === "voice" && (
