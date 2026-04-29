@@ -221,7 +221,7 @@ export default function LLMTrainingFewShot() {
             {/* Three-column layout */}
             <div className="flex flex-1">
               {/* ── Left sidebar ── */}
-              <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0 flex flex-col overflow-hidden">
+              <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 80px)' }}>
                 <h2 className="text-xl font-heading font-bold text-foreground mb-3">
                   Few-shot prompting
                 </h2>
