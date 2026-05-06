@@ -150,8 +150,8 @@ export async function runWebSearchRAG(
     const sseParser = new SSEContentParser();
     const reader = response.body.getReader();
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
+    let streamDone = false;
+    while (!streamDone) {
       const { done, value } = await reader.read();
       if (done) {
         const remaining = sseParser.flush();
@@ -159,6 +159,7 @@ export async function runWebSearchRAG(
           accumulatedAnswer += remaining.join("");
           onStreamDelta?.(remaining.join(""), accumulatedAnswer);
         }
+        streamDone = true;
         break;
       }
       const text = decoder.decode(value, { stream: true });

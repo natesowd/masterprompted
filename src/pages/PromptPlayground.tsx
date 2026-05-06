@@ -869,6 +869,10 @@ const PromptPlayground = () => {
         handlePromptOptimizeRef.current(promptToOptimize, parameters.specificity, parameters.style, parameters.context, parameters.bias);
       }
     }
+    // Intentionally fires only on `parameters` changes. currentPrompt /
+    // editingText / uploadedFiles / fullReset are read from latest state but
+    // adding them would re-run optimization on every keystroke or file change.
+    // The handlePromptOptimize callback is held via ref above for the same reason.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parameters]);
 
