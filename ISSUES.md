@@ -2,18 +2,6 @@
 
 Tech-debt and audit-derived items not yet handled. UI bug priorities live in [TODO](TODO); this file is for codebase-health work. Items move out of here as they ship.
 
-## Greenlit, queued for next PRs
-
-### B5 — `localStorage` / `sessionStorage` adapter
-Tiny wrapper at `src/lib/storage.ts` (`getItem`/`setItem`/`removeItem`, no-ops outside the browser, centralized keys). Migrate the 7 callsites:
-- [src/components/FlagIntroHighlight.tsx](src/components/FlagIntroHighlight.tsx)
-- [src/hooks/useModuleProgress.ts](src/hooks/useModuleProgress.ts)
-- [src/pages/NextWordPredictionResponse.tsx](src/pages/NextWordPredictionResponse.tsx)
-- [src/pages/NextWordPredictionTakeaways.tsx](src/pages/NextWordPredictionTakeaways.tsx)
-- [src/pages/LLMTrainingExercise.tsx](src/pages/LLMTrainingExercise.tsx)
-- [src/pages/PromptPlayground.tsx](src/pages/PromptPlayground.tsx)
-- [src/pages/PromptPlaygroundV2.tsx](src/pages/PromptPlaygroundV2.tsx)
-
 ## Deferred — not greenlit yet
 
 ### Bundled: A4 (exhaustive-deps audit) + decompose `PromptPlayground.tsx`

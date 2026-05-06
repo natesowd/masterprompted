@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ArrowLeft, ArrowRight, Plus, X, Eye, Pencil, GraduationCap, ThumbsUp, ThumbsDown, RotateCcw, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { session, STORAGE_KEYS } from "@/lib/storage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 /* ------------------------------------------------------------------ */
@@ -608,12 +609,10 @@ function getSectionGroup(heading: string): StructGroup | null {
 /*  Session-once hint                                                  */
 /* ------------------------------------------------------------------ */
 
-const HINT_KEY = "llm-training-struct-hint-seen";
-
 function useStructHint() {
-  const [show, setShow] = useState(() => !sessionStorage.getItem(HINT_KEY));
+  const [show, setShow] = useState(() => !session.get(STORAGE_KEYS.LLM_TRAINING_HINT_SEEN));
   const dismiss = () => {
-    sessionStorage.setItem(HINT_KEY, "1");
+    session.set(STORAGE_KEYS.LLM_TRAINING_HINT_SEEN, "1");
     setShow(false);
   };
   return { show, dismiss };

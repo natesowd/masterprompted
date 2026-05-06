@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, GitBranch } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { session, STORAGE_KEYS } from "@/lib/storage";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { predictionTree, getDefaultPath, getOptionsForPath } from "@/data/predictionTreeData";
 import { FLAGGED_WORDS_MAP } from "@/data/flaggedWords";
@@ -39,10 +40,10 @@ export default function HeadlineResponse() {
     setHasEvaluationBeenOpened(false);
     setHasInteracted(false);
 
-    const skipHighlights = sessionStorage.getItem('nwp-skip-highlights');
+    const skipHighlights = session.get(STORAGE_KEYS.NWP_SKIP_HIGHLIGHTS);
     if (skipHighlights) {
       setHighlightStep(0);
-      sessionStorage.removeItem('nwp-skip-highlights');
+      session.remove(STORAGE_KEYS.NWP_SKIP_HIGHLIGHTS);
     } else {
       setHighlightStep(1);
     }

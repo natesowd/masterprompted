@@ -14,6 +14,7 @@ import type { WebSearchResult } from "@/services/webSearch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { apiUrl } from "@/lib/apiBase";
+import { local, STORAGE_KEYS } from "@/lib/storage";
 const NO_CHANGE_VALUE = "no-change";
 const NETLIFY_CHAT_URL = apiUrl("/api/chat");
 
@@ -79,7 +80,6 @@ const PromptPlayground = () => {
   // Last non-null mode; used to keep the button label stable while it's disabled.
   const [lastButtonMode, setLastButtonMode] = useState<'submit' | 'optimize'>('submit');
   const [fullReset, setFullReset] = useState<boolean>(false);
-  const LOCALSTORAGE_POPKEY = "promptPlayground.popoverSeen";
   const [showControlPanelPopover, setShowControlPanelPopover] = useState<boolean>(false);
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
@@ -182,10 +182,9 @@ const PromptPlayground = () => {
   }, []);
 
   useEffect(() => {
-    try {
-      const seen = localStorage.getItem(LOCALSTORAGE_POPKEY);
-      if (!seen) setShowControlPanelPopover(true);
-    } catch (e) { setShowControlPanelPopover(false); }
+    if (!local.get(STORAGE_KEYS.PROMPT_PLAYGROUND_POPOVER_SEEN)) {
+      setShowControlPanelPopover(true);
+    }
   }, []);
 
   const handleParameterChange = (paramKey: keyof Parameters, value: string) => {
@@ -1097,7 +1096,7 @@ const PromptPlayground = () => {
           ]}
           initialStep={0}
           onClose={() => {
-            try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ }
+            local.set(STORAGE_KEYS.PROMPT_PLAYGROUND_POPOVER_SEEN, "true");
             setShowControlPanelPopover(false);
           }}
         />

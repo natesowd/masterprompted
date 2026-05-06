@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { session, STORAGE_KEYS } from "@/lib/storage";
 
 export default function Takeaways() {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export default function Takeaways() {
               variant="outline"
               size="icon"
               onClick={() => {
-                sessionStorage.setItem('nwp-skip-highlights', 'true');
+                session.set(STORAGE_KEYS.NWP_SKIP_HIGHLIGHTS, 'true');
                 navigate("/module/next-word-prediction/response");
               }}
               className="h-12 w-12 rounded-full">

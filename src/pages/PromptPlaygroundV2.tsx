@@ -21,6 +21,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Chatbox from "@/components/ChatBoxPromptPlaygroundV2";
 import FeatureHighlight from "@/components/FeatureHighlight";
 import { apiUrl } from "@/lib/apiBase";
+import { local, STORAGE_KEYS } from "@/lib/storage";
 const NO_CHANGE_VALUE = "no-change";
 const NETLIFY_CHAT_URL = apiUrl("/api/chat");
 
@@ -144,7 +145,6 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
   const [enableStyle, setEnableStyle] = useState<boolean>(false);
   const [enableContext, setEnableContext] = useState<boolean>(false);
   const [fullReset, setFullReset] = useState<boolean>(false);
-  const LOCALSTORAGE_POPKEY = "promptPlayground.popoverSeen";
   const [showControlPanelPopover, setShowControlPanelPopover] = useState<boolean>(false);
   const { t } = useLanguage();
   const [waitingforOptimization, setWaitingForOptimization] = useState<boolean>(false);
@@ -290,10 +290,9 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
   }, []);
 
   useEffect(() => {
-    try {
-      const seen = localStorage.getItem(LOCALSTORAGE_POPKEY);
-      if (!seen) setShowControlPanelPopover(true);
-    } catch (e) { setShowControlPanelPopover(false); }
+    if (!local.get(STORAGE_KEYS.PROMPT_PLAYGROUND_POPOVER_SEEN)) {
+      setShowControlPanelPopover(true);
+    }
   }, []);
 
   const handleParameterChange = (paramKey: keyof Parameters, value: string) => {
@@ -1251,7 +1250,7 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
           ]}
           initialStep={0}
           onClose={() => {
-            try { localStorage.setItem(LOCALSTORAGE_POPKEY, "true"); } catch (e) { /* ignore */ }
+            local.set(STORAGE_KEYS.PROMPT_PLAYGROUND_POPOVER_SEEN, "true");
             setShowControlPanelPopover(false);
           }}
         />

@@ -17,8 +17,8 @@
 
 import { useEffect, useState } from "react";
 import FeatureHighlight from "@/components/FeatureHighlight";
+import { local, STORAGE_KEYS } from "@/lib/storage";
 
-const STORAGE_KEY = "textflag-intro-shown";
 const TARGET_ID = "flag-intro-target";
 // Module-level singleton so React StrictMode's double-mount and multiple
 // instances of this component (dev only) can't cause races.
@@ -38,11 +38,7 @@ export default function FlagIntroHighlight() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    try {
-      if (localStorage.getItem(STORAGE_KEY)) return;
-    } catch {
-      /* ignore — storage might be disabled */
-    }
+    if (local.get(STORAGE_KEYS.INTRO_HIGHLIGHT_SEEN)) return;
     if (introClaimed) return;
 
     let mo: MutationObserver | null = null;
@@ -111,11 +107,7 @@ export default function FlagIntroHighlight() {
   }, []);
 
   const handleClose = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* ignore */
-    }
+    local.set(STORAGE_KEYS.INTRO_HIGHLIGHT_SEEN, "1");
     setShow(false);
   };
 

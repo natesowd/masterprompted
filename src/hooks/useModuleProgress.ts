@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-
-const STORAGE_KEY = "prompted_visited_pages";
+import { local, STORAGE_KEYS } from "@/lib/storage";
 
 /** All pages that belong to each module – visit every page to "complete" the module */
 const MODULE_PAGES: Record<string, string[]> = {
@@ -45,19 +44,15 @@ const MODULE_PAGES: Record<string, string[]> = {
 };
 
 function getVisitedPages(): Set<string> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch {
-    return new Set();
-  }
+  const arr = local.getJSON<string[]>(STORAGE_KEYS.MODULE_PROGRESS);
+  return new Set(arr ?? []);
 }
 
 function markPageVisited(path: string) {
   const visited = getVisitedPages();
   if (visited.has(path)) return;
   visited.add(path);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...visited]));
+  local.setJSON(STORAGE_KEYS.MODULE_PROGRESS, [...visited]);
 }
 
 export function isModuleCompleted(moduleKey: string): boolean {
