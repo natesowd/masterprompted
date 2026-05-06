@@ -1,5 +1,3 @@
-/* eslint-disable */
-// @ts-nocheck
 /**
  * Brave Search proxy edge function.
  *
@@ -8,25 +6,11 @@
  * never exposed to the browser.
  */
 import type { Config, Context } from "@netlify/edge-functions";
+import { getCorsHeaders } from "../lib/cors.ts";
 
-// ---------------------------------------------------------------------------
-// CORS  (mirrors chat.ts)
-// ---------------------------------------------------------------------------
-
-const ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://localhost:8888",
-    "https://masterprompted.lovable.app",
-    "https://prompted-app.eipcm.org",
-];
-
-const getCorsHeaders = (origin: string | null) => ({
-    "Access-Control-Allow-Origin": (origin && ALLOWED_ORIGINS.includes(origin))
-        ? origin
-        : ALLOWED_ORIGINS[0],
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-});
+declare const Deno: {
+    env: { get(key: string): string | undefined };
+};
 
 // ---------------------------------------------------------------------------
 // Types
@@ -51,6 +35,16 @@ interface NormalizedResult {
 const BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search";
 const DEFAULT_COUNT = 6;
 
+interface BraveWebResult {
+    title?: string;
+    url?: string;
+    description?: string;
+}
+
+interface BraveSearchResponse {
+    web?: { results?: BraveWebResult[] };
+}
+
 async function queryBrave(
     query: string,
     count: number,
@@ -74,10 +68,10 @@ async function queryBrave(
         throw new Error(`Brave API ${response.status}: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as BraveSearchResponse;
     const webResults = data.web?.results ?? [];
 
-    return webResults.map((r: any, idx: number) => ({
+    return webResults.map((r, idx) => ({
         title: r.title ?? "",
         url: r.url ?? "",
         snippet: r.description ?? "",
