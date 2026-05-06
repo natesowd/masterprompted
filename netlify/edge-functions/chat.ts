@@ -1,5 +1,3 @@
-/* eslint-disable */
-// @ts-nocheck
 /**
  * HuggingFace chat proxy.
  *
@@ -10,25 +8,11 @@
  * citation style instructions.
  */
 import type { Config, Context } from "@netlify/edge-functions";
+import { getCorsHeaders } from "../lib/cors.ts";
 
-// ---------------------------------------------------------------------------
-// CORS
-// ---------------------------------------------------------------------------
-
-const ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://localhost:8888",
-    "https://masterprompted.lovable.app",
-    "https://prompted-app.eipcm.org",
-];
-
-const getCorsHeaders = (origin: string | null) => ({
-    "Access-Control-Allow-Origin": (origin && ALLOWED_ORIGINS.includes(origin))
-        ? origin
-        : ALLOWED_ORIGINS[0],
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-});
+declare const Deno: {
+    env: { get(key: string): string | undefined };
+};
 
 // ---------------------------------------------------------------------------
 // Types
