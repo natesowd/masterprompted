@@ -1,3 +1,7 @@
+// This module is loaded only via dynamic `await import('@/lib/pdfParser')`
+// from the playground pages, so the pdfjs library (~464 KB) and the worker
+// asset (~2.3 MB, emitted via the `?url` import below) stay out of the main
+// bundle and only download when a user actually uploads a PDF.
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 // Set up the worker

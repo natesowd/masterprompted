@@ -2,48 +2,53 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { EvaluationProvider } from "./contexts/EvaluationContext";
 import Landing from "./pages/Landing";
-import Modules from "./pages/Modules";
-import Introduction from "./pages/IntroBase";
-import AboutSimulator from "./pages/IntroAboutSimulator";
-import JournalisticEvaluation from "./pages/JournalisticEvaluation";
-import NextWordPredictionPrompt from "./pages/NextWordPredictionPrompt";
-import NextWordPredictionIntro from "./pages/NextWordPredictionBase";
-import HeadlineResponse from "./pages/NextWordPredictionResponse";
-import PromptConstruction from "./pages/PromptConstructionBase";
-import Specificity from "./pages/PromptConstructionSpecificity";
-import SpecificityResponse from "./pages/PromptConstructionSpecificityResponse";
-import PromptConstructionSpecificityTakeaways from "./pages/PromptConstructionSpecificityTakeaways";
-import PromptConstructionSummarize from "./pages/PromptConstructionSummarize";
-
-import ConversationStyle from "./pages/PromptConstructionConversationStyle";
-import Context from "./pages/PromptConstructionContext";
-import Bias from "./pages/PrompConstructionBias";
-import SystemParameters from "./pages/SystemParameters";
-import SystemParametersTemperature from "./pages/SystemParametersTemperature";
-import SystemParametersRoles from "./pages/SystemParametersRoles";
-import SystemParametersTakeaways from "./pages/SystemParametersTakeaways";
-import MultipleSources from "./pages/MultipleSources";
-import MultipleSourcesExercise from "./pages/MultipleSourcesExercise";
-import MultipleSourcesTakeaways from "./pages/MultipleSourcesTakeaways";
-import LLMTraining from "./pages/LLMTraining";
-import LLMTrainingExercise from "./pages/LLMTrainingExercise";
-import LLMTrainingFewShot from "./pages/LLMTrainingFewShot";
-import LLMTrainingTakeaways from "./pages/LLMTrainingTakeaways";
-import PromptPlayground from "./pages/PromptPlayground";
-import PromptPlaygroundV2 from "./pages/PromptPlaygroundV2";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Imprint from "./pages/Imprint";
-import Takeaways from "./pages/NextWordPredictionTakeaways";
 import NotFound from "./pages/NotFound";
-import DesignSystem from "./pages/DesignSystem";
-import DesignSystemFab from "./components/DesignSystemFab";
 import FlagIntroHighlight from "./components/FlagIntroHighlight";
 import ErrorBoundary from "./components/ErrorBoundary";
+
+// Landing and NotFound stay eager so first paint and 404s don't pay the
+// chunk-fetch cost. Every other page is split into its own chunk.
+const Modules = lazy(() => import("./pages/Modules"));
+const Introduction = lazy(() => import("./pages/IntroBase"));
+const AboutSimulator = lazy(() => import("./pages/IntroAboutSimulator"));
+const JournalisticEvaluation = lazy(() => import("./pages/JournalisticEvaluation"));
+const NextWordPredictionPrompt = lazy(() => import("./pages/NextWordPredictionPrompt"));
+const NextWordPredictionIntro = lazy(() => import("./pages/NextWordPredictionBase"));
+const HeadlineResponse = lazy(() => import("./pages/NextWordPredictionResponse"));
+const PromptConstruction = lazy(() => import("./pages/PromptConstructionBase"));
+const Specificity = lazy(() => import("./pages/PromptConstructionSpecificity"));
+const SpecificityResponse = lazy(() => import("./pages/PromptConstructionSpecificityResponse"));
+const PromptConstructionSpecificityTakeaways = lazy(() => import("./pages/PromptConstructionSpecificityTakeaways"));
+const PromptConstructionSummarize = lazy(() => import("./pages/PromptConstructionSummarize"));
+const ConversationStyle = lazy(() => import("./pages/PromptConstructionConversationStyle"));
+const Context = lazy(() => import("./pages/PromptConstructionContext"));
+const Bias = lazy(() => import("./pages/PrompConstructionBias"));
+const SystemParameters = lazy(() => import("./pages/SystemParameters"));
+const SystemParametersTemperature = lazy(() => import("./pages/SystemParametersTemperature"));
+const SystemParametersRoles = lazy(() => import("./pages/SystemParametersRoles"));
+const SystemParametersTakeaways = lazy(() => import("./pages/SystemParametersTakeaways"));
+const MultipleSources = lazy(() => import("./pages/MultipleSources"));
+const MultipleSourcesExercise = lazy(() => import("./pages/MultipleSourcesExercise"));
+const MultipleSourcesTakeaways = lazy(() => import("./pages/MultipleSourcesTakeaways"));
+const LLMTraining = lazy(() => import("./pages/LLMTraining"));
+const LLMTrainingExercise = lazy(() => import("./pages/LLMTrainingExercise"));
+const LLMTrainingFewShot = lazy(() => import("./pages/LLMTrainingFewShot"));
+const LLMTrainingTakeaways = lazy(() => import("./pages/LLMTrainingTakeaways"));
+const PromptPlayground = lazy(() => import("./pages/PromptPlayground"));
+const PromptPlaygroundV2 = lazy(() => import("./pages/PromptPlaygroundV2"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Takeaways = lazy(() => import("./pages/NextWordPredictionTakeaways"));
+const DesignSystem = lazy(() => import("./pages/DesignSystem"));
+
 const queryClient = new QueryClient();
+
+const RouteFallback = () => (
+  <div className="min-h-screen bg-background" aria-hidden="true" />
+);
 
 const App = () =>
 <QueryClientProvider client={queryClient}>
@@ -55,6 +60,7 @@ const App = () =>
             {/* <DesignSystemFab /> */}
             <FlagIntroHighlight />
             <ErrorBoundary>
+            <Suspense fallback={<RouteFallback />}>
             <Routes>
               {/* NAV BAR */}
               <Route path="/" element={<Landing />} />
@@ -103,6 +109,7 @@ const App = () =>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
             </ErrorBoundary>
           </BrowserRouter>
         </EvaluationProvider>
