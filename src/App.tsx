@@ -42,6 +42,7 @@ import NotFound from "./pages/NotFound";
 import DesignSystem from "./pages/DesignSystem";
 import DesignSystemFab from "./components/DesignSystemFab";
 import FlagIntroHighlight from "./components/FlagIntroHighlight";
+import ErrorBoundary from "./components/ErrorBoundary";
 const queryClient = new QueryClient();
 
 const App = () =>
@@ -53,6 +54,7 @@ const App = () =>
           <BrowserRouter>
             {/* <DesignSystemFab /> */}
             <FlagIntroHighlight />
+            <ErrorBoundary>
             <Routes>
               {/* NAV BAR */}
               <Route path="/" element={<Landing />} />
@@ -101,6 +103,7 @@ const App = () =>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </ErrorBoundary>
           </BrowserRouter>
         </EvaluationProvider>
       </LanguageProvider>
