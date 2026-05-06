@@ -365,15 +365,16 @@ const PromptPlayground = () => {
               });
             }
           }
-        } catch (err: any) {
+        } catch (err) {
           console.error("Web search RAG outer error:", err);
+          const message = err instanceof Error ? err.message : String(err);
           setThreads(prev => {
             const copy = [...prev];
             const thread = copy[threadIndex];
             if (!thread?.versions[versionIndex]) return prev;
             const versions = [...thread.versions];
             if (!versions[versionIndex].answer || versions[versionIndex].answer!.length < 5) {
-              versions[versionIndex] = { ...versions[versionIndex], answer: `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`, searchStatus: "error", streamComplete: true };
+              versions[versionIndex] = { ...versions[versionIndex], answer: `[[ERROR: [CONNECTION_FAILED - ${message}]]]`, searchStatus: "error", streamComplete: true };
             } else {
               versions[versionIndex] = { ...versions[versionIndex], streamComplete: true };
             }
@@ -531,8 +532,8 @@ const PromptPlayground = () => {
             const text = decoder.decode(value, { stream: true });
             applyDeltas(sseParser.feed(text));
           }
-        } catch (err: any) {
-          if (err.name === 'AbortError') {
+        } catch (err) {
+          if (err instanceof Error && err.name === 'AbortError') {
             const timeoutMsg = `\n\n[[ERROR: [TIMEOUT - Generator stopped after 120s]]]`;
             accumulatedAnswer += timeoutMsg;
             console.error("Stream aborted due to 120s timeout.");
@@ -611,11 +612,13 @@ const PromptPlayground = () => {
           });
         }
 
-      } catch (err: any) {
+      } catch (err) {
         clearTimeout(timeoutId);
-        const errorMessage = err.name === 'AbortError'
+        const isAbort = err instanceof Error && err.name === 'AbortError';
+        const message = err instanceof Error ? err.message : String(err);
+        const errorMessage = isAbort
           ? "[[ERROR: [REQUEST_TIMEOUT - Connection took too long to establish]]]"
-          : `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`;
+          : `[[ERROR: [CONNECTION_FAILED - ${message}]]]`;
 
         console.error("Outer catch error:", err);
 
@@ -725,8 +728,8 @@ const PromptPlayground = () => {
       } else {
         throw new Error("handlePromptOptimize: optimized_prompt missing or empty");
       }
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
         console.log("Optimization request aborted (likely newer request started).");
         return;
       }

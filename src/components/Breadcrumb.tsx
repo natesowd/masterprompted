@@ -4,8 +4,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 
 
+// Component is currently a no-op: imports remain across pages so breadcrumbs
+// can be flipped back on by setting SHOW_BREADCRUMBS to true. The mapping
+// below stays warm so that switch is a one-line change.
 export default function Breadcrumb() {
-  // TODO: Re-enable breadcrumbs when ready
   const SHOW_BREADCRUMBS = false;
   const location = useLocation();
   const { t } = useLanguage();

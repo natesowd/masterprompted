@@ -1,18 +1,22 @@
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 // Set up the worker
-// @ts-ignore
+// @ts-expect-error — Vite ?url import has no declared type
 import pdfjsWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 
 if (pdfjsWorker) {
     pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 }
 
-// Polyfill for ReadableStream.prototype.values which is required by pdfjs-dist 5.x 
+// Polyfill for ReadableStream.prototype.values which is required by pdfjs-dist 5.x
 // but might be missing in some browser versions (e.g. Safari < 17).
-if (typeof ReadableStream !== 'undefined' && !((ReadableStream.prototype as any).values)) {
-    // @ts-ignore
-    ReadableStream.prototype.values = function () {
+type StreamProtoExt = {
+    values?: () => AsyncIterableIterator<unknown>;
+    [Symbol.asyncIterator]?: () => AsyncIterableIterator<unknown>;
+};
+const streamProto = ReadableStream.prototype as unknown as StreamProtoExt;
+if (typeof ReadableStream !== 'undefined' && !streamProto.values) {
+    streamProto.values = function (this: ReadableStream<unknown>) {
         const reader = this.getReader();
         return {
             next() {
@@ -25,11 +29,10 @@ if (typeof ReadableStream !== 'undefined' && !((ReadableStream.prototype as any)
                 reader.releaseLock();
                 return Promise.resolve({ done: true, value: undefined });
             }
-        };
+        } as AsyncIterableIterator<unknown>;
     };
-    if (!(ReadableStream.prototype as any)[Symbol.asyncIterator]) {
-        // @ts-ignore
-        ReadableStream.prototype[Symbol.asyncIterator] = ReadableStream.prototype.values;
+    if (!streamProto[Symbol.asyncIterator]) {
+        streamProto[Symbol.asyncIterator] = streamProto.values;
     }
 }
 
@@ -54,8 +57,8 @@ export async function extractTextFromPDF(file: File): Promise<{ text: string; ti
     // Skip generic placeholders that authoring tools set by default.
     let title: string | undefined;
     try {
-        const meta = await pdf.getMetadata();
-        const infoTitle: unknown = (meta as any)?.info?.Title;
+        const meta = (await pdf.getMetadata()) as { info?: { Title?: unknown } } | undefined;
+        const infoTitle: unknown = meta?.info?.Title;
         if (typeof infoTitle === 'string') {
             const cleaned = infoTitle.trim();
             if (cleaned && !/^(microsoft\s+word|untitled|document\d*|.*\.(docx?|pdf))$/i.test(cleaned)) {
@@ -75,8 +78,8 @@ export async function extractTextFromPDF(file: File): Promise<{ text: string; ti
 
         // Ensure textContent and items exist
         if (textContent && textContent.items) {
-            const pageText = textContent.items
-                .map((item: any) => item.str)
+            const pageText = (textContent.items as Array<{ str?: string }>)
+                .map((item) => item.str ?? '')
                 .join(' ');
             fullText += pageText + '\n';
         }

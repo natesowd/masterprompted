@@ -480,8 +480,8 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
             const text = decoder.decode(value, { stream: true });
             applyDeltas(sseParser.feed(text));
           }
-        } catch (err: any) {
-          if (err.name === 'AbortError') {
+        } catch (err) {
+          if (err instanceof Error && err.name === 'AbortError') {
             const timeoutMsg = `\n\n[[ERROR: [TIMEOUT - Generator stopped after 120s]]]`;
             accumulatedAnswer += timeoutMsg;
             console.error("Stream aborted due to 120s timeout.");
@@ -546,11 +546,13 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
           });
         }
 
-      } catch (err: any) {
+      } catch (err) {
         clearTimeout(timeoutId);
-        const errorMessage = err.name === 'AbortError'
+        const isAbort = err instanceof Error && err.name === 'AbortError';
+        const message = err instanceof Error ? err.message : String(err);
+        const errorMessage = isAbort
           ? "[[ERROR: [REQUEST_TIMEOUT - Connection took too long to establish]]]"
-          : `[[ERROR: [CONNECTION_FAILED - ${err.message}]]]`;
+          : `[[ERROR: [CONNECTION_FAILED - ${message}]]]`;
 
         console.error("Outer catch error:", err);
 
@@ -658,8 +660,8 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
       } else {
         throw new Error("handlePromptOptimize: optimized_prompt missing or empty");
       }
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
         console.log("Optimization request aborted (likely newer request started).");
         return;
       }

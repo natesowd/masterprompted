@@ -172,7 +172,7 @@ export async function runWebSearchRAG(
 
     onStreamComplete?.(accumulatedAnswer);
   } catch (err) {
-    if ((err as any)?.name === "AbortError") {
+    if (err instanceof Error && err.name === "AbortError") {
       accumulatedAnswer += "\n\n[[ERROR: [TIMEOUT - Request aborted]]]";
     }
     console.error("[WebSearchRAG] Stream error:", err);

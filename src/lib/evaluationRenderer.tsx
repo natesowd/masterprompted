@@ -117,7 +117,7 @@ export function renderTextWithFlags(
 
       // Extract gutter (indents/markers) and actual content
       const gutterMatch = content.match(
-        /^(\s*)(?:([*\-]|(?:\d+\.))(?=\s|$))?(\s*)/,
+        /^(\s*)(?:([*-]|(?:\d+\.))(?=\s|$))?(\s*)/,
       );
       const gutter = gutterMatch ? gutterMatch[0] : "";
       const gutterLen = gutter.length;

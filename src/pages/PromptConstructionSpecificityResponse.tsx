@@ -734,7 +734,7 @@ export default function SpecificityResponse() {
 
                       // Base output when all controls are "No Change"
                       <div className="space-y-4">
-                                        <p className="text-gray-800 leading-relaxed text-base">​
+                                        <p className="text-gray-800 leading-relaxed text-base">
                           <TextFlag
                             text="Certainly!"
                             evaluationFactor="voice"

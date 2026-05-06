@@ -43,7 +43,17 @@ export async function webSearchClaim(claimText: string): Promise<WebSearchResult
 
     const data = await response.json();
 
-    const debunkingSources: DebunkingSource[] = (data.debunking ?? []).map((d: any) => ({
+    type RawDebunking = {
+      context?: string;
+      metadata?: {
+        source?: string;
+        origin?: string;
+        citation_number?: number | null;
+      };
+    };
+    const debunkingSources: DebunkingSource[] = (
+      (data.debunking ?? []) as RawDebunking[]
+    ).map((d) => ({
       context: d.context ?? "",
       source: d.metadata?.source ?? "",
       origin: d.metadata?.origin ?? "",

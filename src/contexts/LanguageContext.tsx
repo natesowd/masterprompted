@@ -2,9 +2,13 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'es';
 
+// Translation values are intentionally polymorphic: leaf strings, arrays of
+// strings, and nested objects all coexist. Callers know the shape of the key
+// they're looking up.
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t: (key: string) => any;
 }
 
@@ -25,8 +29,10 @@ interface LanguageProviderProps {
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const [language, setLanguage] = useState<Language>('en');
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const t = (key: string): any => {
     const keys = key.split('.');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let value: any = translations[language];
 
     for (const k of keys) {

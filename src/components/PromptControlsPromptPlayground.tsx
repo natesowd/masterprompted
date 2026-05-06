@@ -41,6 +41,7 @@ function Parameter({
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [pulseActive, setPulseActive] = useState(false);
     const prevEnabledRef = useRef(enabled);
+    const { t } = useLanguage();
 
     useEffect(() => {
         if (enabled && !prevEnabledRef.current) {
@@ -110,7 +111,7 @@ function Parameter({
 
                 <div className="flex flex-1 flex-col items-center gap-1 w-1/3">
                     <RadioGroupItem value={NO_CHANGE_VALUE} id={`${parameterTitle}-r2`} />
-                    <Label htmlFor={`${parameterTitle}-r2`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{useLanguage().t('components.promptControls.original')}</Label>
+                    <Label htmlFor={`${parameterTitle}-r2`} className="text-[11px] font-normal text-center leading-tight px-0.5 text-muted-foreground">{t('components.promptControls.original')}</Label>
                 </div>
 
                 <div className="flex flex-1 flex-col items-center gap-1 w-1/3">

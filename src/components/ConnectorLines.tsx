@@ -22,7 +22,7 @@ const ConnectorLines: React.FC<ConnectorLinesProps> = ({
   }
 
   const startPos = markerPositions[hoveredId];
-  let endPos = commentPositions[hoveredId];
+  const endPos = commentPositions[hoveredId];
 
   // Vertical center of the starting icon
   const startY = startPos.top + startPos.bottom / 2 - startPos.top / 2;

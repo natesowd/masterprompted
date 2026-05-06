@@ -410,11 +410,6 @@ export function BranchDiagram({
 
           return (
             <div key={option.word} style={{ position: 'absolute', top: nodeY - nodeHeight / 2, left: 0, right: 0 }}>
-              {false &&
-              <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-10">
-                </div>
-              }
-
               {isFlaggedWord(option.word) ? (() => {
                 const flagConfig = getFlaggedConfig(option.word)!;
                 const meta = FACTOR_META[flagConfig.evaluationFactor];

@@ -183,9 +183,9 @@ const Chatbox = ({
 
     let wa: Animation | null = null;
     try {
-      if ((el as any).animate) {
+      if (typeof el.animate === 'function') {
         setIsBouncing(true);
-        wa = (el as any).animate(keyframes, options);
+        wa = el.animate(keyframes, options);
         wa.addEventListener('finish', () => {
           // console.log('Chatbox WA finished');
           setIsBouncing(false);

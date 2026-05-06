@@ -61,7 +61,7 @@ function escapeHtml(input: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
 
@@ -130,7 +130,7 @@ export function applyInlineFormatting(raw: string, diff: boolean, isInline: bool
     // Match leading whitespace, optional list marker (*, -, 1.), and content
     // We require the marker to be followed by a space or end-of-line to avoid 
     // peeling off the first asterisk of markdown triples (like ***bold***)
-    const match = line.match(/^(\s*)(?:([*\-]|(?:\d+\.))(?=\s|$))?(\s*)(.*)$/);
+    const match = line.match(/^(\s*)(?:([*-]|(?:\d+\.))(?=\s|$))?(\s*)(.*)$/);
 
     // We process the line into a block if it has leading whitespace OR a marker
     if (match && (match[1] || match[2])) {

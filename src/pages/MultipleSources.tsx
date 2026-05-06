@@ -10,7 +10,6 @@ export default function MultipleSources() {
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    // TODO: navigate to first exercise page when built
     navigate("/module/multiple-sources/exercise");
   };
 
