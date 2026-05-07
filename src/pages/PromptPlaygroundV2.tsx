@@ -613,10 +613,23 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
         .replace('{params}', params)
         .replace('{prompt}', prompt);
 
-      // Append document context so the optimizer can incorporate uploaded content
+      // Append document context so the optimizer can incorporate uploaded
+      // content. The optimizer only needs enough context to know the
+      // document's topic / style / domain — it isn't producing the answer,
+      // just rewriting the user's prompt. Send the full raw PDF here and the
+      // edge function holds the (non-streaming) connection long enough to
+      // hit Netlify's edge wall-time limit (the answer-generation path
+      // streams, so it doesn't have this problem). Truncate per file.
+      const MAX_OPTIMIZE_DOC_CHARS = 8000; // ~2,000 tokens
       const documentContext = uploadedFiles
         .filter(f => !f.isUploading && f.rawContent)
-        .map(f => `[Document: ${f.name}]\n${getFileContent(f, useSummaryForOptimization)}`)
+        .map(f => {
+          const content = getFileContent(f, useSummaryForOptimization);
+          const text = content.length > MAX_OPTIMIZE_DOC_CHARS
+            ? `${content.slice(0, MAX_OPTIMIZE_DOC_CHARS)}\n\n[…truncated for optimization context; full document is ${content.length.toLocaleString()} chars]`
+            : content;
+          return `[Document: ${f.name}]\n${text}`;
+        })
         .join('\n\n');
       const fullOptimizePrompt = documentContext
         ? `${optimizeUserPrompt}\n\nThe user has provided the following document(s) for reference. Consider this content when rewriting the prompt:\n\n${documentContext}`
