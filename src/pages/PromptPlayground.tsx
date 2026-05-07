@@ -690,12 +690,26 @@ const PromptPlayground = () => {
         ? `${optimizeUserPrompt}\n\nThe user has provided the following document(s) for reference. Consider this content when rewriting the prompt:\n\n${documentContext}`
         : optimizeUserPrompt;
 
+      // Stream the optimize call. Without streaming, the edge function
+      // awaits the full HF response before returning, which means the edge
+      // function's wall-time clock equals the model's full inference time.
+      // With a large PDF in context, gpt-oss-20b's reasoning + generation
+      // can exceed Netlify's edge wall-time limit (~50s) and Netlify
+      // returns a bare 500 without our CORS headers — surfaces in the
+      // browser as a CORS rejection. Streaming keeps the edge function's
+      // first-byte latency low and isolates us from that limit.
+      //
+      // We don't show partial state in the UI for optimize (the user
+      // sees a single optimized prompt swap in at the end), so this is
+      // purely a transport-layer change: assemble all SSE deltas into
+      // one string, then use it the same way as the previous JSON path.
       const response = await fetch(NETLIFY_CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "openai/gpt-oss-20b:ovhcloud",
           temperature: 0.5,
+          stream: true,
           messages: [
             {
               role: "system",
@@ -711,9 +725,26 @@ const PromptPlayground = () => {
         const errorText = await response.text();
         throw new Error(`optimize request failed: ${response.status} - ${errorText}`);
       }
+      if (!response.body) {
+        throw new Error("optimize stream missing response body");
+      }
 
-      const hfResult = await response.json();
-      const rawOptimizedPrompt = hfResult.choices[0].message.content || "";
+      const decoder = new TextDecoder();
+      const sseParser = new SSEContentParser();
+      const reader = response.body.getReader();
+      let rawOptimizedPrompt = "";
+      let streamDone = false;
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) {
+          rawOptimizedPrompt += sseParser.flush().join("");
+          streamDone = true;
+          break;
+        }
+        const text = decoder.decode(value, { stream: true });
+        rawOptimizedPrompt += sseParser.feed(text).join("");
+      }
+
       const optimizedPrompt = rawOptimizedPrompt.trim().replace(/^["'](.+)["']$/, '$1');
 
       if (optimizedPrompt) {

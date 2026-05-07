@@ -17,6 +17,8 @@ These are bundled because the dep warnings are concentrated in PromptPlayground 
 
 **Decomp surface — [PromptPlayground.tsx](src/pages/PromptPlayground.tsx) is ~1,100 lines.** Plan: extract `useThreads`, `useFileUploads`, `useChatSubmit`, `useOptimization` hooks; pull out `<SummarizationDialog>` and `<ControlPanelPopover>`; the page becomes a thin compositor. Then [PromptPlaygroundV2.tsx](src/pages/PromptPlaygroundV2.tsx) can adopt the same hooks in a follow-up. The bundled exhaustive-deps fixes ride along since they live inside the new hook boundaries.
 
+**Also fold in: stream the V2 optimize call.** The same fix landed in V1 (PR #129) — `handlePromptOptimize` in [PromptPlaygroundV2.tsx](src/pages/PromptPlaygroundV2.tsx) still does non-streaming `await response.json()` and will hit the Netlify edge wall-time limit on large PDFs. The fix is mechanical: add `stream: true`, replace the JSON read with an `SSEContentParser` reader loop, assemble deltas into `rawOptimizedPrompt`. Easy to do as part of the V2 hook extraction since `useOptimization` will be the natural home for it.
+
 This is a big, behavior-preserving refactor — likely its own multi-commit PR with manual smoke-testing of every playground flow at each extraction step.
 
 ### Make lint a CI gate
