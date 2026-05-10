@@ -1,6 +1,10 @@
 export interface SemanticBlock {
   id: string;
   text: string;
+  /** Index of the original paragraph this block came from (0-based, monotonic). */
+  paragraphIdx: number;
+  /** 'bullet' if the source paragraph was a bullet list (each line one block); 'sentence' otherwise. */
+  kind: 'sentence' | 'bullet';
 }
 
 // Abbreviations that contain a trailing period but should NOT end a sentence.
@@ -55,23 +59,23 @@ export function chunkSemantically(text: string): SemanticBlock[] {
   const blocks: SemanticBlock[] = [];
   let idx = 0;
 
-  for (const para of paragraphs) {
+  paragraphs.forEach((para, paragraphIdx) => {
     const lines = para.split(/\n/).map((l) => l.trim()).filter(Boolean);
     const allBullets = lines.length > 1 && lines.every((l) => BULLET_RE.test(l));
 
     if (allBullets) {
       for (const line of lines) {
-        blocks.push({ id: `b${idx++}`, text: line });
+        blocks.push({ id: `b${idx++}`, text: line, paragraphIdx, kind: 'bullet' });
       }
-      continue;
+      return;
     }
 
     const recombined = lines.join(" ");
     const sentences = splitSentences(recombined);
     for (const s of sentences) {
-      blocks.push({ id: `b${idx++}`, text: s });
+      blocks.push({ id: `b${idx++}`, text: s, paragraphIdx, kind: 'sentence' });
     }
-  }
+  });
 
   return blocks;
 }

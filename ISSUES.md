@@ -50,6 +50,12 @@ Confirm sanitization of inputs at:
 ### Memoize hot chat components
 [src/components/ChatBody.tsx](src/components/ChatBody.tsx) re-renders on every parent update with array props. Wrap in `React.memo`, stabilize props.
 
+### Compare view — lexical-overlap bonus in `bestMatches`
+Pure embedding similarity in [src/lib/cosineSimilarity.ts:22](src/lib/cosineSimilarity.ts) misses obvious textual matches when chunk granularity differs between versions. Concrete repro: when one version has `"Higher Upfront Costs: EVs are…"` as a single sentence and the other has `"Higher upfront costs"` as a standalone heading-style chunk, the long sentence pairs greedily with `"Overall, EVs offer many benefits…"` at ~0.76 cosine because they share more topics, leaving the obvious lexical match orphaned. Fix: before sorting candidates, add a small score boost (e.g. +0.10–0.15) when one chunk is a substring/prefix of the other, capped at 1.0. Cheap, targeted, no UX change.
+
+### Compare view — Phase 2: side-by-side full-text diff
+Phase 1 (heatmap + ribbons + on-demand sidebar; this PR) keeps the sidebar-portal layout from the original Compare view. Phase 2 explores a GitHub/VSCode-style two-column full-text view so users can compare not just *content* between versions but *position and surrounding context*. The data layer added in Phase 1 ([useRelationalAnchors](src/hooks/useRelationalAnchors.ts), [usePairedThreshold](src/hooks/usePairedThreshold.ts), [useChunkRects](src/hooks/useChunkRects.ts), [useSwapState](src/hooks/useSwapState.ts)) was designed to be reusable here — the work is mostly a new layout component plus syncing scroll/highlight between the two columns.
+
 ## Permanently out (per user direction)
 
 - **Stripping `console.log` calls** — calls stay in source forever; only their runtime output is silenced in prod via [src/lib/debug.ts](src/lib/debug.ts).

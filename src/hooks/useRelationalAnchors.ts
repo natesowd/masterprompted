@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { chunkSemantically, SemanticBlock } from "@/lib/semanticChunk";
-import { bestMatches, BlockPair } from "@/lib/cosineSimilarity";
 import { embedTexts } from "@/services/embeddings/embeddingsClient";
 
 export interface RelationalAnchorsState {
   status: "idle" | "loading" | "ready" | "error";
   currentBlocks: SemanticBlock[];
   comparedBlocks: SemanticBlock[];
-  pairs: BlockPair[];
+  /** Embedding vectors aligned 1:1 with currentBlocks / comparedBlocks. Empty until status="ready". */
+  currentVecs: number[][];
+  comparedVecs: number[][];
   error?: string;
 }
 
@@ -15,9 +16,15 @@ const EMPTY: RelationalAnchorsState = {
   status: "idle",
   currentBlocks: [],
   comparedBlocks: [],
-  pairs: [],
+  currentVecs: [],
+  comparedVecs: [],
 };
 
+/**
+ * Fetches embedding vectors for both versions and exposes them alongside the
+ * chunked blocks. Pair-matching happens downstream in `usePairedThreshold` so
+ * threshold changes don't trigger a network round-trip.
+ */
 export function useRelationalAnchors(
   currentText: string | undefined,
   comparedText: string | undefined,
@@ -40,7 +47,8 @@ export function useRelationalAnchors(
         status: "ready",
         currentBlocks,
         comparedBlocks,
-        pairs: currentBlocks.map((_, i) => ({ currentIdx: i, comparedIdx: null, score: 0 })),
+        currentVecs: [],
+        comparedVecs: [],
       });
       return;
     }
@@ -52,7 +60,8 @@ export function useRelationalAnchors(
       status: "loading",
       currentBlocks,
       comparedBlocks,
-      pairs: [],
+      currentVecs: [],
+      comparedVecs: [],
     });
 
     (async () => {
@@ -65,13 +74,13 @@ export function useRelationalAnchors(
 
         const currentVecs = all.slice(0, currentBlocks.length);
         const comparedVecs = all.slice(currentBlocks.length);
-        const pairs = bestMatches(currentVecs, comparedVecs);
 
         setState({
           status: "ready",
           currentBlocks,
           comparedBlocks,
-          pairs,
+          currentVecs,
+          comparedVecs,
         });
       } catch (err) {
         if (reqId !== reqIdRef.current) return;
@@ -81,7 +90,8 @@ export function useRelationalAnchors(
           status: "error",
           currentBlocks,
           comparedBlocks,
-          pairs: [],
+          currentVecs: [],
+          comparedVecs: [],
           error: e?.message ?? "embeddings failed",
         });
       }
