@@ -18,21 +18,44 @@ export interface BlockPair {
   score: number;
 }
 
-// greedy unique-matches
+/**
+ * Greedy unique-matches.
+ *
+ * `lockedPairs` lets callers preserve a stable mapping for currentIdx values
+ * that the user has already swapped in the UI: the locked comparedIdx is
+ * carried through unchanged and excluded from the candidate pool so no other
+ * currentIdx can claim it. Without this, raising the threshold could silently
+ * re-route a swapped chunk to a different compared block (because bestMatches
+ * is greedy globally and the previously-blocking high-score match drops out).
+ */
 export function bestMatches(
   currentVecs: number[][],
   comparedVecs: number[][],
   threshold = 0.55,
+  lockedPairs?: Map<number, number>,
 ): BlockPair[] {
   const pairs: BlockPair[] = [];
   const usedCompared = new Set<number>();
   const assignedCurrent = new Set<number>();
 
-  // 1. Pre-calculate all possible combinations
+  // 0. Apply locked pairs first — these win over greedy results.
+  if (lockedPairs && lockedPairs.size > 0) {
+    for (const [currentIdx, comparedIdx] of lockedPairs) {
+      if (currentIdx >= currentVecs.length || comparedIdx >= comparedVecs.length) continue;
+      const score = cosine(currentVecs[currentIdx], comparedVecs[comparedIdx]);
+      pairs.push({ currentIdx, comparedIdx, score });
+      assignedCurrent.add(currentIdx);
+      usedCompared.add(comparedIdx);
+    }
+  }
+
+  // 1. Pre-calculate all possible combinations (skipping anything locked).
   const candidates: { i: number; j: number; score: number }[] = [];
 
   for (let i = 0; i < currentVecs.length; i++) {
+    if (assignedCurrent.has(i)) continue;
     for (let j = 0; j < comparedVecs.length; j++) {
+      if (usedCompared.has(j)) continue;
       const score = cosine(currentVecs[i], comparedVecs[j]);
       if (score >= threshold) {
         candidates.push({ i, j, score });
