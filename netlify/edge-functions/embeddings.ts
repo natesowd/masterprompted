@@ -17,7 +17,10 @@ interface RequestBody {
     model?: string;
 }
 
-const DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2";
+// Kept in sync with FALLBACK_EMBEDDING_MODEL in src/lib/modelConfig.ts. The
+// HF_EMBEDDING_MODEL env var overrides this at runtime — set it in Netlify so
+// the client and edge function pick up the same model from one source.
+const DEFAULT_MODEL = Deno.env.get("HF_EMBEDDING_MODEL") ?? "BAAI/bge-m3";
 
 function buildHfUrl(model: string): string {
     return `https://router.huggingface.co/hf-inference/models/${model}/pipeline/feature-extraction`;

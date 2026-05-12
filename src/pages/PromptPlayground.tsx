@@ -14,6 +14,7 @@ import type { WebSearchResult } from "@/services/webSearch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { apiUrl } from "@/lib/apiBase";
+import { MODELS } from "@/lib/modelConfig";
 import { local, STORAGE_KEYS } from "@/lib/storage";
 const NO_CHANGE_VALUE = "no-change";
 const NETLIFY_CHAT_URL = apiUrl("/api/chat");
@@ -245,7 +246,7 @@ const PromptPlayground = () => {
         try {
           const { answer, sources } = await runWebSearchRAG(promptText, {
             chatUrl: NETLIFY_CHAT_URL,
-            model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
+            model: MODELS.chat,
             temperature: 0.3,
             abortSignal: controller.signal,
 
@@ -432,7 +433,7 @@ const PromptPlayground = () => {
         : undefined;
 
       const payload: Record<string, unknown> = {
-        model: "meta-llama/Llama-3.3-70B-Instruct:ovhcloud",
+        model: MODELS.chat,
         temperature: uploadedFiles.length > 0 ? 0.3 : 0.7,
         stream: true,
         messages: [
@@ -707,7 +708,7 @@ const PromptPlayground = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "openai/gpt-oss-20b:ovhcloud",
+          model: MODELS.optimizer,
           temperature: 0.5,
           stream: true,
           messages: [

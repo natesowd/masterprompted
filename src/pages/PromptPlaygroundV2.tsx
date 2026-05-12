@@ -21,6 +21,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Chatbox from "@/components/ChatBoxPromptPlaygroundV2";
 import FeatureHighlight from "@/components/FeatureHighlight";
 import { apiUrl } from "@/lib/apiBase";
+import { MODELS } from "@/lib/modelConfig";
 import { local, STORAGE_KEYS } from "@/lib/storage";
 const NO_CHANGE_VALUE = "no-change";
 const NETLIFY_CHAT_URL = apiUrl("/api/chat");
@@ -626,7 +627,7 @@ You are a senior news editor at a public broadcaster. Your summaries must be fai
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "openai/gpt-oss-20b:ovhcloud",
+          model: MODELS.optimizer,
           temperature: 0.5,
           messages: [
             {

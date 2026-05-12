@@ -12,6 +12,7 @@ import { Parameters } from "@/pages/PromptPlaygroundV2";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { MODELS, modelDisplayName } from "@/lib/modelConfig";
 import optimizationFig from "@/assets/optimization_fig.png";
 
 const NO_CHANGE_VALUE = "no-change";
@@ -357,7 +358,7 @@ export default function PromptControls({
                         </Button>
                     </div>
                     <p className="text-[10px] leading-snug text-muted-foreground/70 text-left">
-                        LLMs used in the creation of prompt optimizations and generated outputs include: GPT-OSS-20B, Llama 3.3 70B, and all-MiniLM-L6-v2 (LM feature extractor)
+                        LLMs used in the creation of prompt optimizations and generated outputs include: {modelDisplayName(MODELS.optimizer)}, {modelDisplayName(MODELS.chat)}, and {modelDisplayName(MODELS.embedding)} (LM feature extractor)
                     </p>
                 </div>
             </div>

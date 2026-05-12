@@ -9,6 +9,7 @@ import Chatbox from "./ChatBoxPromptConstruction";
 import { Parameters } from "@/pages/PromptPlayground";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { MODELS, modelDisplayName } from "@/lib/modelConfig";
 
 const NO_CHANGE_VALUE = "no-change";
 
@@ -334,7 +335,7 @@ export default function PromptControls({
                         </div>
                     )}
                     <p className="text-[10px] leading-snug text-muted-foreground/70 text-left pt-2">
-                        LLMs used in the creation of prompt optimizations and generated outputs include: GPT-OSS-20B, Llama 3.3 70B, and all-MiniLM-L6-v2 (LM feature extractor)
+                        LLMs used in the creation of prompt optimizations and generated outputs include: {modelDisplayName(MODELS.optimizer)}, {modelDisplayName(MODELS.chat)}, and {modelDisplayName(MODELS.embedding)} (LM feature extractor)
                     </p>
                 </div>
             </div>

@@ -8,6 +8,7 @@ import { PopoverSeries } from "@/components/PopoverSeries";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { MODELS, modelDisplayName } from "@/lib/modelConfig";
 import { Thread, ParsedFile } from "@/pages/PromptPlayground";
 import { diffWordsWithNewlineProtection } from "@/lib/diff";
 import WebSearchStatus from "@/components/WebSearchStatus";
@@ -544,7 +545,7 @@ const ChatBody = memo(function ChatBody({
       {/* Sticky LLM disclaimer footer */}
       <div className="flex-shrink-0 px-4 py-2 border-t border-border/40 bg-background/80 backdrop-blur-sm">
         <p className="text-[10px] leading-snug text-muted-foreground/70 text-center">
-          LLMs used in the creation of prompt optimizations and generated outputs include: GPT-OSS-20B, Llama 3.3 70B, and all-MiniLM-L6-v2 (LM feature extractor)
+          LLMs used in the creation of prompt optimizations and generated outputs include: {modelDisplayName(MODELS.optimizer)}, {modelDisplayName(MODELS.chat)}, and {modelDisplayName(MODELS.embedding)} (LM feature extractor)
         </p>
       </div>
       {showDiffPopover && (
