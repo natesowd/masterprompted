@@ -41,7 +41,14 @@ interface RequestBody {
 // ---------------------------------------------------------------------------
 
 const HF_URL = "https://router.huggingface.co/v1/chat/completions";
-const DEFAULT_MODEL = "meta-llama/Llama-3.3-70B-Instruct:ovhcloud";
+// Kept in sync with FALLBACK_CHAT_MODEL in src/lib/modelConfig.ts. The
+// HF_CHAT_MODEL env var overrides this at runtime — set it in Netlify so the
+// client and edge function pick up the same model from one source.
+//
+// The client still passes `model` per-request (the same request path serves
+// both the Llama chat model and the GPT-OSS optimizer), so this default only
+// kicks in when a caller omits the field.
+const DEFAULT_MODEL = Deno.env.get("HF_CHAT_MODEL") ?? "meta-llama/Llama-3.3-70B-Instruct:ovhcloud";
 
 /**
  * Inject documents into the system message as a numbered list so the model

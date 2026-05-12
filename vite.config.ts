@@ -17,4 +17,8 @@ export default defineConfig(({ mode }) => ({
       "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
     },
   },
+  // Expose HF_* env vars to the client alongside the default VITE_* prefix so
+  // a single Netlify env var per model is read both by the browser and by the
+  // Deno edge functions (via Deno.env.get). See src/lib/modelConfig.ts.
+  envPrefix: ["VITE_", "HF_"],
 }));

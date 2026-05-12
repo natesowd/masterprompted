@@ -1,4 +1,5 @@
 import { apiUrl } from "@/lib/apiBase";
+import { MODELS } from "@/lib/modelConfig";
 import { fetchWithRetry } from "@/services/evaluations/fetchWithRetry";
 
 const EMBEDDINGS_URL = apiUrl("/api/embeddings");
@@ -26,7 +27,7 @@ export async function embedTexts(
   texts: string[],
   options: EmbedOptions = {},
 ): Promise<number[][]> {
-  const model = options.model ?? "sentence-transformers/all-MiniLM-L6-v2";
+  const model = options.model ?? MODELS.embedding;
 
   const result = new Array<number[] | null>(texts.length).fill(null);
   const missingIdx: number[] = [];
