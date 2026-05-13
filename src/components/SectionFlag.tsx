@@ -110,14 +110,13 @@ export default function SectionFlag({
   const { registerFactor, deregisterFactor } = useEvaluation();
 
   // Highlight the corresponding evaluation criterion when component is mounted
+  const sev = severity ?? "error";
   useEffect(() => {
-    registerFactor(evaluationFactor);
-
-    // Cleanup: remove highlighting when component unmounts
+    registerFactor(evaluationFactor, sev as "error" | "warning" | "info" | "success");
     return () => {
-      deregisterFactor(evaluationFactor);
+      deregisterFactor(evaluationFactor, sev as "error" | "warning" | "info" | "success");
     };
-  }, [evaluationFactor, registerFactor, deregisterFactor]);
+  }, [evaluationFactor, sev, registerFactor, deregisterFactor]);
 
   return (
     <HoverCard>

@@ -1,10 +1,15 @@
 
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
+
+type Severity = "error" | "warning" | "info" | "success";
+
+const SEVERITY_RANK: Record<Severity, number> = { error: 3, warning: 2, info: 1, success: 0 };
 
 interface EvaluationContextType {
     activeEvaluationFactors: Set<string>;
-    registerFactor: (factor: string) => void;
-    deregisterFactor: (factor: string) => void;
+    factorSeverities: Map<string, Severity>;
+    registerFactor: (factor: string, severity?: Severity) => void;
+    deregisterFactor: (factor: string, severity?: Severity) => void;
     toggleFactor: (factor: string) => void;
     panelOpenSignal: number;
 }
@@ -25,20 +30,27 @@ interface EvaluationProviderProps {
 }
 
 export const EvaluationProvider = ({ children }: EvaluationProviderProps) => {
-    // Using a map to track counts of each factor
     const [factorCounts, setFactorCounts] = useState<Map<string, number>>(new Map());
+    const [severityCounts, setSeverityCounts] = useState<Map<string, Map<Severity, number>>>(new Map());
     const [panelOpenSignal, setPanelOpenSignal] = useState<number>(0);
 
-    const registerFactor = useCallback((factor: string) => {
+    const registerFactor = useCallback((factor: string, severity: Severity = "error") => {
         setFactorCounts((prev) => {
             const newMap = new Map(prev);
-            const output = newMap.set(factor, (newMap.get(factor) || 0) + 1);
+            newMap.set(factor, (newMap.get(factor) || 0) + 1);
+            return newMap;
+        });
+        setSeverityCounts((prev) => {
+            const newMap = new Map(prev);
+            const inner = new Map(newMap.get(factor) || []);
+            inner.set(severity, (inner.get(severity) || 0) + 1);
+            newMap.set(factor, inner);
             return newMap;
         });
         setPanelOpenSignal(Date.now());
     }, []);
 
-    const deregisterFactor = useCallback((factor: string) => {
+    const deregisterFactor = useCallback((factor: string, severity: Severity = "error") => {
         setFactorCounts((prev) => {
             const newMap = new Map(prev);
             const current = newMap.get(factor) || 0;
@@ -49,17 +61,36 @@ export const EvaluationProvider = ({ children }: EvaluationProviderProps) => {
             }
             return newMap;
         });
+        setSeverityCounts((prev) => {
+            const newMap = new Map(prev);
+            const inner = new Map(newMap.get(factor) || []);
+            const c = inner.get(severity) || 0;
+            if (c > 1) inner.set(severity, c - 1);
+            else inner.delete(severity);
+            if (inner.size === 0) newMap.delete(factor);
+            else newMap.set(factor, inner);
+            return newMap;
+        });
     }, []);
 
-    const toggleFactor = useCallback((factor: string) => {
-        // Placeholder
-    }, []);
+    const toggleFactor = useCallback((_factor: string) => {}, []);
 
-    // Derived set of active factors
-    const activeEvaluationFactors = new Set(factorCounts.keys());
+    const activeEvaluationFactors = useMemo(() => new Set(factorCounts.keys()), [factorCounts]);
+
+    const factorSeverities = useMemo(() => {
+        const result = new Map<string, Severity>();
+        severityCounts.forEach((inner, factor) => {
+            let worst: Severity = "success";
+            inner.forEach((_count, sev) => {
+                if (SEVERITY_RANK[sev] > SEVERITY_RANK[worst]) worst = sev;
+            });
+            result.set(factor, worst);
+        });
+        return result;
+    }, [severityCounts]);
 
     return (
-        <EvaluationContext.Provider value={{ activeEvaluationFactors, registerFactor, deregisterFactor, toggleFactor, panelOpenSignal }}>
+        <EvaluationContext.Provider value={{ activeEvaluationFactors, factorSeverities, registerFactor, deregisterFactor, toggleFactor, panelOpenSignal }}>
             {children}
         </EvaluationContext.Provider>
     );

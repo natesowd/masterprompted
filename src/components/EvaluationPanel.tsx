@@ -48,7 +48,10 @@ const criterionVariants = cva(
     variants: {
       variant: {
         default: "bg-transparent border border-border hover:bg-muted/40",
-        highlighted: "bg-transparent ring-1 ring-destructive"
+        error: "bg-transparent ring-1 ring-red-500",
+        warning: "bg-transparent ring-1 ring-amber-500",
+        info: "bg-transparent ring-1 ring-blue-500",
+        success: "bg-transparent ring-1 ring-green-500"
       }
     },
     defaultVariants: {
@@ -56,6 +59,13 @@ const criterionVariants = cva(
     }
   }
 );
+
+const severityIconBg: Record<string, string> = {
+  error: "bg-red-500",
+  warning: "bg-amber-500",
+  info: "bg-blue-500",
+  success: "bg-green-500",
+};
 
 interface EvaluationPanelProps extends VariantProps<typeof panelVariants> {
   /** Whether the panel starts open */
@@ -111,7 +121,7 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
   }, [initialIsOpen]);
 
   // Expand panel when a new factor signals via context
-  const { activeEvaluationFactors, panelOpenSignal } = useEvaluation();
+  const { activeEvaluationFactors, factorSeverities, panelOpenSignal } = useEvaluation();
   useEffect(() => {
     if (panelOpenSignal > 0) {
       setIsPanelOpen(true);
@@ -150,11 +160,13 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
               >
                 <CollapsibleTrigger className="w-full">
                   <div className={cn(criterionVariants({
-                    variant: activeEvaluationFactors.has(criterion.id) ? "highlighted" : "default"
+                    variant: activeEvaluationFactors.has(criterion.id)
+                      ? (factorSeverities.get(criterion.id) ?? "error")
+                      : "default"
                   }))}>
                     <div className="flex items-center gap-3 mr-20">
                       {activeEvaluationFactors.has(criterion.id) ? (
-                        <span className="flex items-center justify-center h-7 w-7 rounded-full bg-destructive">
+                        <span className={cn("flex items-center justify-center h-7 w-7 rounded-full", severityIconBg[factorSeverities.get(criterion.id) ?? "error"])}>
                           <criterion.icon className="h-4 w-4 text-white" />
                         </span>
                       ) : (
@@ -180,6 +192,27 @@ export default function EvaluationPanel({ initialIsOpen = true, canClose = false
               </Collapsible>
             ))}
           </div>
+
+            {/* Traffic light legend */}
+            <div className="mt-5 pt-4 border-t border-border space-y-1.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Severity</p>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-500 flex-shrink-0" />
+                <span className="text-xs text-muted-foreground">Error — factual inaccuracy or fabrication</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-500 flex-shrink-0" />
+                <span className="text-xs text-muted-foreground">Warning — imprecise or potentially misleading</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-blue-500 flex-shrink-0" />
+                <span className="text-xs text-muted-foreground">Info — worth noting, not necessarily wrong</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-green-500 flex-shrink-0" />
+                <span className="text-xs text-muted-foreground">Good — well-grounded or correctly sourced</span>
+              </div>
+            </div>
           </>
         ) : (
           <button

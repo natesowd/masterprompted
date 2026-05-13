@@ -141,15 +141,16 @@ export default function TextFlag({
     if (!hoverCardOpen) setPageIndex(0);
   }, [hoverCardOpen]);
 
+  const sev = severity ?? "error";
+
   useEffect(() => {
-    registerFactor(evaluationFactor);
+    registerFactor(evaluationFactor, sev as "error" | "warning" | "info" | "success");
     return () => {
-      deregisterFactor(evaluationFactor);
+      deregisterFactor(evaluationFactor, sev as "error" | "warning" | "info" | "success");
     };
-  }, [evaluationFactor, registerFactor, deregisterFactor]);
+  }, [evaluationFactor, sev, registerFactor, deregisterFactor]);
 
   const activeHref = currentPage?.href ?? href;
-  const sev = severity ?? "error";
   const iconColor = severityIconColor[sev];
   const headingColor = severityHeadingColor[sev];
   const borderColor = severityBorderColor[sev];
