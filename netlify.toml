@@ -1,5 +1,9 @@
+# Netlify hosts only the edge functions in this project — the SPA itself is
+# served from Apache, so we skip the SPA build here and publish a 1-byte stub
+# instead. Cuts deploy size from ~50 JS chunks to a single placeholder file.
+# Local dev still runs the real Vite build via the [dev] section below.
 [build]
-  command = "npm run build"
+  command = "mkdir -p dist && printf '<!doctype html><title>Edge functions only</title>' > dist/index.html"
   publish = "dist"
 
 [[edge_functions]]
