@@ -221,7 +221,7 @@ export default function LLMTrainingFewShot() {
             {/* Three-column layout */}
             <div className="flex flex-1">
               {/* ── Left sidebar ── */}
-              <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+              <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 140px)' }}>
                 <h2 className="text-xl font-heading font-bold text-foreground mb-3">
                   Few-shot prompting
                 </h2>
@@ -313,7 +313,7 @@ export default function LLMTrainingFewShot() {
 
                 {/* ── Choose Examples view sidebar ── */}
                 {viewMode === "examples" && (
-                  <div className="flex-1 overflow-y-auto pr-1 pb-4 space-y-4">
+                  <div className="flex-1 min-h-0 overflow-y-auto pr-1 pb-4 space-y-4">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-semibold text-foreground">
                         Select example ledes

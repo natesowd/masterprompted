@@ -118,6 +118,9 @@ export default function HeadlineResponse() {
             <div className="flex flex-1 items-start px-6 relative">
               {/* Middle column - fixed width to match prompt controls pages */}
               <div className="w-[860px] flex-shrink-0">
+                <h2 className="text-xl font-heading font-bold text-foreground mb-4">
+                  Next Word Prediction
+                </h2>
                 {/* Original Prompt */}
                 <div className="mb-8">
                   <ChatPrompt text="Write a 7-word headline for a long form journalistic article about AI ethics agreement reached across the EU." fileName="EU_AI_Act.pdf" />
