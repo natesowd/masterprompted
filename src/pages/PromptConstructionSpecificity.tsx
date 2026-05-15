@@ -59,6 +59,11 @@ export default function Specificity() {
       <Breadcrumb />
       <div className="mb-5"></div>
 
+      <div className="max-w-2xl mx-auto">
+        <h2 className="text-xl font-heading font-bold text-foreground mb-3">
+          Prompt Construction
+        </h2>
+      </div>
       <div className="max-w-2xl mx-auto flex items-center justify-center min-h-[calc(100vh-300px)]">
         <div className="w-full relative">
           <ChatboxDummy
