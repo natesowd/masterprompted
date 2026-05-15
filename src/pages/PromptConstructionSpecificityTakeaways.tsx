@@ -58,13 +58,6 @@ export default function PromptConstructionSpecificityTakeaways() {
           <div className="mb-6">
             <span className="text-muted-foreground text-sm">Prompt Construction</span>
           </div>
-          <h1 className="text-h2 font-heading text-foreground mb-3">
-            {t('promptConstructionModule.takeaways.title')}
-          </h1>
-          <h2 className="text-h2 font-heading text-foreground mb-12">
-            {t('promptConstructionModule.takeaways.subtitle')}
-          </h2>
-
           <div className="space-y-8">
             {[1, 2, 3].map((n) => (
               <div key={n} className="flex gap-6 items-start">

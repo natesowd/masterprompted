@@ -189,9 +189,6 @@ export default function SpecificityResponse() {
                 <Breadcrumb />
                 <div className="mb-5"></div>
               </div>
-              <h1 className="text-h2 font-heading text-foreground mb-6 max-w-[1100px] w-full">
-                Prompt Construction
-              </h1>
               <div className="flex gap-6 max-w-[1100px] w-full">
 
                 {/* Main Content */}
