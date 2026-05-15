@@ -56,7 +56,7 @@ export default function PromptConstruction() {
               </div>
 
               {/* Main heading */}
-              <h1 className="text-h3 font-heading text-foreground mb-3">
+              <h1 className="text-h2 font-heading text-foreground mb-3">
                 {t('promptConstructionModule.intro.title')}
               </h1>
 

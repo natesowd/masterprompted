@@ -14,7 +14,7 @@ export default function Bias() {
         <div className="mb-5"></div>
         <div className="max-w-4xl mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-4">{t('promptConstruction.bias.title')}</h1>
+            <h1 className="text-h2 font-heading text-foreground mb-4">{t('promptConstruction.bias.title')}</h1>
             <p className="text-xl text-muted-foreground">{t('promptConstruction.bias.comingSoon')}</p>
           </div>
         </div>

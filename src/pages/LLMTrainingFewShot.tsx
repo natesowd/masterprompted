@@ -223,7 +223,7 @@ export default function LLMTrainingFewShot() {
               {/* ── Left sidebar ── */}
               <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 140px)' }}>
                 <h2 className="text-xl font-heading font-bold text-foreground mb-3">
-                  Few-shot prompting
+                  Few-Shot Prompting
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   {viewMode === "voice"

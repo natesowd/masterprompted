@@ -49,7 +49,7 @@ export default function LLMTraining() {
               </div>
 
               {/* Main heading */}
-              <h1 className="text-h3 font-heading text-foreground mb-3">
+              <h1 className="text-h2 font-heading text-foreground mb-3">
                 How are LLM responses improved by training?
               </h1>
 

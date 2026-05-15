@@ -48,7 +48,9 @@ export default function LLMTrainingTakeaways() {
         <Breadcrumb />
         <div className="mb-5" />
         <div className="max-w-4xl mx-auto my-[170px] mt-[130px]">
-          <p className="text-muted-foreground text-sm mb-4">LLM Training</p>
+          <div className="mb-6">
+            <span className="text-muted-foreground text-sm">LLM Training</span>
+          </div>
 
           <h1 className="text-h2 font-heading text-foreground mb-12">
             How are LLM responses improved by training?
