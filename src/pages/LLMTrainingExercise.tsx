@@ -1518,7 +1518,7 @@ export default function LLMTrainingExercise() {
                         <Button
                           variant="outline"
                           size="lg"
-                          onClick={() => navigate("/module/llm-training/few-shot")}
+                          onClick={() => navigate("/module/llm-training")}
                           className="rounded-md border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                         >
                           <ArrowLeft className="!h-5 !w-5" />
@@ -1526,10 +1526,10 @@ export default function LLMTrainingExercise() {
                         <Button
                           variant="outline"
                           size="lg"
-                          onClick={() => navigate("/module/llm-training/takeaways")}
+                          onClick={() => navigate("/module/llm-training/few-shot")}
                           className="px-10 font-heading font-semibold border-brand-tertiary-500 text-brand-tertiary-500 hover:bg-brand-tertiary-500/10"
                         >
-                          Takeaways
+                          Next (Few-Shot Prompting)
                           <ArrowRight className="-mr-2 !h-6 !w-6" />
                         </Button>
                       </div>
