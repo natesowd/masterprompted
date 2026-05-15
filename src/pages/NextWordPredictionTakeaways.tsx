@@ -55,9 +55,12 @@ export default function Takeaways() {
           <div className="mb-6">
             <span className="text-muted-foreground text-sm">Next Word Prediction</span>
           </div>
-          <h1 className="text-h2 font-heading text-foreground mb-12">
-            {t('nextWord.takeaways.subtitle')}
+          <h1 className="text-h2 font-heading text-foreground mb-3">
+            {t('nextWord.takeaways.title')}
           </h1>
+          <h2 className="text-h2 font-heading text-foreground mb-12">
+            {t('nextWord.takeaways.subtitle')}
+          </h2>
 
           <div className="space-y-8">
             {[1, 2, 3].map((n) =>

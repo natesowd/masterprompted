@@ -28,6 +28,11 @@ export default function PromptConstructionSummarize() {
       <main className="container mx-auto px-6 py-6">
         <Breadcrumb />
         <div className="mb-5"></div>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-xl font-heading font-bold text-foreground mb-3">
+            Prompt Construction
+          </h2>
+        </div>
         <div className="max-w-4xl mx-auto relative min-h-[calc(100vh-300px)]">
           
           {/* Add Document Card */}
