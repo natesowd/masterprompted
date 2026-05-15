@@ -10,7 +10,7 @@ export default function LLMTraining() {
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    navigate("/module/llm-training/few-shot");
+    navigate("/module/llm-training/supervised");
   };
 
   return (
