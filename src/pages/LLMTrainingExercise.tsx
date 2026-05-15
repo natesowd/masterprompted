@@ -819,7 +819,7 @@ export default function LLMTrainingExercise() {
               {/* ── Left sidebar ── */}
               <div className="w-80 flex-shrink-0 px-6 pt-6 2xl:pt-0 flex flex-col overflow-hidden">
                 <h2 className="text-xl font-heading font-bold text-foreground mb-3">
-                  Supervised learning
+                  Supervised Learning
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   {viewMode === "structural"

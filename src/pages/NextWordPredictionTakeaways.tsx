@@ -52,12 +52,12 @@ export default function Takeaways() {
         <Breadcrumb />
         <div className="mb-5" />
         <div className="max-w-4xl mx-auto my-[170px]">
-          <p className="text-muted-foreground text-sm mb-4">Next word prediction</p>
-          <h1 className="text-h2 font-heading text-foreground mb-2">
-          </h1>
-          <h2 className="text-h2 font-heading text-foreground mb-12">
+          <div className="mb-6">
+            <span className="text-muted-foreground text-sm">Next Word Prediction</span>
+          </div>
+          <h1 className="text-h2 font-heading text-foreground mb-12">
             {t('nextWord.takeaways.subtitle')}
-          </h2>
+          </h1>
 
           <div className="space-y-8">
             {[1, 2, 3].map((n) =>
